@@ -1,0 +1,6 @@
+README.md
+{{- if eq .chezmoi.hostname "Harlans-MacBook-Pro" }}
+.bashrc
+{{- else }}
+.zshrc
+{{- end }}
