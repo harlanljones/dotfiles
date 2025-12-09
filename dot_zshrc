@@ -1,9 +1,25 @@
+# Shell
 eval "$(starship init zsh)"
+export EDITOR=nvim
+export VISUAL="$EDITOR"
 
+# Tools
 n() { if [ "$#" -eq 0 ]; then nvim .; else nvim "$@"; fi; }
 
+# File system
 alias ls='eza -lh --group-directories-first --icons=auto'
 alias lsa='ls -a'
 alias lt='eza --tree --level=2 --long --icons --git'
 alias lta='lt -a'
 
+# Directories
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+
+# bun completions
+[ -s "/Users/harlan/.bun/_bun" ] && source "/Users/harlan/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
