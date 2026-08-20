@@ -1,0 +1,15 @@
+omarchyPlugins:
+  - url: https://github.com/anagrius/omarchy-resume.git
+    enabled: true
+  - url: https://github.com/gigor/omarchy-simple-notifications.git
+    enabled: true
+  - url: https://github.com/IM0001GT/omarchy-hw-tooltip.git
+    enabled: true
+  - url: https://github.com/This-Is-NPC/dockmarchy.git
+    enabled: true
+  - url: https://github.com/shmall03/omarchy-shmall.lock-plugin.git
+    enabled: true
+  - url: https://github.com/cgmccarron/omarchy-sportsbar.git
+    enabled: true
+  - url: https://github.com/okurmustafa/omarchy-agent-leaderboard.git
+    enabled: true

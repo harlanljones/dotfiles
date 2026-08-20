@@ -1,0 +1,7 @@
+customCommands:
+  - key: '<c-g>'
+    context: 'files'
+    description: 'Generate commit message with Ollama'
+    command: '~/.local/bin/lazygit-ollama-commit.sh'
+    loadingText: 'Generating commit message with Ollama...'
+    output: terminal

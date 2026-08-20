@@ -1,0 +1,47 @@
+{{- if eq .chezmoi.osRelease.id "omarchy" -}}
+#!/bin/bash
+# Installs/enables third-party Omarchy shell plugins listed in
+# .chezmoidata/omarchy_plugins.yaml. Managed by chezmoi; this script is
+# regenerated (and rerun) whenever that manifest changes.
+#
+# chezmoi data hash: {{ .omarchyPlugins | toJson | sha256sum }}
+
+set -euo pipefail
+
+command -v omarchy >/dev/null 2>&1 || { echo "omarchy: not found, skipping plugin sync" >&2; exit 0; }
+
+PLUGINS_DIR="$HOME/.config/omarchy/plugins"
+
+# Prints the plugin id (manifest.json "id") of the installed plugin whose
+# origin remote matches $1, or nothing if none is installed for that url.
+installed_id_for_url() {
+  local url="${1%.git}"
+  local dir
+  [[ -d "$PLUGINS_DIR" ]] || return 0
+  for dir in "$PLUGINS_DIR"/*/; do
+    [[ -d "$dir/.git" ]] || continue
+    local remote="$(git -C "$dir" remote get-url origin 2>/dev/null || true)"
+    remote="${remote%.git}"
+    if [[ "$remote" == "$url" ]]; then
+      jq -r '.id' "$dir/manifest.json" 2>/dev/null || true
+      return 0
+    fi
+  done
+  return 0
+}
+
+{{- range .omarchyPlugins }}
+{{- if .enabled }}
+
+url="{{ .url }}"
+id="$(installed_id_for_url "$url")"
+if [[ -n "$id" ]]; then
+  echo "omarchy plugin: already installed ($id), updating: $url"
+  omarchy plugin update "$id" --yes || true
+else
+  echo "omarchy plugin: installing $url"
+  omarchy plugin add "$url" --enable --yes
+fi
+{{- end }}
+{{- end }}
+{{- end -}}

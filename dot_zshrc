@@ -1,0 +1,21 @@
+eval "$(starship init zsh)"
+eval "$(mise activate zsh)"
+
+export EDITOR=nvim
+export VISUAL="$EDITOR"
+
+n() { if [ "$#" -eq 0 ]; then nvim .; else nvim "$@"; fi; }
+
+alias ls='eza -lh --group-directories-first --icons=auto'
+alias lsa='ls -a'
+alias lt='eza --tree --level=2 --long --icons --git'
+alias lta='lt -a'
+
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+export PATH="$HOME/.local/bin:$PATH"
+
+
+# Added by Antigravity CLI installer
+export PATH="/Users/harlan/.local/bin:$PATH"

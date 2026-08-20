@@ -1,0 +1,11 @@
+{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+#!/bin/bash
+# omarchy:summary=Print Antigravity usage record as JSON
+# omarchy:args=[--force] [--limits-only]
+# omarchy:hidden=true
+
+HELPER="$HOME/.config/omarchy/plugins/mustafaokur.agent-leaderboard/collect-antigravity.py"
+if [[ -f "$HELPER" ]]; then
+  exec python3 "$HELPER" --print "$@"
+fi
+{{- end -}}

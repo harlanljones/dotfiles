@@ -1,0 +1,17 @@
+README.md
+.gemini/antigravity-cli
+.gemini/antigravity-cli/**
+{{- if eq .chezmoi.os "darwin" }}
+.bashrc
+.config/hypr
+.config/hypr/**
+.config/omarchy
+.config/omarchy/**
+.local/bin/omarchy-*
+.local/bin/lazygit-ollama-commit.sh
+10-install-omarchy-plugins.sh
+20-setup-omarchy-antigravity.sh
+{{- else }}
+.zshrc
+{{- end }}
+

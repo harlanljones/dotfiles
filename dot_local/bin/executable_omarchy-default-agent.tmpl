@@ -1,0 +1,37 @@
+{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+#!/bin/bash
+
+# omarchy:summary=Set and launch the default coding agent
+# omarchy:args=[pi|omp|opencode|claude|codex|grok|gemini|copilot|crush|agy|antigravity]
+# omarchy:examples=omarchy default agent | omarchy default agent agy | omarchy default agent claude
+
+installing=false
+if [[ ${1:-} == "--install" ]]; then
+  installing=true
+  shift
+fi
+
+agent_file="$HOME/.config/omarchy/defaults/agent"
+
+if (($# == 0)); then
+  if [[ -f $agent_file ]]; then
+    read -r agent <"$agent_file"
+  fi
+
+  [[ -n ${agent:-} ]] && echo "$agent"
+  exit 0
+fi
+
+case "$1" in
+agy | antigravity)
+  mkdir -p "$(dirname "$agent_file")"
+  printf '%s\n' "agy" >"$agent_file"
+  echo "Default coding agent set to Antigravity (agy)"
+  exit 0
+  ;;
+*)
+  # Delegate standard options to system default-agent handler
+  exec /usr/bin/omarchy-default-agent ${installing:+--install} "$@"
+  ;;
+esac
+{{- end -}}
