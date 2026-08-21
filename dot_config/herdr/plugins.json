@@ -1,0 +1,69 @@
+[
+  {
+    "plugin_id": "shadowfax.ferry",
+    "name": "Herdr Ferry",
+    "version": "0.2.0",
+    "min_herdr_version": "0.8.0",
+    "description": "Move live panes and tabs or merge workspaces from a native popup.",
+    "manifest_path": "/home/harlan/.config/herdr/plugins/github/shadowfax.ferry-00855cba5350/herdr-plugin.toml",
+    "plugin_root": "/home/harlan/.config/herdr/plugins/github/shadowfax.ferry-00855cba5350",
+    "enabled": false,
+    "platforms": [
+      "macos"
+    ],
+    "build": [
+      {
+        "command": [
+          "cargo",
+          "build",
+          "--release",
+          "--locked"
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "install-keybindings",
+        "title": "Install Ferry keybinding",
+        "description": "Bind prefix+m to open Ferry.",
+        "command": [
+          "./target/release/herdr-ferry",
+          "install-keybindings"
+        ]
+      },
+      {
+        "id": "open",
+        "title": "Open Ferry",
+        "description": "Move panes or tabs, or merge one workspace into another.",
+        "contexts": [
+          "pane"
+        ],
+        "command": [
+          "./target/release/herdr-ferry",
+          "open"
+        ]
+      }
+    ],
+    "panes": [
+      {
+        "id": "picker",
+        "title": "Ferry",
+        "placement": "popup",
+        "width": 76,
+        "height": 24,
+        "command": [
+          "./target/release/herdr-ferry",
+          "picker"
+        ]
+      }
+    ],
+    "source": {
+      "kind": "github",
+      "owner": "shadowfax92",
+      "repo": "herdr-ferry",
+      "resolved_commit": "324a137334f8843b5a0eb28ffca330d282776382",
+      "managed_path": "/home/harlan/.config/herdr/plugins/github/shadowfax.ferry-00855cba5350",
+      "installed_unix_ms": 1787275296859
+    }
+  }
+]
