@@ -16,8 +16,12 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
   - `bun`
   - `chezmoi`
   - `claude`
+  - `codex`
   - `gh`
   - `node`
+  - `npm:playwright`
+  - `opencode`
+  - `python`
   - `uv`
 
 ### 💻 Editor
@@ -31,6 +35,8 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
   - Custom keybinding `<Ctrl-g>` to generate conventional git commit messages from staged diffs using local LLMs via Ollama.
 - **Ollama Commit Generator** (`~/.local/bin/lazygit-ollama-commit.sh`):
   - Automated commit message generation script using `qwen2.5-coder:7b` (configurable via `OLLAMA_COMMIT_MODEL`) with fallback handling and `$EDITOR` review step.
+- **Cline Git Safety Wrapper** (`~/.local/bin/cline-safety/git`):
+  - Intercepting Git wrapper for Cline agents to prevent unintentional automated commits and pushes.
 
 ### 🖥️ Window Management & Hardware (Linux / Omarchy)
 - **[Hyprland](https://hyprland.org/)** (`~/.config/hypr/`):
@@ -46,22 +52,28 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
     - `dockmarchy`
     - `omarchy-shmall.lock-plugin`
     - `omarchy-sportsbar`
-    - `omarchy-agent-leaderboard`
+- **Agent Leaderboard Plugin** (`~/.config/omarchy/plugins/harlan.agent-leaderboard/`):
+  - Custom bar widget (`harlan.agent-leaderboard`) ranking token usage across all coding agents (Antigravity, Claude, Cline, Codex, Fireworks, OpenCode, Grok, Hermes) across daily, 7-day, and all-time windows.
+  - Bundles embedded collectors for Antigravity (`collect-antigravity.py`) and Fireworks (`collect-fireworks.py`).
+- **Agents Plugin** (`~/.config/omarchy/plugins/harlan.agents/`):
+  - Custom multi-agent status widget (`harlan.agents`) providing live rate-limit meters, pace, 7-day usage trends, and model breakdown across Claude Code, Cline, Codex, Fireworks, and OpenCode.
 - **Antigravity CLI Integration** (`run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl`):
-  - Sets up `collect-antigravity.py` collector script to parse Antigravity CLI sessions, model attribution, and context-weighted token usage for the Agent Leaderboard widget.
-- **Cline CLI Integration** (`run_onchange_after_21-setup-omarchy-cline.sh.tmpl`):
-  - Registers Cline in the Agent Leaderboard widget (icon and accent color) and ships `omarchy-agent-usage-cline`, a collector that parses `~/.cline/data/sessions` transcripts for per-model, per-day token usage.
-  - **Cline Pass estimated limits**: Cline exposes no rate-limit API, so ClinePass usage is *estimated*, not read live (each limit's label is suffixed "(estimated)" in the panel). Messages billed through ClinePass (raw model id prefixed `cline-pass/`) are rated against Cline's published reference per-token prices and rolled into the three windows ClinePass documents (5-hour rolling, calendar week, calendar month), then compared against a quota. ClinePass's real quota size is unpublished — only "2–5x standard API rate" is documented — but rating a day's spend against the reference prices and comparing it to the actual dashboard reading (app.cline.bot → Subscription) on 2026-08-21 fit a clean 1 : 2.5 : 5 ratio, so the collector defaults to session ≈ $50 / weekly ≈ $125 / monthly ≈ $250. Override any of them in `~/.config/omarchy/agents/cline.json`:
-    ```json
-    { "monthlyQuotaUsd": 250, "weeklyQuotaUsd": 125, "sessionQuotaUsd": 50 }
-    ```
-    Omitted `weeklyQuotaUsd`/`sessionQuotaUsd` derive from `monthlyQuotaUsd` as `monthly/2` and `monthly/5`. Check [app.cline.bot](https://app.cline.bot) periodically for the authoritative reading and adjust the config if your account's allowance differs.
+  - Sets up `collect-antigravity.py` collector to parse Antigravity CLI sessions, model attribution, and context-weighted token usage.
+- **Cline CLI Integration & Automated Scraping** (`run_onchange_after_21-setup-omarchy-cline.sh.tmpl` & `run_onchange_after_22-setup-omarchy-cline-usage-scrape.sh.tmpl`):
+  - Registers Cline in the Agent Leaderboard and Agents widgets; parses `~/.cline/data/sessions` transcripts for per-model, per-day token metrics (`omarchy-agent-usage-cline`).
+  - **Automated Rate Limit Scraper**: Headless Google Chrome scraping via Playwright (`omarchy-cline-usage-scrape` and `omarchy-cline-usage-login`) running on a systemd timer (`omarchy-cline-usage-scrape.timer`) to keep real ClinePass limits up to date without manual dashboard visits.
+  - **Cline Pass estimated limits & manual override**: When scraping is inactive, estimates windows using reference rates, or accepts manual overrides via `omarchy-cline-usage-override` / `/usage` workflow.
+- **Codex & OpenCode Usage Collectors**:
+  - `omarchy-agent-usage-codex`: Collects Codex CLI session logs and app-server RPC metrics.
+  - `omarchy-agent-usage-opencode`: SQLite collector parsing prompt history, session stats, and token usage from `~/.local/share/opencode/opencode.db`.
 - **Cline CLI Settings** (`~/.cline/data/settings/global-settings.json`):
   - Global Cline CLI preferences managed via chezmoi (provider credentials in `providers.json` are intentionally not managed).
-- **Omarchy Agent Wrappers** (`~/.local/bin/`):
+- **Omarchy Agent Wrappers & Utilities** (`~/.local/bin/`):
   - `omarchy-agent`: Launch default coding agent with support for Antigravity (`agy`).
   - `omarchy-default-agent`: Quick switcher to configure default coding agent (e.g. `omarchy default agent agy`).
-  - `omarchy-agent-usage-update`, `omarchy-agent-usage-antigravity` & `omarchy-agent-usage-cline`: Multi-agent usage metric updates.
+  - `omarchy-agent-usage-update`: Master aggregator running all active collectors (`omarchy-agent-usage-*`) to write standard JSON records into `~/.local/state/omarchy/agents/usage/`.
+  - `omarchy-agent-usage-antigravity`, `omarchy-agent-usage-cline`, `omarchy-agent-usage-codex`, `omarchy-agent-usage-opencode`: Standalone usage collectors.
+  - `omarchy-cline-usage-login`, `omarchy-cline-usage-scrape`, `omarchy-cline-usage-override`: ClinePass limit scraper and override utilities.
 
 ---
 
@@ -72,6 +84,8 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
 ├── .chezmoidata/
 │   └── omarchy_plugins.yaml           # Manifest for Omarchy desktop plugins
 ├── .chezmoiignore.tmpl                # OS-specific ignore rules (Darwin vs. Linux)
+├── Documents/
+│   └── Cline/Workflows/usage.md       # Interactive ClinePass usage workflow
 ├── dot_bashrc                         # Bash shell configuration (Linux)
 ├── dot_zshrc                          # Zsh shell configuration (macOS)
 ├── dot_config/
@@ -79,14 +93,19 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
 │   ├── lazygit/                       # Lazygit configuration
 │   ├── mise/                          # Mise runtime tool configurations
 │   ├── nvim/                          # Neovim / LazyVim configurations
-│   ├── omarchy/                       # Omarchy defaults & agent configuration
+│   ├── omarchy/                       # Omarchy defaults, shell config, & custom plugins
+│   │   └── plugins/
+│   │       ├── harlan.agent-leaderboard/ # Agent token leaderboard widget
+│   │       └── harlan.agents/            # Agent usage & limits monitor widget
 │   └── starship.toml                  # Starship cross-shell prompt configuration
 ├── dot_cline/                         # Cline CLI global settings
 ├── dot_local/
-│   └── bin/                           # Custom scripts and AI agent hooks
+│   └── bin/                           # Custom scripts, usage collectors, and AI agent hooks
+│       └── cline-safety/              # Git interceptor for Cline safety
 ├── run_onchange_after_10-install-omarchy-plugins.sh.tmpl
 ├── run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl
-└── run_onchange_after_21-setup-omarchy-cline.sh.tmpl
+├── run_onchange_after_21-setup-omarchy-cline.sh.tmpl
+└── run_onchange_after_22-setup-omarchy-cline-usage-scrape.sh.tmpl
 ```
 
 ---

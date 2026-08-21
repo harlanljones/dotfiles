@@ -14,6 +14,6 @@ systemctl --user enable --now omarchy-cline-usage-scrape.timer
 
 if [[ ! -d "$HOME/.local/state/omarchy/agents/cline-scraper-profile" ]]; then
   echo "omarchy-cline-usage-scrape.timer is enabled but has nothing to scrape yet."
-  echo "Run 'omarchy-cline-usage-login' once to sign the scraper's dedicated Chromium profile into Cline."
+  echo "Run 'omarchy-cline-usage-login' once to sign the scraper's dedicated Chrome profile into Cline."
 fi
 {{- end -}}

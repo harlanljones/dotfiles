@@ -11,5 +11,3 @@ omarchyPlugins:
     enabled: true
   - url: https://github.com/cgmccarron/omarchy-sportsbar.git
     enabled: true
-  - url: https://github.com/okurmustafa/omarchy-agent-leaderboard.git
-    enabled: true

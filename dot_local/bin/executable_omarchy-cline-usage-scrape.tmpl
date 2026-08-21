@@ -6,8 +6,8 @@
 // Cline has no API for ClinePass rate limits, so omarchy-agent-usage-cline
 // can only price local transcripts against reference rates and estimate
 // the Session/Weekly/Monthly windows. This script reads the real numbers
-// off https://app.cline.bot/dashboard/subscription using a headless
-// Chromium (via the dedicated profile omarchy-cline-usage-login signs in),
+// off https://app.cline.bot/dashboard/subscription using headless Google
+// Chrome (via the dedicated profile omarchy-cline-usage-login signs in),
 // then hands them to omarchy-cline-usage-override, which the collector
 // prefers for the next 24 hours.
 //
@@ -31,11 +31,13 @@ const PROFILE_DIR = path.join(
 );
 const DASHBOARD_URL = "https://app.cline.bot/dashboard/subscription?personal=true";
 
-// Matches e.g. "5-Hour Limit\n7%\n\nResets in 4 hours 48 minutes" — the
-// "Resets in ..." line is absent for windows the dashboard doesn't show a
-// countdown for.
+// Matches e.g. "5-Hour Limit\n7%\n\nResets in 4 hours 48 minutes". Between
+// the label and the percentage the dashboard sometimes inserts a status
+// line ("Limit reached", "Approaching limit"), so that line is optional.
+// The "Resets in ..." line is absent for windows the dashboard doesn't
+// show a countdown for.
 const LIMIT_RE =
-  /(5-Hour|Weekly|Monthly) Limit\s*\n\s*(\d+)%(?:\s*\n\s*Resets in ([^\n]+))?/g;
+  /(5-Hour|Weekly|Monthly) Limit\s*\n(?:[^\n%]*\n)?\s*(\d+)%(?:\s*\n\s*Resets in ([^\n]+))?/g;
 
 function toCompactDuration(text) {
   if (!text) return null;
@@ -56,7 +58,10 @@ async function main() {
     process.exit(1);
   }
 
-  const context = await chromium.launchPersistentContext(PROFILE_DIR, { headless: true });
+  const context = await chromium.launchPersistentContext(PROFILE_DIR, {
+    channel: "chrome",
+    headless: true,
+  });
   let text;
   try {
     const page = context.pages()[0] || (await context.newPage());

@@ -7,12 +7,12 @@
 // omarchy-cline-usage-scrape.timer) reads the real Session/Weekly/Monthly
 // ClinePass limits off https://app.cline.bot/dashboard/subscription, since
 // Cline has no API for them. That page needs a logged-in browser session,
-// so the scraper reuses a dedicated Chromium profile instead of your real
-// browser (no profile-lock conflicts, and your everyday browsing session
-// is never touched).
+// so the scraper reuses a dedicated Google Chrome profile instead of your
+// real browser (no profile-lock conflicts, and your everyday browsing
+// session is never touched).
 //
 // Run this once (and again whenever the scraper's logs say the session
-// expired) to sign that dedicated profile in: it opens a visible Chromium
+// expired) to sign that dedicated profile in: it opens a visible Chrome
 // window, you log in as normal, and closing the window saves the session
 // for the scraper to reuse headlessly from then on.
 
@@ -34,8 +34,9 @@ async function main() {
   const { chromium } = require(PLAYWRIGHT_DIR);
   fs.mkdirSync(PROFILE_DIR, { recursive: true });
 
-  console.log("Opening Chromium — log into Cline, then close the window when you see USAGE LIMITS.");
+  console.log("Opening Chrome — log into Cline, then close the window when you see USAGE LIMITS.");
   const context = await chromium.launchPersistentContext(PROFILE_DIR, {
+    channel: "chrome",
     headless: false,
     viewport: { width: 1100, height: 900 },
   });

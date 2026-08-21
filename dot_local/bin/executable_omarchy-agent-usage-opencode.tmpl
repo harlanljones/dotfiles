@@ -1,0 +1,210 @@
+{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+#!/usr/bin/python3
+# omarchy:summary=Print the opencode usage record as JSON
+# omarchy:args=[--force] [--limits-only]
+# omarchy:hidden=true
+"""Collect opencode usage and print a usage record as JSON.
+
+opencode stores every session in a SQLite database at
+$XDG_DATA_HOME/opencode/opencode.db (see `opencode db path`). Assistant
+messages carry per-message provider, model, and token usage in the
+message table's JSON `data` column; user messages give prompt counts.
+opencode exposes no rate-limit API, so limits stay empty and the record
+is local stats only, matching the contract shared by the claude, codex,
+and cline collectors. Read-only: opencode may be writing right now.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import shutil
+import sqlite3
+import sys
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+AGENT_ID = "opencode"
+AGENT_NAME = "opencode"
+AUTH_HELP = "Run `opencode auth login` to authenticate a provider."
+
+
+def opencode_db() -> Path:
+  root = Path(os.environ.get("XDG_DATA_HOME") or (Path.home() / ".local" / "share"))
+  return root / "opencode" / "opencode.db"
+
+
+def runtime_path() -> str:
+  home = str(Path.home())
+  parts = [os.environ.get("PATH", ""), f"{home}/.local/bin", f"{home}/.local/share/mise/shims"]
+  return os.pathsep.join(part for part in parts if part)
+
+
+def local_day_ms(value) -> str:
+  """opencode timestamps are milliseconds since the epoch."""
+  try:
+    ms = int(value)
+  except Exception:
+    return datetime.now().strftime("%Y-%m-%d")
+  if ms < 10_000_000_000:  # seconds, defensively
+    ms *= 1000
+  return datetime.fromtimestamp(ms / 1000).strftime("%Y-%m-%d")
+
+
+def number(value) -> int:
+  try:
+    return int(value or 0)
+  except Exception:
+    return 0
+
+
+def model_name(raw) -> str:
+  value = str(raw or "").strip()
+  if not value:
+    return "opencode"
+  # Some providers namespace model ids ("openai/gpt-5"); keep the model part.
+  return value.rstrip("/").split("/")[-1] or "opencode"
+
+
+def empty_record(ready: bool, has_local: bool) -> dict:
+  now = datetime.now()
+  return {
+    "schemaVersion": 1,
+    "id": AGENT_ID,
+    "name": AGENT_NAME,
+    "updatedAt": datetime.now(timezone.utc).isoformat(),
+    "ready": ready,
+    "hasLocalStats": has_local,
+    "hasPromptStats": True,
+    "todayTotalTokens": 0,
+    "todayPrompts": 0,
+    "todaySessions": 0,
+    "recentDays": [
+      {"date": (now - timedelta(days=offset)).strftime("%Y-%m-%d"), "messageCount": 0}
+      for offset in range(6, -1, -1)
+    ],
+    "modelUsage": {},
+    "todayTokensByModel": {},
+    "totalPrompts": 0,
+    "totalSessions": 0,
+    "activeDates": [],
+    "activeDays": 0,
+    "limits": [],
+    "tierLabel": "",
+    "usageStatusText": "",
+    "authHelpText": AUTH_HELP,
+  }
+
+
+def collect() -> dict:
+  binary = shutil.which("opencode", path=runtime_path())
+  db = opencode_db()
+  record = empty_record(ready=binary is not None, has_local=db.is_file())
+  if not db.is_file():
+    if binary is None:
+      record["usageStatusText"] = "opencode unavailable"
+      record["authHelpText"] = "opencode not found in PATH"
+    return record
+
+  today = datetime.now().strftime("%Y-%m-%d")
+  recent = {entry["date"]: entry for entry in record["recentDays"]}
+  day_tokens: dict[str, int] = {}
+  sessions_today: set[str] = set()
+  sessions_all: set[str] = set()
+
+  try:
+    conn = sqlite3.connect(db.resolve().as_uri() + "?mode=ro", uri=True, timeout=2)
+  except sqlite3.Error:
+    record["hasLocalStats"] = False
+    return record
+
+  try:
+    conn.execute("PRAGMA query_only = ON")
+    # Assistant messages carry the token usage. The LIKE/json_valid guards
+    # avoid JSON-parsing huge unrelated blobs; the per-row try/except is the
+    # final safety net (same approach as the codex collector's opencode scan).
+    for session_id, raw, time_created in conn.execute(
+      "SELECT session_id, data, time_created FROM message"
+      " WHERE data LIKE '%\"role\"%:%\"assistant\"%'"
+      " AND data LIKE '%\"tokens\"%'"
+      " AND CASE WHEN json_valid(data) THEN json_extract(data, '$.role') END = 'assistant'"
+    ):
+      try:
+        entry = json.loads(raw)
+        if not isinstance(entry, dict) or entry.get("role") != "assistant":
+          continue
+        tokens = entry.get("tokens") or {}
+        if not isinstance(tokens, dict):
+          continue
+        cache = tokens.get("cache") or {}
+        input_tokens = number(tokens.get("input"))
+        # opencode keeps reasoning tokens out of output; both are generated.
+        output_tokens = number(tokens.get("output")) + number(tokens.get("reasoning"))
+        cache_read = number(cache.get("read"))
+        cache_write = number(cache.get("write"))
+        total = input_tokens + output_tokens + cache_read + cache_write
+        if not total:
+          continue
+        created = (entry.get("time") or {}).get("created") or time_created
+        day = local_day_ms(created)
+        model = model_name(entry.get("modelID"))
+      except Exception:
+        continue
+
+      sessions_all.add(str(session_id))
+      day_tokens[day] = day_tokens.get(day, 0) + total
+      bucket = record["modelUsage"].setdefault(model, {
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+      })
+      bucket["inputTokens"] += input_tokens
+      bucket["outputTokens"] += output_tokens
+      bucket["cacheReadInputTokens"] += cache_read
+      bucket["cacheCreationInputTokens"] += cache_write
+      if day in recent:
+        recent[day]["messageCount"] += total
+      if day == today:
+        sessions_today.add(str(session_id))
+        record["todayTotalTokens"] += total
+        record["todayTokensByModel"][model] = record["todayTokensByModel"].get(model, 0) + total
+
+    # Prompt counts come from user messages; the time_created column (ms)
+    # avoids parsing the JSON blob just for a date.
+    for role, time_created in conn.execute(
+      "SELECT json_extract(data, '$.role'), time_created FROM message"
+      " WHERE data LIKE '%\"role\"%:%\"user\"%' AND json_valid(data)"
+    ):
+      if role != "user":
+        continue
+      record["totalPrompts"] += 1
+      if local_day_ms(time_created) == today:
+        record["todayPrompts"] += 1
+  except sqlite3.Error:
+    # Transient lock, schema migration, corruption: serve what we read.
+    pass
+  finally:
+    conn.close()
+
+  record["todaySessions"] = len(sessions_today)
+  record["totalSessions"] = len(sessions_all)
+  record["activeDates"] = sorted(day for day, tokens in day_tokens.items() if tokens > 0)
+  record["activeDays"] = len(record["activeDates"])
+  return record
+
+
+def main() -> int:
+  parser = argparse.ArgumentParser(description="Collect opencode usage")
+  parser.add_argument("--force", action="store_true", help="accepted for interface parity")
+  parser.add_argument("--limits-only", action="store_true", help="accepted for interface parity")
+  parser.add_argument("--cache-seconds", type=float, default=10.0, help="accepted for interface parity")
+  args, _ = parser.parse_known_args()
+  print(json.dumps(collect(), separators=(",", ":")))
+  return 0
+
+
+if __name__ == "__main__":
+  sys.exit(main())
+{{- end -}}
