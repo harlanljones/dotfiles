@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Hard block on 'git commit' / 'git push' while running inside a cline session.
+# Installed on PATH ahead of the real git only for the duration of the cline()
+# wrapper in ~/.bashrc, so this has no effect outside of that.
+#
+# This exists because relying on an in-prompt instruction to cline (an LLM
+# agent with auto-approve on by default) is not enforcement -- the agent can
+# and did just run git commit anyway. This blocks it at the process level
+# regardless of what the agent decides to do.
+
+subcmd=""
+for arg in "$@"; do
+    case "$arg" in
+        -*) continue ;;
+        *) subcmd="$arg"; break ;;
+    esac
+done
+
+if [[ "$subcmd" == "commit" || "$subcmd" == "push" ]]; then
+    echo "cline-safety: blocked 'git $subcmd' -- cline may not commit or push. Review the changes and run it yourself." >&2
+    exit 1
+fi
+
+real_git=""
+for candidate in $(type -ap git); do
+    if [[ "$(realpath "$candidate")" != "$(realpath "$0")" ]]; then
+        real_git="$candidate"
+        break
+    fi
+done
+
+if [[ -z "$real_git" ]]; then
+    echo "cline-safety: could not locate the real git binary" >&2
+    exit 1
+fi
+
+exec "$real_git" "$@"
