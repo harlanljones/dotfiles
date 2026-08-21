@@ -302,12 +302,17 @@ def estimate_limits(pass_messages: list[tuple[int, str, dict]]) -> dict[str, Any
         five_h_oldest_ms = ts_ms
 
   quotas = load_quota_config()
+  session_reset = (
+    (datetime.fromtimestamp(five_h_oldest_ms / 1000) + timedelta(hours=5)).astimezone().isoformat()
+    if five_h_oldest_ms is not None
+    else ""
+  )
   limits = [
     {
-      "label": "Monthly (estimated)",
-      "title": "Monthly",
-      "percent": round(min(1.0, month_cost / quotas["monthly"]), 4) if quotas["monthly"] > 0 else 0.0,
-      "resetsAt": next_month.astimezone().isoformat(),
+      "label": "Session (5-hour, estimated)",
+      "title": "Session",
+      "percent": round(min(1.0, five_h_cost / quotas["session"]), 4) if quotas["session"] > 0 else 0.0,
+      "resetsAt": session_reset,
     },
     {
       "label": "Weekly (estimated)",
@@ -315,15 +320,13 @@ def estimate_limits(pass_messages: list[tuple[int, str, dict]]) -> dict[str, Any
       "percent": round(min(1.0, week_cost / quotas["weekly"]), 4) if quotas["weekly"] > 0 else 0.0,
       "resetsAt": next_week.astimezone().isoformat(),
     },
+    {
+      "label": "Monthly (estimated)",
+      "title": "Monthly",
+      "percent": round(min(1.0, month_cost / quotas["monthly"]), 4) if quotas["monthly"] > 0 else 0.0,
+      "resetsAt": next_month.astimezone().isoformat(),
+    },
   ]
-  if five_h_oldest_ms is not None:
-    reset_at = datetime.fromtimestamp(five_h_oldest_ms / 1000) + timedelta(hours=5)
-    limits.append({
-      "label": "Session (5-hour, estimated)",
-      "title": "Session",
-      "percent": round(min(1.0, five_h_cost / quotas["session"]), 4) if quotas["session"] > 0 else 0.0,
-      "resetsAt": reset_at.astimezone().isoformat(),
-    })
 
   # usageStatusText is an alarm-state subtitle (paired with authHelpText, see
   # the claude collector) that overrides the plan-name subtitle and raises a
