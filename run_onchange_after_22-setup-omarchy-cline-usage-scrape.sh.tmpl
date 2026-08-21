@@ -1,0 +1,19 @@
+{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+#!/bin/bash
+# Enables the timer that keeps the omarchy agent monitor's Cline Pass
+# limits current without any manual /usage runs. Managed by chezmoi.
+
+set -euo pipefail
+
+if [[ ! -d "$HOME/.cline" ]]; then
+  exit 0
+fi
+
+systemctl --user daemon-reload
+systemctl --user enable --now omarchy-cline-usage-scrape.timer
+
+if [[ ! -d "$HOME/.local/state/omarchy/agents/cline-scraper-profile" ]]; then
+  echo "omarchy-cline-usage-scrape.timer is enabled but has nothing to scrape yet."
+  echo "Run 'omarchy-cline-usage-login' once to sign the scraper's dedicated Chromium profile into Cline."
+fi
+{{- end -}}

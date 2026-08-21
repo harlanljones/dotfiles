@@ -1,0 +1,121 @@
+{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+#!/usr/bin/python3
+# omarchy:summary=Record real Cline Pass limits read off the dashboard
+# omarchy:args=[--session PCT] [--weekly PCT [--weekly-resets DURATION]] [--monthly PCT [--monthly-resets DURATION]]
+# omarchy:hidden=true
+"""Persist ClinePass limits read off https://app.cline.bot/dashboard/usage.
+
+Cline exposes no API for rate-limit usage, so `omarchy-agent-usage-cline`
+can only price local transcripts against reference rates and estimate the
+session/weekly/monthly windows. This script is the write side of the /usage
+Cline workflow (see ~/Documents/Cline/Workflows/usage.md): once a human (or
+the agent, if it can browse) has read the real percentages and reset
+countdowns off the dashboard, this drops them into
+~/.config/omarchy/agents/cline-dashboard.json, where the collector prefers
+them over its own estimate for the next 24 hours (see
+DASHBOARD_OVERRIDE_MAX_AGE there).
+
+Percentages are 0-100. Reset countdowns are durations like "2d13h", "13h",
+or "45m", matching what the dashboard displays under Weekly/Monthly; the
+session window is rolling and the dashboard shows no countdown for it, so
+--session-resets is rarely needed.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+import sys
+import tempfile
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Any
+
+DASHBOARD_URL = "https://app.cline.bot/dashboard/usage"
+
+DURATION_RE = re.compile(
+  r"^\s*(?:(?P<days>\d+)d)?\s*(?:(?P<hours>\d+)h)?\s*(?:(?P<minutes>\d+)m)?\s*$"
+)
+
+
+def parse_duration(text: str) -> timedelta:
+  match = DURATION_RE.match(text)
+  if not match or not any(match.groups()):
+    raise argparse.ArgumentTypeError(
+      f"{text!r} is not a duration like '2d13h', '13h', or '45m'"
+    )
+  parts = {key: int(value) for key, value in match.groupdict(default="0").items()}
+  return timedelta(days=parts["days"], hours=parts["hours"], minutes=parts["minutes"])
+
+
+def parse_percent(text: str) -> float:
+  value = float(text)
+  if not 0 <= value <= 100:
+    raise argparse.ArgumentTypeError(f"{text!r} is not a percentage between 0 and 100")
+  return value / 100.0
+
+
+def agents_config_dir() -> Path:
+  root = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+  folder = root / "omarchy" / "agents"
+  folder.mkdir(parents=True, exist_ok=True)
+  return folder
+
+
+def write_json(path: Path, payload: dict) -> None:
+  handle_fd, tmp_name = tempfile.mkstemp(dir=path.parent, prefix=path.name + ".", suffix=".tmp")
+  tmp = Path(tmp_name)
+  try:
+    with os.fdopen(handle_fd, "w", encoding="utf-8") as handle:
+      handle.write(json.dumps(payload, indent=2) + "\n")
+    tmp.chmod(0o644)
+    tmp.replace(path)
+  except BaseException:
+    tmp.unlink(missing_ok=True)
+    raise
+
+
+def build_limit(title: str, percent: float, resets_in: timedelta | None) -> dict[str, Any]:
+  now = datetime.now().astimezone()
+  return {
+    "label": title,
+    "title": title,
+    "percent": round(percent, 4),
+    "resetsAt": (now + resets_in).isoformat() if resets_in is not None else "",
+  }
+
+
+def main() -> int:
+  parser = argparse.ArgumentParser(description=__doc__)
+  parser.add_argument("--session", type=parse_percent, required=True, help="Session window, 0-100")
+  parser.add_argument("--session-resets", type=parse_duration, default=None)
+  parser.add_argument("--weekly", type=parse_percent, required=True, help="Weekly window, 0-100")
+  parser.add_argument("--weekly-resets", type=parse_duration, default=None)
+  parser.add_argument("--monthly", type=parse_percent, required=True, help="Monthly window, 0-100")
+  parser.add_argument("--monthly-resets", type=parse_duration, default=None)
+  parser.add_argument("--no-refresh", action="store_true", help="skip the immediate omarchy-agent-usage-update run")
+  args = parser.parse_args()
+
+  payload = {
+    "capturedAt": datetime.now(timezone.utc).isoformat(),
+    "source": DASHBOARD_URL,
+    "limits": [
+      build_limit("Session", args.session, args.session_resets),
+      build_limit("Weekly", args.weekly, args.weekly_resets),
+      build_limit("Monthly", args.monthly, args.monthly_resets),
+    ],
+  }
+  write_json(agents_config_dir() / "cline-dashboard.json", payload)
+
+  if not args.no_refresh:
+    os.system("omarchy-agent-usage-update >/dev/null 2>&1 || true")
+
+  print(json.dumps(payload, indent=2))
+  return 0
+
+
+if __name__ == "__main__":
+  sys.exit(main())
+{{- end -}}

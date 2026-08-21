@@ -1,0 +1,105 @@
+{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+#!/usr/bin/env node
+// omarchy:summary=Scrape real Cline Pass limits and refresh the agent monitor
+// omarchy:hidden=true
+//
+// Cline has no API for ClinePass rate limits, so omarchy-agent-usage-cline
+// can only price local transcripts against reference rates and estimate
+// the Session/Weekly/Monthly windows. This script reads the real numbers
+// off https://app.cline.bot/dashboard/subscription using a headless
+// Chromium (via the dedicated profile omarchy-cline-usage-login signs in),
+// then hands them to omarchy-cline-usage-override, which the collector
+// prefers for the next 24 hours.
+//
+// Run by omarchy-cline-usage-scrape.timer every 15 minutes. Safe to run by
+// hand too. If the saved session has expired, it exits non-zero and leaves
+// the existing override alone — it'll simply age out and the panel falls
+// back to the estimate until omarchy-cline-usage-login is re-run.
+
+const path = require("path");
+const os = require("os");
+const fs = require("fs");
+const { execFileSync } = require("child_process");
+
+const PLAYWRIGHT_DIR = path.join(
+  os.homedir(),
+  ".local/share/mise/installs/npm-playwright/latest/node_modules/playwright"
+);
+const PROFILE_DIR = path.join(
+  os.homedir(),
+  ".local/state/omarchy/agents/cline-scraper-profile"
+);
+const DASHBOARD_URL = "https://app.cline.bot/dashboard/subscription?personal=true";
+
+// Matches e.g. "5-Hour Limit\n7%\n\nResets in 4 hours 48 minutes" — the
+// "Resets in ..." line is absent for windows the dashboard doesn't show a
+// countdown for.
+const LIMIT_RE =
+  /(5-Hour|Weekly|Monthly) Limit\s*\n\s*(\d+)%(?:\s*\n\s*Resets in ([^\n]+))?/g;
+
+function toCompactDuration(text) {
+  if (!text) return null;
+  const days = /(\d+)\s*day/.exec(text);
+  const hours = /(\d+)\s*hour/.exec(text);
+  const minutes = /(\d+)\s*minute/.exec(text);
+  let out = "";
+  if (days) out += `${days[1]}d`;
+  if (hours) out += `${hours[1]}h`;
+  if (minutes) out += `${minutes[1]}m`;
+  return out || null;
+}
+
+async function main() {
+  const { chromium } = require(PLAYWRIGHT_DIR);
+  if (!fs.existsSync(PROFILE_DIR)) {
+    console.error("No scraper profile yet — run omarchy-cline-usage-login first.");
+    process.exit(1);
+  }
+
+  const context = await chromium.launchPersistentContext(PROFILE_DIR, { headless: true });
+  let text;
+  try {
+    const page = context.pages()[0] || (await context.newPage());
+    await page.goto(DASHBOARD_URL, { waitUntil: "networkidle" });
+    try {
+      await page.getByText("USAGE LIMITS", { exact: false }).waitFor({ timeout: 15000 });
+    } catch {
+      console.error(
+        "USAGE LIMITS not found — the saved session has likely expired. Re-run omarchy-cline-usage-login."
+      );
+      process.exit(1);
+    }
+    text = await page.innerText("body");
+  } finally {
+    await context.close();
+  }
+
+  const byWindow = {};
+  for (const match of text.matchAll(LIMIT_RE)) {
+    const [, window, percent, resets] = match;
+    byWindow[window] = { percent, resets: toCompactDuration(resets) };
+  }
+
+  const missing = ["5-Hour", "Weekly", "Monthly"].filter((w) => !byWindow[w]);
+  if (missing.length > 0) {
+    console.error(`Could not find ${missing.join(", ")} on the dashboard page — layout may have changed.`);
+    process.exit(1);
+  }
+
+  const args = [
+    "--session", byWindow["5-Hour"].percent,
+    "--weekly", byWindow["Weekly"].percent,
+    "--monthly", byWindow["Monthly"].percent,
+  ];
+  if (byWindow["5-Hour"].resets) args.push("--session-resets", byWindow["5-Hour"].resets);
+  if (byWindow["Weekly"].resets) args.push("--weekly-resets", byWindow["Weekly"].resets);
+  if (byWindow["Monthly"].resets) args.push("--monthly-resets", byWindow["Monthly"].resets);
+
+  execFileSync("omarchy-cline-usage-override", args, { stdio: "inherit" });
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
+{{- end -}}

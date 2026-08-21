@@ -335,6 +335,28 @@ def estimate_limits(pass_messages: list[tuple[int, str, dict]]) -> dict[str, Any
   return {"limits": limits}
 
 
+# Cline exposes no public rate-limit API (see the module docstring), but
+# `omarchy-cline-usage-override` lets the /usage Cline workflow drop real
+# numbers read off https://app.cline.bot/dashboard/usage here. Fresher than
+# DASHBOARD_OVERRIDE_MAX_AGE, it replaces the priced estimate outright;
+# older than that it's more likely to mislead than help, so it's ignored.
+DASHBOARD_OVERRIDE_MAX_AGE = timedelta(hours=24)
+
+
+def load_dashboard_override() -> dict[str, Any]:
+  data = read_json(agents_config_dir() / "cline-dashboard.json")
+  if not isinstance(data, dict) or not isinstance(data.get("limits"), list):
+    return {}
+  try:
+    captured_at = datetime.fromisoformat(str(data["capturedAt"]))
+  except (KeyError, ValueError):
+    return {}
+  now = captured_at.tzinfo and datetime.now(captured_at.tzinfo) or datetime.now()
+  if now - captured_at > DASHBOARD_OVERRIDE_MAX_AGE:
+    return {}
+  return {"limits": data["limits"]}
+
+
 def collect_metrics() -> dict[str, Any]:
   root = sessions_root()
   if not root.is_dir():
@@ -407,6 +429,7 @@ def collect_metrics() -> dict[str, Any]:
   record["modelUsage"] = model_usage
   record["todayTokensByModel"] = today_by_model
   record.update(estimate_limits(pass_messages))
+  record.update(load_dashboard_override())
   record["recentDays"] = [
     {"date": (week_start + timedelta(days=offset)).isoformat(),
      "messageCount": day_tokens.get((week_start + timedelta(days=offset)).isoformat(), 0)}

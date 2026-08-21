@@ -55,7 +55,7 @@ light surfaces — and the bar glyph stands in when there is none.
 | `claude` | Anthropic's OAuth usage endpoint (5-hour session + 7-day weekly) | `~/.claude/projects` transcripts, opencode sessions on an Anthropic provider, plus `stats-cache.json` and `history.jsonl` as fallback |
 | `codex` | The Codex app-server RPC | native Codex CLI session files (plus pi and opencode sessions) |
 | `fireworks` | Estimated prepaid balance: configured funding minus rated account costs | Fireworks billing API, grouped by day and model for the last 30 days |
-| `cline` | None (local stats only) | `~/.cline/data/sessions` transcripts (per-message token metrics and model attribution) |
+| `cline` | Estimated from priced transcripts, or real dashboard figures via `/usage` (see below) | `~/.cline/data/sessions` transcripts (per-message token metrics and model attribution) |
 
 Claude limits need a signed-in CLI; without credentials the panel says so and
 falls back to local stats only. A non-default Claude directory is honored via
@@ -64,6 +64,22 @@ falls back to local stats only. A non-default Claude directory is honored via
 `~/.fireworks/auth.ini` (which `firectl set-api-key` creates), then the key
 opencode stores in `~/.local/share/opencode/auth.json` when Fireworks is
 signed in there.
+
+### Cline dashboard limits
+
+Cline exposes no rate-limit API, so by default the `cline` collector
+estimates the Session/Weekly/Monthly ClinePass windows by pricing local
+transcripts against reference rates (see the `PRICING` table in
+`bin/omarchy-agent-usage-cline`) — labeled "(estimated)" in the panel.
+
+For the real numbers, run the Cline `/usage` workflow
+(`~/Documents/Cline/Workflows/usage.md`) from inside Cline: it opens
+`https://app.cline.bot/dashboard/usage`, walks you through reading off the
+three percentages and reset countdowns, and hands them to
+`omarchy-cline-usage-override`, which writes
+`~/.config/omarchy/agents/cline-dashboard.json` and refreshes the panel.
+The collector prefers that file over its own estimate for 24 hours, after
+which it quietly falls back to estimating again.
 
 ### Fireworks balance
 
