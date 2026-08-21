@@ -36,8 +36,8 @@ cline() {
     
     # Check if you passed arguments, append the constraint to the instruction
     if [ $# -gt 0 ]; then
-        command cline "$*. $safety_prompt"
+        bun run cline "$*. $safety_prompt"
     else
-        command cline
+        bun run cline
     fi
 }
