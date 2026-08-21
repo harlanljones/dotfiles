@@ -49,10 +49,19 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
     - `omarchy-agent-leaderboard`
 - **Antigravity CLI Integration** (`run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl`):
   - Sets up `collect-antigravity.py` collector script to parse Antigravity CLI sessions, model attribution, and context-weighted token usage for the Agent Leaderboard widget.
+- **Cline CLI Integration** (`run_onchange_after_21-setup-omarchy-cline.sh.tmpl`):
+  - Registers Cline in the Agent Leaderboard widget (icon and accent color) and ships `omarchy-agent-usage-cline`, a collector that parses `~/.cline/data/sessions` transcripts for per-model, per-day token usage.
+  - **Cline Pass estimated limits**: Cline exposes no rate-limit API, so ClinePass usage is *estimated*, not read live (each limit's label is suffixed "(estimated)" in the panel). Messages billed through ClinePass (raw model id prefixed `cline-pass/`) are rated against Cline's published reference per-token prices and rolled into the three windows ClinePass documents (5-hour rolling, calendar week, calendar month), then compared against a quota. ClinePass's real quota size is unpublished — only "2–5x standard API rate" is documented — but rating a day's spend against the reference prices and comparing it to the actual dashboard reading (app.cline.bot → Subscription) on 2026-08-21 fit a clean 1 : 2.5 : 5 ratio, so the collector defaults to session ≈ $50 / weekly ≈ $125 / monthly ≈ $250. Override any of them in `~/.config/omarchy/agents/cline.json`:
+    ```json
+    { "monthlyQuotaUsd": 250, "weeklyQuotaUsd": 125, "sessionQuotaUsd": 50 }
+    ```
+    Omitted `weeklyQuotaUsd`/`sessionQuotaUsd` derive from `monthlyQuotaUsd` as `monthly/2` and `monthly/5`. Check [app.cline.bot](https://app.cline.bot) periodically for the authoritative reading and adjust the config if your account's allowance differs.
+- **Cline CLI Settings** (`~/.cline/data/settings/global-settings.json`):
+  - Global Cline CLI preferences managed via chezmoi (provider credentials in `providers.json` are intentionally not managed).
 - **Omarchy Agent Wrappers** (`~/.local/bin/`):
   - `omarchy-agent`: Launch default coding agent with support for Antigravity (`agy`).
   - `omarchy-default-agent`: Quick switcher to configure default coding agent (e.g. `omarchy default agent agy`).
-  - `omarchy-agent-usage-update` & `omarchy-agent-usage-antigravity`: Multi-agent usage metric updates.
+  - `omarchy-agent-usage-update`, `omarchy-agent-usage-antigravity` & `omarchy-agent-usage-cline`: Multi-agent usage metric updates.
 
 ---
 
@@ -72,10 +81,12 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
 │   ├── nvim/                          # Neovim / LazyVim configurations
 │   ├── omarchy/                       # Omarchy defaults & agent configuration
 │   └── starship.toml                  # Starship cross-shell prompt configuration
+├── dot_cline/                         # Cline CLI global settings
 ├── dot_local/
 │   └── bin/                           # Custom scripts and AI agent hooks
 ├── run_onchange_after_10-install-omarchy-plugins.sh.tmpl
-└── run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl
+├── run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl
+└── run_onchange_after_21-setup-omarchy-cline.sh.tmpl
 ```
 
 ---

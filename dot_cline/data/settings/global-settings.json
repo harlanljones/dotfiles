@@ -1,0 +1,14 @@
+{
+  "autoUpdateEnabled": true,
+  "telemetryOptOut": false,
+  "compactionStrategy": "agentic",
+  "compactionEnabled": true,
+  "planActMode": "act",
+  "toolAutoApprove": true,
+  "tuiTheme": "auto",
+  "tools": {
+    "web_search": {
+      "enabled": true
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+#!/bin/bash
+# Configures Cline CLI integration for the Agent Leaderboard widget.
+# Managed by chezmoi.
+
+set -euo pipefail
+
+PLUGIN_DIR="$HOME/.config/omarchy/plugins/mustafaokur.agent-leaderboard"
+if [[ ! -d "$PLUGIN_DIR" ]]; then
+  exit 0
+fi
+
+# Collection needs no plugin-side helper: omarchy-agent-usage-update (the
+# user wrapper in ~/.local/bin) auto-discovers omarchy-agent-usage-cline,
+# and the leaderboard rescans the usage directory after every update run.
+# Only the mark and accent need patching into Panel.qml.
+
+# 1. Deploy SVG assets
+mkdir -p "$PLUGIN_DIR/assets"
+cat << 'SVG_EOF' > "$PLUGIN_DIR/assets/cline.svg"
+<svg fill="#6BCB77" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <title>Cline</title>
+  <path d="M12 1.5a1 1 0 0 1 1 1V5h3.5A4.5 4.5 0 0 1 21 9.5v7a4.5 4.5 0 0 1-4.5 4.5h-9A4.5 4.5 0 0 1 3 16.5v-7A4.5 4.5 0 0 1 7.5 5H11V2.5a1 1 0 0 1 1-1ZM8.25 10a1.75 1.75 0 1 0 0 3.5 1.75 1.75 0 0 0 0-3.5Zm7.5 0a1.75 1.75 0 1 0 0 3.5 1.75 1.75 0 0 0 0-3.5Z"/>
+</svg>
+SVG_EOF
+
+cat << 'SVG_EOF' > "$PLUGIN_DIR/assets/cline-light.svg"
+<svg fill="#2E7D43" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <title>Cline</title>
+  <path d="M12 1.5a1 1 0 0 1 1 1V5h3.5A4.5 4.5 0 0 1 21 9.5v7a4.5 4.5 0 0 1-4.5 4.5h-9A4.5 4.5 0 0 1 3 16.5v-7A4.5 4.5 0 0 1 7.5 5H11V2.5a1 1 0 0 1 1-1ZM8.25 10a1.75 1.75 0 1 0 0 3.5 1.75 1.75 0 0 0 0-3.5Zm7.5 0a1.75 1.75 0 1 0 0 3.5 1.75 1.75 0 0 0 0-3.5Z"/>
+</svg>
+SVG_EOF
+
+# 2. Patch Panel.qml if cline isn't registered
+if ! grep -q "cline: true" "$PLUGIN_DIR/Panel.qml"; then
+  sed -i 's/readonly property var shippedMarks: ({/readonly property var shippedMarks: ({\n    cline: true,/' "$PLUGIN_DIR/Panel.qml"
+  sed -i 's/function agentAccent(id, index) {/function agentAccent(id, index) {\n    if (id === "cline") return "#6BCB77"/' "$PLUGIN_DIR/Panel.qml"
+  sed -i 's/|| id === "agy") \&\& colorLuminance/|| id === "agy" || id === "cline") \&\& colorLuminance/' "$PLUGIN_DIR/Panel.qml"
+fi
+
+# 3. Run initial usage collection
+omarchy-agent-usage-update || true
+{{- end -}}

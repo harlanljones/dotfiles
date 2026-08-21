@@ -1,0 +1,435 @@
+{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+#!/usr/bin/python3
+# omarchy:summary=Print Cline usage record as JSON
+# omarchy:args=[--force] [--limits-only]
+# omarchy:hidden=true
+"""Collect Cline CLI usage and print a usage record as JSON.
+
+Scans Cline session metadata and message transcripts under
+~/.cline/data/sessions/ and compiles per-model and per-day token usage,
+matching the record contract shared by the claude and codex collectors.
+
+Model attribution comes from each assistant message's modelInfo, so
+switching models mid-session is handled correctly. Cline exposes no
+public rate-limit API, so quota usage cannot be read directly. Instead,
+messages billed through Cline Pass (raw modelInfo.id prefixed
+"cline-pass/") are rated against Cline's published reference per-token
+prices and rolled into the three windows ClinePass documents (5-hour
+rolling, calendar week, calendar month), then compared against a
+configurable quota — see QUOTA_CONFIG_PATH. Cline Pass's actual quota
+size is unpublished (only "2-5x standard API rate" is documented), so
+this is an estimate, not an authoritative reading; usageStatusText
+says so and points at the real dashboard.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+import sys
+import tempfile
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Any
+
+TIER_LABELS = {
+  "cline-pass": "Cline Pass",
+  "cline": "Cline",
+}
+
+# Reference per-1M-token prices (input, output, cache-read, cache-write) in
+# USD, from docs.cline.bot/getting-started/clinepass. DeepSeek quotes peak
+# and off-peak rates; we always use peak (the conservative, higher figure).
+# Keys are matched against the compacted (lowercased, punctuation-stripped)
+# model id, so "Kimi K2.7 Code" and "kimi-k2-7-code" both hit "kimik27code".
+PRICING: dict[str, tuple[float, float, float, float]] = {
+  "glm53": (1.40, 4.40, 0.26, 0.0),
+  "glm52": (1.40, 4.40, 0.26, 0.0),
+  "kimik3": (3.00, 15.00, 0.30, 0.0),
+  "kimik27code": (0.95, 4.00, 0.19, 0.0),
+  "kimik26": (0.95, 4.00, 0.16, 0.0),
+  "deepseekv4pro": (1.32, 3.96, 0.044, 0.0),
+  "deepseekv4flash": (0.44, 1.32, 0.014, 0.0),
+  "mimov25pro": (1.74, 3.48, 0.0145, 0.0),
+  "mimov25": (0.14, 0.28, 0.0028, 0.0),
+  "minimaxm3": (0.30, 1.20, 0.06, 0.0),
+  "qwen38max": (2.00, 6.00, 0.25, 2.50),
+  "qwen37max": (2.50, 7.50, 0.50, 0.0),
+  "qwen37plus": (0.40, 1.60, 0.04, 0.0),
+}
+
+# Reverse-engineered from the app.cline.bot dashboard on 2026-08-21: rating a
+# day's cline-pass spend against reference pricing gave ~$50.67, against a
+# dashboard reading of 5-hour 100% / weekly 40% / monthly 20% — a clean
+# 1 : 2.5 : 5 fit (session ≈ $50, weekly ≈ $125, monthly ≈ $250). The windows
+# are independent flat allowances, not a time-share split of one quota.
+# Override any of them in ~/.config/omarchy/agents/cline.json if Cline
+# publishes real numbers or your account's allowance differs.
+DEFAULT_MONTHLY_QUOTA_USD = 250.0
+
+
+def cline_dir() -> Path:
+  return Path(os.environ.get("CLINE_CONFIG_DIR", Path.home() / ".cline"))
+
+
+def sessions_root() -> Path:
+  return cline_dir() / "data" / "sessions"
+
+
+def usage_dir() -> Path:
+  root = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state"))
+  folder = root / "omarchy" / "agents" / "usage"
+  folder.mkdir(parents=True, exist_ok=True)
+  return folder
+
+
+def write_json(path: Path, payload: dict) -> None:
+  handle_fd, tmp_name = tempfile.mkstemp(dir=path.parent, prefix=path.name + ".", suffix=".tmp")
+  tmp = Path(tmp_name)
+  try:
+    with os.fdopen(handle_fd, "w", encoding="utf-8") as handle:
+      handle.write(json.dumps(payload, indent=2) + "\n")
+    tmp.chmod(0o644)
+    tmp.replace(path)
+  except BaseException:
+    tmp.unlink(missing_ok=True)
+    raise
+
+
+def read_json(path: Path) -> Any:
+  try:
+    with open(path, encoding="utf-8") as handle:
+      return json.load(handle)
+  except Exception:
+    return None
+
+
+def local_day(epoch_ms: Any) -> str | None:
+  """Local YYYY-MM-DD for a millisecond epoch timestamp."""
+  try:
+    return datetime.fromtimestamp(float(epoch_ms) / 1000).date().isoformat()
+  except Exception:
+    return None
+
+
+def parse_session_day(started_at: Any) -> str | None:
+  """Local YYYY-MM-DD for an ISO 8601 started_at value."""
+  if not started_at:
+    return None
+  try:
+    parsed = datetime.fromisoformat(str(started_at).replace("Z", "+00:00"))
+    return parsed.astimezone().date().isoformat()
+  except Exception:
+    return None
+
+
+def raw_model_id(model_info: Any) -> str:
+  if isinstance(model_info, dict):
+    return str(model_info.get("id") or "")
+  if model_info:
+    return str(model_info)
+  return ""
+
+
+def model_key(model_info: Any) -> str:
+  """Strip the provider prefix: cline-pass/kimi-k3 -> kimi-k3."""
+  raw = raw_model_id(model_info)
+  if "/" in raw:
+    raw = raw.rsplit("/", 1)[-1]
+  return raw or "unknown"
+
+
+def is_cline_pass(model_info: Any) -> bool:
+  return raw_model_id(model_info).startswith("cline-pass/")
+
+
+def compact(text: str) -> str:
+  return re.sub(r"[^a-z0-9]", "", text.lower())
+
+
+def rate_for(model: str) -> tuple[float, float, float, float] | None:
+  """Best-effort match of a model id against PRICING, tolerant of the
+  hyphen/dot punctuation that varies between docs and model ids."""
+  key = compact(model)
+  if key in PRICING:
+    return PRICING[key]
+  best, best_len = None, 0
+  for candidate, rates in PRICING.items():
+    if (candidate in key or key in candidate) and len(candidate) > best_len:
+      best, best_len = rates, len(candidate)
+  return best
+
+
+def message_cost_usd(model: str, metrics: dict) -> float:
+  rates = rate_for(model)
+  if rates is None:
+    return 0.0
+  p_in, p_out, p_cache_read, p_cache_write = rates
+  return (
+    float(metrics.get("inputTokens") or 0) / 1_000_000 * p_in
+    + float(metrics.get("outputTokens") or 0) / 1_000_000 * p_out
+    + float(metrics.get("cacheReadTokens") or 0) / 1_000_000 * p_cache_read
+    + float(metrics.get("cacheWriteTokens") or 0) / 1_000_000 * p_cache_write
+  )
+
+
+def agents_config_dir() -> Path:
+  root = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+  return root / "omarchy" / "agents"
+
+
+def load_quota_config() -> dict[str, float]:
+  """Monthly quota is configurable (or defaults to DEFAULT_MONTHLY_QUOTA_USD);
+  weekly/session derive from it by time-share unless set explicitly."""
+  data = read_json(agents_config_dir() / "cline.json")
+  monthly = DEFAULT_MONTHLY_QUOTA_USD
+  weekly = None
+  session = None
+  if isinstance(data, dict):
+    if data.get("monthlyQuotaUsd") is not None:
+      monthly = float(data["monthlyQuotaUsd"])
+    if data.get("weeklyQuotaUsd") is not None:
+      weekly = float(data["weeklyQuotaUsd"])
+    if data.get("sessionQuotaUsd") is not None:
+      session = float(data["sessionQuotaUsd"])
+  if weekly is None:
+    weekly = monthly / 2.0
+  if session is None:
+    session = monthly / 5.0
+  return {"monthly": monthly, "weekly": weekly, "session": session}
+
+
+def tier_label() -> str:
+  data = read_json(cline_dir() / "data" / "settings" / "providers.json")
+  if not isinstance(data, dict):
+    return ""
+  provider = str(data.get("lastUsedProvider") or "")
+  return TIER_LABELS.get(provider, provider)
+
+
+def new_bucket() -> dict[str, int]:
+  return {
+    "inputTokens": 0,
+    "outputTokens": 0,
+    "cacheReadInputTokens": 0,
+    "cacheCreationInputTokens": 0,
+  }
+
+
+def add_metrics(bucket: dict[str, int], metrics: dict) -> int:
+  """Add one message's metrics to a bucket; return the message's total."""
+  fields = (
+    ("inputTokens", "inputTokens"),
+    ("outputTokens", "outputTokens"),
+    ("cacheReadTokens", "cacheReadInputTokens"),
+    ("cacheWriteTokens", "cacheCreationInputTokens"),
+  )
+  total = 0
+  for src, dst in fields:
+    value = int(metrics.get(src) or 0)
+    bucket[dst] += value
+    total += value
+  return total
+
+
+def is_prompt(message: dict) -> bool:
+  """A user message only counts as a prompt when it carries real text —
+  tool results arrive as user messages too."""
+  if message.get("role") != "user":
+    return False
+  content = message.get("content")
+  if isinstance(content, str):
+    return content.strip() != ""
+  if isinstance(content, list):
+    return any(isinstance(block, dict) and block.get("type") == "text" for block in content)
+  return False
+
+
+def empty_record(ready: bool) -> dict[str, Any]:
+  return {
+    "id": "cline",
+    "name": "Cline",
+    "schemaVersion": 1,
+    "ready": ready,
+    "hasLocalStats": ready,
+    "hasPromptStats": ready,
+    "todayPrompts": 0,
+    "todaySessions": 0,
+    "todayTotalTokens": 0,
+    "todayTokensByModel": {},
+    "recentDays": [],
+    "totalPrompts": 0,
+    "totalSessions": 0,
+    "activeDays": 0,
+    "activeDates": [],
+    "modelUsage": {},
+    "limits": [],
+    "tierLabel": "",
+    "usageStatusText": "",
+    "authHelpText": "" if ready else "Install and sign in to the Cline CLI to track usage.",
+    "updatedAt": datetime.now(timezone.utc).isoformat(),
+  }
+
+
+def estimate_limits(pass_messages: list[tuple[int, str, dict]]) -> dict[str, Any]:
+  """Estimate ClinePass window usage from Cline Pass-billed messages, each
+  (ts_ms, model, metrics). Returns {} when there is nothing to estimate."""
+  if not pass_messages:
+    return {}
+
+  now = datetime.now()
+  five_h_start = now - timedelta(hours=5)
+  month_start = datetime(now.year, now.month, 1)
+  week_start = datetime.combine(now.date() - timedelta(days=now.weekday()), datetime.min.time())
+  next_month = datetime(now.year + 1, 1, 1) if now.month == 12 else datetime(now.year, now.month + 1, 1)
+  next_week = week_start + timedelta(days=7)
+
+  month_cost = week_cost = five_h_cost = 0.0
+  five_h_oldest_ms: int | None = None
+
+  for ts_ms, model, metrics in pass_messages:
+    msg_dt = datetime.fromtimestamp(ts_ms / 1000)
+    cost = message_cost_usd(model, metrics)
+    if msg_dt >= month_start:
+      month_cost += cost
+    if msg_dt >= week_start:
+      week_cost += cost
+    if msg_dt >= five_h_start:
+      five_h_cost += cost
+      if five_h_oldest_ms is None or ts_ms < five_h_oldest_ms:
+        five_h_oldest_ms = ts_ms
+
+  quotas = load_quota_config()
+  limits = [
+    {
+      "label": "Monthly (estimated)",
+      "title": "Monthly",
+      "percent": round(min(1.0, month_cost / quotas["monthly"]), 4) if quotas["monthly"] > 0 else 0.0,
+      "resetsAt": next_month.astimezone().isoformat(),
+    },
+    {
+      "label": "Weekly (estimated)",
+      "title": "Weekly",
+      "percent": round(min(1.0, week_cost / quotas["weekly"]), 4) if quotas["weekly"] > 0 else 0.0,
+      "resetsAt": next_week.astimezone().isoformat(),
+    },
+  ]
+  if five_h_oldest_ms is not None:
+    reset_at = datetime.fromtimestamp(five_h_oldest_ms / 1000) + timedelta(hours=5)
+    limits.append({
+      "label": "Session (5-hour, estimated)",
+      "title": "Session",
+      "percent": round(min(1.0, five_h_cost / quotas["session"]), 4) if quotas["session"] > 0 else 0.0,
+      "resetsAt": reset_at.astimezone().isoformat(),
+    })
+
+  # usageStatusText is an alarm-state subtitle (paired with authHelpText, see
+  # the claude collector) that overrides the plan-name subtitle and raises a
+  # red status banner — not the place for a routine caveat. The "(estimated)"
+  # suffix on each label already says these are estimates.
+  return {"limits": limits}
+
+
+def collect_metrics() -> dict[str, Any]:
+  root = sessions_root()
+  if not root.is_dir():
+    return empty_record(ready=False)
+
+  record = empty_record(ready=True)
+  record["tierLabel"] = tier_label()
+
+  today = datetime.now().date()
+  week_start = today - timedelta(days=6)
+  day_tokens: dict[str, int] = {}
+  model_usage: dict[str, dict[str, int]] = {}
+  today_by_model: dict[str, dict[str, int]] = {}
+  pass_messages: list[tuple[int, str, dict]] = []
+
+  for session_dir in sorted(root.iterdir()):
+    if not session_dir.is_dir():
+      continue
+    session_id = session_dir.name
+
+    metadata = read_json(session_dir / (session_id + ".json"))
+    session_day = None
+    if isinstance(metadata, dict):
+      record["totalSessions"] += 1
+      session_day = parse_session_day(metadata.get("started_at"))
+      if session_day == today.isoformat():
+        record["todaySessions"] += 1
+
+    transcript = read_json(session_dir / (session_id + ".messages.json"))
+    if not isinstance(transcript, dict):
+      continue
+    messages = transcript.get("messages")
+    if not isinstance(messages, list):
+      continue
+
+    for message in messages:
+      if not isinstance(message, dict):
+        continue
+      day = local_day(message.get("ts")) or session_day
+
+      if is_prompt(message):
+        record["totalPrompts"] += 1
+        if day == today.isoformat():
+          record["todayPrompts"] += 1
+        continue
+
+      if message.get("role") != "assistant":
+        continue
+      metrics = message.get("metrics")
+      if not isinstance(metrics, dict):
+        continue
+
+      model_info = message.get("modelInfo")
+      model = model_key(model_info)
+      total = add_metrics(model_usage.setdefault(model, new_bucket()), metrics)
+      if is_cline_pass(model_info):
+        ts_ms = message.get("ts")
+        if ts_ms is not None:
+          try:
+            pass_messages.append((int(ts_ms), model, metrics))
+          except (TypeError, ValueError):
+            pass
+      if day is None:
+        continue
+      day_tokens[day] = day_tokens.get(day, 0) + total
+      if day == today.isoformat():
+        record["todayTotalTokens"] += total
+        add_metrics(today_by_model.setdefault(model, new_bucket()), metrics)
+
+  record["modelUsage"] = model_usage
+  record["todayTokensByModel"] = today_by_model
+  record.update(estimate_limits(pass_messages))
+  record["recentDays"] = [
+    {"date": (week_start + timedelta(days=offset)).isoformat(),
+     "messageCount": day_tokens.get((week_start + timedelta(days=offset)).isoformat(), 0)}
+    for offset in range(7)
+  ]
+  record["activeDates"] = sorted(day for day, tokens in day_tokens.items() if tokens > 0)
+  record["activeDays"] = len(record["activeDates"])
+  return record
+
+
+def main() -> int:
+  parser = argparse.ArgumentParser(description="Collect Cline CLI usage")
+  parser.add_argument("--force", action="store_true", help="accepted for interface parity")
+  parser.add_argument("--limits-only", action="store_true", help="accepted for interface parity")
+  parser.add_argument("--cache-seconds", type=float, default=10.0, help="accepted for interface parity")
+  parser.add_argument("--print", action="store_true", help="print JSON output")
+  args, _ = parser.parse_known_args()
+
+  record = collect_metrics()
+  write_json(usage_dir() / "cline.json", record)
+
+  if not sys.stdout.isatty() or args.print:
+    print(json.dumps(record, indent=2))
+  return 0
+
+
+if __name__ == "__main__":
+  sys.exit(main())
+{{- end -}}

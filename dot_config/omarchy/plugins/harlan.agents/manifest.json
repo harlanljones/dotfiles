@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "author": "Omarchy",
   "license": "MIT",
-  "description": "Claude Code, Codex, and Fireworks usage, limits, and pace in a native Omarchy bar panel.",
+  "description": "Claude Code, Cline, Codex, and Fireworks usage, limits, and pace in a native Omarchy bar panel.",
   "kinds": [
     "bar-widget"
   ],
@@ -25,6 +25,9 @@
     "defaults": {
       "providers": {
         "claude": {
+          "enabled": true
+        },
+        "cline": {
           "enabled": true
         },
         "codex": {
