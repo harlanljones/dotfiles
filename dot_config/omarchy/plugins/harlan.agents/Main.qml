@@ -144,7 +144,11 @@ Item {
   }
 
   function updateCommand(kind, agentIds) {
-    var command = ["omarchy-agent-usage-update"]
+    // quickshell's own PATH puts /usr/share/omarchy/bin ahead of
+    // ~/.local/bin, so a bare lookup would always hit the stock collector
+    // and skip user overrides (e.g. the codex rate-limit fix). Force
+    // ~/.local/bin first, matching how a login shell already resolves it.
+    var command = ["bash", "-c", 'PATH="$HOME/.local/bin:$PATH" exec omarchy-agent-usage-update "$@"', "omarchy-agent-usage-update"]
     if (kind === "force") command.push("--force")
     if (kind === "limits") command.push("--limits-only")
     var providers = settings && settings.providers ? settings.providers : {}

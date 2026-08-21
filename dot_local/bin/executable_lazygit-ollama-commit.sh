@@ -67,6 +67,32 @@ ensure_ollama() {
 
 ensure_ollama
 
+# Exit the lazygit instance that launched this script. Lazygit runs terminal
+# custom commands through a shell, so it may be more than one parent away.
+# When run directly from a terminal, this is intentionally a no-op.
+exit_parent_lazygit() {
+  local pid="$PPID"
+  local parent_pid
+  local process_name
+
+  while [[ "$pid" =~ ^[0-9]+$ ]] && (( pid > 1 )); do
+    process_name="$(ps -o comm= -p "$pid" 2>/dev/null || true)"
+    process_name="${process_name//[[:space:]]/}"
+
+    if [[ "$process_name" == "lazygit" ]]; then
+      kill -TERM "$pid" 2>/dev/null || true
+      return
+    fi
+
+    parent_pid="$(ps -o ppid= -p "$pid" 2>/dev/null || true)"
+    parent_pid="${parent_pid//[[:space:]]/}"
+    if [[ ! "$parent_pid" =~ ^[0-9]+$ ]] || [[ "$parent_pid" == "$pid" ]]; then
+      return
+    fi
+    pid="$parent_pid"
+  done
+}
+
 # --- Build diff & context ----------------------------------------------
 
 # Filter noisy/generated files from the detailed diff to save token budget
@@ -258,5 +284,11 @@ printf '%s\n' "$CLEAN_MSG" > "$TMP_MSG_FILE"
 
 # git commit with the generated message loaded into your editor for
 # review/edit before it's finalized.
-git commit --edit --file="$TMP_MSG_FILE"
-
+if git commit --edit --file="$TMP_MSG_FILE"; then
+  # Leave the successful commit output on screen and return to the invoking
+  # terminal instead of showing lazygit's "press enter to return" prompt.
+  exit_parent_lazygit
+else
+  commit_status=$?
+  exit "$commit_status"
+fi

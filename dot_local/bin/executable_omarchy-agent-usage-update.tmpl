@@ -6,7 +6,19 @@
 USAGE_DIR="${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/agents/usage"
 mkdir -p "$USAGE_DIR"
 
-/usr/bin/omarchy-agent-usage-update "$@"
+# Every agent with a user override below gets a second, fresh collector
+# run anyway, so let the stock script skip it — otherwise both spawn a
+# codex app-server back to back, and the extra one just adds contention
+# that can push the real attempt past its own timeout under load.
+override_agents=()
+for collector in "$HOME/.local/bin/omarchy-agent-usage-"*; do
+  [[ -x $collector ]] || continue
+  agent="${collector##*/omarchy-agent-usage-}"
+  [[ $agent == "update" ]] && continue
+  override_agents+=(--except "$agent")
+done
+
+/usr/bin/omarchy-agent-usage-update "$@" "${override_agents[@]}"
 status=$?
 
 flags=()

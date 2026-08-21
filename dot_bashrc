@@ -27,6 +27,8 @@ if [ -f '/home/harlan/dev/harlan-web/google-cloud-sdk/path.bash.inc' ]; then . '
 if [ -f '/home/harlan/dev/harlan-web/google-cloud-sdk/completion.bash.inc' ]; then . '/home/harlan/dev/harlan-web/google-cloud-sdk/completion.bash.inc'; fi
 
 
+alias codex="codex --approve-for-me"
+
 # Added by Antigravity CLI installer
 export PATH="/home/harlan/.local/bin:$PATH"
 

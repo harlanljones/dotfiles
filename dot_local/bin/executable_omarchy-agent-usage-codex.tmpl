@@ -424,7 +424,10 @@ def fetch_codex_rpc():
         text=True,
         env=ENV,
       )
-      rpc_request(proc, 1, "initialize", {"clientInfo": {"name": "omarchy-agent-usage", "version": "1"}}, timeout=8)
+      # 15s, not 8s: this machine routinely runs multiple concurrent codex
+      # sessions, and a fresh app-server can take a while to answer
+      # `initialize` when they're all contending for the same auth/config.
+      rpc_request(proc, 1, "initialize", {"clientInfo": {"name": "omarchy-agent-usage", "version": "1"}}, timeout=15)
       break
     except Exception as exc:
       last_error = exc
