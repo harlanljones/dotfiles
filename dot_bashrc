@@ -29,6 +29,8 @@ if [ -f '/home/harlan/dev/harlan-web/google-cloud-sdk/completion.bash.inc' ]; th
 
 alias codex="codex --approve-for-me"
 
+alias oc="opencode"
+
 # Added by Antigravity CLI installer
 export PATH="/home/harlan/.local/bin:$PATH"
 

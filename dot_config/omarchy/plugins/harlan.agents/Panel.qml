@@ -458,15 +458,16 @@ Panel {
           }
 
           // ---------- Provider switch ----------
-          Row {
+          // A Flow, not a row of equal cells: the kit button centers its
+          // un-elided label inside whatever width it is given, so a name
+          // longer than its cell spills out both sides — "Antigravity" lost
+          // its first letter off the panel's clipped edge. Natural-width
+          // buttons that wrap keep every harness name readable.
+          Flow {
             id: providerSwitch
             visible: root.providers.length > 1
             width: parent.width
             spacing: Style.spacing.md
-
-            readonly property real cellWidth: root.providers.length > 0
-              ? (width - spacing * (root.providers.length - 1)) / root.providers.length
-              : 0
 
             Repeater {
               model: root.providers
@@ -475,7 +476,6 @@ Panel {
                 required property var modelData
                 required property int index
 
-                width: providerSwitch.cellWidth
                 text: modelData.providerName
                 selected: index === root.providerIndex
                 hasCursor: root.cursorActive && index === root.providerIndex
