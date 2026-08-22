@@ -1,12 +1,12 @@
 [Unit]
 Description=Cloudflare Tunnel for agents.harlanljones.com
-After=network-online.target agent-leaderboard-dashboard.service
+After=network-online.target omarchy-agents-dashboard.service
 Wants=network-online.target
-ConditionPathExists=%h/.config/agent-leaderboard/tunnel.env
+ConditionPathExists=%h/.config/omarchy-agents/tunnel.env
 
 [Service]
 Type=simple
-EnvironmentFile=%h/.config/agent-leaderboard/tunnel.env
+EnvironmentFile=%h/.config/omarchy-agents/tunnel.env
 ExecStart=/usr/bin/cloudflared tunnel --no-autoupdate run
 Restart=on-failure
 RestartSec=5

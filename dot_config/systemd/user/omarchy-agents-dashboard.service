@@ -1,12 +1,12 @@
 [Unit]
-Description=Private Agent Leaderboard dashboard
-After=network-online.target ollama-agent-leaderboard.service
+Description=Private Omarchy Agents dashboard
+After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=simple
-WorkingDirectory=%h/dev/agent-leaderboard/apps/web
-EnvironmentFile=-%h/.config/agent-leaderboard/dashboard.env
+WorkingDirectory=%h/dev/omarchy-agents/apps/web
+EnvironmentFile=-%h/.config/omarchy-agents/dashboard.env
 ExecStart=%h/.local/share/mise/installs/bun/latest/bin/bun src/server.ts
 Restart=on-failure
 RestartSec=3
@@ -14,7 +14,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=read-only
-ReadWritePaths=%h/.local/state/agent-leaderboard
+ReadWritePaths=%h/.local/state/omarchy-agents
 
 [Install]
 WantedBy=default.target

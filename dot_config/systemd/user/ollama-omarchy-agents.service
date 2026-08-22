@@ -1,5 +1,5 @@
 [Unit]
-Description=Local Ollama service for Agent Leaderboard
+Description=Local Ollama service for Omarchy Agents
 After=network-online.target
 
 [Service]

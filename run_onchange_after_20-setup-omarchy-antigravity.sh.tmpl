@@ -1,11 +1,11 @@
 {{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
 #!/bin/bash
-# Configures Antigravity CLI integration for Omarchy and Agent Leaderboard widget.
+# Configures Antigravity CLI integration for the Omarchy Agents leaderboard plugin.
 # Managed by chezmoi.
 
 set -euo pipefail
 
-PLUGIN_DIR="$HOME/.config/omarchy/plugins/mustafaokur.agent-leaderboard"
+PLUGIN_DIR="$HOME/.config/omarchy/plugins/harlan.agent-leaderboard"
 if [[ ! -d "$PLUGIN_DIR" ]]; then
   exit 0
 fi

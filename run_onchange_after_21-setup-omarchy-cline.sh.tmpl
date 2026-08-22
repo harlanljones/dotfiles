@@ -1,11 +1,11 @@
 {{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
 #!/bin/bash
-# Configures Cline CLI integration for the Agent Leaderboard widget.
+# Configures Cline CLI integration for the Omarchy Agents leaderboard plugin.
 # Managed by chezmoi.
 
 set -euo pipefail
 
-PLUGIN_DIR="$HOME/.config/omarchy/plugins/mustafaokur.agent-leaderboard"
+PLUGIN_DIR="$HOME/.config/omarchy/plugins/harlan.agent-leaderboard"
 if [[ ! -d "$PLUGIN_DIR" ]]; then
   exit 0
 fi

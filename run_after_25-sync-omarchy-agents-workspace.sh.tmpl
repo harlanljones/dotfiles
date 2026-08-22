@@ -2,16 +2,17 @@
 #!/bin/bash
 set -euo pipefail
 
-repo="$HOME/dev/agent-leaderboard"
+repo="$HOME/dev/omarchy-agents"
+repo_url="https://github.com/harlanljones/omarchy-agents.git"
 bun="$HOME/.local/share/mise/installs/bun/latest/bin/bun"
 
 if [[ ! -f "$repo/package.json" ]]; then
-  echo "agent-leaderboard: $repo is not checked out; skipping workspace deployment" >&2
+  echo "omarchy-agents: $repo is not checked out from $repo_url; skipping workspace deployment" >&2
   exit 0
 fi
 
 if [[ ! -x "$bun" ]]; then
-  echo "agent-leaderboard: Bun is unavailable at $bun; skipping workspace deployment" >&2
+  echo "omarchy-agents: Bun is unavailable at $bun; skipping workspace deployment" >&2
   exit 0
 fi
 

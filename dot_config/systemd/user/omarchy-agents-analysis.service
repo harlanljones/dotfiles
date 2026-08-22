@@ -1,0 +1,14 @@
+[Unit]
+Description=Generate Omarchy Agents nightly analysis
+After=omarchy-agents-dashboard.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/dev/omarchy-agents/apps/web
+EnvironmentFile=-%h/.config/omarchy-agents/dashboard.env
+ExecStart=%h/.local/share/mise/installs/bun/latest/bin/bun src/cli.ts analyze
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.local/state/omarchy-agents

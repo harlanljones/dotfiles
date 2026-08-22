@@ -1,11 +1,11 @@
 [Unit]
-Description=Nightly Agent Leaderboard analysis at 03:15 local time
+Description=Nightly Omarchy Agents analysis at 03:15 local time
 
 [Timer]
 OnCalendar=*-*-* 03:15:00
 Persistent=true
 RandomizedDelaySec=120
-Unit=agent-leaderboard-analysis.service
+Unit=omarchy-agents-analysis.service
 
 [Install]
 WantedBy=timers.target
