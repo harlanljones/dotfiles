@@ -59,7 +59,7 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
   - Turborepo source of truth for the web dashboard and both Omarchy plugin forks. Chezmoi retains only machine configuration and invokes the workspace's deployment task after apply.
   - Kept outside `.chezmoidata/omarchy_plugins.yaml` because the repository contains multiple apps; `run_after_25-sync-omarchy-agents-workspace.sh.tmpl` validates and deploys both plugin builds.
 - **Agent Leaderboard Plugin** (`~/dev/omarchy-agents/apps/omarchy-agent-leaderboard/`, deployed to `~/.config/omarchy/plugins/harlan.agent-leaderboard/`):
-  - Custom bar widget (`harlan.agent-leaderboard`) ranking token usage across all coding agents (Antigravity, Claude, Cline, Codex, Fireworks, OpenCode, Grok, Hermes) across daily, 7-day, and all-time windows.
+  - Custom bar widget (`harlan.agent-leaderboard`) ranking token usage across all coding agents (Antigravity, Claude, Cline, Codex, Cursor, Fireworks, OpenCode, Grok, Hermes) across daily, 7-day, and all-time windows.
   - Bundles embedded collectors for Antigravity (`collect-antigravity.py`) and Fireworks (`collect-fireworks.py`).
 - **Agents Plugin** (`~/dev/omarchy-agents/apps/omarchy-agent-usage/`, deployed to `~/.config/omarchy/plugins/harlan.agents/`):
   - Custom multi-agent status widget (`harlan.agents`) providing live rate-limit meters, pace, 7-day usage trends, and model breakdown across Claude Code, Cline, Codex, Fireworks, and OpenCode.
@@ -72,13 +72,16 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
 - **Codex & OpenCode Usage Collectors**:
   - `omarchy-agent-usage-codex`: Collects Codex CLI session logs and app-server RPC metrics.
   - `omarchy-agent-usage-opencode`: SQLite collector parsing prompt history, session stats, and token usage from `~/.local/share/opencode/opencode.db`.
+- **Cursor CLI Integration** (`run_onchange_after_26-setup-omarchy-cursor.sh.tmpl`):
+  - Registers Cursor in the Agent Leaderboard; `omarchy-agent-usage-cursor` parses `~/.config/cursor/chats/*/*/store.db` chat stores for prompt/session/model counts. Cursor's local storage has no token or rate-limit data, so — unlike the other collectors — usage shown is counts-only, never totals or cost.
+  - `omarchy default agent cursor` / `omarchy agent` launch `cursor-agent --yolo`; Cursor CLI itself installs separately (`curl https://cursor.com/install -fsS | bash`), same as Antigravity.
 - **Cline CLI Settings** (`~/.cline/data/settings/global-settings.json`):
   - Global Cline CLI preferences managed via chezmoi (provider credentials in `providers.json` are intentionally not managed).
 - **Omarchy Agent Wrappers & Utilities** (`~/.local/bin/`):
-  - `omarchy-agent`: Launch default coding agent with support for Antigravity (`agy`).
-  - `omarchy-default-agent`: Quick switcher to configure default coding agent (e.g. `omarchy default agent agy`).
+  - `omarchy-agent`: Launch default coding agent with support for Antigravity (`agy`) and Cursor.
+  - `omarchy-default-agent`: Quick switcher to configure default coding agent (e.g. `omarchy default agent agy`, `omarchy default agent cursor`).
   - `omarchy-agent-usage-update`: Master aggregator running all active collectors (`omarchy-agent-usage-*`) to write standard JSON records into `~/.local/state/omarchy/agents/usage/`.
-  - `omarchy-agent-usage-antigravity`, `omarchy-agent-usage-cline`, `omarchy-agent-usage-codex`, `omarchy-agent-usage-opencode`: Standalone usage collectors.
+  - `omarchy-agent-usage-antigravity`, `omarchy-agent-usage-cline`, `omarchy-agent-usage-codex`, `omarchy-agent-usage-cursor`, `omarchy-agent-usage-opencode`: Standalone usage collectors.
   - `omarchy-cline-usage-login`, `omarchy-cline-usage-scrape`, `omarchy-cline-usage-override`: ClinePass limit scraper and override utilities.
 
 ---
@@ -113,7 +116,8 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
 ├── run_onchange_after_21-setup-omarchy-cline.sh.tmpl
 ├── run_onchange_after_22-setup-omarchy-cline-usage-scrape.sh.tmpl
 ├── run_after_23-sync-agent-skills.sh.tmpl
-└── run_after_25-sync-omarchy-agents-workspace.sh.tmpl
+├── run_after_25-sync-omarchy-agents-workspace.sh.tmpl
+└── run_onchange_after_26-setup-omarchy-cursor.sh.tmpl
 ```
 
 ---

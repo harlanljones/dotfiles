@@ -57,6 +57,22 @@ if [[ "$agent" == "agy" || "$agent" == "antigravity" ]]; then
   fi
 fi
 
+if [[ "$agent" == "cursor" ]]; then
+  if omarchy-cmd-missing cursor-agent; then
+    echo "cursor-agent is not installed or not on PATH." >&2
+    exit 1
+  fi
+
+  command=(cursor-agent --yolo)
+  [[ -n ${prompt:-} ]] && command+=("$prompt")
+
+  if [[ $inline == "true" ]]; then
+    exec "${command[@]}"
+  else
+    exec omarchy-launch-tui --app-id=org.omarchy.agent "${command[@]}"
+  fi
+fi
+
 # Fallback to upstream system omarchy-agent for all other agents
 args=()
 [[ $inline == "true" ]] && args+=(--inline)

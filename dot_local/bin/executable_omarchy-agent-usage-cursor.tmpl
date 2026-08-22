@@ -1,0 +1,318 @@
+{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+#!/usr/bin/python3
+# omarchy:summary=Print Cursor CLI usage record as JSON
+# omarchy:args=[--force] [--limits-only]
+# omarchy:hidden=true
+"""Collect Cursor CLI usage and print a usage record as JSON.
+
+Scans chat stores under ~/.config/cursor/chats/<workspace>/<chat-id>/ —
+meta.json for session timing and store.db (a two-table SQLite file:
+meta(key, value) and blobs(id, data)) for the actual conversation. Every
+row in `blobs` whose data parses as JSON with a "role" is one message;
+non-JSON rows are opaque protobuf (tool-call/image payloads) and are
+skipped. Assistant messages carry the active model in
+content[].providerOptions.cursor.modelName when present.
+
+Cursor's local storage has no per-token usage anywhere — no promptTokens,
+no cost, no quota — and no rate-limit API, so this collector can only
+report prompt/session/model *counts*, never totals or cost. Every token
+field in the record contract (todayTotalTokens, modelUsage buckets,
+recentDays[].messageCount — which the shared contract defines as a token
+total, not a message count) is left at zero rather than repurposed, so a
+zero here always means "not measurable," not "no activity."
+
+Per-message timestamps aren't stored directly either, but Cursor embeds
+one in the text of every user turn after the first: a
+"<timestamp>Saturday, Aug 22, 2026, 3:08 PM (UTC-7)</timestamp>" tag
+ahead of the actual query. That's parsed for real day-bucketing; the
+one first turn per chat that lacks it (it carries only synthesic
+<user_info> context, not the tag) falls back to the chat's meta.json
+createdAtMs day.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+import sqlite3
+import sys
+import tempfile
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Any
+
+AGENT_ID = "cursor"
+AGENT_NAME = "Cursor"
+AUTH_HELP = "Run `cursor-agent login` (or start `cursor-agent`) to start tracking Cursor CLI usage."
+
+TIMESTAMP_RE = re.compile(
+  r"<timestamp>\w+, (?P<month>\w+) (?P<day>\d+), (?P<year>\d+), "
+  r"(?P<hour>\d+):(?P<minute>\d+) (?P<ampm>AM|PM) \(UTC(?P<offset>[+-]\d+)\)</timestamp>"
+)
+MONTHS = {
+  "Jan": 1, "Feb": 2, "Mar": 3, "Apr": 4, "May": 5, "Jun": 6,
+  "Jul": 7, "Aug": 8, "Sep": 9, "Oct": 10, "Nov": 11, "Dec": 12,
+}
+
+
+def chats_root() -> Path:
+  root = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+  return root / "cursor" / "chats"
+
+
+def usage_dir() -> Path:
+  root = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state"))
+  folder = root / "omarchy" / "agents" / "usage"
+  folder.mkdir(parents=True, exist_ok=True)
+  return folder
+
+
+def write_json(path: Path, payload: dict) -> None:
+  handle_fd, tmp_name = tempfile.mkstemp(dir=path.parent, prefix=path.name + ".", suffix=".tmp")
+  tmp = Path(tmp_name)
+  try:
+    with os.fdopen(handle_fd, "w", encoding="utf-8") as handle:
+      handle.write(json.dumps(payload, indent=2) + "\n")
+    tmp.chmod(0o644)
+    tmp.replace(path)
+  except BaseException:
+    tmp.unlink(missing_ok=True)
+    raise
+
+
+def read_json(path: Path) -> Any:
+  try:
+    with open(path, encoding="utf-8") as handle:
+      return json.load(handle)
+  except Exception:
+    return None
+
+
+def local_day(epoch_ms: Any) -> str | None:
+  try:
+    return datetime.fromtimestamp(float(epoch_ms) / 1000).date().isoformat()
+  except Exception:
+    return None
+
+
+def message_text(content: Any) -> str:
+  """Flatten a message's content (string, or list of typed parts) to text."""
+  if isinstance(content, str):
+    return content
+  if isinstance(content, list):
+    parts = []
+    for part in content:
+      if isinstance(part, dict) and part.get("type") == "text":
+        parts.append(str(part.get("text") or ""))
+    return "\n".join(parts)
+  return ""
+
+
+def message_day(content: Any, fallback_day: str | None) -> str | None:
+  """Real local day from the embedded <timestamp> tag; falls back to the
+  chat's createdAtMs day for the one first turn per chat that lacks it."""
+  match = TIMESTAMP_RE.search(message_text(content))
+  if not match:
+    return fallback_day
+  try:
+    month = MONTHS[match.group("month")]
+    hour = int(match.group("hour")) % 12
+    if match.group("ampm") == "PM":
+      hour += 12
+    offset_hours = int(match.group("offset"))
+    dt = datetime(
+      int(match.group("year")), month, int(match.group("day")),
+      hour, int(match.group("minute")),
+      tzinfo=timezone(timedelta(hours=offset_hours)),
+    )
+    return dt.astimezone().date().isoformat()
+  except Exception:
+    return fallback_day
+
+
+def assistant_model(content: Any) -> str | None:
+  if not isinstance(content, list):
+    return None
+  for part in content:
+    if not isinstance(part, dict):
+      continue
+    model = ((part.get("providerOptions") or {}).get("cursor") or {}).get("modelName")
+    if model:
+      return str(model)
+  return None
+
+
+def empty_record(ready: bool) -> dict[str, Any]:
+  return {
+    "id": AGENT_ID,
+    "name": AGENT_NAME,
+    "schemaVersion": 1,
+    "ready": ready,
+    "hasLocalStats": ready,
+    "hasPromptStats": ready,
+    "todayPrompts": 0,
+    "todaySessions": 0,
+    "todayTotalTokens": 0,
+    "todayTokensByModel": {},
+    "recentDays": [],
+    "totalPrompts": 0,
+    "totalSessions": 0,
+    "activeDays": 0,
+    "activeDates": [],
+    "modelUsage": {},
+    "limits": [],
+    "tierLabel": "",
+    "usageStatusText": "",
+    "authHelpText": "" if ready else AUTH_HELP,
+    "updatedAt": datetime.now(timezone.utc).isoformat(),
+  }
+
+
+def tier_label() -> str:
+  data = read_json(Path.home() / ".config" / "cursor" / "cli-config.json")
+  if not isinstance(data, dict):
+    return ""
+  model = data.get("model")
+  if isinstance(model, dict):
+    return str(model.get("displayName") or "")
+  return ""
+
+
+def collect_chat(store_db: Path, meta: dict, today: str) -> dict[str, Any]:
+  """One chat's prompts, day buckets, and models. Read-only: cursor-agent
+  may hold this database open while a session is active."""
+  result = {
+    "prompts": 0,
+    "todayPrompts": 0,
+    "dayPrompts": {},
+    "models": set(),
+  }
+  fallback_day = local_day(meta.get("createdAtMs"))
+
+  try:
+    con = sqlite3.connect(f"file:{store_db}?mode=ro", uri=True)
+  except Exception:
+    return result
+
+  try:
+    cur = con.cursor()
+    cur.execute("SELECT data FROM blobs")
+    for (data,) in cur.fetchall():
+      try:
+        message = json.loads(data)
+      except Exception:
+        continue
+      if not isinstance(message, dict):
+        continue
+
+      role = message.get("role")
+      if role == "user":
+        result["prompts"] += 1
+        day = message_day(message.get("content"), fallback_day)
+        if day:
+          result["dayPrompts"][day] = result["dayPrompts"].get(day, 0) + 1
+          if day == today:
+            result["todayPrompts"] += 1
+      elif role == "assistant":
+        model = assistant_model(message.get("content"))
+        if model:
+          result["models"].add(model)
+  except Exception:
+    pass
+  finally:
+    con.close()
+
+  return result
+
+
+def collect_metrics() -> dict[str, Any]:
+  root = chats_root()
+  if not root.is_dir():
+    return empty_record(ready=False)
+
+  today = datetime.now().date().isoformat()
+  week_start = datetime.now().date() - timedelta(days=6)
+
+  total_prompts = 0
+  total_sessions = 0
+  today_prompts = 0
+  today_sessions = 0
+  day_prompts: dict[str, int] = {}
+  all_models: set[str] = set()
+  found_any = False
+
+  for chat_dir in sorted(root.glob("*/*")):
+    if not chat_dir.is_dir():
+      continue
+    meta = read_json(chat_dir / "meta.json")
+    if not isinstance(meta, dict):
+      continue
+    found_any = True
+    if not meta.get("hasConversation"):
+      continue
+
+    total_sessions += 1
+    session_day = local_day(meta.get("createdAtMs"))
+    if session_day == today:
+      today_sessions += 1
+
+    store_db = chat_dir / "store.db"
+    if not store_db.is_file():
+      continue
+    chat = collect_chat(store_db, meta, today)
+    total_prompts += chat["prompts"]
+    today_prompts += chat["todayPrompts"]
+    all_models |= chat["models"]
+    for day, count in chat["dayPrompts"].items():
+      day_prompts[day] = day_prompts.get(day, 0) + count
+
+  record = empty_record(ready=found_any)
+  record["hasLocalStats"] = found_any
+  record["hasPromptStats"] = found_any
+  record["tierLabel"] = tier_label()
+  record["totalPrompts"] = total_prompts
+  record["totalSessions"] = total_sessions
+  record["todayPrompts"] = today_prompts
+  record["todaySessions"] = today_sessions
+  # modelUsage/recentDays keep the shared token-bucket shape (zeroed, since
+  # no token data exists locally) so downstream mergers relying on those
+  # field names/types keep working; only presence-of-model is real here.
+  record["modelUsage"] = {
+    model: {
+      "inputTokens": 0,
+      "outputTokens": 0,
+      "cacheReadInputTokens": 0,
+      "cacheCreationInputTokens": 0,
+    }
+    for model in sorted(all_models)
+  }
+  record["recentDays"] = [
+    {"date": (week_start + timedelta(days=offset)).isoformat(), "messageCount": 0}
+    for offset in range(7)
+  ]
+  record["activeDates"] = sorted(day for day, count in day_prompts.items() if count > 0)
+  record["activeDays"] = len(record["activeDates"])
+  return record
+
+
+def main() -> int:
+  parser = argparse.ArgumentParser(description="Collect Cursor CLI usage")
+  parser.add_argument("--force", action="store_true", help="accepted for interface parity")
+  parser.add_argument("--limits-only", action="store_true", help="accepted for interface parity")
+  parser.add_argument("--cache-seconds", type=float, default=10.0, help="accepted for interface parity")
+  parser.add_argument("--print", action="store_true", help="print JSON output")
+  args, _ = parser.parse_known_args()
+
+  record = collect_metrics()
+  write_json(usage_dir() / "cursor.json", record)
+
+  if not sys.stdout.isatty() or args.print:
+    print(json.dumps(record, indent=2))
+  return 0
+
+
+if __name__ == "__main__":
+  sys.exit(main())
+{{- end -}}

@@ -1,0 +1,35 @@
+{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+#!/bin/bash
+# Configures Cursor CLI integration for the Omarchy Agents leaderboard plugin.
+# Managed by chezmoi. Cursor CLI itself is installed separately
+# (curl https://cursor.com/install -fsS | bash) — this only wires up the
+# leaderboard once it's present.
+
+set -euo pipefail
+
+PLUGIN_DIR="$HOME/.config/omarchy/plugins/harlan.agent-leaderboard"
+if [[ ! -d "$PLUGIN_DIR" ]]; then
+  exit 0
+fi
+
+# 1. Deploy SVG asset. Cursor's brand orange (#F54E00) reads fine on both
+# light and dark surfaces, so — like Claude and Fireworks — it ships a
+# single mark with no separate -light variant.
+mkdir -p "$PLUGIN_DIR/assets"
+cat << 'SVG_EOF' > "$PLUGIN_DIR/assets/cursor.svg"
+<svg fill="#F54E00" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <title>Cursor</title>
+  <path d="M4 2.5 19.5 11 12.6 12.9 10.8 20.5 4 2.5Z"/>
+</svg>
+SVG_EOF
+
+# 2. Patch Panel.qml if cursor isn't registered
+if ! grep -q "cursor: true" "$PLUGIN_DIR/Panel.qml"; then
+  sed -i 's/readonly property var shippedMarks: ({/readonly property var shippedMarks: ({\n    cursor: true,/' "$PLUGIN_DIR/Panel.qml"
+  sed -i 's/function agentAccent(id, index) {/function agentAccent(id, index) {\n    if (id === "cursor") return "#F54E00"/' "$PLUGIN_DIR/Panel.qml"
+  sed -i 's/function agentAccent(id) {/function agentAccent(id) {\n    if (id === "cursor") return "#F54E00"/' "$PLUGIN_DIR/Panel.qml"
+fi
+
+# 3. Run initial usage collection
+omarchy-agent-usage-update || true
+{{- end -}}

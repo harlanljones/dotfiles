@@ -2,7 +2,7 @@
 #!/bin/bash
 
 # omarchy:summary=Set and launch the default coding agent
-# omarchy:args=[pi|omp|opencode|claude|codex|grok|gemini|copilot|crush|agy|antigravity]
+# omarchy:args=[pi|omp|opencode|claude|codex|grok|gemini|copilot|crush|agy|antigravity|cursor]
 # omarchy:examples=omarchy default agent | omarchy default agent agy | omarchy default agent claude
 
 installing=false
@@ -27,6 +27,12 @@ agy | antigravity)
   mkdir -p "$(dirname "$agent_file")"
   printf '%s\n' "agy" >"$agent_file"
   echo "Default coding agent set to Antigravity (agy)"
+  exit 0
+  ;;
+cursor)
+  mkdir -p "$(dirname "$agent_file")"
+  printf '%s\n' "cursor" >"$agent_file"
+  echo "Default coding agent set to Cursor"
   exit 0
   ;;
 *)
