@@ -1,7 +1,7 @@
 {
   "autoUpdateEnabled": true,
   "telemetryOptOut": false,
-  "compactionStrategy": "agentic",
+  "compactionStrategy": "basic",
   "compactionEnabled": true,
   "planActMode": "act",
   "toolAutoApprove": true,

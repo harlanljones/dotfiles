@@ -1,0 +1,16 @@
+{{- if eq .chezmoi.os "linux" -}}
+#!/bin/bash
+set -eu
+
+config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/agent-leaderboard"
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/agent-leaderboard"
+mkdir -p "$config_dir" "$state_dir"
+chmod 700 "$config_dir"
+
+if [[ ! -e "$config_dir/dashboard.env" ]]; then
+  umask 077
+  : >"$config_dir/dashboard.env"
+fi
+
+systemctl --user daemon-reload
+{{- end -}}

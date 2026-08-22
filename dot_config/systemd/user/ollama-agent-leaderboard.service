@@ -1,0 +1,15 @@
+[Unit]
+Description=Local Ollama service for Agent Leaderboard
+After=network-online.target
+
+[Service]
+Type=simple
+Environment=OLLAMA_HOST=127.0.0.1:11434
+ExecStart=/usr/local/bin/ollama serve
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target

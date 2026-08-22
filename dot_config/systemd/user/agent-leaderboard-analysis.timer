@@ -1,0 +1,11 @@
+[Unit]
+Description=Nightly Agent Leaderboard analysis at 03:15 local time
+
+[Timer]
+OnCalendar=*-*-* 03:15:00
+Persistent=true
+RandomizedDelaySec=120
+Unit=agent-leaderboard-analysis.service
+
+[Install]
+WantedBy=timers.target

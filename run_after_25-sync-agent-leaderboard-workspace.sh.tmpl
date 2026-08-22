@@ -1,0 +1,23 @@
+{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+#!/bin/bash
+set -euo pipefail
+
+repo="$HOME/dev/agent-leaderboard"
+bun="$HOME/.local/share/mise/installs/bun/latest/bin/bun"
+
+if [[ ! -f "$repo/package.json" ]]; then
+  echo "agent-leaderboard: $repo is not checked out; skipping workspace deployment" >&2
+  exit 0
+fi
+
+if [[ ! -x "$bun" ]]; then
+  echo "agent-leaderboard: Bun is unavailable at $bun; skipping workspace deployment" >&2
+  exit 0
+fi
+
+cd "$repo"
+"$bun" install --frozen-lockfile
+"$bun" run check
+"$bun" run deploy:local
+systemctl --user daemon-reload
+{{- end -}}

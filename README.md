@@ -55,10 +55,12 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
     - `dockmarchy`
     - `omarchy-shmall.lock-plugin`
     - `omarchy-sportsbar`
-- **Agent Leaderboard Plugin** (`~/.config/omarchy/plugins/harlan.agent-leaderboard/`):
+- **Agent Leaderboard Workspace** (`~/dev/agent-leaderboard/`):
+  - Turborepo source of truth for the web dashboard and both Omarchy plugin forks. Chezmoi retains only machine configuration and invokes the workspace's deployment task after apply.
+- **Agent Leaderboard Plugin** (`~/dev/agent-leaderboard/apps/omarchy-agent-leaderboard/`, deployed to `~/.config/omarchy/plugins/harlan.agent-leaderboard/`):
   - Custom bar widget (`harlan.agent-leaderboard`) ranking token usage across all coding agents (Antigravity, Claude, Cline, Codex, Fireworks, OpenCode, Grok, Hermes) across daily, 7-day, and all-time windows.
   - Bundles embedded collectors for Antigravity (`collect-antigravity.py`) and Fireworks (`collect-fireworks.py`).
-- **Agents Plugin** (`~/.config/omarchy/plugins/harlan.agents/`):
+- **Agents Plugin** (`~/dev/agent-leaderboard/apps/omarchy-agent-usage/`, deployed to `~/.config/omarchy/plugins/harlan.agents/`):
   - Custom multi-agent status widget (`harlan.agents`) providing live rate-limit meters, pace, 7-day usage trends, and model breakdown across Claude Code, Cline, Codex, Fireworks, and OpenCode.
 - **Antigravity CLI Integration** (`run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl`):
   - Sets up `collect-antigravity.py` collector to parse Antigravity CLI sessions, model attribution, and context-weighted token usage.
@@ -97,10 +99,7 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
 │   ├── lazygit/                       # Lazygit configuration
 │   ├── mise/                          # Mise runtime tool configurations
 │   ├── nvim/                          # Neovim / LazyVim configurations
-│   ├── omarchy/                       # Omarchy defaults, shell config, & custom plugins
-│   │   └── plugins/
-│   │       ├── harlan.agent-leaderboard/ # Agent token leaderboard widget
-│   │       └── harlan.agents/            # Agent usage & limits monitor widget
+│   ├── omarchy/                       # Omarchy defaults and shell placement/settings
 │   └── starship.toml                  # Starship cross-shell prompt configuration
 ├── dot_cline/                         # Cline CLI global settings
 ├── dot_codex/skills/                  # Custom skill source and metadata
@@ -112,7 +111,8 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
 ├── run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl
 ├── run_onchange_after_21-setup-omarchy-cline.sh.tmpl
 ├── run_onchange_after_22-setup-omarchy-cline-usage-scrape.sh.tmpl
-└── run_after_23-sync-agent-skills.sh.tmpl
+├── run_after_23-sync-agent-skills.sh.tmpl
+└── run_after_25-sync-agent-leaderboard-workspace.sh.tmpl
 ```
 
 ---
