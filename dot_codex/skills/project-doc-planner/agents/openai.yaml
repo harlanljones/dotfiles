@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Doc Planner"
+  short_description: "Critique project docs and plan execution"
+  default_prompt: "Use $project-doc-planner to critique this project document and turn it into a measurable, parallel development plan."

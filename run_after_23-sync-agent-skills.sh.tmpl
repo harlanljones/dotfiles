@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+# Reconciles portable global skills into harness-specific discovery roots.
+# Managed by chezmoi; existing provider-owned files are never overwritten.
+# manifest hash: {{ .agentSkills | toJson | sha256sum }}
+
+set -euo pipefail
+
+skill_home="${AGENT_SKILL_SYNC_HOME:-{{ .chezmoi.homeDir }}}"
+shared_root="$skill_home/.agents/skills"
+
+# Recreate shared links whose canonical content is owned by another installed
+# package. Relative source paths are resolved from the target home directory.
+external_skill_names=(
+{{- range .agentSkills.sharedExtras }}
+  {{ .name | quote }}
+{{- end }}
+)
+external_skill_sources=(
+{{- range .agentSkills.sharedExtras }}
+  {{ .sourcePath | quote }}
+{{- end }}
+)
+
+ensure_shared_extra() {
+  local skill_name=$1
+  local external_source=$2
+  local shared_destination="$shared_root/$skill_name"
+
+  if [[ "$external_source" != /* ]]; then
+    external_source="$skill_home/$external_source"
+  fi
+
+  if [[ -e "$shared_destination" || -L "$shared_destination" ]]; then
+    return
+  fi
+
+  if [[ ! -f "$external_source/SKILL.md" ]]; then
+    printf 'agent-skill-sync: external source unavailable, skipped %s\n' "$external_source" >&2
+    return
+  fi
+
+  mkdir -p "$shared_root"
+  ln -s "$external_source" "$shared_destination"
+  printf 'agent-skill-sync: linked shared source %s\n' "$shared_destination"
+}
+
+for skill_index in "${!external_skill_names[@]}"; do
+  ensure_shared_extra \
+    "${external_skill_names[$skill_index]}" \
+    "${external_skill_sources[$skill_index]}"
+done
+
+# Codex and OpenCode discover ~/.agents/skills directly. The remaining
+# harnesses need their own global discovery roots. Keep this allowlist limited
+# to portable Agent Skills; provider-generated variants stay with their owner.
+portable_skills=(
+{{- range .agentSkills.cloudflare.skills }}
+  {{ . | quote }}
+{{- end }}
+{{- range .agentSkills.sharedExtras }}
+  {{ .name | quote }}
+{{- end }}
+)
+
+harness_roots=(
+  "$skill_home/.claude/skills"
+  "$skill_home/.cline/skills"
+  "$skill_home/.gemini/config/skills"
+  "$skill_home/.gemini/skills"
+  "$skill_home/.pi/agent/skills"
+)
+
+resolve_path() {
+  if command -v realpath >/dev/null 2>&1; then
+    realpath "$1" 2>/dev/null || true
+  else
+    readlink -f "$1" 2>/dev/null || true
+  fi
+}
+
+link_skill() {
+  local skill_name=$1
+  local destination_root=$2
+  local skill_source="$shared_root/$skill_name"
+  local skill_destination="$destination_root/$skill_name"
+  local expected_path
+  local current_path
+
+  if [[ ! -f "$skill_source/SKILL.md" ]]; then
+    printf 'agent-skill-sync: source missing, skipped %s\n' "$skill_source" >&2
+    return
+  fi
+
+  mkdir -p "$destination_root"
+
+  if [[ -L "$skill_destination" ]]; then
+    expected_path=$(resolve_path "$skill_source")
+    current_path=$(resolve_path "$skill_destination")
+    if [[ -n "$expected_path" && "$current_path" == "$expected_path" ]]; then
+      return
+    fi
+    printf 'agent-skill-sync: existing link preserved at %s\n' "$skill_destination" >&2
+    return
+  fi
+
+  if [[ -e "$skill_destination" ]]; then
+    return
+  fi
+
+  ln -s "$skill_source" "$skill_destination"
+  printf 'agent-skill-sync: linked %s\n' "$skill_destination"
+}
+
+for destination_root in "${harness_roots[@]}"; do
+  for skill_name in "${portable_skills[@]}"; do
+    link_skill "$skill_name" "$destination_root"
+  done
+done
+
+# Provider-generated builds stay untouched. Use a generic shared build only
+# for harnesses without an upstream provider variant.
+{{- range .agentSkills.clineFallbacks }}
+link_skill {{ . | quote }} "$skill_home/.cline/skills"
+{{- end }}

@@ -44,6 +44,9 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
   - **Input** (`input.lua`): Pointer sensitivity and custom input overrides.
 
 ### 🤖 Omarchy & AI Coding Agent Integration
+- **Cross-Harness Agent Skills** (`.chezmoidata/agent_skills.yaml`, `run_onchange_before_09-install-agent-skills.sh.tmpl`, and `run_after_23-sync-agent-skills.sh.tmpl`):
+  - Tracks the portable global skill catalog, restores missing third-party skills, and safely links it into Claude, Cline, Antigravity, Gemini, and Pi without replacing provider-owned variants. Codex and OpenCode consume the shared `~/.agents/skills` catalog directly.
+  - Keeps custom skills such as `project-doc-planner` in chezmoi and preserves harness-specific `impeccable` builds.
 - **Plugin Management** (`.chezmoidata/omarchy_plugins.yaml` & `run_onchange_after_10-install-omarchy-plugins.sh.tmpl`):
   - Declarative tracking and automatic installation/updating of Omarchy desktop plugins:
     - `omarchy-resume`
@@ -82,6 +85,7 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
 ```text
 .
 ├── .chezmoidata/
+│   ├── agent_skills.yaml              # Cross-harness global skill manifest
 │   └── omarchy_plugins.yaml           # Manifest for Omarchy desktop plugins
 ├── .chezmoiignore.tmpl                # OS-specific ignore rules (Darwin vs. Linux)
 ├── Documents/
@@ -99,13 +103,16 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
 │   │       └── harlan.agents/            # Agent usage & limits monitor widget
 │   └── starship.toml                  # Starship cross-shell prompt configuration
 ├── dot_cline/                         # Cline CLI global settings
+├── dot_codex/skills/                  # Custom skill source and metadata
 ├── dot_local/
 │   └── bin/                           # Custom scripts, usage collectors, and AI agent hooks
 │       └── cline-safety/              # Git interceptor for Cline safety
+├── run_onchange_before_09-install-agent-skills.sh.tmpl
 ├── run_onchange_after_10-install-omarchy-plugins.sh.tmpl
 ├── run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl
 ├── run_onchange_after_21-setup-omarchy-cline.sh.tmpl
-└── run_onchange_after_22-setup-omarchy-cline-usage-scrape.sh.tmpl
+├── run_onchange_after_22-setup-omarchy-cline-usage-scrape.sh.tmpl
+└── run_after_23-sync-agent-skills.sh.tmpl
 ```
 
 ---

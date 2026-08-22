@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Restores externally maintained global skills before the cross-harness sync.
+# Managed by chezmoi and rerun when the skill manifest changes.
+# manifest hash: {{ .agentSkills | toJson | sha256sum }}
+
+set -euo pipefail
+
+skill_home="${AGENT_SKILL_SYNC_HOME:-{{ .chezmoi.homeDir }}}"
+cloudflare_source={{ .agentSkills.cloudflare.source | quote }}
+missing_cloudflare_args=()
+missing_impeccable_providers=()
+
+{{- range .agentSkills.cloudflare.skills }}
+if [[ ! -f "$skill_home/.agents/skills/{{ . }}/SKILL.md" ]]; then
+  missing_cloudflare_args+=(--skill {{ . | quote }})
+fi
+{{- end }}
+
+{{- range .agentSkills.impeccableProviders }}
+if [[ ! -f "$skill_home/{{ .skillPath }}" ]]; then
+  missing_impeccable_providers+=({{ .name | quote }})
+fi
+{{- end }}
+
+if [[ ${#missing_cloudflare_args[@]} -eq 0 && ${#missing_impeccable_providers[@]} -eq 0 ]]; then
+  exit 0
+fi
+
+if ! command -v npx >/dev/null 2>&1; then
+  printf 'agent-skill-install: npx not found; external skills were not restored\n' >&2
+  exit 0
+fi
+
+if [[ ${#missing_cloudflare_args[@]} -gt 0 ]]; then
+  npx -y skills add "$cloudflare_source" -g -a codex -y "${missing_cloudflare_args[@]}"
+fi
+
+if [[ ${#missing_impeccable_providers[@]} -gt 0 ]]; then
+  provider_csv=$(IFS=,; printf '%s' "${missing_impeccable_providers[*]}")
+  npx -y impeccable install --providers="$provider_csv" --scope=global -y --no-hooks
+fi

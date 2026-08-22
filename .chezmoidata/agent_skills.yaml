@@ -1,0 +1,39 @@
+agentSkills:
+  cloudflare:
+    source: cloudflare/skills
+    skills:
+      - agents-sdk
+      - cloudflare
+      - cloudflare-email-service
+      - cloudflare-one
+      - cloudflare-one-migrations
+      - durable-objects
+      - sandbox-migrate-to-next
+      - sandbox-next
+      - sandbox-stable
+      - turnstile-spin
+      - web-perf
+      - workers-best-practices
+      - wrangler
+  sharedExtras:
+    - name: diagnose-crash
+      sourcePath: /usr/share/omarchy/default/agents/skills/diagnose-crash
+    - name: omarchy
+      sourcePath: /usr/share/omarchy/default/agents/skills/omarchy
+    - name: terminal-browser
+      sourcePath: .local/share/terminal-browser/app/skills/default/terminal-browser
+  impeccableProviders:
+    - name: claude
+      skillPath: .claude/skills/impeccable/SKILL.md
+    - name: codex
+      skillPath: .agents/skills/impeccable/SKILL.md
+    - name: opencode
+      skillPath: .config/opencode/skills/impeccable/SKILL.md
+    - name: antigravity
+      skillPath: .gemini/config/skills/impeccable/SKILL.md
+    - name: gemini
+      skillPath: .gemini/skills/impeccable/SKILL.md
+    - name: pi
+      skillPath: .pi/agent/skills/impeccable/SKILL.md
+  clineFallbacks:
+    - impeccable
