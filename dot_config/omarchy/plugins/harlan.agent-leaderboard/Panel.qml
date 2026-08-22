@@ -119,15 +119,20 @@ Panel {
     return candidates
   }
 
-  function agentAccent(id, index) {
+  function agentAccent(id) {
     if (id === "cline") return "#6BCB77"
     if (id === "antigravity" || id === "agy") return "#4285F4"
     if (id === "claude") return "#D97757"
     if (id === "fireworks") return "#FF6B22"
     if (id === "hermes") return "#C9A227"
-    if (id === "grok" || id === "codex" || id === "opencode") return root.foreground
+    if (id === "codex") return "#10A37F"
+    if (id === "opencode") return "#C77DFF"
+    if (id === "grok") return "#E8C468"
     var palette = ["#7C9CFF", "#6BCB77", "#FFD93D", "#FF6B6B", "#C77DFF", "#4ECDC4"]
-    return palette[Math.max(0, index) % palette.length]
+    var hash = 0
+    var key = String(id || "")
+    for (var i = 0; i < key.length; i++) hash = (hash * 31 + key.charCodeAt(i)) >>> 0
+    return palette[hash % palette.length]
   }
 
   function weekTooltip(day) {
@@ -470,7 +475,7 @@ Panel {
       anchors.bottom: parent.bottom
       width: parent.width * root.clamp(rankRow.row ? rankRow.row.bar : 0, 0, 1)
       radius: Style.cornerRadius
-      color: root.alpha(root.agentAccent(rankRow.row ? rankRow.row.providerId : "", rankRow.rowIndex), 0.22)
+      color: root.alpha(root.agentAccent(rankRow.row ? rankRow.row.providerId : ""), 0.22)
 
       Behavior on width {
         NumberAnimation { duration: 160; easing.type: Easing.OutCubic }
@@ -519,7 +524,7 @@ Panel {
         anchors.fill: parent
         radius: width / 2
         visible: markImage.status !== Image.Ready
-        color: root.alpha(root.agentAccent(rankRow.row ? rankRow.row.providerId : "", rankRow.rowIndex), 0.85)
+        color: root.alpha(root.agentAccent(rankRow.row ? rankRow.row.providerId : ""), 0.85)
 
         Text {
           anchors.centerIn: parent
@@ -615,7 +620,7 @@ Panel {
                 required property int index
                 width: dayTrack.width
                 height: dayTrack.height * (modelData.tokens / Math.max(1, dayCol.day.total))
-                color: root.alpha(root.agentAccent(modelData.providerId, index), dayCol.today ? 0.95 : 0.70)
+                color: root.alpha(root.agentAccent(modelData.providerId), dayCol.today ? 0.95 : 0.70)
               }
             }
           }
