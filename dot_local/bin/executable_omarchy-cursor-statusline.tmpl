@@ -1,0 +1,211 @@
+{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+#!/usr/bin/python3
+# omarchy:hidden=true
+"""Cursor CLI statusLine hook: logs real per-API-call token usage.
+
+Registered as the `statusLine` command in ~/.cursor/cli-config.json (see
+run_onchange_after_26-setup-omarchy-cursor.sh.tmpl). Cursor invokes this on
+every conversation update in an interactive session and feeds it a JSON
+payload on stdin — documented at ~/.cursor/skills-cursor/statusline/SKILL.md,
+spec aligned with Claude Code's status line. The payload's
+context_window.current_usage carries real token counts from the most
+recently completed API call (null before the first one). Nothing else in
+Cursor's local storage exposes token counts at all — see
+omarchy-agent-usage-cursor's docstring — so this hook is the only source.
+
+current_usage repeats across invocations whenever no new API call has
+completed since the last one (the hook can fire many times a second while
+idle or streaming); logging it unconditionally would double- or triple-count
+the same call. So a tiny per-session state file remembers the last-seen
+usage tuple, and a line is only appended when it actually changes — once per
+real API call, matching Cursor's own accounting.
+
+Two files get updated per real call, both under
+$XDG_STATE_HOME/omarchy/agents/cursor/:
+  - turns.jsonl: one line per call (ts, model, token fields), pruned to the
+    trailing 8 days — enough for the leaderboard's 7-day window plus today.
+  - model-totals.json: cumulative per-model totals that never get pruned, so
+    all-time numbers survive after old turns.jsonl lines age out.
+
+This only captures usage from interactive sessions from the moment this
+hook is installed onward — it cannot see calls made before installation or
+through --print/scripted invocations (they don't appear to invoke the
+status line), and Cursor exposes no rate-limit/quota API, so quota-percent
+limits stay empty regardless.
+
+Errors are swallowed everywhere: this runs on Cursor's UI thread budget
+(default 2s timeout, minimum 300ms between invocations), so it must never
+crash or hang the CLI. Worst case it just fails to log a data point.
+"""
+
+from __future__ import annotations
+
+import fcntl
+import json
+import os
+import sys
+import tempfile
+import time
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Any
+
+TOKEN_FIELDS = (
+  ("input_tokens", "inputTokens"),
+  ("output_tokens", "outputTokens"),
+  ("cache_read_input_tokens", "cacheReadInputTokens"),
+  ("cache_creation_input_tokens", "cacheCreationInputTokens"),
+)
+RETAIN_DAYS = 8
+
+
+def state_root() -> Path:
+  root = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state"))
+  folder = root / "omarchy" / "agents" / "cursor"
+  folder.mkdir(parents=True, exist_ok=True)
+  return folder
+
+
+def session_state_dir() -> Path:
+  folder = state_root() / "sessions"
+  folder.mkdir(parents=True, exist_ok=True)
+  return folder
+
+
+def read_json(path: Path) -> Any:
+  try:
+    with open(path, encoding="utf-8") as handle:
+      return json.load(handle)
+  except Exception:
+    return None
+
+
+def write_json_locked(path: Path, mutate) -> None:
+  """Read-modify-write path under an flock, atomic via tempfile+rename."""
+  lock_path = path.with_suffix(path.suffix + ".lock")
+  with open(lock_path, "a+") as lock_handle:
+    fcntl.flock(lock_handle, fcntl.LOCK_EX)
+    try:
+      current = read_json(path)
+      if not isinstance(current, dict):
+        current = {}
+      updated = mutate(current)
+      handle_fd, tmp_name = tempfile.mkstemp(dir=path.parent, prefix=path.name + ".", suffix=".tmp")
+      tmp = Path(tmp_name)
+      try:
+        with os.fdopen(handle_fd, "w", encoding="utf-8") as handle:
+          handle.write(json.dumps(updated, indent=2) + "\n")
+        tmp.replace(path)
+      except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise
+    finally:
+      fcntl.flock(lock_handle, fcntl.LOCK_UN)
+
+
+def append_turn_locked(path: Path, entry: dict, cutoff_ts: float) -> None:
+  """Append one line, dropping anything older than cutoff_ts. Locked so
+  concurrent sessions don't interleave writes."""
+  lock_path = path.with_suffix(".lock")
+  with open(lock_path, "a+") as lock_handle:
+    fcntl.flock(lock_handle, fcntl.LOCK_EX)
+    try:
+      lines = []
+      if path.is_file():
+        with open(path, encoding="utf-8") as handle:
+          for line in handle:
+            line = line.strip()
+            if not line:
+              continue
+            try:
+              parsed = json.loads(line)
+            except Exception:
+              continue
+            if float(parsed.get("ts") or 0) >= cutoff_ts:
+              lines.append(line)
+      lines.append(json.dumps(entry))
+      handle_fd, tmp_name = tempfile.mkstemp(dir=path.parent, prefix=path.name + ".", suffix=".tmp")
+      tmp = Path(tmp_name)
+      try:
+        with os.fdopen(handle_fd, "w", encoding="utf-8") as handle:
+          handle.write("\n".join(lines) + "\n")
+        tmp.replace(path)
+      except BaseException:
+        tmp.unlink(missing_ok=True)
+        raise
+    finally:
+      fcntl.flock(lock_handle, fcntl.LOCK_UN)
+
+
+def usage_tuple(current_usage: dict) -> tuple:
+  return tuple(int(current_usage.get(src) or 0) for src, _dst in TOKEN_FIELDS)
+
+
+def record_usage(session_id: str, model: str, current_usage: dict) -> None:
+  tuple_now = usage_tuple(current_usage)
+  if not any(tuple_now):
+    return
+
+  state_path = session_state_dir() / f"{session_id}.json"
+  last = read_json(state_path)
+  last_tuple = tuple(last.get("usage") or []) if isinstance(last, dict) else None
+  if last_tuple == tuple_now:
+    return
+
+  now = time.time()
+  write_json_locked(state_path, lambda _current: {"usage": list(tuple_now), "updatedAt": now})
+
+  entry = {"ts": now, "model": model or "unknown"}
+  for (src, dst) in TOKEN_FIELDS:
+    entry[dst] = int(current_usage.get(src) or 0)
+
+  cutoff = (datetime.now() - timedelta(days=RETAIN_DAYS)).timestamp()
+  append_turn_locked(state_root() / "turns.jsonl", entry, cutoff)
+
+  def bump_totals(totals: dict) -> dict:
+    bucket = totals.get(model or "unknown")
+    if not isinstance(bucket, dict):
+      bucket = {dst: 0 for _src, dst in TOKEN_FIELDS}
+    for (src, dst) in TOKEN_FIELDS:
+      bucket[dst] = int(bucket.get(dst) or 0) + int(current_usage.get(src) or 0)
+    totals[model or "unknown"] = bucket
+    return totals
+
+  write_json_locked(state_root() / "model-totals.json", bump_totals)
+
+
+def render_status(payload: dict) -> str:
+  model = ((payload.get("model") or {}).get("display_name")
+           or (payload.get("model") or {}).get("id") or "Cursor")
+  ctx = payload.get("context_window") or {}
+  pct = ctx.get("used_percentage")
+  if isinstance(pct, (int, float)):
+    return f"{model}  ctx {int(pct)}%"
+  return str(model)
+
+
+def main() -> int:
+  try:
+    payload = json.load(sys.stdin)
+  except Exception:
+    return 0
+
+  try:
+    session_id = str(payload.get("session_id") or "")
+    model = ((payload.get("model") or {}).get("id") or "")
+    current_usage = (payload.get("context_window") or {}).get("current_usage")
+    if session_id and isinstance(current_usage, dict):
+      record_usage(session_id, model, current_usage)
+  except Exception:
+    pass
+
+  try:
+    print(render_status(payload))
+  except Exception:
+    print("Cursor")
+  return 0
+
+
+if __name__ == "__main__":
+  sys.exit(main())
+{{- end -}}

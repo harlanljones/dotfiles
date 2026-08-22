@@ -73,7 +73,9 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
   - `omarchy-agent-usage-codex`: Collects Codex CLI session logs and app-server RPC metrics.
   - `omarchy-agent-usage-opencode`: SQLite collector parsing prompt history, session stats, and token usage from `~/.local/share/opencode/opencode.db`.
 - **Cursor CLI Integration** (`run_onchange_after_26-setup-omarchy-cursor.sh.tmpl`):
-  - Registers Cursor in the Agent Leaderboard; `omarchy-agent-usage-cursor` parses `~/.config/cursor/chats/*/*/store.db` chat stores for prompt/session/model counts. Cursor's local storage has no token or rate-limit data, so — unlike the other collectors — usage shown is counts-only, never totals or cost.
+  - Registers Cursor in the Agent Leaderboard; `omarchy-agent-usage-cursor` parses `~/.config/cursor/chats/*/*/store.db` chat stores for prompt/session/model counts, and combines them with real per-API-call token usage logged by `omarchy-cursor-statusline`.
+  - **Token tracking via statusLine hook**: Cursor's local chat storage carries no token data at all, but its CLI supports a `statusLine` hook (same spec as Claude Code's) that receives real usage on every conversation update. The setup script registers `omarchy-cursor-statusline` as that hook in `~/.cursor/cli-config.json` (only if no `statusLine` is already configured); it logs deduplicated per-call token counts to `~/.local/state/omarchy/agents/cursor/`. This only tracks interactive sessions from the moment the hook is installed onward — no backfill, no `--print`/scripted runs.
+  - **Included-usage limits via manual override** (`omarchy-cursor-usage-override`): Cursor publishes no numeric quota and no API for it (unlike ClinePass, its billing isn't priced per-token anywhere public), so there's nothing to estimate from local data. Run `omarchy-cursor-usage-override --included 42` with the real percentage read off cursor.com/dashboard to populate the limits bar for the next 24 hours; older than that, it's dropped rather than shown stale.
   - `omarchy default agent cursor` / `omarchy agent` launch `cursor-agent --yolo`; Cursor CLI itself installs separately (`curl https://cursor.com/install -fsS | bash`), same as Antigravity.
 - **Cline CLI Settings** (`~/.cline/data/settings/global-settings.json`):
   - Global Cline CLI preferences managed via chezmoi (provider credentials in `providers.json` are intentionally not managed).
@@ -82,6 +84,8 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
   - `omarchy-default-agent`: Quick switcher to configure default coding agent (e.g. `omarchy default agent agy`, `omarchy default agent cursor`).
   - `omarchy-agent-usage-update`: Master aggregator running all active collectors (`omarchy-agent-usage-*`) to write standard JSON records into `~/.local/state/omarchy/agents/usage/`.
   - `omarchy-agent-usage-antigravity`, `omarchy-agent-usage-cline`, `omarchy-agent-usage-codex`, `omarchy-agent-usage-cursor`, `omarchy-agent-usage-opencode`: Standalone usage collectors.
+  - `omarchy-cursor-statusline`: Cursor CLI `statusLine` hook; logs real per-call token usage for `omarchy-agent-usage-cursor` to read.
+  - `omarchy-cursor-usage-override`: Records a manually-read included-usage percentage from cursor.com/dashboard, since Cursor has no local/API quota source.
   - `omarchy-cline-usage-login`, `omarchy-cline-usage-scrape`, `omarchy-cline-usage-override`: ClinePass limit scraper and override utilities.
 
 ---

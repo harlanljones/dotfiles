@@ -13,15 +13,22 @@ non-JSON rows are opaque protobuf (tool-call/image payloads) and are
 skipped. Assistant messages carry the active model in
 content[].providerOptions.cursor.modelName when present.
 
-Cursor's local storage has no per-token usage anywhere — no promptTokens,
-no cost, no quota — and no rate-limit API, so this collector can only
-report prompt/session/model *counts*, never totals or cost. Every token
-field in the record contract (todayTotalTokens, modelUsage buckets,
-recentDays[].messageCount — which the shared contract defines as a token
-total, not a message count) is left at zero rather than repurposed, so a
-zero here always means "not measurable," not "no activity."
+Cursor's local storage (chats/store.db) has no per-token usage anywhere —
+no promptTokens, no cost, no quota — so prompt/session/model counts from
+there are real but token fields would have to stay at zero if that were
+the only source.
 
-Per-message timestamps aren't stored directly either, but Cursor embeds
+It isn't: omarchy-cursor-statusline is registered as Cursor's `statusLine`
+hook (see run_onchange_after_26-setup-omarchy-cursor.sh.tmpl) and logs real
+per-API-call token counts to $XDG_STATE_HOME/omarchy/agents/cursor/ as they
+happen, going forward, in interactive sessions only — nothing before the
+hook was installed, and nothing from --print/scripted runs. This collector
+reads those logs for todayTotalTokens/modelUsage/recentDays; if they don't
+exist yet (hook not installed, or no interactive session run since), those
+fields stay zero, meaning "not measured," not "no activity." Cursor still
+exposes no rate-limit/quota API either way, so `limits` is always empty.
+
+Per-message timestamps aren't stored in store.db directly either, but Cursor embeds
 one in the text of every user turn after the first: a
 "<timestamp>Saturday, Aug 22, 2026, 3:08 PM (UTC-7)</timestamp>" tag
 ahead of the actual query. That's parsed for real day-bucketing; the
@@ -62,11 +69,44 @@ def chats_root() -> Path:
   return root / "cursor" / "chats"
 
 
+def statusline_state_dir() -> Path:
+  root = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state"))
+  return root / "omarchy" / "agents" / "cursor"
+
+
 def usage_dir() -> Path:
   root = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state"))
   folder = root / "omarchy" / "agents" / "usage"
   folder.mkdir(parents=True, exist_ok=True)
   return folder
+
+
+def agents_config_dir() -> Path:
+  root = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+  return root / "omarchy" / "agents"
+
+
+# Cursor publishes no numeric quota and no API for one (see the module
+# docstring), so there's no estimate to compute the way the cline collector
+# rates transcripts against published pricing. omarchy-cursor-usage-override
+# is the only source of limits data: a human reads the real included-usage
+# percentage off cursor.com/dashboard and drops it in manually. Fresher than
+# this, it's shown as-is; older, it's more likely stale than helpful.
+DASHBOARD_OVERRIDE_MAX_AGE = timedelta(hours=24)
+
+
+def load_dashboard_override() -> dict[str, Any]:
+  data = read_json(agents_config_dir() / "cursor-dashboard.json")
+  if not isinstance(data, dict) or not isinstance(data.get("limits"), list):
+    return {}
+  try:
+    captured_at = datetime.fromisoformat(str(data["capturedAt"]))
+  except (KeyError, ValueError):
+    return {}
+  now = captured_at.tzinfo and datetime.now(captured_at.tzinfo) or datetime.now()
+  if now - captured_at > DASHBOARD_OVERRIDE_MAX_AGE:
+    return {}
+  return {"limits": data["limits"]}
 
 
 def write_json(path: Path, payload: dict) -> None:
@@ -227,10 +267,63 @@ def collect_chat(store_db: Path, meta: dict, today: str) -> dict[str, Any]:
   return result
 
 
+TOKEN_KEYS = ("inputTokens", "outputTokens", "cacheReadInputTokens", "cacheCreationInputTokens")
+
+
+def new_bucket() -> dict[str, int]:
+  return {key: 0 for key in TOKEN_KEYS}
+
+
+def bucket_total(bucket: dict) -> int:
+  return sum(int(bucket.get(key) or 0) for key in TOKEN_KEYS)
+
+
+def add_bucket(dst: dict[str, int], src: dict) -> None:
+  for key in TOKEN_KEYS:
+    dst[key] = dst.get(key, 0) + int(src.get(key) or 0)
+
+
+def read_turns() -> list[dict]:
+  """Real per-API-call token entries logged by omarchy-cursor-statusline,
+  oldest first. Missing/corrupt lines are skipped, not fatal."""
+  path = statusline_state_dir() / "turns.jsonl"
+  if not path.is_file():
+    return []
+  turns = []
+  try:
+    with open(path, encoding="utf-8") as handle:
+      for line in handle:
+        line = line.strip()
+        if not line:
+          continue
+        try:
+          entry = json.loads(line)
+        except Exception:
+          continue
+        if isinstance(entry, dict) and entry.get("ts"):
+          turns.append(entry)
+  except Exception:
+    return []
+  return turns
+
+
+def read_model_totals() -> dict[str, dict[str, int]]:
+  """All-time per-model token totals, maintained by the statusline hook
+  independently of turns.jsonl's rolling window."""
+  data = read_json(statusline_state_dir() / "model-totals.json")
+  if not isinstance(data, dict):
+    return {}
+  totals: dict[str, dict[str, int]] = {}
+  for model, bucket in data.items():
+    if isinstance(bucket, dict):
+      merged = new_bucket()
+      add_bucket(merged, bucket)
+      totals[str(model)] = merged
+  return totals
+
+
 def collect_metrics() -> dict[str, Any]:
   root = chats_root()
-  if not root.is_dir():
-    return empty_record(ready=False)
 
   today = datetime.now().date().isoformat()
   week_start = datetime.now().date() - timedelta(days=6)
@@ -243,7 +336,9 @@ def collect_metrics() -> dict[str, Any]:
   all_models: set[str] = set()
   found_any = False
 
-  for chat_dir in sorted(root.glob("*/*")):
+  # No store.db scan possible without a chats dir, but the statusline hook's
+  # logs (checked below regardless) can still carry real usage.
+  for chat_dir in sorted(root.glob("*/*")) if root.is_dir() else []:
     if not chat_dir.is_dir():
       continue
     meta = read_json(chat_dir / "meta.json")
@@ -268,6 +363,31 @@ def collect_metrics() -> dict[str, Any]:
     for day, count in chat["dayPrompts"].items():
       day_prompts[day] = day_prompts.get(day, 0) + count
 
+  # Real per-call token data from the statusline hook, if any has landed yet.
+  turns = read_turns()
+  day_tokens: dict[str, int] = {}
+  today_tokens_by_model: dict[str, dict[str, int]] = {}
+  today_total_tokens = 0
+  turn_models: set[str] = set()
+  for turn in turns:
+    bucket = {key: int(turn.get(key) or 0) for key in TOKEN_KEYS}
+    total = bucket_total(bucket)
+    if total <= 0:
+      continue
+    model = str(turn.get("model") or "unknown")
+    turn_models.add(model)
+    day = local_day(float(turn["ts"]) * 1000)
+    if day is None:
+      continue
+    day_tokens[day] = day_tokens.get(day, 0) + total
+    if day == today:
+      today_total_tokens += total
+      add_bucket(today_tokens_by_model.setdefault(model, new_bucket()), bucket)
+
+  model_totals = read_model_totals()
+  all_models |= turn_models | set(model_totals.keys())
+  found_any = found_any or bool(turns) or bool(model_totals)
+
   record = empty_record(ready=found_any)
   record["hasLocalStats"] = found_any
   record["hasPromptStats"] = found_any
@@ -276,24 +396,24 @@ def collect_metrics() -> dict[str, Any]:
   record["totalSessions"] = total_sessions
   record["todayPrompts"] = today_prompts
   record["todaySessions"] = today_sessions
-  # modelUsage/recentDays keep the shared token-bucket shape (zeroed, since
-  # no token data exists locally) so downstream mergers relying on those
-  # field names/types keep working; only presence-of-model is real here.
+  record["todayTotalTokens"] = today_total_tokens
+  record["todayTokensByModel"] = today_tokens_by_model
+  # Real cumulative totals for models the statusline hook has seen; models
+  # only known from store.db (no interactive turn logged yet) get a zeroed
+  # bucket — presence is real, the zero means "not measured," not "no usage."
   record["modelUsage"] = {
-    model: {
-      "inputTokens": 0,
-      "outputTokens": 0,
-      "cacheReadInputTokens": 0,
-      "cacheCreationInputTokens": 0,
-    }
-    for model in sorted(all_models)
+    model: model_totals.get(model, new_bucket()) for model in sorted(all_models)
   }
   record["recentDays"] = [
-    {"date": (week_start + timedelta(days=offset)).isoformat(), "messageCount": 0}
+    {
+      "date": (week_start + timedelta(days=offset)).isoformat(),
+      "messageCount": day_tokens.get((week_start + timedelta(days=offset)).isoformat(), 0),
+    }
     for offset in range(7)
   ]
-  record["activeDates"] = sorted(day for day, count in day_prompts.items() if count > 0)
+  record["activeDates"] = sorted(set(day_prompts) | set(day_tokens))
   record["activeDays"] = len(record["activeDates"])
+  record.update(load_dashboard_override())
   return record
 
 

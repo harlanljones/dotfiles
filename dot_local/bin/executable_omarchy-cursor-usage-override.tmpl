@@ -1,0 +1,111 @@
+{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+#!/usr/bin/python3
+# omarchy:summary=Record real Cursor included-usage % read off the dashboard
+# omarchy:args=[--included PCT] [--resets DURATION]
+# omarchy:hidden=true
+"""Persist Cursor's included-usage percentage read off cursor.com/dashboard.
+
+Cursor publishes no numeric quota and no API for it — the CLI's `status`
+and `about` commands carry no usage/limit fields (see
+omarchy-agent-usage-cursor's docstring for why the collector can't estimate
+one the way it does for Cline). This script is a manual write side with no
+automated read side: a human reads the real included-usage percentage off
+the web dashboard and drops it in here, where the collector prefers it over
+having no limits at all for the next 24 hours (see
+DASHBOARD_OVERRIDE_MAX_AGE in omarchy-agent-usage-cursor).
+
+Cursor bills included usage on a single monthly cycle — there's no
+session/weekly split like ClinePass — so this takes one percentage, not
+three. --resets is optional and rarely known precisely; the dashboard shows
+the cycle reset date, not a countdown, so pass a duration like "12d" if you
+want a reset time shown, and omit it otherwise.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import re
+import sys
+import tempfile
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Any
+
+DASHBOARD_URL = "https://cursor.com/dashboard"
+
+DURATION_RE = re.compile(
+  r"^\s*(?:(?P<days>\d+)d)?\s*(?:(?P<hours>\d+)h)?\s*(?:(?P<minutes>\d+)m)?\s*$"
+)
+
+
+def parse_duration(text: str) -> timedelta:
+  match = DURATION_RE.match(text)
+  if not match or not any(match.groups()):
+    raise argparse.ArgumentTypeError(
+      f"{text!r} is not a duration like '12d', '13h', or '45m'"
+    )
+  parts = {key: int(value) for key, value in match.groupdict(default="0").items()}
+  return timedelta(days=parts["days"], hours=parts["hours"], minutes=parts["minutes"])
+
+
+def parse_percent(text: str) -> float:
+  value = float(text)
+  if not 0 <= value <= 100:
+    raise argparse.ArgumentTypeError(f"{text!r} is not a percentage between 0 and 100")
+  return value / 100.0
+
+
+def agents_config_dir() -> Path:
+  root = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+  folder = root / "omarchy" / "agents"
+  folder.mkdir(parents=True, exist_ok=True)
+  return folder
+
+
+def write_json(path: Path, payload: dict) -> None:
+  handle_fd, tmp_name = tempfile.mkstemp(dir=path.parent, prefix=path.name + ".", suffix=".tmp")
+  tmp = Path(tmp_name)
+  try:
+    with os.fdopen(handle_fd, "w", encoding="utf-8") as handle:
+      handle.write(json.dumps(payload, indent=2) + "\n")
+    tmp.chmod(0o644)
+    tmp.replace(path)
+  except BaseException:
+    tmp.unlink(missing_ok=True)
+    raise
+
+
+def main() -> int:
+  parser = argparse.ArgumentParser(description=__doc__)
+  parser.add_argument("--included", type=parse_percent, required=True, help="Included usage this cycle, 0-100")
+  parser.add_argument("--resets", type=parse_duration, default=None)
+  parser.add_argument("--no-refresh", action="store_true", help="skip the immediate omarchy-agent-usage-update run")
+  args = parser.parse_args()
+
+  now = datetime.now().astimezone()
+  payload = {
+    "capturedAt": datetime.now(timezone.utc).isoformat(),
+    "source": DASHBOARD_URL,
+    "limits": [
+      {
+        "label": "Included usage (this cycle)",
+        "title": "Included usage",
+        "percent": round(args.included, 4),
+        "resetsAt": (now + args.resets).isoformat() if args.resets is not None else "",
+      }
+    ],
+  }
+  write_json(agents_config_dir() / "cursor-dashboard.json", payload)
+
+  if not args.no_refresh:
+    os.system("omarchy-agent-usage-update >/dev/null 2>&1 || true")
+
+  print(json.dumps(payload, indent=2))
+  return 0
+
+
+if __name__ == "__main__":
+  sys.exit(main())
+{{- end -}}

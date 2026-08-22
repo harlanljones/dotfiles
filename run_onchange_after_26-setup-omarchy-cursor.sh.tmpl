@@ -30,6 +30,31 @@ if ! grep -q "cursor: true" "$PLUGIN_DIR/Panel.qml"; then
   sed -i 's/function agentAccent(id) {/function agentAccent(id) {\n    if (id === "cursor") return "#F54E00"/' "$PLUGIN_DIR/Panel.qml"
 fi
 
-# 3. Run initial usage collection
+# 3. Register the token-usage statusLine hook, without touching any other
+# key a user (or Cursor itself) has already set in cli-config.json. Skipped
+# entirely if the file doesn't exist yet (Cursor creates it on first run) or
+# if a statusLine is already configured — never override a customization.
+CLI_CONFIG="$HOME/.config/cursor/cli-config.json"
+if [[ -f "$CLI_CONFIG" ]]; then
+  python3 - "$CLI_CONFIG" "$HOME/.local/bin/omarchy-cursor-statusline" << 'PY_EOF' || true
+import json
+import sys
+
+config_path, command = sys.argv[1], sys.argv[2]
+with open(config_path, encoding="utf-8") as handle:
+  data = json.load(handle)
+
+if "statusLine" not in data:
+  data["statusLine"] = {"type": "command", "command": command, "padding": 0}
+  tmp_path = config_path + ".tmp"
+  with open(tmp_path, "w", encoding="utf-8") as handle:
+    json.dump(data, handle, indent=2)
+    handle.write("\n")
+  import os
+  os.replace(tmp_path, config_path)
+PY_EOF
+fi
+
+# 4. Run initial usage collection
 omarchy-agent-usage-update || true
 {{- end -}}
