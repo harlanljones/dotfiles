@@ -9,9 +9,9 @@ opencode stores every session in a SQLite database at
 $XDG_DATA_HOME/opencode/opencode.db (see `opencode db path`). Assistant
 messages carry per-message provider, model, and token usage in the
 message table's JSON `data` column; user messages give prompt counts.
-opencode exposes no rate-limit API, so limits stay empty and the record
-is local stats only, matching the contract shared by the claude, codex,
-and cline collectors. Read-only: opencode may be writing right now.
+opencode exposes no universal rate-limit API. Provider quotas can therefore
+be supplied as JSON through OPENCODE_USAGE_LIMITS; usage is still collected
+locally for every provider. Read-only: opencode may be writing right now.
 """
 
 from __future__ import annotations
@@ -67,6 +67,67 @@ def model_name(raw) -> str:
   return value.rstrip("/").split("/")[-1] or "opencode"
 
 
+def provider_name(raw) -> str:
+  value = str(raw or "").strip() or "unknown"
+  labels = {"opencode": "Zen", "opencode-go": "Go", "openrouter": "OpenRouter"}
+  return labels.get(value, value.replace("-", " ").title())
+
+
+def provider_model(provider: str, model: str) -> str:
+  return f"{provider}/{model}"
+
+
+def configured_limits() -> dict:
+  raw = os.environ.get("OPENCODE_USAGE_LIMITS", "")
+  if not raw:
+    path_value = os.environ.get("OPENCODE_USAGE_LIMITS_FILE", "")
+    path = Path(path_value) if path_value else None
+    if path and path.is_file():
+      try:
+        raw = path.read_text()
+      except OSError:
+        return {}
+  try:
+    value = json.loads(raw) if raw else {}
+    return value if isinstance(value, dict) else {}
+  except (TypeError, ValueError):
+    return {}
+
+
+def reset_at(period: str) -> str:
+  now = datetime.now().astimezone()
+  if period == "daily":
+    reset = (now + timedelta(days=1)).replace(hour=0, minute=0, second=0, microsecond=0)
+  elif period == "weekly":
+    reset = (now + timedelta(days=7 - now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+  else:
+    year, month = now.year + (now.month == 12), 1 if now.month == 12 else now.month + 1
+    reset = now.replace(year=year, month=month, day=1, hour=0, minute=0, second=0, microsecond=0)
+  return reset.isoformat()
+
+
+def quota_limits(provider: str, days: dict[str, int]) -> list[dict]:
+  config = configured_limits()
+  limits = config.get(provider, config.get("*", {}))
+  if not isinstance(limits, dict):
+    return []
+  now = datetime.now()
+  starts = {
+    "daily": now.strftime("%Y-%m-%d"),
+    "weekly": (now - timedelta(days=now.weekday())).strftime("%Y-%m-%d"),
+    "monthly": now.replace(day=1).strftime("%Y-%m-%d"),
+  }
+  result = []
+  for period, start in starts.items():
+    quota = number(limits.get(period))
+    if quota <= 0:
+      continue
+    used = sum(value for day, value in days.items() if day >= start)
+    label = period.title() + " tokens"
+    result.append({"label": label, "title": f"{provider_name(provider)} {label}", "percent": min(1.0, used / quota), "used": used, "limit": quota, "resetsAt": reset_at(period)})
+  return result
+
+
 def empty_record(ready: bool, has_local: bool) -> dict:
   now = datetime.now()
   return {
@@ -110,6 +171,7 @@ def collect() -> dict:
   today = datetime.now().strftime("%Y-%m-%d")
   recent = {entry["date"]: entry for entry in record["recentDays"]}
   day_tokens: dict[str, int] = {}
+  provider_days: dict[str, dict[str, int]] = {}
   sessions_today: set[str] = set()
   sessions_all: set[str] = set()
 
@@ -148,12 +210,15 @@ def collect() -> dict:
           continue
         created = (entry.get("time") or {}).get("created") or time_created
         day = local_day_ms(created)
-        model = model_name(entry.get("modelID"))
+        provider = str(entry.get("providerID") or "unknown")
+        model = provider_model(provider, model_name(entry.get("modelID")))
       except Exception:
         continue
 
       sessions_all.add(str(session_id))
       day_tokens[day] = day_tokens.get(day, 0) + total
+      provider_day_tokens = provider_days.setdefault(provider, {})
+      provider_day_tokens[day] = provider_day_tokens.get(day, 0) + total
       bucket = record["modelUsage"].setdefault(model, {
         "inputTokens": 0,
         "outputTokens": 0,
@@ -192,6 +257,9 @@ def collect() -> dict:
   record["totalSessions"] = len(sessions_all)
   record["activeDates"] = sorted(day for day, tokens in day_tokens.items() if tokens > 0)
   record["activeDays"] = len(record["activeDates"])
+  # Providers do not share quotas. Unknown providers remain token-only unless
+  # a matching quota is supplied through OPENCODE_USAGE_LIMITS.
+  record["limits"] = [limit for provider, days in provider_days.items() for limit in quota_limits(provider, days)]
   return record
 
 
