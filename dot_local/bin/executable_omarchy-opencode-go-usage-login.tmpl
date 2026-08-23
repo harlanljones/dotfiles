@@ -1,0 +1,55 @@
+{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+#!/usr/bin/env node
+// omarchy:summary=One-time login for the automatic OpenCode Go usage scraper
+// omarchy:hidden=true
+//
+// omarchy-opencode-go-usage-scrape (run on a timer by
+// omarchy-opencode-go-usage-scrape.timer) reads the real Rolling/Weekly/Monthly
+// Go limits off https://opencode.ai/workspace/<id>/go, since OpenCode has no
+// quota endpoint. That page needs a logged-in browser session, so the scraper
+// reuses a dedicated Google Chrome profile instead of your real browser (no
+// profile-lock conflicts, and your everyday browsing session is never touched).
+//
+// Run this once (and again whenever the scraper's logs say the session
+// expired) to sign that dedicated profile in: it opens a visible Chrome
+// window, you log in as normal, and closing the window saves the session
+// for the scraper to reuse headlessly from then on.
+
+const path = require("path");
+const os = require("os");
+const fs = require("fs");
+
+const PLAYWRIGHT_DIR = path.join(
+  os.homedir(),
+  ".local/share/mise/installs/npm-playwright/latest/node_modules/playwright"
+);
+const PROFILE_DIR = path.join(
+  os.homedir(),
+  ".local/state/omarchy/agents/opencode-go-scraper-profile"
+);
+const GO_URL = "https://opencode.ai/go";
+
+async function main() {
+  const { chromium } = require(PLAYWRIGHT_DIR);
+  fs.mkdirSync(PROFILE_DIR, { recursive: true });
+
+  console.log("Opening Chrome — log into OpenCode, then close the window when you see your Go usage.");
+  const context = await chromium.launchPersistentContext(PROFILE_DIR, {
+    channel: "chrome",
+    headless: false,
+    viewport: { width: 1100, height: 900 },
+  });
+  const page = context.pages()[0] || (await context.newPage());
+  await page.goto(GO_URL);
+
+  // The window closing (context.close(), or the user clicking the X) is
+  // what ends this script — there's nothing to poll for.
+  await new Promise((resolve) => context.on("close", resolve));
+  console.log("Session saved. omarchy-opencode-go-usage-scrape can now run unattended.");
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
+{{- end -}}

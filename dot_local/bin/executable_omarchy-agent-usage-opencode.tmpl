@@ -128,6 +128,39 @@ def quota_limits(provider: str, days: dict[str, int]) -> list[dict]:
   return result
 
 
+GO_PROVIDER = "opencode-go"
+
+# The Go plan's real Rolling/Weekly/Monthly meters exist only in the workspace
+# UI, so `omarchy-opencode-go-usage-scrape` — or the /opencode-go-usage skill,
+# when a human reads them off the page instead — drops them here through
+# `omarchy-opencode-go-usage-override`. Fresher than DASHBOARD_OVERRIDE_MAX_AGE
+# they replace whatever OPENCODE_USAGE_LIMITS configured for opencode-go; older
+# than that they are more likely to mislead than help, so they are ignored.
+DASHBOARD_OVERRIDE_MAX_AGE = timedelta(hours=24)
+
+
+def agents_config_dir() -> Path:
+  root = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
+  return root / "omarchy" / "agents"
+
+
+def load_dashboard_override() -> list[dict]:
+  try:
+    data = json.loads((agents_config_dir() / "opencode-go-dashboard.json").read_text())
+  except (OSError, ValueError):
+    return []
+  if not isinstance(data, dict) or not isinstance(data.get("limits"), list):
+    return []
+  try:
+    captured_at = datetime.fromisoformat(str(data["capturedAt"]))
+  except (KeyError, ValueError):
+    return []
+  now = datetime.now(captured_at.tzinfo) if captured_at.tzinfo else datetime.now()
+  if now - captured_at > DASHBOARD_OVERRIDE_MAX_AGE:
+    return []
+  return data["limits"]
+
+
 def empty_record(ready: bool, has_local: bool) -> dict:
   now = datetime.now()
   return {
@@ -259,7 +292,13 @@ def collect() -> dict:
   record["activeDays"] = len(record["activeDates"])
   # Providers do not share quotas. Unknown providers remain token-only unless
   # a matching quota is supplied through OPENCODE_USAGE_LIMITS.
-  record["limits"] = [limit for provider, days in provider_days.items() for limit in quota_limits(provider, days)]
+  by_provider = {provider: quota_limits(provider, days) for provider, days in provider_days.items()}
+  # Real Go figures beat any configured ceiling, and stand even before this
+  # machine has recorded a single Go token.
+  override = load_dashboard_override()
+  if override:
+    by_provider[GO_PROVIDER] = override
+  record["limits"] = [limit for provider in sorted(by_provider) for limit in by_provider[provider]]
   return record
 
 

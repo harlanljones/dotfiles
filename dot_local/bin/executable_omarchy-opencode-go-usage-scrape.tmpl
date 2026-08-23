@@ -1,0 +1,148 @@
+{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+#!/usr/bin/env node
+// omarchy:summary=Scrape real OpenCode Go limits and refresh the agent monitor
+// omarchy:hidden=true
+//
+// OpenCode has no quota endpoint, so omarchy-agent-usage-opencode can only
+// report raw token totals per provider plus hand-configured ceilings from
+// OPENCODE_USAGE_LIMITS. The Go plan's real Rolling/Weekly/Monthly meters
+// exist only in the workspace UI. This script reads them off
+// https://opencode.ai/workspace/<id>/go using headless Google Chrome (via
+// the dedicated profile omarchy-opencode-go-usage-login signs in), then
+// hands them to omarchy-opencode-go-usage-override, which the collector
+// prefers for the next 24 hours.
+//
+// The page is server-rendered, and the payload it inlines carries the three
+// windows as named `usagePercent`/`resetInSec` pairs. Reading those beats
+// scraping rendered text (the way the Cline scraper has to): the numbers are
+// keyed by name, so they survive any amount of visual redesign.
+//
+// Run by omarchy-opencode-go-usage-scrape.timer every 15 minutes. Safe to run
+// by hand too. If the saved session has expired, it exits non-zero and leaves
+// the existing override alone — it'll simply age out and the panel falls back
+// to token-only reporting until omarchy-opencode-go-usage-login is re-run.
+
+const path = require("path");
+const os = require("os");
+const fs = require("fs");
+const { execFileSync } = require("child_process");
+
+const PLAYWRIGHT_DIR = path.join(
+  os.homedir(),
+  ".local/share/mise/installs/npm-playwright/latest/node_modules/playwright"
+);
+const PROFILE_DIR = path.join(
+  os.homedir(),
+  ".local/state/omarchy/agents/opencode-go-scraper-profile"
+);
+const ORIGIN = "https://opencode.ai";
+const GO_URL = `${ORIGIN}/go`;
+
+const WINDOWS = ["rollingUsage", "weeklyUsage", "monthlyUsage"];
+
+// The inlined payload puts the two numbers right after the window's key.
+// Bounding each segment at the next window key keeps one window from
+// reading its neighbour's numbers if the serializer ever reorders fields.
+function readWindow(html, name) {
+  const start = html.indexOf(name);
+  if (start < 0) return null;
+  let end = start + 400;
+  for (const other of WINDOWS) {
+    if (other === name) continue;
+    const at = html.indexOf(other, start + name.length);
+    if (at >= 0 && at < end) end = at;
+  }
+  const segment = html.slice(start, end);
+  const percent = /usagePercent\D{0,10}(\d+)/.exec(segment);
+  const reset = /resetInSec\D{0,10}(\d+)/.exec(segment);
+  if (!percent || !reset) return null;
+  const value = Number(percent[1]);
+  if (!Number.isFinite(value) || value < 0 || value > 100) return null;
+  return { percent: String(value), resets: toCompactDuration(Number(reset[1])) };
+}
+
+// omarchy-opencode-go-usage-override parses "30d22h" / "3h52m" / "45m";
+// the page gives whole seconds.
+function toCompactDuration(seconds) {
+  if (!Number.isFinite(seconds) || seconds <= 0) return null;
+  const days = Math.floor(seconds / 86400);
+  const hours = Math.floor((seconds % 86400) / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  let out = "";
+  if (days) out += `${days}d`;
+  if (hours) out += `${hours}h`;
+  if (minutes) out += `${minutes}m`;
+  return out || null;
+}
+
+async function main() {
+  const { chromium } = require(PLAYWRIGHT_DIR);
+  if (!fs.existsSync(PROFILE_DIR)) {
+    console.error("No scraper profile yet — run omarchy-opencode-go-usage-login first.");
+    process.exit(1);
+  }
+
+  const context = await chromium.launchPersistentContext(PROFILE_DIR, {
+    channel: "chrome",
+    headless: true,
+  });
+  let html;
+  let source;
+  try {
+    const page = context.pages()[0] || (await context.newPage());
+
+    // The workspace id is never configured: the marketing page links to the
+    // signed-in workspace, so following that link both finds the id and
+    // proves the session is still good.
+    await page.goto(GO_URL, { waitUntil: "networkidle" });
+    const href = await page
+      .locator('a[href^="/workspace/"][href$="/go"]')
+      .first()
+      .getAttribute("href")
+      .catch(() => null);
+    if (!href) {
+      console.error(
+        "No workspace link on /go — the saved session has likely expired. Re-run omarchy-opencode-go-usage-login."
+      );
+      process.exit(1);
+    }
+
+    source = ORIGIN + href;
+    await page.goto(source, { waitUntil: "networkidle" });
+    html = await page.content();
+  } finally {
+    await context.close();
+  }
+
+  const byWindow = {};
+  for (const name of WINDOWS) {
+    const found = readWindow(html, name);
+    if (found) byWindow[name] = found;
+  }
+
+  const missing = WINDOWS.filter((name) => !byWindow[name]);
+  if (missing.length > 0) {
+    console.error(
+      `Could not read ${missing.join(", ")} off ${source} — the payload shape may have changed.`
+    );
+    process.exit(1);
+  }
+
+  const args = [
+    "--rolling", byWindow.rollingUsage.percent,
+    "--weekly", byWindow.weeklyUsage.percent,
+    "--monthly", byWindow.monthlyUsage.percent,
+    "--source", source,
+  ];
+  if (byWindow.rollingUsage.resets) args.push("--rolling-resets", byWindow.rollingUsage.resets);
+  if (byWindow.weeklyUsage.resets) args.push("--weekly-resets", byWindow.weeklyUsage.resets);
+  if (byWindow.monthlyUsage.resets) args.push("--monthly-resets", byWindow.monthlyUsage.resets);
+
+  execFileSync("omarchy-opencode-go-usage-override", args, { stdio: "inherit" });
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
+{{- end -}}
