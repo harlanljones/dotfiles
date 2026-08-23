@@ -16,5 +16,8 @@
       "git commit*": "deny",
       "git push*": "deny"
     }
+  },
+  "mcp": {
+    "codebase-memory-mcp": {"command":["/home/harlan/.local/bin/codebase-memory-mcp"],"type":"local"}
   }
 }

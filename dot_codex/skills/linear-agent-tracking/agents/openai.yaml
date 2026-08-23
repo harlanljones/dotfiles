@@ -1,0 +1,4 @@
+interface:
+  display_name: "Linear Agent Tracking"
+  short_description: "Track agent task graphs and Wayfinder maps"
+  default_prompt: "Use $linear-agent-tracking to coordinate this work in Linear."

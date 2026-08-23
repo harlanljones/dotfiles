@@ -1,5 +1,101 @@
 {
-  "model": "opusplan",
+  "permissions": {
+    "deny": [
+      "Bash(git push *)",
+      "Bash(git commit *)"
+    ]
+  },
+  "model": "haiku",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/home/harlan/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.claude/hooks/cbm-session-reminder\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.claude/hooks/cbm-session-reminder\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "clear",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.claude/hooks/cbm-session-reminder\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.claude/hooks/cbm-session-reminder\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Grep|Glob",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.claude/hooks/cbm-code-discovery-gate\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.claude/hooks/cbm-code-discovery-gate\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$HOME/.claude/hooks/cbm-subagent-reminder\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  },
   "enabledPlugins": {
     "frontend-design@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
@@ -42,31 +138,21 @@
       "**Sensitive remote targets**: any namespace, host, or container whose name carries `prod` or `production` as a whole word or name segment",
       "**Protected deployment namespaces / environments**: None configured — fall back to the Sensitive remote targets heuristic",
       "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
+      "**Cloud provider(s)**: Cloudflare (deploy key referenced in CI: CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN)",
+      "**Repository visibility**: Private — harlanljones/bayes-horizon (github.com)",
+      "**Secrets management**: CI secrets referenced by name only (CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_API_TOKEN) — no values available",
+      "**Default / protected branches**: Default branch main; no protected branches listed (rulesets not queryable here — a non-empty rulesets line would not imply unprotected, but none was returned)",
+      "**CI/CD deploy targets**: Cloudflare (inferred from CI secret names; no explicit deploy target configured)",
+      "**Source control**: The trusted repo (harlanljones/bayes-horizon) and its origin remote (github.com/harlanljones/bayes-horizon.git) only",
+      "**Sensitive data locations & audiences**: any file or store holding personal data, confidential business data, credentials, regulated data, or similarly sensitive material; preserve exact handles when known and share only with audiences cleared at the [named+specifics] bar",
+      "**Sensitive remote targets**: any namespace, host, or container whose name carries `prod` or `production` as a whole word or name segment (hyphen/underscore/dot-delimited)",
       "### User-specific",
       "**Primary use of Claude Code**: personal/hobby software development (Astro + Bun portfolio site)",
       "**Trusted repo**: /home/harlan/dev/harlan-web (harlanljones/harlan-web, private) and its origin remote — confidential material is fine here; content ported from outside this session's repo is not this repo's own work",
       "**Org-specific CLIs**: None configured",
-      "routine under harlan/ prefix: none identified from evidence"
-    ]
-  },
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash '/home/harlan/.claude/hooks/herdr-agent-state.sh' session",
-            "timeout": 10
-          }
-        ]
-      }
-    ]
-  },
-  "permissions": {
-    "deny": [
-      "Bash(git push *)",
-      "Bash(git commit *)"
+      "routine under harlan/ prefix: none identified from evidence",
+      "**Primary use of Claude Code**: personal/hobby software development (S&P 500 ML research project — offline, synthetic-fixture based)",
+      "**Trusted repo**: /home/harlan/dev/bayes-horizon (harlanljones/bayes-horizon, private) and its origin remote — confidential material is fine here; content ported from outside this session's repo is not this repo's own work"
     ]
   }
 }

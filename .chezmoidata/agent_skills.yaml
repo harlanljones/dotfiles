@@ -1,4 +1,6 @@
 agentSkills:
+  portableLocal:
+    - linear-agent-tracking
   cloudflare:
     source: cloudflare/skills
     skills:

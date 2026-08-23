@@ -20,6 +20,8 @@ source "$OMARCHY_PATH/default/bash/rc"
 # alias p='python'
 export PATH="$HOME/.local/bin:$PATH"
 
+export PATH="/home/harlan/.cache/.bun/bin:$PATH"
+
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/home/harlan/dev/harlan-web/google-cloud-sdk/path.bash.inc' ]; then . '/home/harlan/dev/harlan-web/google-cloud-sdk/path.bash.inc'; fi
 
@@ -30,6 +32,8 @@ if [ -f '/home/harlan/dev/harlan-web/google-cloud-sdk/completion.bash.inc' ]; th
 alias codex="codex --approve-for-me"
 
 alias oc="opencode"
+
+alias cursor="agent"
 
 # Added by Antigravity CLI installer
 export PATH="/home/harlan/.local/bin:$PATH"

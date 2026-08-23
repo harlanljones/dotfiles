@@ -45,8 +45,8 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
 
 ### 🤖 Omarchy & AI Coding Agent Integration
 - **Cross-Harness Agent Skills** (`.chezmoidata/agent_skills.yaml`, `run_onchange_before_09-install-agent-skills.sh.tmpl`, and `run_after_23-sync-agent-skills.sh.tmpl`):
-  - Tracks the portable global skill catalog, restores missing third-party skills, and safely links it into Claude, Cline, Antigravity, Gemini, and Pi without replacing provider-owned variants. Codex and OpenCode consume the shared `~/.agents/skills` catalog directly.
-  - Keeps custom skills such as `project-doc-planner` in chezmoi and preserves harness-specific `impeccable` builds.
+  - Restores missing third-party skills and safely reconciles the complete shared `~/.agents/skills` catalog into Claude, Cline, Antigravity, Gemini, and Pi without replacing provider-owned variants. Codex and OpenCode consume the shared catalog directly.
+  - Keeps custom skills such as `project-doc-planner` and `linear-agent-tracking` in chezmoi while preserving harness-specific `impeccable` builds.
 - **Plugin Management** (`.chezmoidata/omarchy_plugins.yaml` & `run_onchange_after_10-install-omarchy-plugins.sh.tmpl`):
   - Declarative tracking and automatic installation/updating of Omarchy desktop plugins:
     - `omarchy-resume`
