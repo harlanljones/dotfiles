@@ -64,12 +64,22 @@ jobs:
         run: |
           export PATH="$HOME/.local/bin:$PATH"
           status=0
-          for tmpl in $(find . -name '*.sh.tmpl' -o -path './dot_local/bin/*' -name '*.tmpl' | sort); do
-            out="/tmp/sc_$(echo "$tmpl" | tr '/' '_')"
-            chezmoi execute-template --source "$PWD" < "$tmpl" > "$out"
-            echo "::group::shellcheck $tmpl"
-            shellcheck -S warning "$out" || status=1
-            echo "::endgroup::"
+          for file in $(find . -name '*.sh' -o -name '*.sh.tmpl' -o -path './dot_local/bin/*' -name '*.tmpl' | sort -u); do
+            if [[ "$file" == *.tmpl ]]; then
+              out="/tmp/sc_$(echo "$file" | tr '/' '_')"
+              chezmoi execute-template --source "$PWD" --override-data '{"chezmoi":{"osRelease":{"id":"omarchy"}}}' < "$file" > "$out"
+              target="$out"
+            else
+              target="$file"
+            fi
+
+            [ -s "$target" ] || continue
+
+            if head -n 1 "$target" | grep -qE '^#!.*\b(sh|bash|dash|ksh)\b'; then
+              echo "::group::shellcheck $file"
+              shellcheck -S warning "$target" || status=1
+              echo "::endgroup::"
+            fi
           done
           exit $status
 
