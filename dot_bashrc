@@ -14,6 +14,28 @@ else
 fi
 source "$OMARCHY_PATH/default/bash/rc"
 
+# Recolor Starship's cyan prompt after failed commands. Starship exposes the
+# previous exit status to its character module, but not as a global style.
+if declare -F starship_precmd &>/dev/null; then
+  _starship_precmd_definition="$(declare -f starship_precmd)"
+  eval "${_starship_precmd_definition/starship_precmd /starship_precmd_original }"
+  unset _starship_precmd_definition
+
+  starship_precmd() {
+    starship_precmd_original
+    local color_pattern rendered_style
+
+    if (( ${STARSHIP_CMD_STATUS:-0} != 0 )); then
+      color_pattern=$'\e''\[([0-9;]*)(30|32|33|34|35|36|37|90|92|93|94|95|96|97)m'
+
+      while [[ $PS1 =~ $color_pattern ]]; do
+        rendered_style=$'\e['"${BASH_REMATCH[1]}31m"
+        PS1="${PS1/"${BASH_REMATCH[0]}"/"$rendered_style"}"
+      done
+    fi
+  }
+fi
+
 # Add your own exports, aliases, and functions here.
 #
 # Make an alias for invoking commands you use constantly
@@ -27,6 +49,12 @@ if [ -f '/home/harlan/dev/harlan-web/google-cloud-sdk/path.bash.inc' ]; then . '
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/home/harlan/dev/harlan-web/google-cloud-sdk/completion.bash.inc' ]; then . '/home/harlan/dev/harlan-web/google-cloud-sdk/completion.bash.inc'; fi
+
+# Modern shell QoL -- each guarded so a missing tool never breaks the shell
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init bash)"
+command -v fzf >/dev/null 2>&1 && eval "$(fzf --bash)"
+command -v atuin >/dev/null 2>&1 && eval "$(atuin init bash)"
+command -v direnv >/dev/null 2>&1 && eval "$(direnv hook bash)"
 
 
 alias codex="codex --approve-for-me"

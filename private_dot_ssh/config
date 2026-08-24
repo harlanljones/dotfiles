@@ -1,0 +1,16 @@
+# SSH client configuration
+#
+# This file is managed by chezmoi (permissions 0600 via private_ prefix).
+# Private keys are NOT stored here and are intentionally not managed by
+# chezmoi -- provision those out-of-band on each machine.
+
+Host *
+    AddKeysToAgent yes
+
+# Per-host entries: copy the template below.
+#
+# Host myserver
+#     HostName example.com
+#     User harlan
+#     Port 22
+#     IdentityFile ~/.ssh/id_ed25519

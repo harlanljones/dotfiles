@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate-linux:
+    name: Validate (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install chezmoi
+        run: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+
+      - name: Dry-run apply (encrypted entries excluded -- no age key in CI)
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          chezmoi apply --source "$GITHUB_WORKSPACE" --dry-run --exclude encrypted
+
+      - name: Verify dependency gate script renders and runs
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          chezmoi execute-template < run_once_before_00-verify-deps.sh.tmpl > /tmp/verify-deps.sh
+          sh -n /tmp/verify-deps.sh && sh /tmp/verify-deps.sh
+
+  validate-macos:
+    name: Validate (macOS)
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install chezmoi
+        run: brew install chezmoi
+
+      - name: Dry-run apply (encrypted entries excluded -- no age key in CI)
+        run: chezmoi apply --source "$GITHUB_WORKSPACE" --dry-run --exclude encrypted

@@ -1,4 +1,33 @@
 eval "$(starship init zsh)"
+
+# Match the Bash prompt behavior: keep successful prompts cyan and recolor all
+# Starship components red after a non-zero exit status.
+starship_status_prompt() {
+  local rendered_prompt style_prefix old_style new_style
+  local -a style_prefixes
+
+  rendered_prompt="$(command starship prompt \
+    --terminal-width="$COLUMNS" \
+    --keymap="${KEYMAP:-}" \
+    --status="${STARSHIP_CMD_STATUS:-}" \
+    --pipestatus="${STARSHIP_PIPE_STATUS[*]:-}" \
+    --cmd-duration="${STARSHIP_DURATION:-}" \
+    --jobs="$STARSHIP_JOBS_COUNT")"
+
+  if (( ${STARSHIP_CMD_STATUS:-0} != 0 )); then
+    style_prefixes=("" "1;" "2;" "3;" "1;2;" "1;3;" "2;3;" "1;2;3;")
+
+    for style_prefix in $style_prefixes; do
+      old_style=$'%{\e['"${style_prefix}"$'36m%}'
+      new_style=$'%{\e['"${style_prefix}"$'31m%}'
+      rendered_prompt="${rendered_prompt//$old_style/$new_style}"
+    done
+  fi
+
+  print -rn -- "$rendered_prompt"
+}
+
+PROMPT='$(starship_status_prompt)'
 eval "$(mise activate zsh)"
 
 export EDITOR=nvim
@@ -19,3 +48,9 @@ export PATH="$HOME/.local/bin:$PATH"
 
 # Added by Antigravity CLI installer
 export PATH="/Users/harlan/.local/bin:$PATH"
+
+# Modern shell QoL -- each guarded so a missing tool never breaks the shell
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
+command -v fzf >/dev/null 2>&1 && source <(fzf --zsh)
+command -v atuin >/dev/null 2>&1 && eval "$(atuin init zsh)"
+command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"

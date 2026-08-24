@@ -1,0 +1,5 @@
+# Foreign (AUR) packages
+# Regenerate: pacman -Qqem > ~/.config/pacman/aurlist.txt
+# Restore:    paru -S --needed - < ~/.config/pacman/aurlist.txt  (or yay)
+google-chrome
+slack-desktop

@@ -1,0 +1,54 @@
+#!/bin/sh
+# Fail fast on missing hard dependencies before any other chezmoi script runs,
+# and surface optional-but-referenced tools early with install hints.
+
+set -u
+
+missing_hard=""
+missing_opt=""
+
+have() { command -v "$1" >/dev/null 2>&1; }
+
+# Hard requirements: git is assumed everywhere; age is required to decrypt
+# any encrypted_* source file during apply.
+for cmd in git age; do
+    if ! have "$cmd"; then
+        missing_hard="$missing_hard $cmd"
+    fi
+done
+
+{{- if eq .chezmoi.os "darwin" }}
+if ! have brew; then
+    echo "ERROR: Homebrew is required (https://brew.sh) before applying these dotfiles." >&2
+    exit 1
+fi
+
+opt_hint="brew bundle --file=~/.Brewfile"
+optional="mise eza starship gh fzf zoxide atuin direnv nvim lazygit ghostty"
+{{- else }}
+opt_hint="sudo pacman -S --needed <packages>; AUR entries: see ~/.config/pacman/aurlist.txt"
+optional="mise eza starship gh fzf zoxide atuin direnv nvim lazygit ollama ghostty"
+{{- end }}
+
+for cmd in $optional; do
+    if ! have "$cmd"; then
+        missing_opt="$missing_opt $cmd"
+    fi
+done
+
+if [ -n "$missing_hard" ]; then
+    echo "ERROR: required tools not found:$missing_hard" >&2
+    {{- if eq .chezmoi.os "darwin" }}
+    echo "Install with: brew install$missing_hard" >&2
+    {{- else }}
+    echo "Install with: sudo pacman -S --needed$missing_hard" >&2
+    {{- end }}
+    exit 1
+fi
+
+if [ -n "$missing_opt" ]; then
+    echo "NOTE: optional tools not found:$missing_opt"
+    echo "      Some features will be unavailable until installed ($opt_hint)."
+fi
+
+echo "verify-deps: OK"

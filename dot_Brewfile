@@ -1,0 +1,24 @@
+# Homebrew Bundle manifest (macOS)
+#
+# Restore:  brew bundle --file=~/.Brewfile
+# Refresh:  brew bundle dump --file=~/.Brewfile --force
+#
+# Managed by chezmoi; curate by hand -- this is the declarative source of
+# truth for system packages that mise does not manage.
+
+# CLI tools (parity with the Linux pacman list)
+brew "age"
+brew "direnv"
+brew "eza"
+brew "fzf"
+brew "gh"
+brew "lazygit"
+brew "mise"
+brew "neovim"
+brew "starship"
+brew "zoxide"
+brew "atuin"
+
+# Apps & fonts
+cask "ghostty"
+cask "font-jetbrainsmono-nerd-font"
