@@ -1,0 +1,152 @@
+{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+#!/usr/bin/python3
+# omarchy:summary=Capture real Cursor plan usage and refresh the agent monitor
+# omarchy:hidden=true
+"""Read Cursor Agent's authenticated /usage view through a private PTY.
+
+Cursor Agent exposes no standalone usage subcommand, but /usage is a read-only
+client command backed by the same authenticated RPCs as its dashboard. This
+script drives only that command, normalizes the terminal output, and hands the
+result to omarchy-cursor-usage-override. No prompt is submitted.
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import pty
+import re
+import select
+import signal
+import struct
+import subprocess
+import sys
+import termios
+import time
+from datetime import datetime
+from pathlib import Path
+
+ANSI_CSI_RE = re.compile(r"\x1b\[[0-?]*[ -/]*[@-~]")
+ANSI_OSC_RE = re.compile(r"\x1b\].*?(?:\x07|\x1b\\)")
+ROW_RE = re.compile(r"^\s*(Included|Auto|API|On-Demand)\s+(?:(\d+(?:\.\d+)?)% used|(Disabled|Unavailable|Unlimited|\$[^\s]+))", re.MULTILINE)
+HEADER_RE = re.compile(r"^\s*Usage\s*[•·]\s*(.+?)\s+Resets\s+([A-Z][a-z]{2}\s+\d{1,2})\s*$", re.MULTILINE)
+
+
+def plain_terminal(data: bytes | bytearray | str) -> str:
+  text = bytes(data).decode("utf-8", "replace") if isinstance(data, (bytes, bytearray)) else data
+  text = ANSI_OSC_RE.sub("", text)
+  text = ANSI_CSI_RE.sub("", text)
+  return text.replace("\r", "")
+
+
+def parse_usage(text: str, now: datetime | None = None) -> dict:
+  plain = plain_terminal(text)
+  header = HEADER_RE.search(plain)
+  if not header:
+    raise ValueError("Cursor /usage header was not found")
+  rows = {match.group(1): (match.group(2) or match.group(3)) for match in ROW_RE.finditer(plain)}
+  missing = [name for name in ("Included", "Auto", "API", "On-Demand") if name not in rows]
+  if missing:
+    raise ValueError("Cursor /usage rows missing: " + ", ".join(missing))
+
+  current = now or datetime.now().astimezone()
+  reset = datetime.strptime(f"{header.group(2)} {current.year}", "%b %d %Y").replace(tzinfo=current.tzinfo)
+  if reset.date() < current.date():
+    reset = reset.replace(year=current.year + 1)
+  return {
+    "plan": header.group(1).strip(),
+    "resetDate": reset.date().isoformat(),
+    "included": float(rows["Included"]),
+    "auto": float(rows["Auto"]),
+    "api": float(rows["API"]),
+    "onDemand": rows["On-Demand"],
+  }
+
+
+def read_until(master: int, output: bytearray, needle: bytes, deadline: float) -> None:
+  while needle not in output:
+    remaining = deadline - time.monotonic()
+    if remaining <= 0:
+      raise TimeoutError(f"Cursor Agent did not render {needle.decode(errors='replace')!r}")
+    ready, _, _ = select.select([master], [], [], min(remaining, 0.5))
+    if not ready:
+      continue
+    chunk = os.read(master, 65536)
+    if not chunk:
+      raise RuntimeError("Cursor Agent exited before /usage rendered")
+    output.extend(chunk)
+
+
+def capture_usage(timeout: float = 20.0) -> str:
+  state_root = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state"))
+  workspace = state_root / "omarchy" / "agents" / "cursor-usage-workspace"
+  workspace.mkdir(parents=True, exist_ok=True)
+  master, slave = pty.openpty()
+  # Keep the layout wide enough that labels never truncate or wrap.
+  import fcntl
+  fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack("HHHH", 40, 120, 0, 0))
+  env = os.environ.copy()
+  env.setdefault("TERM", "xterm-256color")
+  process = subprocess.Popen(
+    ["cursor-agent", "--trust", "--workspace", str(workspace)],
+    stdin=slave, stdout=slave, stderr=slave,
+    env=env, start_new_session=True, close_fds=True,
+  )
+  os.close(slave)
+  output = bytearray()
+  deadline = time.monotonic() + timeout
+  try:
+    read_until(master, output, b"Ready", deadline)
+    os.write(master, b"/usage\r")
+    read_until(master, output, b"Show plan and on-demand usage", deadline)
+    os.write(master, b"\r")
+    read_until(master, output, b"Esc to close", deadline)
+    return plain_terminal(output)
+  finally:
+    try:
+      os.write(master, b"\x1b\x04")
+    except OSError:
+      pass
+    try:
+      process.wait(timeout=2)
+    except subprocess.TimeoutExpired:
+      os.killpg(process.pid, signal.SIGTERM)
+      try:
+        process.wait(timeout=2)
+      except subprocess.TimeoutExpired:
+        os.killpg(process.pid, signal.SIGKILL)
+        process.wait()
+    os.close(master)
+
+
+def main() -> int:
+  parser = argparse.ArgumentParser(description=__doc__)
+  parser.add_argument("--parse-file", type=Path, help="parse a saved terminal capture instead of launching Cursor")
+  parser.add_argument("--no-write", action="store_true", help="print parsed data without updating the override")
+  parser.add_argument("--timeout", type=float, default=20.0)
+  args = parser.parse_args()
+
+  text = args.parse_file.read_text(encoding="utf-8") if args.parse_file else capture_usage(args.timeout)
+  usage = parse_usage(text)
+  if args.no_write:
+    print(json.dumps(usage, indent=2))
+    return 0
+
+  command = [
+    "omarchy-cursor-usage-override",
+    "--included", str(usage["included"]),
+    "--auto", str(usage["auto"]),
+    "--api", str(usage["api"]),
+    "--reset-date", usage["resetDate"],
+    "--plan", usage["plan"],
+    "--on-demand", usage["onDemand"],
+    "--source", "cursor-agent:/usage",
+  ]
+  subprocess.run(command, check=True)
+  return 0
+
+
+if __name__ == "__main__":
+  sys.exit(main())
+{{- end }}

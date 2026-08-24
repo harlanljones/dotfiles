@@ -1,18 +1,13 @@
 {{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
 #!/usr/bin/python3
-# omarchy:summary=Record real Cursor included-usage % read off the dashboard
-# omarchy:args=[--included PCT] [--resets DURATION]
+# omarchy:summary=Record real Cursor plan usage read from Cursor Agent or dashboard
+# omarchy:args=--included PCT [--auto PCT] [--api PCT] [--reset-date YYYY-MM-DD]
 # omarchy:hidden=true
-"""Persist Cursor's included-usage percentage read off cursor.com/dashboard.
+"""Persist Cursor's plan usage read from Cursor Agent's /usage view.
 
-Cursor publishes no numeric quota and no API for it — the CLI's `status`
-and `about` commands carry no usage/limit fields (see
-omarchy-agent-usage-cursor's docstring for why the collector can't estimate
-one the way it does for Cline). This script is a manual write side with no
-automated read side: a human reads the real included-usage percentage off
-the web dashboard and drops it in here, where the collector prefers it over
-having no limits at all for the next 24 hours (see
-DASHBOARD_OVERRIDE_MAX_AGE in omarchy-agent-usage-cursor).
+The automated scraper drives only Cursor Agent's read-only /usage command and
+passes Included, Auto, API, plan, reset date, and on-demand state here. The
+older manual `--included`/`--resets` workflow remains supported as a fallback.
 
 Cursor bills included usage on a single monthly cycle — there's no
 session/weekly split like ClinePass — so this takes one percentage, not
@@ -29,7 +24,7 @@ import os
 import re
 import sys
 import tempfile
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -57,6 +52,13 @@ def parse_percent(text: str) -> float:
   return value / 100.0
 
 
+def parse_date(text: str) -> date:
+  try:
+    return date.fromisoformat(text)
+  except ValueError as error:
+    raise argparse.ArgumentTypeError(f"{text!r} is not a date like '2026-09-09'") from error
+
+
 def agents_config_dir() -> Path:
   root = Path(os.environ.get("XDG_CONFIG_HOME", Path.home() / ".config"))
   folder = root / "omarchy" / "agents"
@@ -80,22 +82,42 @@ def write_json(path: Path, payload: dict) -> None:
 def main() -> int:
   parser = argparse.ArgumentParser(description=__doc__)
   parser.add_argument("--included", type=parse_percent, required=True, help="Included usage this cycle, 0-100")
+  parser.add_argument("--auto", type=parse_percent, default=None, help="Auto share of included usage, 0-100")
+  parser.add_argument("--api", type=parse_percent, default=None, help="API share of included usage, 0-100")
   parser.add_argument("--resets", type=parse_duration, default=None)
+  parser.add_argument("--reset-date", type=parse_date, default=None)
+  parser.add_argument("--plan", default="")
+  parser.add_argument("--on-demand", default="")
+  parser.add_argument("--source", default=DASHBOARD_URL)
   parser.add_argument("--no-refresh", action="store_true", help="skip the immediate omarchy-agent-usage-update run")
   args = parser.parse_args()
 
   now = datetime.now().astimezone()
+  if args.reset_date is not None:
+    resets_at = datetime.combine(args.reset_date, time.min, tzinfo=timezone.utc).isoformat()
+  else:
+    resets_at = (now + args.resets).isoformat() if args.resets is not None else ""
+
+  limits = [
+    {
+      "label": "Included usage (this cycle)",
+      "title": "Included",
+      "percent": round(args.included, 4),
+      "resetsAt": resets_at,
+      "binding": True,
+    }
+  ]
+  if args.auto is not None:
+    limits.append({"label": "Auto", "title": "Auto", "percent": round(args.auto, 4), "resetsAt": resets_at, "binding": False})
+  if args.api is not None:
+    limits.append({"label": "API", "title": "API", "percent": round(args.api, 4), "resetsAt": resets_at, "binding": False})
+
   payload = {
     "capturedAt": datetime.now(timezone.utc).isoformat(),
-    "source": DASHBOARD_URL,
-    "limits": [
-      {
-        "label": "Included usage (this cycle)",
-        "title": "Included usage",
-        "percent": round(args.included, 4),
-        "resetsAt": (now + args.resets).isoformat() if args.resets is not None else "",
-      }
-    ],
+    "source": args.source,
+    "tierLabel": args.plan,
+    "usageStatusText": "On-demand usage is " + args.on_demand.lower() if args.on_demand else "",
+    "limits": limits,
   }
   write_json(agents_config_dir() / "cursor-dashboard.json", payload)
 

@@ -26,7 +26,9 @@ hook was installed, and nothing from --print/scripted runs. This collector
 reads those logs for todayTotalTokens/modelUsage/recentDays; if they don't
 exist yet (hook not installed, or no interactive session run since), those
 fields stay zero, meaning "not measured," not "no activity." Cursor still
-exposes no rate-limit/quota API either way, so `limits` is always empty.
+The separate omarchy-cursor-usage-scrape helper captures Cursor Agent's
+read-only /usage view every 15 minutes and writes the normalized plan meters
+that this collector merges into `limits`.
 
 Per-message timestamps aren't stored in store.db directly either, but Cursor embeds
 one in the text of every user turn after the first: a
@@ -86,12 +88,9 @@ def agents_config_dir() -> Path:
   return root / "omarchy" / "agents"
 
 
-# Cursor publishes no numeric quota and no API for one (see the module
-# docstring), so there's no estimate to compute the way the cline collector
-# rates transcripts against published pricing. omarchy-cursor-usage-override
-# is the only source of limits data: a human reads the real included-usage
-# percentage off cursor.com/dashboard and drops it in manually. Fresher than
-# this, it's shown as-is; older, it's more likely stale than helpful.
+# Cursor Agent's /usage capture is kept separate from transcript scanning so a
+# transient network/login failure cannot erase local statistics. Fresh plan
+# data is merged here; old data ages out instead of presenting stale quota.
 DASHBOARD_OVERRIDE_MAX_AGE = timedelta(hours=24)
 
 
@@ -106,7 +105,11 @@ def load_dashboard_override() -> dict[str, Any]:
   now = captured_at.tzinfo and datetime.now(captured_at.tzinfo) or datetime.now()
   if now - captured_at > DASHBOARD_OVERRIDE_MAX_AGE:
     return {}
-  return {"limits": data["limits"]}
+  result = {"limits": data["limits"]}
+  for key in ("tierLabel", "usageStatusText"):
+    if data.get(key):
+      result[key] = data[key]
+  return result
 
 
 def write_json(path: Path, payload: dict) -> None:
