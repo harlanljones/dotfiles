@@ -207,7 +207,7 @@ Templates use `.chezmoiignore.tmpl` to ensure only platform-relevant configurati
 ### 🏛️ Parent & Sister Projects
 - **[Omarchy Desktop](https://github.com/omarchy/omarchy)**: The core Linux desktop environment providing window management defaults, bar shell placement, plugin hooks, and system-level agent skills.
 - **[`harlanljones/omarchy-agents`](https://github.com/harlanljones/omarchy-agents)**: Turborepo monorepo housing the multi-agent web dashboard, background Ollama analytics service, and both custom desktop bar plugins (`harlan.agent-leaderboard` and `harlan.agents`).
-- **[`harlanljones/herdr`](https://github.com/harlanljones/herdr)**: Modern terminal multiplexer workspace providing tmux-parity keybindings, split pane navigation, and agent lifecycle state reporting.
+- **[`harlanljones/herdr-outpost`](https://github.com/harlanljones/herdr-outpost)**: A lightweight, secure remote dashboard and relay gateway for Herdr.
 
 ### 🤖 Coding Agent Harnesses & Knowledge Infrastructure
 - **[Google Antigravity & Gemini CLI](https://github.com/google-deepmind)**: Advanced multi-turn agentic coding tool with MCP support and project knowledge graphs.
