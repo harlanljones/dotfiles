@@ -16,7 +16,7 @@ if [[ ! -x "$bun" ]]; then
   exit 0
 fi
 
-cd "$repo"
+cd "$repo" || exit 1
 "$bun" install --frozen-lockfile
 "$bun" run check
 "$bun" run deploy:local
