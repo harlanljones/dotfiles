@@ -7,6 +7,7 @@
 aether
 alsa-utils
 asdcontrol
+atuin
 avahi
 base
 base-devel
@@ -27,6 +28,8 @@ cups-browsed
 cups-filters
 cups-pdf
 ddcutil
+delta
+direnv
 docker
 docker-buildx
 docker-compose

@@ -5,3 +5,8 @@ customCommands:
     command: '~/.local/bin/lazygit-ollama-commit.sh'
     loadingText: 'Generating commit message with Ollama...'
     output: terminal
+{{ if lookPath "delta" -}}
+git:
+  # Only rendered when delta is installed
+  pager: delta --dark --paging=never
+{{- end }}

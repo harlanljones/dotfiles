@@ -6,6 +6,10 @@
 
 Host *
     AddKeysToAgent yes
+    # 1Password SSH agent first (keys stay in the vault, served via
+    # ~/.config/1password/ssh/agent.toml); falls back to on-disk keys in
+    # ~/.ssh when the socket is absent or has no matching key.
+    IdentityAgent ~/.1password/agent.sock
 
 # Per-host entries: copy the template below.
 #

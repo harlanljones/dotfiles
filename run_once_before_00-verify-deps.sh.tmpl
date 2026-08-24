@@ -24,10 +24,10 @@ if ! have brew; then
 fi
 
 opt_hint="brew bundle --file=~/.Brewfile"
-optional="mise eza starship gh fzf zoxide atuin direnv nvim lazygit ghostty"
+optional="mise eza delta starship gh fzf zoxide atuin direnv nvim lazygit ghostty"
 {{- else }}
 opt_hint="sudo pacman -S --needed <packages>; AUR entries: see ~/.config/pacman/aurlist.txt"
-optional="mise eza starship gh fzf zoxide atuin direnv nvim lazygit ollama ghostty"
+optional="mise eza delta starship gh fzf zoxide atuin direnv nvim lazygit ollama ghostty"
 {{- end }}
 
 for cmd in $optional; do

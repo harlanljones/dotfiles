@@ -13,11 +13,15 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
 - **Prompt failure recoloring** (`.zshrc` + `.bashrc`): Both shells hook Starship so every prompt segment renders red after a non-zero exit status and returns to cyan on success — zsh via a `starship_status_prompt` PROMPT wrapper, bash via a `starship_precmd` override.
 - **[herdr](https://github.com/harlanljones/herdr)** (`~/.config/herdr/config.toml`): Modern terminal multiplexer configured with tmux-parity keybindings (`Ctrl+Space` prefix), follow-CWD panes/splits, and terminal-native palette.
 - **[Ghostty](https://ghostty.org/)** (`~/.config/ghostty/config`): Terminal emulator config with Omarchy theme integration, JetBrainsMono Nerd Font, copy/paste keybindings, and split-resize bindings.
+- **[btop](https://github.com/aristocratos/btop)** (`~/.config/btop/btop.conf`, Linux): Adopted monitor settings (vim keys, truecolor, omarchy-managed theme) so upgrades stop clobbering them.
 - **Modern shell QoL** (both `.zshrc` and `.bashrc`, each guarded so missing tools never break the shell):
   - **[zoxide](https://github.com/ajeetdsouza/zoxide)**: Smarter `cd` with directory jumping.
-  - **[fzf](https://github.com/junegunn/fzf)**: Fuzzy keybindings and completion (`Ctrl-R` history, `Ctrl-T` files).
-  - **[atuin](https://github.com/atuinsh/atuin)**: Searchable, synced shell history.
+  - **[fzf](https://github.com/junegunn/fzf)**: Fuzzy keybindings and completion (`Ctrl-R` history, `Ctrl-T` files), with fd-backed default commands (`FZF_DEFAULT_COMMAND`, preview layout opts).
+  - **[atuin](https://github.com/atuinsh/atuin)**: Searchable shell history synced across machines (`~/.config/atuin/config.toml`).
   - **[direnv](https://direnv.net/)**: Per-directory environment loading.
+- **[ripgrep](https://github.com/BurntSushi/ripgrep) config** (`~/.config/ripgrep/rc`): Smart-case, column caps, hidden/followed files via `RIPGREP_CONFIG_PATH`.
+- **Man pages through [bat](https://github.com/sharkdp/bat)**: `MANPAGER` shim when bat is installed.
+- **[GitHub CLI](https://cli.github.com/)** (`~/.config/gh/config.yml`): Adopted config (editor/prompt settings, aliases); `hosts.yml` auth state deliberately unmanaged.
 
 ### 🧰 Version & Tool Management
 - **[mise](https://mise.jdx.dev/)** (`~/.config/mise/config.toml`): Manages CLI tools and runtime versions:
@@ -51,6 +55,7 @@ Declarative tracking for system-level packages that mise does not manage:
 - **Git Configuration** (`~/.config/git/config` + `~/.config/git/ignore`):
   - Identity, aliases, rebase-on-pull, histogram diffs, rerere, and `gh`-based credential helpers (gh path templated per-OS).
   - Global ignore for `.claude/settings.local.json` and macOS cruft.
+  - **[delta](https://github.com/dandavison/delta) integration** (`core.pager`, `interactive.diffFilter`, `zdiff3` merges) — rendered only when the delta binary is on PATH (`lookPath` guard), same for lazygit's pager.
 - **[Lazygit](https://github.com/jesseduffield/lazygit)** (`~/.config/lazygit/config.yml`):
   - Custom keybinding `<Ctrl-g>` to generate conventional git commit messages from staged diffs using local LLMs via Ollama.
 - **Ollama Commit Generator** (`~/.local/bin/lazygit-ollama-commit.sh`):
@@ -64,7 +69,9 @@ Declarative tracking for system-level packages that mise does not manage:
 
 ### 🔐 Secret Management & Issue Tracking
 - **[age Encryption](https://github.com/FiloSottile/age)** (`.chezmoi.toml.tmpl`): Chezmoi encrypts sensitive credentials and configurations at rest using age with identity key located at `~/.config/chezmoi/key.txt`.
-- **SSH Config** (`~/.ssh/config`): Managed starter with safe defaults (`AddKeysToAgent`) and per-host template; private keys are deliberately NOT managed (see `docs/recovery.md`).
+- **SSH Config** (`~/.ssh/config`): Managed defaults with the **1Password SSH agent** first (`IdentityAgent ~/.1password/agent.sock`, keys served from `~/.config/1password/ssh/agent.toml`) and on-disk `~/.ssh` keys as fallback; private keys are deliberately NOT managed (see `docs/recovery.md`).
+- **Systemd user environment** (`~/.config/environment.d/10-defaults.conf`, Linux): `EDITOR`/`VISUAL`/`PAGER`/`LESS` for all user systemd services (dashboard, tunnel, analytics) which never inherit shell rc files.
+- **macOS Defaults** (`run_onchange_after_30-macos-defaults.sh.tmpl`, darwin only): Declarative `defaults write` preferences — screenshot location, Finder path bar/extensions, Dock autohide, key repeat.
 - **[Linear](https://linear.app/) Integration** (`encrypted_private_dot_linear.toml.age` -> `~/.linear.toml`):
   - Encrypted configuration for `@schpet/linear-cli`.
   - **Linear Agent Tracking Skill** (`dot_codex/skills/linear-agent-tracking/`): Enables coding agents to read/query issues, claim tasks, create Wayfinder decision maps, track dependencies, and update ticket statuses.
@@ -160,16 +167,22 @@ Declarative tracking for system-level packages that mise does not manage:
 │   ├── rules/default.rules                       # Codex git commit/push safety policies
 │   └── skills/                                   # Custom skills (linear-agent-tracking, project-doc-planner)
 ├── dot_config/
+│   ├── 1password/ssh/                            # 1Password SSH agent key list (agent.toml)
+│   ├── atuin/                                    # Atuin shell history sync config
+│   ├── btop/                                     # btop monitor settings (Linux)
+│   ├── environment.d/                            # Systemd user-service env defaults (Linux)
 │   ├── ghostty/                                  # Ghostty terminal emulator config
-│   ├── git/                                      # Global git config and ignore file
+│   ├── gh/                                       # GitHub CLI config (hosts.yml unmanaged)
+│   ├── git/                                      # Global git config (.tmpl w/ delta guard) and ignore file
 │   ├── herdr/                                    # Herdr terminal multiplexer config and plugins
 │   ├── hypr/                                     # Hyprland monitor & input configs
-│   ├── lazygit/                                  # Lazygit configuration
+│   ├── lazygit/                                  # Lazygit configuration (templated delta pager)
 │   ├── mise/                                     # Mise runtime tool configurations
 │   ├── nvim/                                     # Neovim / LazyVim configurations
 │   ├── omarchy/                                  # Omarchy defaults and shell placement/settings
 │   ├── opencode/                                 # OpenCode config, subagent personas, and skills
 │   ├── pacman/                                   # Explicit native + AUR package lists (Linux)
+│   ├── ripgrep/                                  # ripgrep defaults (rc via RIPGREP_CONFIG_PATH)
 │   ├── starship.toml                             # Starship cross-shell prompt configuration
 │   └── systemd/user/                             # Systemd services & timers for dashboard, scrapers, and analytics
 ├── dot_gemini/
@@ -189,14 +202,15 @@ Declarative tracking for system-level packages that mise does not manage:
 ├── run_after_23-sync-agent-skills.sh.tmpl
 ├── run_once_after_24-setup-omarchy-agents.sh.tmpl
 ├── run_after_25-sync-omarchy-agents-workspace.sh.tmpl
-└── run_onchange_after_26-setup-omarchy-cursor.sh.tmpl
+├── run_onchange_after_26-setup-omarchy-cursor.sh.tmpl
+└── run_onchange_after_30-macos-defaults.sh.tmpl  # Declarative macOS defaults (darwin only)
 ```
 
 ---
 
 ## 🧪 Repo Hygiene & Recovery
 
-- **CI** (`.github/workflows/ci.yml`): On every push/PR, `chezmoi apply --dry-run --exclude encrypted` validates all templates and ignore rules on both Linux and macOS runners (encrypted entries are skipped since CI has no age key), plus a render-and-syntax check of the dependency gate script.
+- **CI** (`.github/workflows/ci.yml`): On every push/PR, `chezmoi apply --dry-run --exclude encrypted` validates all templates and ignore rules on both Linux and macOS runners (encrypted entries are skipped since CI has no age key), a render-and-run check of the dependency gate script, and a lint job (shellcheck over every rendered managed script + actionlint on workflows).
 - **Recovery guide** (`docs/recovery.md`): Age key backup procedure, key rotation, new-machine bootstrap order, and the `chezmoi doctor` checklist.
 
 ---
@@ -234,8 +248,8 @@ chezmoi status
 ## 💻 OS Support
 
 Templates use `.chezmoiignore.tmpl` to ensure only platform-relevant configurations are applied:
-- **macOS (`darwin`)**: Installs `.zshrc`, Starship, Mise, Neovim, Lazygit configs, git config, Ghostty, SSH config, and the Homebrew `Brewfile`.
-- **Linux (`omarchy`)**: Installs `.bashrc`, Hyprland, Herdr, Omarchy agent integrations, systemd user services/timers, plugin sync hooks, pacman package manifests, and usage collectors/scrapers.
+- **macOS (`darwin`)**: Installs `.zshrc`, Starship, Mise, Neovim, Lazygit configs, git config, Ghostty, SSH config, 1Password SSH agent config, GitHub CLI config, macOS defaults script, and the Homebrew `Brewfile`.
+- **Linux (`omarchy`)**: Installs `.bashrc`, Hyprland, Herdr, Omarchy agent integrations, systemd user services/timers + environment.d, pacman package manifests, btop, and usage collectors/scrapers.
 
 ---
 

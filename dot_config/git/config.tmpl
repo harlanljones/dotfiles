@@ -39,5 +39,18 @@
 	helper = 
 	helper = !{{ $gh }} auth git-credential
 [credential "https://gist.github.com"]
-	helper = 
+	helper =
 	helper = !{{ $gh }} auth git-credential
+{{- if lookPath "delta" }}
+
+# delta pager (only wired up when the binary is installed)
+[core]
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+[merge]
+	conflictstyle = zdiff3
+{{- end }}
+

@@ -1,0 +1,27 @@
+#!/bin/sh
+# Apply macOS user defaults declaratively. chezmoi re-runs this whenever the
+# script content changes (run_onchange). Linux machines: no-op.
+
+{{ if eq .chezmoi.os "darwin" -}}
+mkdir -p ~/Pictures/Screenshots
+
+# Screenshots land in ~/Pictures/Screenshots
+defaults write com.apple.screencapture location ~/Pictures/Screenshots
+
+# Finder: show all extensions, path bar, status bar
+defaults write NSGlobalDomain AppleShowAllExtensions -bool true
+defaults write com.apple.finder ShowPathbar -bool true
+defaults write com.apple.finder ShowStatusBar -bool true
+
+# Dock: autohide
+defaults write com.apple.dock autohide -bool true
+
+# Fast, short key repeat (feels closer to the Linux setup)
+defaults write NSGlobalDomain KeyRepeat -int 2
+defaults write NSGlobalDomain InitialKeyRepeat -int 15
+
+killall Finder Dock 2>/dev/null || true
+{{- else }}
+echo "macos-defaults: skipping on {{ .chezmoi.os }}"
+{{- end }}
+exit 0

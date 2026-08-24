@@ -44,3 +44,34 @@ jobs:
 
       - name: Dry-run apply (encrypted entries excluded -- no age key in CI)
         run: chezmoi apply --source "$GITHUB_WORKSPACE" --dry-run --exclude encrypted
+
+  lint:
+    name: Lint (shellcheck + actionlint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools
+        run: |
+          sudo apt-get update && sudo apt-get install -y shellcheck
+          curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash -s -- latest /tmp
+          sudo mv /tmp/actionlint /usr/local/bin/actionlint
+
+      - name: Install chezmoi (renders scripts for shellcheck)
+        run: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+
+      - name: Shellcheck all managed scripts
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          status=0
+          for tmpl in $(find . -name '*.sh.tmpl' -o -path './dot_local/bin/*' -name '*.tmpl' | sort); do
+            out="/tmp/sc_$(echo "$tmpl" | tr '/' '_')"
+            chezmoi execute-template --source "$PWD" < "$tmpl" > "$out"
+            echo "::group::shellcheck $tmpl"
+            shellcheck -S warning "$out" || status=1
+            echo "::endgroup::"
+          done
+          exit $status
+
+      - name: actionlint
+        run: actionlint -color

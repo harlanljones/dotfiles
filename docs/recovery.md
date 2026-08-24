@@ -99,7 +99,9 @@ save the output next to this doc before making big changes.
 ## 4. What is deliberately NOT managed here
 
 - **SSH private keys** (`~/.ssh/id_*`) -- provision out-of-band; only
-  `~/.ssh/config` is managed.
+  `~/.ssh/config` is managed. Prefer the configured **1Password SSH agent**
+  (`~/.config/1password/ssh/agent.toml`): save keys as vault items so they
+  never touch disk; on-disk `~/.ssh/id_ed25519` remains the fallback.
 - **Age key itself** (`~/.config/chezmoi/key.txt`) -- never put it in the repo.
 - **Browser profiles / gh auth state** -- log in per machine
   (`gh auth login` restores the git credential helper used by `dot_config/git/config`).

@@ -1,0 +1,7 @@
+# ripgrep config — loaded via RIPGREP_CONFIG_PATH (set in .bashrc/.zshrc)
+--smart-case
+--max-columns=160
+--max-columns-preview
+--follow
+--hidden
+--glob=!.git/

@@ -1,0 +1,20 @@
+# Atuin shell history — synced across machines.
+#
+# First run on a new machine:
+#   atuin register --email you@example.com   # once, creates the account
+#   atuin login                               # or link an existing account
+# Keys are end-to-end encrypted by atuin; the key lives in ~/.local/share/atuin.
+
+## How often to sync with the server
+sync_frequency = "5m"
+
+## Compact list UI, fuzzy search
+style = "compact"
+search_mode = "fuzzy"
+
+## Enter runs the command directly (ghostty/fish-style)
+enter_accept = true
+
+## Up-arrow searches history scoped to the current directory;
+## Ctrl-R stays global.
+filter_mode_shell_up_key_binding = "directory"

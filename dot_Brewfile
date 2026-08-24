@@ -18,6 +18,7 @@ brew "neovim"
 brew "starship"
 brew "zoxide"
 brew "atuin"
+brew "delta"
 
 # Apps & fonts
 cask "ghostty"

@@ -1,0 +1,10 @@
+# SSH keys served by the 1Password SSH agent (~/.1password/agent.sock).
+#
+# 1Password only offers keys listed here. After saving an SSH key as an item
+# in your vault (category: SSH Key), point at it below:
+#
+# [[ssh-key]]
+# vault = "Personal"
+#
+# Until entries exist here the agent serves nothing and SSH falls back to
+# ~/.ssh/id_ed25519 (see ssh_config).
