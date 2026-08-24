@@ -25,7 +25,8 @@ jobs:
       - name: Dry-run apply (encrypted entries excluded -- no age key in CI)
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          chezmoi apply --source "$GITHUB_WORKSPACE" --dry-run --exclude encrypted
+          chezmoi execute-template --source "$GITHUB_WORKSPACE" -f .chezmoi.toml.tmpl > "$RUNNER_TEMP/chezmoi.toml"
+          chezmoi apply --config "$RUNNER_TEMP/chezmoi.toml" --source "$GITHUB_WORKSPACE" --dry-run --exclude encrypted
 
       - name: Verify dependency gate script renders and runs
         run: |
@@ -43,7 +44,9 @@ jobs:
         run: brew install chezmoi
 
       - name: Dry-run apply (encrypted entries excluded -- no age key in CI)
-        run: chezmoi apply --source "$GITHUB_WORKSPACE" --dry-run --exclude encrypted
+        run: |
+          chezmoi execute-template --source "$GITHUB_WORKSPACE" -f .chezmoi.toml.tmpl > "$RUNNER_TEMP/chezmoi.toml"
+          chezmoi apply --config "$RUNNER_TEMP/chezmoi.toml" --source "$GITHUB_WORKSPACE" --dry-run --exclude encrypted
 
   lint:
     name: Lint (shellcheck + actionlint)
