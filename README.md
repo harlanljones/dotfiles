@@ -11,7 +11,7 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
 - **Bash** (`.bashrc` on Linux/Omarchy): Integrates with Omarchy shell defaults, Google Cloud SDK PATH and autocompletion, user PATH entries, coding-agent launch aliases (`codex`, `oc`, `cursor`, sandboxed `cline`), and guarded modern shell QoL hooks.
 - **[Starship](https://starship.rs/)** (`~/.config/starship.toml`): Fast, cyan-accented prompt displaying `user@host` (SSH sessions only), directory path with smart repo-root formatting, git branch with a compact dirty-repo dot indicator, in-progress rebase/merge state, detached-HEAD commit hash, and long command duration (`>=3s`).
 - **Prompt failure recoloring** (`.zshrc` + `.bashrc`): Both shells hook Starship so every prompt segment renders red after a non-zero exit status and returns to cyan on success — zsh via a `starship_status_prompt` PROMPT wrapper, bash via a `starship_precmd` override.
-- **[herdr](https://github.com/harlanljones/herdr)** (`~/.config/herdr/config.toml`): Modern terminal multiplexer configured with tmux-parity keybindings (`Ctrl+Space` prefix), follow-CWD panes/splits, and terminal-native palette.
+- **Herdr** (`~/.config/herdr/config.toml`): Modern terminal multiplexer configured with tmux-parity keybindings (`Ctrl+Space` prefix), follow-CWD panes/splits, and terminal-native palette. Pairs with [`herdr-outpost`](https://github.com/harlanljones/herdr-outpost) for remote dashboard/relay access.
 - **[Ghostty](https://ghostty.org/)** (`~/.config/ghostty/config`): Terminal emulator config with Omarchy theme integration, JetBrainsMono Nerd Font, copy/paste keybindings, and split-resize bindings.
 - **[btop](https://github.com/aristocratos/btop)** (`~/.config/btop/btop.conf`, Linux): Adopted monitor settings (vim keys, truecolor, omarchy-managed theme) so upgrades stop clobbering them.
 - **Modern shell QoL** (both `.zshrc` and `.bashrc`, each guarded so missing tools never break the shell):
@@ -210,7 +210,7 @@ Declarative tracking for system-level packages that mise does not manage:
 
 ## 🧪 Repo Hygiene & Recovery
 
-- **CI** (`.github/workflows/ci.yml`): On every push/PR, `chezmoi apply --dry-run --exclude encrypted` validates all templates and ignore rules on both Linux and macOS runners (encrypted entries are skipped since CI has no age key), a render-and-run check of the dependency gate script, and a lint job (shellcheck over every rendered managed script + actionlint on workflows).
+- **CI** (`.github/workflows/ci.yml`): On every push/PR, `chezmoi apply --dry-run --exclude encrypted` validates all templates and ignore rules on both Linux and macOS runners (encrypted entries are skipped since CI has no age key; the Linux job installs `age` so the gate script can run for real), plus a lint job (shellcheck over every rendered managed script + actionlint on workflows).
 - **Recovery guide** (`docs/recovery.md`): Age key backup procedure, key rotation, new-machine bootstrap order, and the `chezmoi doctor` checklist.
 
 ---
@@ -226,6 +226,11 @@ chezmoi init --apply https://github.com/harlanljones/dotfiles.git
 # Or if already initialized
 chezmoi apply
 ```
+
+The first run executes the dependency gate (`run_once_before_00-verify-deps.sh`), which
+fails early with install hints if `git`/`age` are missing and warns about optional tools
+(delta, atuin, direnv, ...). Full bootstrap order (age key restore, package manifests,
+`chezmoi doctor` checklist) lives in [`docs/recovery.md`](docs/recovery.md).
 
 ### Daily Workflow
 
