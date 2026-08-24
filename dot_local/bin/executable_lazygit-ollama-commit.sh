@@ -28,7 +28,12 @@ exit_parent_lazygit() {
     process_name="${process_name//[[:space:]]/}"
 
     if [[ "$process_name" == "lazygit" ]]; then
-      kill -TERM "$pid" 2>/dev/null || true
+      # Deferred and detached on purpose. Killing lazygit while it is still
+      # waiting on this script makes it tear down the subprocess and render
+      # the result as "exit status 128" before shutting down. Exiting 0 first
+      # lets lazygit record the command as successful; setsid keeps the timer
+      # out of lazygit's process group so its cleanup can't take it with it.
+      setsid bash -c "sleep 0.3; kill -TERM $pid" >/dev/null 2>&1 &
       return
     fi
 
