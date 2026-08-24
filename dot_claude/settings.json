@@ -5,7 +5,7 @@
       "Bash(git commit *)"
     ]
   },
-  "model": "haiku",
+  "model": "opus",
   "hooks": {
     "SessionStart": [
       {

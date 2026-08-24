@@ -1,5 +1,26 @@
 -- Save all, git commit (message drafted by ollama), git push, quit all
 vim.keymap.set("n", "<leader>P", function()
+  -- When nvim is git's editor (lazygit <c-g>, `git commit`, rebase todo), the
+  -- outer git process owns the commit. Committing from in here moves HEAD out
+  -- from under it and it dies with "cannot lock ref 'HEAD'" (exit 128), so
+  -- just save the message and hand control back.
+  local ft = vim.bo.filetype
+  local bufname = vim.fn.expand("%:t")
+  local git_buf = ft == "gitcommit"
+    or ft == "gitrebase"
+    or bufname == "COMMIT_EDITMSG"
+    or bufname == "MERGE_MSG"
+    or bufname == "TAG_EDITMSG"
+    or bufname == "git-rebase-todo"
+  if git_buf or vim.env.GIT_INDEX_FILE then
+    vim.cmd("silent! wall")
+    vim.notify("Saved; letting git finish.", vim.log.levels.INFO)
+    vim.schedule(function()
+      vim.cmd("qa")
+    end)
+    return
+  end
+
   vim.cmd("silent! wall")
 
   local root = vim.fn.getcwd()

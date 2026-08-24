@@ -35,3 +35,8 @@ ALWAYS prefer MCP graph tools over grep/glob/file-search for code discovery.
 - Before spawning a subagent, query the graph and coverage in the parent. Pass the tier, project, generation/freshness, bounded scope, queries and pagination state, qualified symbols, paths, call-chain findings, coverage evidence with ranges/reasons, source fallback already performed, and unresolved questions in the delegated task context.
 - Do not assume subagents inherit MCP access or the parent conversation. If a child lacks MCP tools, it must not call or claim MCP access. It should use the supplied evidence and read/grep exact source, especially every reported missed-coverage range.
 <!-- codebase-memory-mcp:end -->
+
+# Ticket Selection
+
+When picking the next ticket from Linear (or any numbered tracker), select the open ticket with the lowest number. Claim it (`--assignee self`) before starting work.
+
