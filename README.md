@@ -4,7 +4,29 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
 
 ---
 
+## 🖥️ Machines
+
+This repository identifies each workstation by a canonical **machine name** resolved at apply time (see `.chezmoi.toml.tmpl` → `[data] machine`). Detection is hostname-first with an OS fallback, so a box is identified deterministically without renaming the system:
+
+| Machine | OS | System hostname | Role | Meaning |
+| --- | --- | --- | --- | --- |
+| **Augustus** | Linux (Omarchy / Arch) | `omarchy` | The foundational architect | Built from the ground up to establish order over the bare metal — the supreme ruler of the local network. |
+| **Hadrian** | macOS (M1 Pro) | *(darwin)* | The roaming administrator | Spent his reign traveling the empire inspecting borders — a fitting title for a mobile, highly engineered Unix daily driver. |
+
+The registry (display name, role, backstory, per-machine theme) lives in `.chezmoidata/machines.yaml` and is referenced from templates via `{{ index .machines .machine ... }}`. The resolved name is surfaced in the Starship prompt (SSH sessions) and exported as `MACHINE_NAME` via `environment.d` on Linux.
+
+**Overriding the machine:** edit the `machine` mapping in `.chezmoi.toml.tmpl` (e.g. to pin a box regardless of OS, or to register a new machine). `.chezmoiignore.tmpl` already gates Augustus-only files behind `{{ if eq .machine "augustus" }}`, which is the pattern for per-machine branching.
+
+---
+
 ## 🛠️ Components & Configurations
+
+### 🌐 Dotfiles Showcase
+
+An interactive, local-first web app that visualizes these dotfiles — headlined by a **Starship Playground** that drives the real `starship` binary to reproduce your exact prompt (including the failure-recolor), plus a broad explorer of the tools below. Built with React + Vite + Tailwind and a Bun/Hono API; reads your live `~/.config/*` at runtime.
+
+- Repo: [harlanljones/dotfiles-showcase](https://github.com/harlanljones/dotfiles-showcase) (tracked here as a git submodule at `dotfiles-showcase/`).
+- Run locally: `bun install && bun run dev` (needs the `starship` binary on PATH). See `AGENTS.md` / `ROADMAP.md` in the showcase repo for architecture, milestones, and the Linear project.
 
 ### 🐚 Shell & Prompt
 - **Zsh** (`.zshrc` on macOS): Includes Starship prompt init with failure-recoloring wrapper, mise environment activation, editor defaults, `eza` alias shortcuts (`ls`, `lsa`, `lt`, `lta`), and guarded modern shell QoL hooks.

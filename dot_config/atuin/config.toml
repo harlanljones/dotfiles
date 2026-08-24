@@ -12,6 +12,11 @@ sync_frequency = "5m"
 style = "compact"
 search_mode = "fuzzy"
 
+## Max lines the search UI takes up inline at the bottom of the terminal.
+## 0 = fullscreen; atuin also forces fullscreen if this exceeds the
+## terminal height (default 40, taller than most terminals).
+inline_height = 15
+
 ## Enter runs the command directly (ghostty/fish-style)
 enter_accept = true
 

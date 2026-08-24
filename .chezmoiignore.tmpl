@@ -1,10 +1,26 @@
 README.md
 .github
 .github/**
+
+# Dotfiles Showcase — standalone web app, consumed as a git submodule.
+# Never apply it as a dotfile or manage its .gitmodules.
+dotfiles-showcase
+dotfiles-showcase/**
+.gitmodules
+
+
 docs
 docs/**
 .gemini/antigravity-cli
 .gemini/antigravity-cli/**
+{{- if and (eq .chezmoi.os "linux") (ne .machine "augustus") }}
+.config/omarchy
+.config/omarchy/**
+.config/pacman
+.config/pacman/**
+.config/btop
+.config/btop/**
+{{- end }}
 {{- if eq .chezmoi.os "darwin" }}
 .bashrc
 .config/hypr

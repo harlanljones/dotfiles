@@ -1,0 +1,17 @@
+machines:
+  augustus:
+    displayName: Augustus
+    os: linux
+    hostname: omarchy
+    role: "The foundational architect"
+    backstory: "You built this machine from the ground up to establish order over the bare metal, making it the supreme ruler of your local network."
+    theme:
+      accent: "bold dimmed cyan"
+  hadrian:
+    displayName: Hadrian
+    os: darwin
+    hostname: "<hadrian-mac-hostname>"
+    role: "The roaming administrator"
+    backstory: "Hadrian spent most of his reign traveling the empire inspecting borders, making it a fitting title for a mobile, highly engineered Unix daily driver."
+    theme:
+      accent: "bold purple"

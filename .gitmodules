@@ -1,0 +1,3 @@
+[submodule "dotfiles-showcase"]
+	path = dotfiles-showcase
+	url = https://github.com/harlanljones/dotfiles-showcase.git
