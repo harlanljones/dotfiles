@@ -1,8 +1,10 @@
--- Save all, git commit, git push, quit all
+-- Save all, git commit (message drafted by ollama), git push, quit all
 vim.keymap.set("n", "<leader>P", function()
   vim.cmd("silent! wall")
 
   local root = vim.fn.getcwd()
+  local msg_generator = vim.fn.expand("~/.local/bin/ollama-commit-msg.sh")
+
   local function git(...)
     return vim.system({ "git", ... }, { cwd = root, text = true }):wait()
   end
@@ -18,41 +20,63 @@ vim.keymap.set("n", "<leader>P", function()
   end
 
   local dirty = vim.trim(git("status", "--porcelain").stdout) ~= ""
-  local function commit_and_push(msg)
-    if dirty then
-      local add = git("add", "-A")
-      if add.code ~= 0 then
-        return fail(add, "git add failed")
-      end
-      local commit = git("commit", "-m", msg)
-      if commit.code ~= 0 then
-        return fail(commit, "git commit failed")
-      end
-    end
 
+  local function push_and_quit(committed_msg)
     local push = git("push")
     if push.code ~= 0 then
       return fail(push, "git push failed")
     end
-
-    vim.notify(dirty and ("Committed and pushed: " .. msg) or "Nothing to commit; push up to date. Bye!", vim.log.levels.INFO)
+    vim.notify(
+      committed_msg and ("Committed and pushed: " .. committed_msg) or "Nothing to commit; push up to date. Bye!",
+      vim.log.levels.INFO
+    )
     vim.schedule(function()
       vim.cmd("qa!")
     end)
   end
 
   if not dirty then
-    return commit_and_push()
+    return push_and_quit(nil)
   end
 
-  vim.ui.input({
-    prompt = "Commit message: ",
-    default = os.date("chore: update %Y-%m-%d %H:%M"),
-  }, function(msg)
-    if not msg or vim.trim(msg) == "" then
-      vim.notify("Aborted: no commit message", vim.log.levels.WARN)
-      return
-    end
-    commit_and_push(vim.trim(msg))
+  -- Stage everything first so the generator sees the same diff we'll commit.
+  local add = git("add", "-A")
+  if add.code ~= 0 then
+    return fail(add, "git add failed")
+  end
+
+  local function prompt_and_commit(default_msg)
+    vim.ui.input({ prompt = "Commit message: ", default = default_msg }, function(msg)
+      if not msg or vim.trim(msg) == "" then
+        vim.notify("Aborted: no commit message (changes left staged)", vim.log.levels.WARN)
+        return
+      end
+      msg = vim.trim(msg)
+      local commit = git("commit", "-m", msg)
+      if commit.code ~= 0 then
+        return fail(commit, "git commit failed")
+      end
+      push_and_quit(msg)
+    end)
+  end
+
+  local fallback_msg = os.date("chore: update %Y-%m-%d %H:%M")
+
+  if vim.fn.executable(msg_generator) ~= 1 then
+    return prompt_and_commit(fallback_msg)
+  end
+
+  -- Draft the message with the local model, then prompt. Async so nvim stays
+  -- responsive; the generator enforces its own OLLAMA_TIMEOUT.
+  vim.notify("Generating commit message...", vim.log.levels.INFO)
+  vim.system({ msg_generator }, { cwd = root, text = true }, function(out)
+    vim.schedule(function()
+      local subject = vim.split(vim.trim(out.stdout or ""), "\n", { plain = true })[1] or ""
+      if out.code ~= 0 or subject == "" then
+        vim.notify("Ollama message failed, using fallback: " .. vim.trim(out.stderr or ""), vim.log.levels.WARN)
+        return prompt_and_commit(fallback_msg)
+      end
+      prompt_and_commit(subject)
+    end)
   end)
-end, { desc = "Write all, Git commit, push, quit all" })
+end, { desc = "Write all, Git commit (ollama msg), push, quit all" })

@@ -80,8 +80,10 @@ Declarative tracking for system-level packages that mise does not manage:
   - **[delta](https://github.com/dandavison/delta) integration** (`core.pager`, `interactive.diffFilter`, `zdiff3` merges) — rendered only when the delta binary is on PATH (`lookPath` guard), same for lazygit's pager.
 - **[Lazygit](https://github.com/jesseduffield/lazygit)** (`~/.config/lazygit/config.yml`):
   - Custom keybinding `<Ctrl-g>` to generate conventional git commit messages from staged diffs using local LLMs via Ollama.
-- **Ollama Commit Generator** (`~/.local/bin/lazygit-ollama-commit.sh`):
-  - Automated commit message generation script using `qwen2.5-coder:7b` (configurable via `OLLAMA_COMMIT_MODEL`) with fallback handling and `$EDITOR` review step.
+- **Ollama Commit Generator** (`~/.local/bin/ollama-commit-msg.sh`):
+  - Prints a Conventional Commit message for the staged diff using `qwen2.5-coder:7b` (configurable via `OLLAMA_COMMIT_MODEL`), with sanitizing and fallback handling. Consumed by:
+    - `~/.local/bin/lazygit-ollama-commit.sh` — lazygit's `<Ctrl-g>`, adds an `$EDITOR` review step.
+    - Neovim `<leader>P` — pre-fills the commit prompt before write-all/commit/push/quit.
 - **Agent Git Safety Policies**:
   - Enforced denial of automated `git commit` and `git push` operations across all coding agent harnesses:
     - **Cline**: `~/.local/bin/cline-safety/git` wrapper intercepting automated commits/pushes.
