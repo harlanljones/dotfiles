@@ -8,7 +8,7 @@ dashboard and pushes them into both this chat and that widget.
 
 Run these steps:
 
-1. Open `https://app.cline.bot/dashboard/usage` for the user. If you have a
+1. Open `https://app.cline.bot/dashboard/subscription` for the user. If you have a
    browser tool, navigate there and read the page directly. Otherwise, run
    a terminal command to open it (`xdg-open` on Linux, `open` on macOS), and
    ask the user to read off three numbers from the page:

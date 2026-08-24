@@ -31,7 +31,7 @@ the timer isn't installed, or the user wants the numbers right now in chat.
    window to sign in), then continue with the steps below for the numbers
    they need right now.
 
-2. **Read the numbers.** Open `https://opencode.ai/go` for the user — it
+2. **Read the numbers.** Open `https://opencode.ai/workspace/wrk_01M0JWEHT6TBW13JZBZQVW1XVB/go` for the user — it
    redirects a signed-in browser to their workspace Go page. With a browser
    tool, navigate there and read the page directly. Otherwise open it
    (`xdg-open` on Linux) and ask the user to read off three pairs:

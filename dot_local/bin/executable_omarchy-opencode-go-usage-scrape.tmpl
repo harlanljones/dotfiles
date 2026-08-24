@@ -35,8 +35,7 @@ const PROFILE_DIR = path.join(
   os.homedir(),
   ".local/state/omarchy/agents/opencode-go-scraper-profile"
 );
-const ORIGIN = "https://opencode.ai";
-const GO_URL = `${ORIGIN}/go`;
+const GO_URL = "https://opencode.ai/workspace/wrk_01M0JWEHT6TBW13JZBZQVW1XVB/go";
 
 const WINDOWS = ["rollingUsage", "weeklyUsage", "monthlyUsage"];
 
@@ -91,23 +90,10 @@ async function main() {
   try {
     const page = context.pages()[0] || (await context.newPage());
 
-    // The workspace id is never configured: the marketing page links to the
-    // signed-in workspace, so following that link both finds the id and
-    // proves the session is still good.
-    await page.goto(GO_URL, { waitUntil: "networkidle" });
-    const href = await page
-      .locator('a[href^="/workspace/"][href$="/go"]')
-      .first()
-      .getAttribute("href")
-      .catch(() => null);
-    if (!href) {
-      console.error(
-        "No workspace link on /go — the saved session has likely expired. Re-run omarchy-opencode-go-usage-login."
-      );
-      process.exit(1);
-    }
-
-    source = ORIGIN + href;
+    // The workspace id is fixed, so no discovery click is needed: navigate
+    // straight to the /go page. If the session has expired the page won't
+    // inline the usage payload and the window reads below fail cleanly.
+    source = GO_URL;
     await page.goto(source, { waitUntil: "networkidle" });
     html = await page.content();
   } finally {

@@ -337,7 +337,7 @@ def estimate_limits(pass_messages: list[tuple[int, str, dict]]) -> dict[str, Any
 
 # Cline exposes no public rate-limit API (see the module docstring), but
 # `omarchy-cline-usage-override` lets the /usage Cline workflow drop real
-# numbers read off https://app.cline.bot/dashboard/usage here. Fresher than
+# numbers read off https://app.cline.bot/dashboard/subscription here. Fresher than
 # DASHBOARD_OVERRIDE_MAX_AGE, it replaces the priced estimate outright;
 # older than that it's more likely to mislead than help, so it's ignored.
 DASHBOARD_OVERRIDE_MAX_AGE = timedelta(hours=24)

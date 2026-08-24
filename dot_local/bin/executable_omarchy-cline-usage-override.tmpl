@@ -3,7 +3,7 @@
 # omarchy:summary=Record real Cline Pass limits read off the dashboard
 # omarchy:args=[--session PCT] [--weekly PCT [--weekly-resets DURATION]] [--monthly PCT [--monthly-resets DURATION]]
 # omarchy:hidden=true
-"""Persist ClinePass limits read off https://app.cline.bot/dashboard/usage.
+"""Persist ClinePass limits read off https://app.cline.bot/dashboard/subscription.
 
 Cline exposes no API for rate-limit usage, so `omarchy-agent-usage-cline`
 can only price local transcripts against reference rates and estimate the
@@ -33,7 +33,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
-DASHBOARD_URL = "https://app.cline.bot/dashboard/usage"
+DASHBOARD_URL = "https://app.cline.bot/dashboard/subscription"
 
 DURATION_RE = re.compile(
   r"^\s*(?:(?P<days>\d+)d)?\s*(?:(?P<hours>\d+)h)?\s*(?:(?P<minutes>\d+)m)?\s*$"
