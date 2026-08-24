@@ -3,6 +3,21 @@ name: linear-agent-tracking
 description: Coordinate agent-owned work in Linear using @schpet/linear-cli. Use when creating or working a Wayfinder map, publishing Matt Pocock-style tickets, claiming ready work, recording progress or resolution, or configuring Linear as a repo's issue tracker.
 ---
 
+## Load synced Linear credentials
+
+Before invoking the CLI, load the chezmoi-managed TOML without printing the key:
+
+```bash
+load_linear_toml() {
+  local file="${1:-$HOME/.linear.toml}"
+  export LINEAR_API_KEY="$(sed -n 's/^LINEAR_API_KEY[[:space:]]*=[[:space:]]*"\(.*\)"$/\1/p' "$file")"
+}
+
+load_linear_toml
+```
+
+Use this loader for every Linear workflow in this skill.
+
 # Linear Agent Tracking
 
 Use Linear as the shared, durable task graph for agents. This skill supplies the tracker mechanics; preserve the workflow semantics of the skill that produced the work.
