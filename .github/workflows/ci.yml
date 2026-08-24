@@ -19,6 +19,9 @@ jobs:
       - name: Install chezmoi
         run: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
 
+      - name: Install age
+        run: sudo apt-get update && sudo apt-get install -y age
+
       - name: Dry-run apply (encrypted entries excluded -- no age key in CI)
         run: |
           export PATH="$HOME/.local/bin:$PATH"
@@ -27,7 +30,7 @@ jobs:
       - name: Verify dependency gate script renders and runs
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          chezmoi execute-template < run_once_before_00-verify-deps.sh.tmpl > /tmp/verify-deps.sh
+          chezmoi execute-template --source "$GITHUB_WORKSPACE" < run_once_before_00-verify-deps.sh.tmpl > /tmp/verify-deps.sh
           sh -n /tmp/verify-deps.sh && sh /tmp/verify-deps.sh
 
   validate-macos:
