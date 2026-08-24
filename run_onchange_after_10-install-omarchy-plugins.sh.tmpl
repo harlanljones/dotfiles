@@ -16,11 +16,11 @@ PLUGINS_DIR="$HOME/.config/omarchy/plugins"
 # origin remote matches $1, or nothing if none is installed for that url.
 installed_id_for_url() {
   local url="${1%.git}"
-  local dir
+  local dir remote
   [[ -d "$PLUGINS_DIR" ]] || return 0
   for dir in "$PLUGINS_DIR"/*/; do
     [[ -d "$dir/.git" ]] || continue
-    local remote="$(git -C "$dir" remote get-url origin 2>/dev/null || true)"
+    remote="$(git -C "$dir" remote get-url origin 2>/dev/null || true)"
     remote="${remote%.git}"
     if [[ "$remote" == "$url" ]]; then
       jq -r '.id' "$dir/manifest.json" 2>/dev/null || true
