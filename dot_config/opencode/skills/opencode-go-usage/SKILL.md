@@ -27,8 +27,9 @@ the timer isn't installed, or the user wants the numbers right now in chat.
    the three percentages and reset times, and stop.
 
    If it fails with "the saved session has likely expired", tell the user to
-   run `omarchy-opencode-go-usage-login` once (it opens a visible Chrome
-   window to sign in), then continue with the steps below for the numbers
+   run `omarchy-opencode-go-usage-login` once (it opens a visible window in
+   the machine's default Chromium-based browser to sign in), then continue
+   with the steps below for the numbers
    they need right now.
 
 2. **Read the numbers.** Open `https://opencode.ai/workspace/wrk_01M0JWEHT6TBW13JZBZQVW1XVB/go` for the user — it

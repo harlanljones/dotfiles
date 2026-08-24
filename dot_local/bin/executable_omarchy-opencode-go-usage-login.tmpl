@@ -7,13 +7,14 @@
 // omarchy-opencode-go-usage-scrape.timer) reads the real Rolling/Weekly/Monthly
 // Go limits off https://opencode.ai/workspace/<id>/go, since OpenCode has no
 // quota endpoint. That page needs a logged-in browser session, so the scraper
-// reuses a dedicated Google Chrome profile instead of your real browser (no
-// profile-lock conflicts, and your everyday browsing session is never touched).
+// reuses a dedicated browser profile instead of your real one (no profile-lock
+// conflicts, and your everyday browsing session is never touched).
 //
 // Run this once (and again whenever the scraper's logs say the session
-// expired) to sign that dedicated profile in: it opens a visible Chrome
-// window, you log in as normal, and closing the window saves the session
-// for the scraper to reuse headlessly from then on.
+// expired) to sign that dedicated profile in: it opens a visible window in
+// the machine's default Chromium-based browser, you log in as normal, and
+// closing the window saves the session for the scraper to reuse headlessly
+// from then on.
 
 const path = require("path");
 const os = require("os");
@@ -29,13 +30,64 @@ const PROFILE_DIR = path.join(
 );
 const GO_URL = "https://opencode.ai/workspace/wrk_01M0JWEHT6TBW13JZBZQVW1XVB/go";
 
+// Playwright only drives Chromium-family browsers, so "default machine
+// browser" means the xdg default when it's Chromium-based; otherwise fall
+// back through the usual install paths. omarchy-opencode-go-usage-scrape
+// runs this same resolution against the same profile, so both always end up
+// on the same engine.
+function findDefaultBrowser() {
+  const { execFileSync } = require("child_process");
+  const CHROMIUM_FAMILY = /(chrome|chromium|edge|brave|vivaldi|opera)/i;
+  const fromPath = (bin) => {
+    if (bin.includes("/")) return fs.existsSync(bin) ? bin : null;
+    for (const dir of (process.env.PATH || "").split(":")) {
+      const full = path.join(dir, bin);
+      if (fs.existsSync(full)) return full;
+    }
+    return null;
+  };
+
+  try {
+    const desktop = execFileSync("xdg-settings", ["get", "default-web-browser"], {
+      encoding: "utf8",
+    }).trim();
+    for (const dir of [
+      path.join(os.homedir(), ".local/share/applications"),
+      "/usr/share/applications",
+    ]) {
+      try {
+        const ini = fs.readFileSync(path.join(dir, desktop), "utf8");
+        const exec = /^Exec=(\S+)/m.exec(ini);
+        const bin = exec && fromPath(exec[1]);
+        if (bin && CHROMIUM_FAMILY.test(bin)) return bin;
+      } catch {}
+    }
+  } catch {}
+
+  const fallbacks = [
+    "/opt/google/chrome/chrome",
+    "/usr/bin/google-chrome-stable",
+    "/usr/bin/google-chrome",
+    "/usr/bin/chromium",
+    "/usr/bin/chromium-browser",
+  ];
+  return fallbacks.find((p) => fs.existsSync(p)) || null;
+}
+
 async function main() {
   const { chromium } = require(PLAYWRIGHT_DIR);
+  const browser = findDefaultBrowser();
+  if (!browser) {
+    console.error(
+      "No Chromium-based browser found — install Google Chrome (or set your default browser to one)."
+    );
+    process.exit(1);
+  }
   fs.mkdirSync(PROFILE_DIR, { recursive: true });
 
-  console.log("Opening Chrome — log into OpenCode, then close the window when you see your Go usage.");
+  console.log(`Opening ${browser} — log into OpenCode, then close the window when you see your Go usage.`);
   const context = await chromium.launchPersistentContext(PROFILE_DIR, {
-    channel: "chrome",
+    executablePath: browser,
     headless: false,
     viewport: { width: 1100, height: 900 },
   });

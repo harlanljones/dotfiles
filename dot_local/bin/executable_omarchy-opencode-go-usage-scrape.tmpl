@@ -7,8 +7,8 @@
 // report raw token totals per provider plus hand-configured ceilings from
 // OPENCODE_USAGE_LIMITS. The Go plan's real Rolling/Weekly/Monthly meters
 // exist only in the workspace UI. This script reads them off
-// https://opencode.ai/workspace/<id>/go using headless Google Chrome (via
-// the dedicated profile omarchy-opencode-go-usage-login signs in), then
+// https://opencode.ai/workspace/<id>/go using headless the machine's default
+// Chromium-family browser (via
 // hands them to omarchy-opencode-go-usage-override, which the collector
 // prefers for the next 24 hours.
 //
@@ -38,6 +38,48 @@ const PROFILE_DIR = path.join(
 const GO_URL = "https://opencode.ai/workspace/wrk_01M0JWEHT6TBW13JZBZQVW1XVB/go";
 
 const WINDOWS = ["rollingUsage", "weeklyUsage", "monthlyUsage"];
+
+// Must resolve to the same browser omarchy-opencode-go-usage-login used to
+// sign this profile in, or the profile may be rejected as a version mismatch.
+// See findDefaultBrowser there for the full rationale.
+function findDefaultBrowser() {
+  const { execFileSync } = require("child_process");
+  const CHROMIUM_FAMILY = /(chrome|chromium|edge|brave|vivaldi|opera)/i;
+  const fromPath = (bin) => {
+    if (bin.includes("/")) return fs.existsSync(bin) ? bin : null;
+    for (const dir of (process.env.PATH || "").split(":")) {
+      const full = path.join(dir, bin);
+      if (fs.existsSync(full)) return full;
+    }
+    return null;
+  };
+
+  try {
+    const desktop = execFileSync("xdg-settings", ["get", "default-web-browser"], {
+      encoding: "utf8",
+    }).trim();
+    for (const dir of [
+      path.join(os.homedir(), ".local/share/applications"),
+      "/usr/share/applications",
+    ]) {
+      try {
+        const ini = fs.readFileSync(path.join(dir, desktop), "utf8");
+        const exec = /^Exec=(\S+)/m.exec(ini);
+        const bin = exec && fromPath(exec[1]);
+        if (bin && CHROMIUM_FAMILY.test(bin)) return bin;
+      } catch {}
+    }
+  } catch {}
+
+  const fallbacks = [
+    "/opt/google/chrome/chrome",
+    "/usr/bin/google-chrome-stable",
+    "/usr/bin/google-chrome",
+    "/usr/bin/chromium",
+    "/usr/bin/chromium-browser",
+  ];
+  return fallbacks.find((p) => fs.existsSync(p)) || null;
+}
 
 // The inlined payload puts the two numbers right after the window's key.
 // Bounding each segment at the next window key keeps one window from
@@ -81,8 +123,13 @@ async function main() {
     process.exit(1);
   }
 
+  const browser = findDefaultBrowser();
+  if (!browser) {
+    console.error("No Chromium-based browser found — run omarchy-opencode-go-usage-login after installing one.");
+    process.exit(1);
+  }
   const context = await chromium.launchPersistentContext(PROFILE_DIR, {
-    channel: "chrome",
+    executablePath: browser,
     headless: true,
   });
   let html;
