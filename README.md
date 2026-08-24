@@ -8,10 +8,10 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
 
 This repository identifies each workstation by a canonical **machine name** resolved at apply time (see `.chezmoi.toml.tmpl` → `[data] machine`). Detection is hostname-first with an OS fallback, so a box is identified deterministically without renaming the system:
 
-| Machine | OS | System hostname | Role | Meaning |
-| --- | --- | --- | --- | --- |
-| **Augustus** | Linux (Omarchy / Arch) | `omarchy` | The foundational architect | Built from the ground up to establish order over the bare metal — the supreme ruler of the local network. |
-| **Hadrian** | macOS (M1 Pro) | *(darwin)* | The roaming administrator | Spent his reign traveling the empire inspecting borders — a fitting title for a mobile, highly engineered Unix daily driver. |
+| Machine | OS | System hostname |
+| --- | --- | --- |
+| **Augustus** | Linux (Omarchy / Arch) | `omarchy` |
+| **Hadrian** | macOS (M1 Pro) | *(darwin)* |
 
 The registry (display name, role, backstory, per-machine theme) lives in `.chezmoidata/machines.yaml` and is referenced from templates via `{{ index .machines .machine ... }}`. The resolved name is surfaced in the Starship prompt (SSH sessions) and exported as `MACHINE_NAME` via `environment.d` on Linux.
 
