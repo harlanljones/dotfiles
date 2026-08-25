@@ -60,11 +60,25 @@
         }
       }
     },
-    "bai-luna": {
+    "bai-glm": {
       "api": "https://api.b.ai/v1",
-      "options": {
-        "apiKey": "sk-djw3tsh82guq47i11inhss2kt8i62fph"
-      },
+      "env": [
+        "BAI_GLM_API_KEY"
+      ],
+      "models": {
+        "glm-5.2": {
+          "name": "GLM 5.2"
+        },
+        "grok-4.6": {
+          "name": "Grok 4.6"
+        }
+      }
+    },
+    "bai-gpt": {
+      "api": "https://api.b.ai/v1",
+      "env": [
+        "BAI_GPT_API_KEY"
+      ],
       "models": {
         "gpt-5.6-luna": {
           "name": "GPT-5.6 Luna"
