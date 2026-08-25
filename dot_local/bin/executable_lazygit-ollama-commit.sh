@@ -29,7 +29,9 @@ trap 'rm -f "$TMP_MSG_FILE"' EXIT
 # git commit with the generated message loaded into your editor for
 # review/edit before it's finalized. Saving with <leader>P in nvim hands
 # control back here rather than committing itself, so the push below is the
-# one that runs.
+# one that runs. The marker lets nvim recognize this session even though the
+# buffer is a /tmp file, not COMMIT_EDITMSG; any non-approved exit aborts.
+export NVIM_GIT_EDITOR_SESSION=1
 git commit --edit --file="$TMP_MSG_FILE"
 
 # --- Push --------------------------------------------------------------

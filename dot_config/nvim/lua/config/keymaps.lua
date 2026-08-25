@@ -1,18 +1,52 @@
+-- Files where git itself asked us to write a message. Exiting these without
+-- <leader>P means "abandon": ExitPre below converts that to :cq (non-zero) so
+-- git gives up instead of finalizing the commit (and any wrapper script stops
+-- before its push). The env marker covers sessions spawned by our own
+-- lazygit-ollama-commit.sh, whose message buffer is a /tmp file, not
+-- COMMIT_EDITMSG.
+local function is_git_editor_session()
+  if vim.env.NVIM_GIT_EDITOR_SESSION == "1" then
+    return true
+  end
+  local ft = vim.bo.filetype
+  local bufname = vim.fn.expand("%:t")
+  return ft == "gitcommit"
+    or bufname == "COMMIT_EDITMSG"
+    or bufname == "MERGE_MSG"
+    or bufname == "TAG_EDITMSG"
+end
+
+vim.api.nvim_create_autocmd("ExitPre", {
+  group = vim.api.nvim_create_augroup("git-editor-abort", { clear = true }),
+  callback = function(args)
+    if not is_git_editor_session() then
+      return
+    end
+    if vim.g.git_editor_approved then
+      vim.g.git_editor_approved = nil
+      return
+    end
+    -- Delete first so our own :cq! doesn't re-enter.
+    vim.api.nvim_del_autocmd(args.id)
+    vim.notify("Commit abandoned", vim.log.levels.WARN)
+    vim.cmd("cq!")
+  end,
+})
+
 -- Save all, git commit (message drafted by ollama), git push, quit all
 vim.keymap.set("n", "<leader>P", function()
   -- When nvim is git's editor (lazygit <c-g>, `git commit`, rebase todo), the
   -- outer git process owns the commit. Committing from in here moves HEAD out
   -- from under it and it dies with "cannot lock ref 'HEAD'" (exit 128), so
-  -- just save the message and hand control back.
+  -- just save the message and hand control back. Approved via <leader>P only;
+  -- every other exit path aborts (see ExitPre above).
   local ft = vim.bo.filetype
   local bufname = vim.fn.expand("%:t")
-  local git_buf = ft == "gitcommit"
+  local git_buf = is_git_editor_session()
     or ft == "gitrebase"
-    or bufname == "COMMIT_EDITMSG"
-    or bufname == "MERGE_MSG"
-    or bufname == "TAG_EDITMSG"
     or bufname == "git-rebase-todo"
   if git_buf or vim.env.GIT_INDEX_FILE then
+    vim.g.git_editor_approved = true
     vim.cmd("silent! wall")
     vim.notify("Saved; letting git finish.", vim.log.levels.INFO)
     vim.schedule(function()
