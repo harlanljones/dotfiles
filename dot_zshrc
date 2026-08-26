@@ -22,6 +22,18 @@ starship_status_prompt() {
       new_style=$'%{\e['"${style_prefix}"$'31m%}'
       rendered_prompt="${rendered_prompt//$old_style/$new_style}"
     done
+
+    # TC-01 (HJ-431): truecolor cyan 38;2;46;222;250 -> red 38;2;255;102;92.
+    # Mirror the 8-color loop; cyan-only (zsh semantics). The RGB is the starship
+    # default palette cyan (#2EDEFA); if a custom hex palette is adopted, update
+    # these literals to match the active palette.
+    local tc_cyan="46;222;250"
+    local tc_red="255;102;92"
+    for style_prefix in $style_prefixes; do
+      old_style=$'%{\e['"${style_prefix}"$'38;2;'"${tc_cyan}"$'m%}'
+      new_style=$'%{\e['"${style_prefix}"$'38;2;'"${tc_red}"$'m%}'
+      rendered_prompt="${rendered_prompt//$old_style/$new_style}"
+    done
   fi
 
   print -rn -- "$rendered_prompt"
