@@ -1,0 +1,39 @@
+{
+  "hooks": {
+    "SessionStart": [
+    {
+        "hooks": [
+            {
+                "command": "bash '/home/harlan/.codex/herdr-agent-state.sh' session",
+                "timeout": 10,
+                "type": "command"
+            }
+        ]
+    },
+    {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+            {
+                "type": "command",
+                "command": "'/home/harlan/.local/bin/codebase-memory-mcp' hook-augment",
+                "command_windows": "& '/home/harlan/.local/bin/codebase-memory-mcp' hook-augment",
+                "timeout": 5
+            }
+        ]
+    }
+],
+    "SubagentStart": [
+    {
+        "matcher": "*",
+        "hooks": [
+            {
+                "type": "command",
+                "command": "'/home/harlan/.local/bin/codebase-memory-mcp' hook-augment",
+                "command_windows": "& '/home/harlan/.local/bin/codebase-memory-mcp' hook-augment",
+                "timeout": 5
+            }
+        ]
+    }
+]
+  }
+}

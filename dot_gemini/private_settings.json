@@ -1,0 +1,62 @@
+{
+  "mcpServers": {
+    "codebase-memory-mcp": {"command":"/home/harlan/.local/bin/codebase-memory-mcp","args":[]}
+  },
+  "hooks": {
+    "BeforeTool": [
+    {
+        "matcher": "google_web_search|grep_search",
+        "hooks": [
+            {
+                "type": "command",
+                "command": "node -e \"process.stdout.write(JSON.stringify({hookSpecificOutput:{hookEventName:'BeforeTool',additionalContext:'Code discovery: prefer codebase-memory-mcp search_graph, trace_path, and get_code_snippet over grep or file search.'}}))\""
+            }
+        ]
+    }
+],
+    "AfterTool": [
+    {
+        "matcher": "read_file",
+        "hooks": [
+            {
+                "type": "command",
+                "command": "'/home/harlan/.local/bin/codebase-memory-mcp' hook-augment --dialect gemini",
+                "timeout": 5000
+            }
+        ]
+    }
+],
+    "SessionStart": [
+    {
+        "matcher": "startup",
+        "hooks": [
+            {
+                "type": "command",
+                "command": "node -e \"process.stdout.write(JSON.stringify({hookSpecificOutput:{hookEventName:'SessionStart',additionalContext:'Code discovery: prefer codebase-memory-mcp search_graph, trace_path, get_code_snippet, query_graph, and search_code; run index_repository first when needed.'}}))\"",
+                "timeout": 5000
+            }
+        ]
+    },
+    {
+        "matcher": "resume",
+        "hooks": [
+            {
+                "type": "command",
+                "command": "node -e \"process.stdout.write(JSON.stringify({hookSpecificOutput:{hookEventName:'SessionStart',additionalContext:'Code discovery: prefer codebase-memory-mcp search_graph, trace_path, get_code_snippet, query_graph, and search_code; run index_repository first when needed.'}}))\"",
+                "timeout": 5000
+            }
+        ]
+    },
+    {
+        "matcher": "clear",
+        "hooks": [
+            {
+                "type": "command",
+                "command": "node -e \"process.stdout.write(JSON.stringify({hookSpecificOutput:{hookEventName:'SessionStart',additionalContext:'Code discovery: prefer codebase-memory-mcp search_graph, trace_path, get_code_snippet, query_graph, and search_code; run index_repository first when needed.'}}))\"",
+                "timeout": 5000
+            }
+        ]
+    }
+]
+  }
+}

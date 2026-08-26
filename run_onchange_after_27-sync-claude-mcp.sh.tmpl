@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+# Sync curated mcpServers into the live Claude state file without touching
+# any other state. Idempotent: exits early when already in sync.
+
+set -euo pipefail
+
+CLAUDE_JSON="${HOME}/.claude.json"
+MCP='{{ .claude.mcpServers | toJson }}'
+
+if [[ ! -f "$CLAUDE_JSON" ]]; then
+  printf '{}\n' > "$CLAUDE_JSON"
+  chmod 600 "$CLAUDE_JSON"
+fi
+
+if ! jq -e . "$CLAUDE_JSON" >/dev/null 2>&1; then
+  echo "error: $CLAUDE_JSON is not valid JSON; refusing to modify" >&2
+  exit 1
+fi
+
+want="$(printf '%s' "$MCP" | jq -Sc '.')"
+have="$(jq -Sc '.mcpServers // {}' "$CLAUDE_JSON")"
+
+if [[ "$want" == "$have" ]]; then
+  exit 0
+fi
+
+cp "$CLAUDE_JSON" "$CLAUDE_JSON.bak-mcp-sync"
+
+tmp="$(mktemp)"
+jq --argjson mcp "$MCP" '.mcpServers = $mcp' "$CLAUDE_JSON" > "$tmp"
+mv "$tmp" "$CLAUDE_JSON"
+chmod 600 "$CLAUDE_JSON"
+
+echo "synced mcpServers into $CLAUDE_JSON (backup: $CLAUDE_JSON.bak-mcp-sync)"

@@ -1,0 +1,84 @@
+model = "gpt-5.6-sol"
+model_reasoning_effort = "medium"
+approvals_reviewer = "auto_review"
+plan_mode_reasoning_effort = "xhigh"
+[features]
+hooks = true
+
+[projects."/home/harlan"]
+trust_level = "trusted"
+
+[projects."/home/harlan/dev/arbitrage-rs"]
+trust_level = "trusted"
+
+[projects."/home/harlan/dev/clify"]
+trust_level = "trusted"
+
+[projects."/home/harlan/.local/share/chezmoi"]
+trust_level = "trusted"
+
+[projects."/home/harlan/dev/harlanljones"]
+trust_level = "trusted"
+
+[projects."/home/harlan/dev/herdr-outpost"]
+trust_level = "trusted"
+
+[projects."/home/harlan/dev/concerto-labs"]
+trust_level = "trusted"
+
+[projects."/home/harlan/dev/sabermetrics-in-rust"]
+trust_level = "trusted"
+
+[projects."/home/harlan/dev/saberkit"]
+trust_level = "trusted"
+
+[projects."/home/harlan/dev/baseball-dashboard"]
+trust_level = "trusted"
+
+[projects."/home/harlan/dev/omarchy-agents"]
+trust_level = "trusted"
+
+[projects."/home/harlan/dev/bayes-horizon"]
+trust_level = "trusted"
+
+[projects."/home/harlan/dev/urban-signal"]
+trust_level = "trusted"
+
+[projects."/home/harlan/dev/arbkit"]
+trust_level = "trusted"
+
+[projects."/home/harlan/dev/film-lab"]
+trust_level = "trusted"
+
+[projects."/home/harlan/dev/ferrite-db"]
+trust_level = "trusted"
+
+[projects."/home/harlan/.local/share/chezmoi/dotfiles-showcase"]
+trust_level = "trusted"
+
+[projects."/home/harlan/dev/dotfiles-showcase"]
+trust_level = "trusted"
+
+[hooks.state]
+
+[hooks.state."/home/harlan/.codex/hooks.json:session_start:0:0"]
+trusted_hash = "sha256:916c3cbfa20654e47b56f75fc00a79649ee051d258f9de33bed21fb5286dbd67"
+
+[hooks.state."/home/harlan/.codex/hooks.json:session_start:1:0"]
+trusted_hash = "sha256:38550ada5702212ada131d3a9cfc084a76458be8ad51089b992f849a90cd84f8"
+
+[hooks.state."/home/harlan/.codex/hooks.json:subagent_start:0:0"]
+trusted_hash = "sha256:2936203ffffc238b171e67f5e34fe74c284496f749af1a8983e84b610f063819"
+
+[tui]
+status_line = ["model-with-reasoning", "current-dir", "git-branch"]
+status_line_use_colors = true
+
+[mcp_servers.codebase-memory-mcp]
+command = "/home/harlan/.local/bin/codebase-memory-mcp"
+env_vars = ["CBM_CACHE_DIR", "CBM_RUNTIME_DIR"]
+
+[mcp_servers.chrome-devtools]
+command = "npx"
+args = ["-y", "chrome-devtools-mcp@latest"]
+# <<< codebase-memory-mcp MCP <<<

@@ -1,0 +1,11 @@
+{
+  "dependencies": {
+    "@magnitudedev/cli": "^0.0.6",
+    "@nanonets/graft": "^0.12.0",
+    "@schpet/linear-cli": "^2.5.0",
+    "cline": "^3.0.55",
+    "freebuff": "^0.0.156",
+    "supabase": "^2.115.0",
+    "wrangler": "^4.125.0"
+  }
+}

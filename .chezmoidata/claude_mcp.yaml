@@ -1,0 +1,5 @@
+claude:
+  mcpServers:
+    codebase-memory-mcp:
+      command: /home/harlan/.local/bin/codebase-memory-mcp
+      args: []
