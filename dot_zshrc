@@ -62,10 +62,44 @@ export PATH="$HOME/.local/bin:$PATH"
 export PATH="/Users/harlan/.local/bin:$PATH"
 
 # Modern shell QoL -- each guarded so a missing tool never breaks the shell
-command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh)"
+command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init zsh --hook pwd)"
 command -v fzf >/dev/null 2>&1 && source <(fzf --zsh)
 command -v atuin >/dev/null 2>&1 && eval "$(atuin init zsh)"
 command -v direnv >/dev/null 2>&1 && eval "$(direnv hook zsh)"
+
+# --- Directory navigation (zoxide-aware) ---
+# `z` / `zi` are defined by `zoxide init` above.
+# `zj`: scored interactive jump (shows frecency score from db.zo).
+# `zp`: paths-only interactive jump (the `zi` feel from a key).
+zj() {
+  if command -v zoxide >/dev/null 2>&1 && command -v fzf >/dev/null 2>&1; then
+    local line
+    line=$(zoxide query -ls -- "$@" | fzf --height=40% --layout=reverse \
+           --border --info=inline --prompt='z❯ ' --nth=2.. --accept-nth=2..)
+    [ -n "$line" ] && cd "$line"
+  else
+    z "$@"
+  fi
+}
+zp() {
+  if command -v zoxide >/dev/null 2>&1 && command -v fzf >/dev/null 2>&1; then
+    local line
+    line=$(zoxide query -l -- "$@" | fzf --height=40% --layout=reverse \
+           --border --info=inline --prompt='z❯ ')
+    [ -n "$line" ] && cd "$line"
+  else
+    z "$@"
+  fi
+}
+# Alt-Z: paths-only jump.  Alt-X: scored jump.  (`cd` stays the builtin.)
+zj-widget() { local d; d=$(zoxide query -ls | fzf --height=40% --layout=reverse \
+  --border --info=inline --prompt='z❯ ' --nth=2.. --accept-nth=2..); \
+  [ -n "$d" ] && cd "$d" && zle reset-prompt; }
+zp-widget() { zle -I; zp; zle reset-prompt; }
+zle -N zj-widget; zle -N zp-widget
+bindkey '\ez' zp-widget
+bindkey '\ex' zj-widget
+compdef _zoxide zj
 
 # Tool configuration via environment
 export RIPGREP_CONFIG_PATH="$HOME/.config/ripgrep/rc"

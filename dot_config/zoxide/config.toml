@@ -1,0 +1,23 @@
+# zoxide — frecency-based `cd` with a local database (~/.local/share/zoxide/db.zo).
+#
+# `z <pattern>` jumps to the best match; `zi` opens fzf (inherits
+# $FZF_DEFAULT_OPTS) for interactive selection. `zj` / `zp` (in dot_zshrc /
+# dot_bashrc) add scored and paths-only jumps bound to keys.
+
+## Collapse symlinks so a dir reached via two paths stays one ranked entry.
+resolve_symlinks = true
+
+## Track the directory on every prompt (default hook; stated explicitly so the
+## behavior is stable across upgrades and covers `cd`, `..`, and eza-based nav).
+pwd = true
+
+## Keep transient / VCS / dependency trees out of the database.
+zoxide_ignore_dirs = [
+    "*/.git",
+    "*/node_modules",
+    "*/.venv",
+    "*/target",
+    "/tmp",
+    "/Volumes",   # macOS (hadrian)
+    "/mnt",       # Linux (augustus)
+]
