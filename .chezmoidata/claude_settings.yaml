@@ -1,0 +1,69 @@
+claudeSettings:
+  permissions:
+    deny:
+      - "Bash(git push *)"
+      - "Bash(git commit *)"
+  model: "opus"
+  hooks:
+    SessionStart:
+      - matcher: "*"
+        hooks:
+          - type: "command"
+            command: "bash '/home/harlan/.claude/hooks/herdr-agent-state.sh' session"
+            timeout: 10
+      - matcher: "startup"
+        hooks:
+          - type: "command"
+            command: "\"$HOME/.claude/hooks/cbm-session-reminder\""
+            timeout: 5
+      - matcher: "resume"
+        hooks:
+          - type: "command"
+            command: "\"$HOME/.claude/hooks/cbm-session-reminder\""
+            timeout: 5
+      - matcher: "clear"
+        hooks:
+          - type: "command"
+            command: "\"$HOME/.claude/hooks/cbm-session-reminder\""
+            timeout: 5
+      - matcher: "compact"
+        hooks:
+          - type: "command"
+            command: "\"$HOME/.claude/hooks/cbm-session-reminder\""
+            timeout: 5
+    PreToolUse:
+      - matcher: "Grep|Glob"
+        hooks:
+          - type: "command"
+            command: "\"$HOME/.claude/hooks/cbm-code-discovery-gate\""
+            timeout: 5
+    PostToolUse:
+      - matcher: "Read"
+        hooks:
+          - type: "command"
+            command: "\"$HOME/.claude/hooks/cbm-code-discovery-gate\""
+            timeout: 5
+    SubagentStart:
+      - matcher: "*"
+        hooks:
+          - type: "command"
+            command: "\"$HOME/.claude/hooks/cbm-subagent-reminder\""
+            timeout: 5
+  enabledPlugins:
+    frontend-design@claude-plugins-official: true
+    superpowers@claude-plugins-official: true
+    code-simplifier@claude-plugins-official: true
+    playwright@claude-plugins-official: true
+    claude-md-management@claude-plugins-official: true
+    security-guidance@claude-plugins-official: true
+    chrome-devtools-mcp@claude-plugins-official: true
+    impeccable@impeccable: true
+    vercel@claude-plugins-official: true
+  extraKnownMarketplaces:
+    impeccable:
+      source:
+        source: "github"
+        repo: "pbakaus/impeccable"
+  effortLevel: "medium"
+  tui: "fullscreen"
+  skipDangerousModePermissionPrompt: true

@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# Sync baseline settings into live Claude settings file (~/.claude/settings.json)
+# while preserving runtime/dynamic fields (autoMode, push notifications, etc.).
+# Idempotent: exits early when managed keys are already in sync.
+#
+# chezmoi data hash: {{ .claudeSettings | toJson | sha256sum }}
+
+set -euo pipefail
+
+SETTINGS_FILE="${HOME}/.claude/settings.json"
+BASELINE='{{ .claudeSettings | toJson }}'
+
+mkdir -p "$(dirname "$SETTINGS_FILE")"
+
+if [[ ! -f "$SETTINGS_FILE" ]]; then
+  printf '%s\n' "$BASELINE" | jq . > "$SETTINGS_FILE"
+  chmod 600 "$SETTINGS_FILE"
+  echo "created $SETTINGS_FILE from baseline"
+  exit 0
+fi
+
+if ! jq -e . "$SETTINGS_FILE" >/dev/null 2>&1; then
+  echo "error: $SETTINGS_FILE is not valid JSON; refusing to modify" >&2
+  exit 1
+fi
+
+# Merge live settings with baseline; baseline keys override baseline fields,
+# while dynamic fields (autoMode, agentPushNotifEnabled, etc.) are preserved.
+merged=$(jq -s '.[0] * .[1]' "$SETTINGS_FILE" <(printf '%s' "$BASELINE"))
+
+# Check if merged result is already what's on disk
+if [[ "$(jq -S . "$SETTINGS_FILE")" == "$(printf '%s' "$merged" | jq -S .)" ]]; then
+  exit 0
+fi
+
+cp "$SETTINGS_FILE" "$SETTINGS_FILE.bak-settings-sync"
+
+tmp="$(mktemp)"
+printf '%s\n' "$merged" | jq . > "$tmp"
+mv "$tmp" "$SETTINGS_FILE"
+chmod 600 "$SETTINGS_FILE"
+
+echo "synced baseline settings into $SETTINGS_FILE (backup: $SETTINGS_FILE.bak-settings-sync)"

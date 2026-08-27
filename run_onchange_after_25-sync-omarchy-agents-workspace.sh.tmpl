@@ -1,5 +1,11 @@
 {{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
 #!/bin/bash
+# Builds and deploys omarchy-agents workspace when package manifests change
+# or when OMARCHY_AGENTS_FORCE_BUILD=1 is set.
+#
+# package.json hash: {{ if stat (printf "%s/dev/omarchy-agents/package.json" .chezmoi.homeDir) }}{{ include (printf "%s/dev/omarchy-agents/package.json" .chezmoi.homeDir) | sha256sum }}{{ end }}
+# bun.lock hash: {{ if stat (printf "%s/dev/omarchy-agents/bun.lock" .chezmoi.homeDir) }}{{ include (printf "%s/dev/omarchy-agents/bun.lock" .chezmoi.homeDir) | sha256sum }}{{ end }}
+
 set -euo pipefail
 
 repo="$HOME/dev/omarchy-agents"
