@@ -49,10 +49,22 @@
           ]
         },
         {
+          "id": "lgse.backdrop"
+        },
+        {
+          "id": "io.github.patrickfanella.shelfish"
+        },
+        {
+          "id": "io.github.patrickfanella.shelfish.group.default",
+          "source": "{{ .chezmoi.homeDir }}/.config/omarchy/plugins/io.github.patrickfanella.shelfish/GroupButton.qml",
+          "shelfishGroupId": "default"
+        },
+        {
           "id": "harlan.agent-leaderboard"
         },
         {
-          "id": "io.github.this-is-npc.dockmarchy"
+          "id": "io.github.this-is-npc.dockmarchy",
+          "language": "en"
         },
         {
           "id": "im0001gt.hw-tooltip"
@@ -67,10 +79,10 @@
           "id": "omarchy.network"
         },
         {
-          "id": "omarchy.audio"
+          "id": "omarchy.power"
         },
         {
-          "id": "omarchy.power"
+          "id": "omarchy.audio"
         },
         {
           "id": "omarchy.monitor"
@@ -94,10 +106,12 @@
   ],
   "version": 1,
   "disabledPlugins": [
-    "omarchy.lock"
+    "omarchy.lock",
+    "omarchy.background"
   ],
   "cloneSourceRestores": [
-    "shmall.lock"
+    "shmall.lock",
+    "lgse.backdrop"
   ]
 }
 {{- end }}

@@ -11,3 +11,13 @@ omarchyPlugins:
     enabled: true
   - url: https://github.com/cgmccarron/omarchy-sportsbar.git
     enabled: true
+  - url: https://github.com/PatrickFanella/omarchy-plugin-shelfish.git
+    enabled: true
+  - url: https://github.com/lgse/backdrop.git
+    enabled: true
+  - url: https://github.com/maiosx/Runway.git
+    enabled: true
+  - url: https://github.com/ryrobes/hazel.git
+    enabled: true
+  - url: https://github.com/taufderl/omarchy.taufderl.ipinfo.git
+    enabled: true

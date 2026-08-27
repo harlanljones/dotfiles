@@ -1,0 +1,189 @@
+#!/bin/bash
+# omarchy-dotfiles-sync - capture this machine's live Omarchy setup into the
+# chezmoi source repo. Run occasionally; review the diff, then commit.
+#
+# Direction is always live -> repo. It never writes to ~/.config, so it cannot
+# clobber your running setup.
+#
+#   omarchy-dotfiles-sync            # capture, print report, leave commit to you
+#   omarchy-dotfiles-sync -n         # dry run, write nothing
+#   omarchy-dotfiles-sync --prune    # also drop manifest entries no longer installed
+#   omarchy-dotfiles-sync --commit   # capture, then commit just these paths
+
+set -euo pipefail
+
+DRY_RUN=0
+PRUNE=0
+COMMIT=0
+
+usage() { sed -n '2,12p' "$0" | sed 's/^# \?//'; exit "${1:-0}"; }
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -n|--dry-run) DRY_RUN=1 ;;
+    --prune)      PRUNE=1 ;;
+    --commit)     COMMIT=1 ;;
+    -h|--help)    usage 0 ;;
+    *) echo "unknown option: $1" >&2; usage 1 ;;
+  esac
+  shift
+done
+
+command -v chezmoi >/dev/null 2>&1 || { echo "chezmoi: not found" >&2; exit 1; }
+
+SOURCE="$(chezmoi source-path)"
+OMARCHY_DIR="$HOME/.config/omarchy"
+PLUGINS_DIR="$OMARCHY_DIR/plugins"
+MANIFEST="$SOURCE/.chezmoidata/omarchy_plugins.yaml"
+SHELL_LIVE="$OMARCHY_DIR/shell.json"
+SHELL_TMPL="$SOURCE/dot_config/omarchy/create_private_shell.json.tmpl"
+
+[[ -d "$OMARCHY_DIR" ]] || { echo "no $OMARCHY_DIR; nothing to sync" >&2; exit 0; }
+
+(( DRY_RUN )) && echo "== DRY RUN: nothing will be written ==" && echo
+
+# ---------------------------------------------------------------- plugins ---
+# The manifest drives run_onchange_after_10-install-omarchy-plugins.sh, which
+# clones each url. Only git-backed plugins can be provisioned that way; local
+# ones are reported so they don't silently go missing on a fresh machine.
+echo "-- plugin manifest --"
+if [[ -f "$MANIFEST" && -d "$PLUGINS_DIR" ]]; then
+  PRUNE=$PRUNE DRY_RUN=$DRY_RUN python3 - "$MANIFEST" "$PLUGINS_DIR" <<'PY'
+import os, subprocess, sys, yaml
+
+manifest_path, plugins_dir = sys.argv[1], sys.argv[2]
+prune, dry_run = os.environ["PRUNE"] == "1", os.environ["DRY_RUN"] == "1"
+
+def norm(u):
+    return u.rstrip("/").removesuffix(".git")
+
+doc = yaml.safe_load(open(manifest_path)) or {}
+declared = doc.get("omarchyPlugins") or []
+
+installed, local_only = {}, []
+for name in sorted(os.listdir(plugins_dir)):
+    d = os.path.join(plugins_dir, name)
+    if not os.path.isdir(d):
+        continue
+    if not os.path.isdir(os.path.join(d, ".git")):
+        local_only.append(name)
+        continue
+    r = subprocess.run(["git", "-C", d, "remote", "get-url", "origin"],
+                       capture_output=True, text=True)
+    if r.returncode == 0 and r.stdout.strip():
+        installed[norm(r.stdout.strip())] = name
+
+declared_urls = {norm(e["url"]) for e in declared if isinstance(e, dict) and e.get("url")}
+missing = [u for u in installed if u not in declared_urls]
+stale = [e for e in declared
+         if isinstance(e, dict) and norm(e.get("url", "")) not in installed]
+
+# Preserve existing order and enabled flags; append new entries sorted.
+kept = declared if not prune else [e for e in declared if e not in stale]
+for url in sorted(missing):
+    kept.append({"url": url + ".git", "enabled": True})
+
+for url in sorted(missing):
+    print(f"   + {installed[url]}  ({url}.git)")
+for e in stale:
+    print(f"   {'- removing' if prune else '! declared but not installed:'} {e.get('url')}")
+for name in local_only:
+    print(f"   ~ local plugin, not git-backed (won't provision): {name}")
+if not missing and not stale:
+    print("   manifest already matches installed plugins")
+
+if (missing or (prune and stale)) and not dry_run:
+    lines = ["omarchyPlugins:"]
+    for e in kept:
+        lines.append(f"  - url: {e['url']}")
+        lines.append(f"    enabled: {str(bool(e.get('enabled', True))).lower()}")
+    open(manifest_path, "w").write("\n".join(lines) + "\n")
+    print(f"   wrote {os.path.basename(manifest_path)} ({len(kept)} plugins)")
+PY
+else
+  echo "   skipped (no manifest or no plugins dir)"
+fi
+
+# ------------------------------------------------------------- shell.json ---
+# chezmoi re-add refuses to overwrite templates, so this file is regenerated
+# by hand from the live one, with $HOME swapped for a template expression.
+echo
+echo "-- shell.json template --"
+if [[ -f "$SHELL_LIVE" ]]; then
+  DRY_RUN=$DRY_RUN python3 - "$SHELL_LIVE" "$SHELL_TMPL" "$HOME" <<'PY'
+import json, os, sys
+
+live_path, tmpl_path, home = sys.argv[1], sys.argv[2], sys.argv[3]
+dry_run = os.environ["DRY_RUN"] == "1"
+
+live = open(live_path).read().rstrip("\n")
+try:
+    json.loads(live)
+except json.JSONDecodeError as e:
+    sys.exit(f"   live shell.json is not valid JSON ({e}); refusing to capture it")
+
+if "{{" in live or "}}" in live:
+    sys.exit("   live shell.json contains '{{' or '}}' which would break the "
+             "Go template; capture it by hand")
+
+body = live.replace(f'"{home}/', '"{{ .chezmoi.homeDir }}/')
+n = body.count("{{ .chezmoi.homeDir }}")
+out = '{{- if eq .chezmoi.osRelease.id "omarchy" -}}\n' + body + "\n{{- end }}\n"
+
+old = open(tmpl_path).read() if os.path.exists(tmpl_path) else ""
+if out == old:
+    print("   template already matches live shell.json")
+else:
+    print(f"   regenerating from live shell.json ({n} path(s) templatized)")
+    if not dry_run:
+        os.makedirs(os.path.dirname(tmpl_path), exist_ok=True)
+        open(tmpl_path, "w").write(out)
+PY
+else
+  echo "   skipped (no live shell.json)"
+fi
+
+# ------------------------------------------------- everything else managed ---
+# Plain managed files under the Omarchy/Hyprland trees: themes, hypr/*.lua, etc.
+echo
+echo "-- other managed files (themes, hypr, ...) --"
+readd=()
+for d in "$OMARCHY_DIR" "$HOME/.config/hypr"; do
+  [[ -d "$d" ]] && readd+=("$d")
+done
+if (( ${#readd[@]} )); then
+  if (( DRY_RUN )); then
+    chezmoi status "${readd[@]}" 2>/dev/null | sed 's/^/   /' || true
+    echo "   (dry run: would re-add the files marked above)"
+  else
+    chezmoi re-add "${readd[@]}"
+    echo "   re-added modified managed files"
+  fi
+fi
+
+# ------------------------------------------------------------------ report ---
+echo
+echo "-- repo status --"
+PATHS=(.chezmoidata/omarchy_plugins.yaml dot_config/omarchy dot_config/hypr)
+git -C "$SOURCE" status --short -- "${PATHS[@]}" | sed 's/^/   /' || true
+if git -C "$SOURCE" diff --quiet -- "${PATHS[@]}" 2>/dev/null; then
+  echo "   no changes to commit"
+else
+  git -C "$SOURCE" diff --stat -- "${PATHS[@]}" | sed 's/^/   /'
+fi
+
+if (( COMMIT )) && (( ! DRY_RUN )); then
+  echo
+  if git -C "$SOURCE" diff --quiet -- "${PATHS[@]}" && \
+     git -C "$SOURCE" diff --cached --quiet -- "${PATHS[@]}"; then
+    echo "-- commit: nothing to do --"
+  else
+    git -C "$SOURCE" add -- "${PATHS[@]}"
+    git -C "$SOURCE" commit -q -m "chore(omarchy): sync dotfiles with live setup on $(hostname)"
+    echo "-- committed --"
+    git -C "$SOURCE" log --oneline -1 | sed 's/^/   /'
+  fi
+fi
+
+echo
+echo "Done. Review with:  git -C $SOURCE diff -- ${PATHS[*]}"
