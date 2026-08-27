@@ -1,0 +1,42 @@
+#!/usr/bin/env bash
+# dots-push - Commit & push the chezmoi dotfiles repo with an Ollama-generated
+# conventional commit message. Invoked directly or via `dots push`.
+#
+# Usage:
+#   dots-push
+#
+# Environment overrides:
+#   CHEZMOI_DIR           Chezmoi source directory (default: ~/.local/share/chezmoi)
+#   OLLAMA_COMMIT_MODEL   Model used for message generation
+#                         (default: qwen2.5-coder:7b)
+#   MAX_DIFF_LINES        Diff lines sent to Ollama (default: 400)
+set -euo pipefail
+
+DOTFILES="${CHEZMOI_DIR:-$HOME/.local/share/chezmoi}"
+MODEL="${OLLAMA_COMMIT_MODEL:-qwen2.5-coder:7b}"
+MAX_DIFF_LINES=400
+
+cd "$DOTFILES"
+
+chezmoi re-add >/dev/null 2>&1 || true
+
+if git diff --quiet && git diff --cached --quiet && [ -z "$(git ls-files --others --exclude-standard)" ]; then
+  git push
+  echo "Nothing to commit; pushed."
+  exit 0
+fi
+
+git add -A
+
+diff=$(git diff --cached | head -n "$MAX_DIFF_LINES")
+msg=$(ollama run "$MODEL" "Write one concise conventional-commit message line (max 72 chars) summarizing this diff of dotfiles. Reply with ONLY the message text, no quotes, no code fences, no explanation.
+
+Diff:
+$diff" 2>/dev/null | grep -v '^[[:space:]]*$' | head -n1 || true)
+msg=$(printf '%s' "$msg" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//;s/^```.*$//;s/```$//')
+msg=${msg:0:72}
+[ -z "$msg" ] && msg="chore: update dotfiles $(date +%Y-%m-%d)"
+
+git commit -m "$msg"
+git push
+echo "Pushed: $msg"

@@ -219,6 +219,74 @@
     }
   },
   {
+    "plugin_id": "ponko2.equalize-panes",
+    "name": "Equalize Panes",
+    "version": "0.2.1",
+    "min_herdr_version": "0.8.2",
+    "description": "Keep panes the same size as the layout changes",
+    "manifest_path": "/home/harlan/.config/herdr/plugins/github/ponko2.equalize-panes-2b6e52023561/herdr-plugin.toml",
+    "plugin_root": "/home/harlan/.config/herdr/plugins/github/ponko2.equalize-panes-2b6e52023561",
+    "enabled": true,
+    "platforms": [
+      "linux",
+      "macos"
+    ],
+    "build": [
+      {
+        "command": [
+          "./install.sh"
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "equalize",
+        "title": "Equalize panes",
+        "description": "Make every pane in the focused tab the same size",
+        "contexts": [
+          "tab"
+        ],
+        "command": [
+          "./bin/equalize-panes"
+        ]
+      }
+    ],
+    "events": [
+      {
+        "on": "pane.closed",
+        "command": [
+          "./bin/equalize-panes"
+        ]
+      },
+      {
+        "on": "pane.created",
+        "command": [
+          "./bin/equalize-panes"
+        ]
+      },
+      {
+        "on": "pane.exited",
+        "command": [
+          "./bin/equalize-panes"
+        ]
+      },
+      {
+        "on": "pane.moved",
+        "command": [
+          "./bin/equalize-panes"
+        ]
+      }
+    ],
+    "source": {
+      "kind": "github",
+      "owner": "ponko2",
+      "repo": "herdr-equalize-panes",
+      "resolved_commit": "9aacbe8e53358abff685096d6afdb1315fd7f3de",
+      "managed_path": "/home/harlan/.config/herdr/plugins/github/ponko2.equalize-panes-2b6e52023561",
+      "installed_unix_ms": 1787864990982
+    }
+  },
+  {
     "plugin_id": "shadowfax.ferry",
     "name": "Herdr Ferry",
     "version": "0.2.0",

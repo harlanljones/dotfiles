@@ -79,6 +79,12 @@ type = "plugin_action"
 command = "herdr-automatic-rename.reset"
 description = "Automatic Rename: reset"
 
+[[keys.command]]
+key = "prefix+="
+type = "plugin_action"
+command = "ponko2.equalize-panes.equalize"
+description = "Equalize panes"
+
 [ui]
 accent = "blue"
 

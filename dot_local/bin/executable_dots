@@ -40,6 +40,7 @@ ${BOLD}COMMANDS:${NC}
   ${CYAN}edit, ed${NC}          Edit the source template for a target managed file
   ${CYAN}cd${NC}                Open a shell or print the chezmoi source directory path
   ${CYAN}update, pull${NC}      Pull latest dotfiles from git remote and apply
+  ${CYAN}push, pp${NC}          Commit & push dotfiles repo with an Ollama-generated commit message
   ${CYAN}doctor${NC}            Run diagnostics on tools, age keys, and agent skill links
   ${CYAN}help${NC}              Show this help message
 
@@ -51,12 +52,25 @@ ${BOLD}OPTIONS FOR SYNC:${NC}
 ${BOLD}OPTIONS FOR DIFF:${NC}
   -a, --all          Include generated script contents in the diff output
 
+${BOLD}OPTIONS FOR PUSH:${NC}
+  Delegates to dots-push: re-adds locally modified targets, stages all
+  changes, generates a one-line conventional commit message with local
+  Ollama, commits, and pushes to origin. Falls back to a dated message
+  when Ollama is unavailable.
+  Environment overrides:
+    OLLAMA_COMMIT_MODEL   Model used for message generation
+                          (default: qwen2.5-coder:7b)
+    CHEZMOI_DIR           Chezmoi source directory
+                          (default: ~/.local/share/chezmoi)
+
 ${BOLD}EXAMPLES:${NC}
   dots sync                # Fast apply managed dotfiles
   dots diff                # View clean config diff without template noise
   dots diff --all          # View full diff including run_* scripts
   dots status              # View modified files
   dots absorb ~/.zshrc     # Capture local changes into chezmoi source
+  dots update              # Pull remote changes and apply
+  dots push                # Stage, commit with AI-generated message, push
   dots doctor              # Verify encryption keys, toolchains & agent links
 EOF
 }
@@ -200,6 +214,15 @@ cmd_update() {
   cmd_sync "$@"
 }
 
+cmd_push() {
+  if ! command -v dots-push >/dev/null 2>&1; then
+    echo -e "${RED}error:${NC} dots-push is not installed or not in PATH." >&2
+    exit 1
+  fi
+  echo -e "${CYAN}== Committing & pushing dotfiles repo (Ollama-generated message) ==${NC}"
+  exec dots-push "$@"
+}
+
 cmd_doctor() {
   ensure_chezmoi
   local src
@@ -281,6 +304,7 @@ main() {
     edit|ed)        cmd_edit "$@" ;;
     cd)             cmd_cd "$@" ;;
     update|pull)    cmd_update "$@" ;;
+    push|pp)        cmd_push "$@" ;;
     doctor)         cmd_doctor "$@" ;;
     help|-h|--help) usage ;;
     *)

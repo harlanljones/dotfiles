@@ -58,6 +58,28 @@ An interactive, local-first web app that visualizes these dotfiles — headlined
   - `python`
   - `uv`
 
+### 🗂️ Dotfiles CLI (`dots`)
+An ergonomic wrapper around chezmoi (`~/.local/bin/dots`, managed by this repo) that speeds up the daily dotfiles workflow and noise-reduces diff output.
+
+| Command | Aliases | Description |
+| --- | --- | --- |
+| `dots sync` | `apply` | Apply managed dotfiles to your home directory (`-n/--dry-run`, `-v/--verbose`, `-f/--force`) |
+| `dots diff` | | Clean diff of pending changes (generated script contents hidden by default; `-a/--all` to include) |
+| `dots status` | `st` | Show state of managed files (modified, added, deleted, untracked) |
+| `dots absorb` | `add` | Capture live modified files back into the chezmoi repo (`dots absorb <file>`; with no argument it delegates to `omarchy-dotfiles-sync`) |
+| `dots edit` | `ed` | Edit the source template for a target managed file |
+| `dots cd` | | Open a shell in the chezmoi source directory (`--print` to output the path) |
+| `dots update` | `pull` | Pull latest changes from the git remote (`--rebase`) and re-apply |
+| `dots push` | `pp` | Stage all changes, generate a conventional commit message with local Ollama, commit, and push to origin |
+| `dots doctor` | | Diagnostics: chezmoi version, source repo git state, age key, mise/bun, agent skills catalog |
+| `dots help` | | Show help |
+
+**Push (`dots-push`)**: `dots push` delegates to `~/.local/bin/dots-push`, which re-adds locally modified targets (`chezmoi re-add`), stages everything, and asks a local Ollama model to write a one-line Conventional Commit message from the diff (first 400 lines), with a dated `chore:` fallback when Ollama is unavailable. Then it commits and pushes. Environment overrides:
+
+- `OLLAMA_COMMIT_MODEL`: message-generation model (default `qwen2.5-coder:7b`).
+- `CHEZMOI_DIR`: chezmoi source directory (default `~/.local/share/chezmoi`).
+- `MAX_DIFF_LINES`: how many diff lines are sent to Ollama (default `400`).
+
 ### 📦 System Package Manifests
 Declarative tracking for system-level packages that mise does not manage:
 - **macOS** (`~/.Brewfile`): Homebrew Bundle manifest (`brews` + `casks`, including Ghostty and JetBrainsMono Nerd Font).
@@ -270,6 +292,15 @@ chezmoi update
 
 # Check status of managed files
 chezmoi status
+```
+
+Or with the `dots` CLI wrapper (see [Dotfiles CLI](#️-dotfiles-cli-dots)):
+
+```bash
+dots status       # Check state of managed files
+dots diff         # Clean diff of pending changes
+dots update       # Pull remote changes and apply
+dots push         # Stage, commit with Ollama-generated message, push
 ```
 
 ---
