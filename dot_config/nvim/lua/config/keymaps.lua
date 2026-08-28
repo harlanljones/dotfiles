@@ -33,6 +33,14 @@ vim.api.nvim_create_autocmd("ExitPre", {
   end,
 })
 
+-- Open CopilotChat without replacing an existing mapping.
+if vim.fn.maparg("<leader>cc", "n") == "" then
+  vim.keymap.set("n", "<leader>cc", "<cmd>CopilotChat<cr>", {
+    silent = true,
+    desc = "Open CopilotChat",
+  })
+end
+
 -- Save all, git commit (message drafted by ollama), git push, quit all
 vim.keymap.set("n", "<leader>P", function()
   -- When nvim is git's editor (lazygit <c-g>, `git commit`, rebase todo), the
