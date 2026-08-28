@@ -115,3 +115,6 @@ mouse_capture = true
 tab_bar_right = [{ type = "zoom" }, { type = "hostname" }]
 
 # set -g set-titles on / set -g set-titles-string '#h:#W', where tmux's #W was
+
+[experimental]
+kitty_graphics = true
