@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Cursor Desktop
+Exec=/home/harlan/.local/share/AppImage/Cursor-3.17.21-x86_64.AppImage
+Icon=/home/harlan/Downloads/images.jpeg
+Categories=Utility;
+Terminal=false
+

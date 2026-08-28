@@ -5,7 +5,7 @@
   "compactionEnabled": true,
   "planActMode": "act",
   "toolAutoApprove": true,
-  "tuiTheme": "tokyo-night",
+  "tuiTheme": "dark",
   "tools": {
     "web_search": {
       "enabled": true

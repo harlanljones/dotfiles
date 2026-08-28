@@ -139,3 +139,4 @@ cline() {
 for _f in "$HOME"/.config/herdr/plugins/github/herdr-automatic-rename-*/shell/hook.bash; do
   [ -r "$_f" ] && { source "$_f"; break; }
 done
+export PATH="/home/harlan/.evotai/bin:$PATH"

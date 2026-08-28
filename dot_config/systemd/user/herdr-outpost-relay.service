@@ -1,0 +1,16 @@
+[Unit]
+Description=herdr-outpost Relay Daemon
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory=/home/harlan/dev/herdr-outpost/relay
+EnvironmentFile=/home/harlan/.config/herdr-outpost/config.env
+ExecStart=/home/harlan/.local/share/mise/installs/uv/latest/.mise-bins/uv run --directory /home/harlan/dev/herdr-outpost/relay python3 /home/harlan/dev/herdr-outpost/relay/herdr_relay.py
+Restart=always
+RestartSec=3s
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
