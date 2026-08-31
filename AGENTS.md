@@ -1,0 +1,127 @@
+# AGENTS.md — Dotfiles Repo
+
+Authoritative index for any development agent (or human) working in this chezmoi
+dotfiles repo. When instructions here conflict with a task's ad-hoc request, prefer
+this file and surface the conflict rather than silently overriding it.
+
+---
+
+## 1. What this is
+
+A [chezmoi](https://www.chezmoi.io/) source tree that manages the user's shell,
+editor, prompt, terminal, window manager, git config, and AI-agent harness config
+across **two machines** (macOS `hadrian`, Linux/Omarchy `augustus`). Sensitive
+values are stored as [age](https://github.com/FiloSottile/age) encrypted files.
+
+- **Source repo:** `~/.local/share/chezmoi` (this directory). Target home dir is `~`.
+- **Apply:** `chezmoi apply` (or the `dots` CLI wrapper). Dry-run: `chezmoi apply --dry-run`.
+- **Machine resolution:** `.chezmoi.toml.tmpl` → `[data] machine` ⟶ `augustus` (hostname
+  `omarchy` or any Linux) / `hadrian` (darwin) / `unknown`.
+
+## 2. Source-name conventions
+
+Every entry in the source tree maps to a home-directory target by a filename prefix:
+
+| Prefix | Target | Example |
+| --- | --- | --- |
+| `dot_` | literal file in `~` | `dot_zshrc` → `~/.zshrc` |
+| `dot_config/` | `~/.config/…` | `dot_config/starship.toml.tmpl` → `~/.config/starship.toml` |
+| `dot_local/` | `~/.local/…` | `dot_local/bin/executable_dots` → `~/.local/bin/dots` |
+| `private_dot_` | literal file in `~` with `0600` perms | `private_dot_ssh/config` → `~/.ssh/config` |
+| `encrypted_…age` | age-encrypted at rest | `encrypted_private_dot_linear.toml.age` → `~/.linear.toml` |
+| `executable_` | file becomes an executable | `executable_dots` → `~/.local/bin/dots` |
+| `symlink_` | file becomes a symlink | `symlink_evot` → `~/.local/bin/evot` |
+| `run_*.sh.tmpl` | executable apply script (not a dotfile) | see §3 |
+| `*.tmpl` | Go-template rendered at apply time | `dot_config/git/config.tmpl` |
+
+`.chezmoiignore.tmpl` controls what is *applied* (target-side), including per-OS and
+per-machine gating. It does **not** control git tracking.
+
+## 3. `run_*` script contract (apply hooks)
+
+Chezmoi auto-runs scripts matching `run_*.sh` in the source root. Trigger semantics:
+
+- `run_once_*` — executes once ever.
+- `run_onchange_*` — executes only when the script file's contents change.
+- `run_after_*` — executes after **every** apply.
+- `*_before_*` — runs before normal dotfiles are applied; `*_after_*` runs after.
+
+Number prefixes establish **intra-phase** order. There is no strict cross-type
+ordering guarantee — treat each trigger class separately.
+
+| Order | Script | Trigger | Purpose |
+| --- | --- | --- | --- |
+| 00 | `run_once_before_00-verify-deps.sh.tmpl` | once | Fail early if `git`/`age` missing; warn on optional tools |
+| 09 | `run_onchange_before_09-install-agent-skills.sh.tmpl` | onchange | Install missing cross-harness agent skills |
+| 10 | `run_onchange_after_10-install-omarchy-plugins.sh.tmpl` | onchange | Install/update Omarchy desktop plugins |
+| 20 | `run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl` | onchange | Antigravity token/usage collector setup |
+| 21 | `run_onchange_after_21-setup-omarchy-cline.sh.tmpl` | onchange | Cline usage collector setup |
+| 22 | `run_onchange_after_22-setup-omarchy-cline-usage-scrape.sh.tmpl` | onchange | Cline rate-limit headless scraper |
+| 23 | `run_after_23-sync-agent-skills.sh.tmpl` | every apply | Reconcile shared `~/.agents/skills` into harnesses |
+| 24 | `run_once_after_24-setup-omarchy-agents.sh.tmpl` | once | Local state dirs + user systemd daemon |
+| 25 | `run_after_25-sync-omarchy-agents-workspace.sh.tmpl` | every apply | Validate/deploy `omarchy-agents` plugin builds |
+| 26 | `run_onchange_after_26-setup-omarchy-cursor.sh.tmpl` | onchange | Cursor usage collector setup |
+| 27 | `run_onchange_after_27-sync-claude-mcp.sh.tmpl` | onchange | Sync Claude Code MCP config |
+| 28 | `run_onchange_after_28-sync-claude-settings.sh.tmpl` | onchange | Sync Claude Code permissions/hooks |
+| 30 | `run_onchange_after_30-macos-defaults.sh.tmpl` | onchange (darwin) | Declarative `defaults write` preferences |
+
+## 4. Contents map
+
+| Path | What lives there |
+| --- | --- |
+| `dot_config/` | All per-tool configs under `~/.config` (starship, ghostty, git, nvim, hypr, mise, opencode, omarchy, systemd/user, …) |
+| `dot_local/bin/` | Custom scripts, usage collectors, scrapers, agent hooks (installed to `~/.local/bin`) |
+| `dot_local/bin/cline-safety/` | `git` interceptor that refuses `commit`/`push` under Cline |
+| `dot_local/bin/executable_statusline.tmpl` | Shared cross-harness CLI statusline renderer (Claude Code + Cursor) → `~/.local/bin/statusline` |
+| `dot_agents/`, `dot_claude/`, `dot_cline/`, `dot_codex/`, `dot_gemini/`, `dot_grok/`, `dot_pi/` | Per-harness config, skills, rules, MCP, hooks |
+| `.chezmoidata/` | YAML data sources read by `.tmpl`s (`machines`, `agent_skills`, `omarchy_plugins`, `claude_mcp`, `claude_settings`) |
+| `docs/` | Recovery guide + maintenance scripts (chezmoi-ignored, git-tracked) |
+| `Documents/` | Non-config content (Cline workflow docs) |
+| `.github/workflows/ci.yml` | CI: dry-run apply on Linux + macOS, shellcheck, actionlint |
+| `encrypted_private_dot_linear.toml.age` | Age-encrypted Linear CLI config |
+| `dotfiles-showcase/` | **Submodule** — interactive web app; never apply, never edit here |
+| `package.json` / `bun.lock` | Runtime CLI deps installed outside mise (see §5) |
+
+Chezmoi ignores `dotfiles-showcase/`, `docs/`, `.github/`, `README.md`,
+`package.json`, `bun.lock`, and `to-questionnaire-*.md` for **apply** (see
+`.chezmoiignore.tmpl`). These are repository/git material, not home-dir dotfiles.
+
+## 5. Tool ownership (single source of truth)
+
+Each CLI/runtime is owned by exactly one manager. Do not spread a tool across two.
+
+| Manager | Manifest | Tools |
+| --- | --- | --- |
+| mise | `dot_config/mise/config.toml` | bun, chezmoi, claude, codex, gh, node, `npm:playwright`, opencode, python, uv |
+| node/bun (npm) | root `package.json` + `bun.lock` | @magnitudedev/cli, @nanonets/graft, @schpet/linear-cli, cline, freebuff, supabase, wrangler |
+| Homebrew (macOS) | `dot_Brewfile` | brews + casks (Ghostty, JetBrainsMono Nerd Font, …) |
+| pacman / paru (Linux) | `dot_config/pacman/pkglist.txt` + `aurlist.txt` | native + AUR packages |
+
+## 6. Hard rules for agents
+
+- **Never apply or edit `dotfiles-showcase/`.** It's an independent git submodule with
+  its own `AGENTS.md`/`ROADMAP.md`. Changes belong in the submodule repo.
+- **Never commit secrets.** Do not add `.linear.toml`, `key.txt`, age keys, SSH
+  private material, or harness `settings.local.json` contents. Use age encryption for
+  new secrets (`encrypted_*.age`).
+- **Keep repo-level `.gitignore` and `.chezmoiignore` in sync** with what is
+  intentionally git-tracked vs applied.
+- **Add new dotfiles with the correct prefix** (§2) and register them in
+  `README.md` + this file if they add a tool or hook.
+- **After editing any `run_*` hook**, `git gc`/re-apply mentally: `run_onchange_*`
+  will re-trigger if contents changed, which may re-run installs.
+- **`dots` CLI** is the human-friendly wrapper (`dots status/diff/update/push/doctor`).
+  Prefer `dots push` to commit+push; it generates a Conventional Commit message via
+  local Ollama and never commits agent work automatically.
+
+## 7. Validation
+
+- `chezmoi apply --dry-run` must succeed after any template edit.
+- The `## 📂 Repository Structure` tree in `README.md` is generated by
+  `docs/generate_readme_tree.py` and gated by CI
+  (`python3 docs/generate_readme_tree.py --check`). Regenerate it after adding or
+  moving dotfiles (`python3 docs/generate_readme_tree.py`).
+- CI (`.github/workflows/ci.yml`) validates templates on Linux + macOS, and runs
+  `shellcheck` over every rendered managed script.
+- For changes to tools not self-verified here, run the relevant tool's own tests
+  (e.g. the submodule's `bun test`).

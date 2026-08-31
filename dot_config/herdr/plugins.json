@@ -1,5 +1,43 @@
 [
   {
+    "plugin_id": "harlan.corral",
+    "name": "Corral",
+    "version": "0.1.0",
+    "min_herdr_version": "0.8.0",
+    "description": "Dispatch Linear issues to agent panes and sync status back to Linear.",
+    "manifest_path": "/home/harlan/dev/herdr-corral/herdr-plugin.toml",
+    "plugin_root": "/home/harlan/dev/herdr-corral",
+    "enabled": true,
+    "platforms": [
+      "linux",
+      "macos"
+    ],
+    "build": [
+      {
+        "command": [
+          "cargo",
+          "build",
+          "--release",
+          "--locked"
+        ]
+      }
+    ],
+    "panes": [
+      {
+        "id": "panel",
+        "title": "Linear",
+        "placement": "split",
+        "command": [
+          "./target/release/corral",
+          "panel"
+        ]
+      }
+    ],
+    "source": {
+      "kind": "local"
+    }
+  },
+  {
     "plugin_id": "herdr-automatic-rename",
     "name": "Herdr Automatic Rename",
     "version": "0.7.3",

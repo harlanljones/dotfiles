@@ -1,4 +1,8 @@
 claudeSettings:
+  statusLine:
+    type: "command"
+    command: "~/.local/bin/statusline"
+    padding: 0
   permissions:
     deny:
       - "Bash(git push *)"

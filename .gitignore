@@ -1,0 +1,16 @@
+# Runtime/install artifacts for the root package.json manifest (not committed)
+node_modules/
+bun/
+
+# Python tooling (docs/generate_readme_tree.py is stdlib-only, but stay safe)
+__pycache__/
+*.pyc
+
+# OS cruft
+.DS_Store
+
+# Stray download dir (not a dotfile; prevents accidental commits)
+Downloads/
+
+# Logs
+*.log

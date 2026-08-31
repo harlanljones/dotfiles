@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+# Shared CLI status line renderer for Claude Code and Cursor (and any other
+# harness that speaks the Claude-aligned statusline payload on stdin).
+#
+# Pure render only — no side effects. Reads one JSON object on stdin and
+# prints a single line. Field names are optional: the line is composed from
+# whatever is present, so a slim Cursor payload renders slim while a rich
+# Claude payload adds cost / line-diff / output-style when available.
+#
+# Both harnesses call this so the visual is identical:
+#   - Claude:  statusLine.command -> ~/.local/bin/statusline
+#   - Cursor:  omarchy-cursor-statusline keeps its token-usage logging and
+#              shells out here for display (payload passed straight through).
+#
+# Cross-platform: runs on macOS (hadrian) and Linux/Omarchy (augustus).
+
+set -uo pipefail
+
+input=$(cat)
+
+mapfile -t F < <(
+  printf '%s' "$input" | jq -r '
+    (.model.display_name // .model.id // "claude"),
+    (.workspace.current_dir // .cwd // "."),
+    (.context_window.used_percentage // -1 | floor),
+    (.cost.total_lines_added // 0),
+    (.cost.total_lines_removed // 0),
+    (.cost.total_cost_usd // 0),
+    (.output_style.name // "default")'
+)
+MODEL=${F[0]:-claude}; DIR=${F[1]:-.}; PCT=${F[2]:--1}
+ADDED=${F[3]:-0}; REMOVED=${F[4]:-0}; COST=${F[5]:-0}; STYLE=${F[6]:-default}
+
+C_RESET=$'\033[0m'; C_DIM=$'\033[90m'; C_CYAN=$'\033[36m'
+C_GREEN=$'\033[32m'; C_YELLOW=$'\033[33m'; C_RED=$'\033[31m'; C_MAGENTA=$'\033[35m'
+
+# Directory (with ~ collapsed)
+SHORT_DIR="${DIR/#$HOME/\~}"
+
+# Git branch + dirty marker
+GIT=""
+if branch=$(git -C "$DIR" branch --show-current 2>/dev/null); then
+  [ -z "$branch" ] && branch=$(git -C "$DIR" rev-parse --short HEAD 2>/dev/null)
+  dirty=""
+  git -C "$DIR" diff --quiet --ignore-submodules HEAD 2>/dev/null || dirty="*"
+  GIT=" ${C_DIM}on${C_RESET} ${C_GREEN}${branch}${C_YELLOW}${dirty}${C_RESET}"
+fi
+
+# Context meter
+CTX=""
+if [ "$PCT" -ge 0 ] 2>/dev/null; then
+  width=8; filled=$(( PCT * width / 100 )); (( filled > width )) && filled=$width
+  bar=""
+  for ((i=0;i<width;i++)); do (( i < filled )) && bar+="▓" || bar+="░"; done
+  if   [ "$PCT" -ge 85 ]; then c=$C_RED
+  elif [ "$PCT" -ge 60 ]; then c=$C_YELLOW
+  else c=$C_GREEN; fi
+  CTX=" ${C_DIM}|${C_RESET} ${c}${bar} ${PCT}%${C_RESET}"
+fi
+
+# Lines changed this session
+DIFF=""
+if [ "${ADDED:-0}" -gt 0 ] || [ "${REMOVED:-0}" -gt 0 ]; then
+  DIFF=" ${C_DIM}|${C_RESET} ${C_GREEN}+${ADDED}${C_RESET}/${C_RED}-${REMOVED}${C_RESET}"
+fi
+
+# Session cost
+CST=""
+if [ -n "${COST:-}" ] && awk "BEGIN{exit !($COST > 0.005)}" 2>/dev/null; then
+  CST=$(printf " ${C_DIM}| \$%.2f${C_RESET}" "$COST")
+fi
+
+# Non-default output style
+STY=""
+[ "$STYLE" != "default" ] && STY=" ${C_DIM}| ${STYLE}${C_RESET}"
+
+printf "%s%s%s %s%s%s%s%s%s" \
+  "$C_MAGENTA" "$MODEL" "$C_RESET" \
+  "${C_CYAN}${SHORT_DIR}${C_RESET}" "$GIT" "$CTX" "$DIFF" "$CST" "$STY"

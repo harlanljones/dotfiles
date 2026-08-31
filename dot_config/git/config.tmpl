@@ -44,8 +44,20 @@
 {{- if lookPath "delta" }}
 
 # delta pager (only wired up when the binary is installed)
+
+{{- end }}
 [core]
+	fsmonitor = true
+	untrackedCache = true
+{{- if lookPath "delta" }}
 	pager = delta
+{{- end }}
+[status]
+	showUntrackedFiles = normal
+[advice]
+	statusUoption = false
+{{- if lookPath "delta" }}
+
 [interactive]
 	diffFilter = delta --color-only
 [delta]

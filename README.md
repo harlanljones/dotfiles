@@ -130,7 +130,7 @@ Declarative tracking for system-level packages that mise does not manage:
 ### 🤖 Omarchy & AI Coding Agent Integration
 - **Cross-Harness Agent Skills** (`.chezmoidata/agent_skills.yaml`, `run_onchange_before_09-install-agent-skills.sh.tmpl`, and `run_after_23-sync-agent-skills.sh.tmpl`):
   - Restores missing third-party skills and safely reconciles the complete shared `~/.agents/skills` catalog into Claude, Cline, Antigravity, Gemini, and Pi without replacing provider-owned variants. Codex and OpenCode consume the shared catalog directly.
-  - Keeps custom skills such as `project-doc-planner` and `linear-agent-tracking` in chezmoi while preserving harness-specific `impeccable` builds.
+  - Keeps custom skills such as `grilling`, `project-doc-planner`, `dots`, and `linear-agent-tracking` in chezmoi while preserving harness-specific `impeccable` builds.
 - **Plugin Management** (`.chezmoidata/omarchy_plugins.yaml` & `run_onchange_after_10-install-omarchy-plugins.sh.tmpl`):
   - Declarative tracking and automatic installation/updating of Omarchy desktop plugins:
     - `omarchy-resume`
@@ -156,7 +156,7 @@ Declarative tracking for system-level packages that mise does not manage:
   - **Cline Pass estimated limits & manual override**: When scraping is inactive, estimates windows using reference rates, or accepts manual overrides via `omarchy-cline-usage-override` / `/usage` workflow.
 - **Cursor CLI Integration & Automated Scraping** (`run_onchange_after_26-setup-omarchy-cursor.sh.tmpl`):
   - Registers Cursor in the Agent Leaderboard; `omarchy-agent-usage-cursor` parses `~/.config/cursor/chats/*/*/store.db` chat stores for prompt/session/model counts, and combines them with real per-API-call token usage logged by `omarchy-cursor-statusline`.
-  - **Token tracking via statusLine hook**: Cursor CLI `statusLine` hook registers `omarchy-cursor-statusline` in `~/.cursor/cli-config.json` to log deduplicated per-call token counts to `~/.local/state/omarchy/agents/cursor/`.
+  - **Token tracking via statusLine hook**: Cursor CLI `statusLine` hook registers `omarchy-cursor-statusline` in `~/.cursor/cli-config.json` to log deduplicated per-call token counts to `~/.local/state/omarchy/agents/cursor/`; display is delegated to the shared `~/.local/bin/statusline` renderer.
   - **Automated Usage Scraper**: Headless scraping via Playwright (`omarchy-cursor-usage-scrape`) running periodically on a systemd timer (`omarchy-cursor-usage-scrape.timer`) to capture dashboard usage.
   - **Manual override fallback**: `omarchy-cursor-usage-override` allows setting manually-read percentage metrics.
   - `omarchy default agent cursor` / `omarchy agent` launches `cursor-agent --yolo`.
@@ -168,6 +168,7 @@ Declarative tracking for system-level packages that mise does not manage:
 - **Codex & Claude Code Configuration**:
   - `omarchy-agent-usage-codex`: Collects Codex CLI session logs and app-server RPC metrics.
   - `~/.claude/settings.json`: Configures Claude Code tool execution permissions, git safety hooks, and session hooks for `herdr` agent state and codebase memory reminders.
+  - **Shared CLI statusline** (`~/.local/bin/statusline`): Single cross-harness statusline renderer used by Claude Code (`statusLine.command` in `~/.claude/settings.json`) and Cursor (via `omarchy-cursor-statusline`). Reads the Claude-aligned JSON payload and renders model, cwd, git branch, context meter, line diff, session cost, and output style; drops the extras when absent. Codex uses native `[tui] status_line` widgets (no external-script support); opencode has no statusline slot today.
 - **Background Systemd User Services & Timers** (`~/.config/systemd/user/`):
   - `omarchy-agents-dashboard.service`: Web dashboard server for agent monitoring.
   - `omarchy-agents-tunnel.service`: Cloudflare tunnel service exposing the local dashboard securely.
@@ -181,7 +182,8 @@ Declarative tracking for system-level packages that mise does not manage:
   - `omarchy-default-agent`: Quick switcher to configure default coding agent (`omarchy default agent agy`, `omarchy default agent cursor`).
   - `omarchy-agent-usage-update`: Master aggregator running all active collectors (`omarchy-agent-usage-*`) to write standard JSON records into `~/.local/state/omarchy/agents/usage/`.
   - `omarchy-agent-usage-antigravity`, `omarchy-agent-usage-cline`, `omarchy-agent-usage-codex`, `omarchy-agent-usage-cursor`, `omarchy-agent-usage-opencode`: Standalone usage collectors.
-  - `omarchy-cursor-statusline`: Cursor CLI `statusLine` hook; logs real per-call token usage.
+  - `omarchy-cursor-statusline`: Cursor CLI `statusLine` hook; logs real per-call token usage and delegates display to the shared `statusline` renderer.
+  - `statusline`: Shared cross-harness CLI statusline renderer for Claude Code and Cursor.
   - `omarchy-cursor-usage-scrape`, `omarchy-cursor-usage-override`: Cursor limit scraping and override tools.
   - `omarchy-cline-usage-login`, `omarchy-cline-usage-scrape`, `omarchy-cline-usage-override`: ClinePass limit scraper and override utilities.
   - `omarchy-opencode-go-usage-login`, `omarchy-opencode-go-usage-scrape`, `omarchy-opencode-go-usage-override`: OpenCode Go limit scraper and override utilities.
@@ -190,67 +192,274 @@ Declarative tracking for system-level packages that mise does not manage:
 
 ## 📂 Repository Structure
 
+<!-- BEGIN REPO TREE (generated by docs/generate_readme_tree.py) -->
 ```text
 .
-├── .chezmoidata/
-│   ├── agent_skills.yaml                         # Cross-harness global skill manifest
-│   └── omarchy_plugins.yaml                      # Manifest for Omarchy desktop plugins
-├── .chezmoiignore.tmpl                           # OS-specific ignore rules (Darwin vs. Linux)
-├── .chezmoi.toml.tmpl                            # Age encryption configuration
-├── .github/workflows/ci.yml                      # CI: dry-run apply validation on Linux + macOS
-├── Documents/
-│   └── Cline/Workflows/usage.md                  # Interactive ClinePass usage workflow
-├── docs/
-│   └── recovery.md                               # Age key backup, bootstrap order, doctor checklist
-├── dot_Brewfile                                  # Homebrew Bundle manifest (macOS)
-├── dot_bashrc                                    # Bash shell configuration (Linux)
-├── dot_zshrc                                     # Zsh shell configuration (macOS)
-├── dot_claude/
-│   └── settings.json                             # Claude Code permissions and session hooks
-├── dot_cline/
-│   └── data/settings/global-settings.json        # Cline CLI global settings
-├── dot_codex/
-│   ├── rules/default.rules                       # Codex git commit/push safety policies
-│   └── skills/                                   # Custom skills (linear-agent-tracking, project-doc-planner)
-├── dot_config/
-│   ├── 1password/ssh/                            # 1Password SSH agent key list (agent.toml)
-│   ├── atuin/                                    # Atuin shell history sync config
-│   ├── btop/                                     # btop monitor settings (Linux)
-│   ├── environment.d/                            # Systemd user-service env defaults (Linux)
-│   ├── ghostty/                                  # Ghostty terminal emulator config
-│   ├── gh/                                       # GitHub CLI config (hosts.yml unmanaged)
-│   ├── git/                                      # Global git config (.tmpl w/ delta guard) and ignore file
-│   ├── herdr/                                    # Herdr terminal multiplexer config and plugins
-│   ├── hypr/                                     # Hyprland monitor & input configs
-│   ├── lazygit/                                  # Lazygit configuration (templated delta pager)
-│   ├── mise/                                     # Mise runtime tool configurations
-│   ├── nvim/                                     # Neovim / LazyVim configurations
-│   ├── omarchy/                                  # Omarchy defaults and shell placement/settings
-│   ├── opencode/                                 # OpenCode config, subagent personas, and skills
-│   ├── pacman/                                   # Explicit native + AUR package lists (Linux)
-│   ├── ripgrep/                                  # ripgrep defaults (rc via RIPGREP_CONFIG_PATH)
-│   ├── starship.toml                             # Starship cross-shell prompt configuration
-│   └── systemd/user/                             # Systemd services & timers for dashboard, scrapers, and analytics
-├── dot_gemini/
-│   └── config/mcp_config.json                    # Gemini CLI / Antigravity MCP server definitions
-├── dot_local/
-│   └── bin/                                      # Custom scripts, usage collectors, scrapers, and AI agent hooks
-│       └── cline-safety/                         # Git interceptor for Cline safety
-├── encrypted_private_dot_linear.toml.age         # Age-encrypted Linear configuration
-├── private_dot_ssh/
-│   └── config                                    # SSH client config starter (0600)
-├── run_once_before_00-verify-deps.sh.tmpl        # Early dependency gate (git, age, optional tools)
-├── run_onchange_before_09-install-agent-skills.sh.tmpl
+├── .chezmoi.toml.tmpl
+├── .chezmoidata
+│   ├── agent_skills.yaml
+│   ├── claude_mcp.yaml
+│   ├── claude_settings.yaml
+│   ├── machines.yaml
+│   └── omarchy_plugins.yaml
+├── .chezmoiignore.tmpl
+├── dot_Brewfile
+├── dot_agents
+│   └── skills
+│       └── symlink_project-doc-planner
+├── dot_bash_profile
+├── dot_bashrc
+├── dot_claude
+│   └── skills
+│       └── symlink_project-doc-planner
+├── dot_cline
+│   ├── data
+│   │   └── settings
+│   │       └── global-settings.json
+│   └── skills
+│       └── symlink_project-doc-planner
+├── dot_codex
+│   ├── hooks.json
+│   ├── private_AGENTS.md
+│   ├── private_config.toml
+│   ├── rules
+│   │   └── default.rules
+│   └── skills
+│       ├── dots
+│       │   └── SKILL.md
+│       ├── linear-agent-tracking
+│       │   ├── SKILL.md
+│       │   ├── agents
+│       │   │   └── openai.yaml
+│       │   └── references
+│       │       ├── issue-tracker-linear.md
+│       │       └── linear-cli.md
+│       └── project-doc-planner
+│           ├── SKILL.md
+│           └── agents
+│               └── openai.yaml
+├── dot_config
+│   ├── 1password
+│   │   └── ssh
+│   │       └── agent.toml
+│   ├── atuin
+│   │   └── config.toml
+│   ├── btop
+│   │   └── btop.conf
+│   ├── environment.d
+│   │   ├── 10-defaults.conf
+│   │   └── 10-machine.conf.tmpl
+│   ├── gh
+│   │   └── config.yml
+│   ├── ghostty
+│   │   └── config
+│   ├── git
+│   │   ├── config.tmpl
+│   │   └── ignore
+│   ├── herdr
+│   │   ├── config.toml
+│   │   └── plugins.json
+│   ├── hypr
+│   │   ├── bindings.lua
+│   │   ├── hyprland.lua
+│   │   ├── hyprmoncfg-monitors.lua
+│   │   ├── input.lua
+│   │   ├── looknfeel.lua
+│   │   └── monitors.lua
+│   ├── lazygit
+│   │   └── config.yml.tmpl
+│   ├── mise
+│   │   └── config.toml
+│   ├── nvim
+│   │   ├── lazyvim.json
+│   │   └── lua
+│   │       ├── config
+│   │       │   └── keymaps.lua
+│   │       └── plugins
+│   │           ├── blink-cmp.lua
+│   │           ├── copilot-lualine.lua
+│   │           ├── copilot.lua
+│   │           ├── empty_html-preview.lua
+│   │           ├── example.lua
+│   │           ├── faster-smear-cursor.lua
+│   │           ├── mini-animate-disable-cursor.lua
+│   │           └── vim-be-good.lua
+│   ├── omarchy
+│   │   ├── create_private_shell.json.tmpl
+│   │   ├── defaults
+│   │   │   └── agent.tmpl
+│   │   └── themes
+│   │       ├── red-mountain-peaks-at-dusk-01-red-aether
+│   │       │   ├── aether.zed.json
+│   │       │   ├── alacritty.toml
+│   │       │   ├── backgrounds
+│   │       │   │   └── 5d0e5451240b8b7f.jpg
+│   │       │   ├── btop.theme
+│   │       │   ├── chromium.theme
+│   │       │   ├── colors.toml
+│   │       │   ├── foot.ini
+│   │       │   ├── ghostty.conf
+│   │       │   ├── hyprland.conf
+│   │       │   ├── hyprlock.conf
+│   │       │   ├── icons.theme
+│   │       │   ├── kitty.conf
+│   │       │   ├── mako.ini
+│   │       │   ├── neovim.lua
+│   │       │   ├── swayosd.css
+│   │       │   ├── vencord.theme.css
+│   │       │   ├── vscode-extension
+│   │       │   │   ├── package.json
+│   │       │   │   └── themes
+│   │       │   │       └── aether-color-theme.json
+│   │       │   ├── vscode.json
+│   │       │   ├── walker.css
+│   │       │   ├── warp.yaml
+│   │       │   ├── waybar.css
+│   │       │   ├── wofi.css
+│   │       │   └── zellij.kdl
+│   │       └── red-mountain-peaks-at-dusk-01-red-palette
+│   │           ├── aether.zed.json
+│   │           ├── alacritty.toml
+│   │           ├── backgrounds
+│   │           │   └── 5d0e5451240b8b7f.jpg
+│   │           ├── btop.theme
+│   │           ├── chromium.theme
+│   │           ├── colors.toml
+│   │           ├── foot.ini
+│   │           ├── ghostty.conf
+│   │           ├── hyprland.conf
+│   │           ├── hyprlock.conf
+│   │           ├── icons.theme
+│   │           ├── kitty.conf
+│   │           ├── mako.ini
+│   │           ├── neovim.lua
+│   │           ├── swayosd.css
+│   │           ├── vencord.theme.css
+│   │           ├── vscode-extension
+│   │           │   ├── package.json
+│   │           │   └── themes
+│   │           │       └── aether-color-theme.json
+│   │           ├── vscode.json
+│   │           ├── walker.css
+│   │           ├── warp.yaml
+│   │           ├── waybar.css
+│   │           ├── wofi.css
+│   │           └── zellij.kdl
+│   ├── opencode
+│   │   ├── agents
+│   │   │   ├── private_codebase-memory-auditor.md
+│   │   │   ├── private_codebase-memory-scout.md
+│   │   │   └── private_codebase-memory.md
+│   │   ├── dot_gitignore
+│   │   ├── encrypted_opencode.json.age
+│   │   ├── private_AGENTS.md
+│   │   ├── skills
+│   │   │   ├── opencode-go-usage
+│   │   │   │   └── SKILL.md
+│   │   │   └── symlink_project-doc-planner
+│   │   ├── tui.json
+│   │   └── tui.jsonc
+│   ├── pacman
+│   │   ├── aurlist.txt
+│   │   └── pkglist.txt
+│   ├── private_Cursor
+│   │   └── User
+│   │       └── settings.json
+│   ├── ripgrep
+│   │   └── rc
+│   ├── starship.toml.tmpl
+│   ├── systemd
+│   │   └── user
+│   │       ├── herdr-outpost-relay.service
+│   │       ├── ollama-omarchy-agents.service
+│   │       ├── omarchy-agents-analysis.service
+│   │       ├── omarchy-agents-analysis.timer
+│   │       ├── omarchy-agents-dashboard.service
+│   │       ├── omarchy-agents-tunnel.service
+│   │       ├── omarchy-cline-usage-scrape.service
+│   │       ├── omarchy-cline-usage-scrape.timer
+│   │       ├── omarchy-cursor-usage-scrape.service
+│   │       ├── omarchy-cursor-usage-scrape.timer
+│   │       ├── omarchy-opencode-go-usage-scrape.service
+│   │       └── omarchy-opencode-go-usage-scrape.timer
+│   └── zoxide
+│       └── config.toml
+├── dot_evotai
+│   └── evot.env
+├── dot_gemini
+│   ├── agents
+│   │   ├── private_codebase-memory-auditor.md
+│   │   ├── private_codebase-memory-scout.md
+│   │   └── private_codebase-memory.md
+│   ├── config
+│   │   ├── mcp_config.json
+│   │   └── skills
+│   │       └── symlink_project-doc-planner
+│   ├── private_GEMINI.md
+│   ├── private_settings.json
+│   └── skills
+│       └── symlink_project-doc-planner
+├── dot_grok
+│   └── hooks
+│       ├── executable_herdr-agent-state.sh
+│       └── herdr.json
+├── dot_local
+│   ├── bin
+│   │   ├── cline-safety
+│   │   │   └── executable_git
+│   │   ├── executable_cursor
+│   │   ├── executable_dots
+│   │   ├── executable_dots-push
+│   │   ├── executable_grok
+│   │   ├── executable_lazygit-ollama-commit.sh
+│   │   ├── executable_ollama-commit-msg.sh
+│   │   ├── executable_omarchy-agent-usage-antigravity.tmpl
+│   │   ├── executable_omarchy-agent-usage-cline.tmpl
+│   │   ├── executable_omarchy-agent-usage-codex.tmpl
+│   │   ├── executable_omarchy-agent-usage-cursor.tmpl
+│   │   ├── executable_omarchy-agent-usage-opencode.tmpl
+│   │   ├── executable_omarchy-agent-usage-update.tmpl
+│   │   ├── executable_omarchy-agent.tmpl
+│   │   ├── executable_omarchy-cline-usage-login.tmpl
+│   │   ├── executable_omarchy-cline-usage-override.tmpl
+│   │   ├── executable_omarchy-cline-usage-scrape.tmpl
+│   │   ├── executable_omarchy-cursor-statusline.tmpl
+│   │   ├── executable_omarchy-cursor-usage-override.tmpl
+│   │   ├── executable_omarchy-cursor-usage-scrape.tmpl
+│   │   ├── executable_omarchy-default-agent.tmpl
+│   │   ├── executable_omarchy-dotfiles-sync
+│   │   ├── executable_omarchy-opencode-go-usage-login.tmpl
+│   │   ├── executable_omarchy-opencode-go-usage-override.tmpl
+│   │   ├── executable_omarchy-opencode-go-usage-scrape.tmpl
+│   │   └── symlink_evot
+│   └── share
+│       └── applications
+│           └── cursor-desktop.desktop
+├── dot_pi
+│   └── agent
+│       └── skills
+│           └── symlink_project-doc-planner
+├── dot_zshrc
+├── encrypted_private_dot_linear.toml.age
+├── private_dot_grokbot
+│   └── settings.json
+├── private_dot_ssh
+│   └── config
+├── run_after_23-sync-agent-skills.sh.tmpl
+├── run_once_after_24-setup-omarchy-agents.sh.tmpl
+├── run_once_before_00-verify-deps.sh.tmpl
 ├── run_onchange_after_10-install-omarchy-plugins.sh.tmpl
 ├── run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl
 ├── run_onchange_after_21-setup-omarchy-cline.sh.tmpl
 ├── run_onchange_after_22-setup-omarchy-cline-usage-scrape.sh.tmpl
-├── run_after_23-sync-agent-skills.sh.tmpl
-├── run_once_after_24-setup-omarchy-agents.sh.tmpl
-├── run_after_25-sync-omarchy-agents-workspace.sh.tmpl
+├── run_onchange_after_25-sync-omarchy-agents-workspace.sh.tmpl
 ├── run_onchange_after_26-setup-omarchy-cursor.sh.tmpl
-└── run_onchange_after_30-macos-defaults.sh.tmpl  # Declarative macOS defaults (darwin only)
+├── run_onchange_after_27-sync-claude-mcp.sh.tmpl
+├── run_onchange_after_28-sync-claude-settings.sh.tmpl
+├── run_onchange_after_30-macos-defaults.sh.tmpl
+└── run_onchange_before_09-install-agent-skills.sh.tmpl
 ```
+<!-- END REPO TREE -->
 
 ---
 

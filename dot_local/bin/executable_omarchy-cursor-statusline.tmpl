@@ -43,6 +43,7 @@ from __future__ import annotations
 import fcntl
 import json
 import os
+import subprocess
 import sys
 import tempfile
 import time
@@ -175,10 +176,31 @@ def record_usage(session_id: str, model: str, current_usage: dict) -> None:
 
 
 def render_status(payload: dict) -> str:
+  """Delegate display to the shared statusline renderer.
+
+  The shared renderer (~/.local/bin/statusline) is the single source of truth
+  for the visual, so Cursor's statusline matches Claude and any other harness.
+  It is pure render and accepts the same stdin payload; if it is somehow
+  missing or fails, fall back to a minimal safe line. This hook never reads
+  the payload itself for display — only for usage logging above."""
+  script = os.path.expanduser("~/.local/bin/statusline")
+  pct = ((payload.get("context_window") or {}).get("used_percentage"))
+  if os.path.isfile(script):
+    try:
+      rendered = subprocess.run(
+        [script],
+        input=json.dumps(payload),
+        capture_output=True,
+        text=True,
+        timeout=2,
+      )
+      line = rendered.stdout.rstrip("\n")
+      if line:
+        return line
+    except Exception:
+      pass
   model = ((payload.get("model") or {}).get("display_name")
            or (payload.get("model") or {}).get("id") or "Cursor")
-  ctx = payload.get("context_window") or {}
-  pct = ctx.get("used_percentage")
   if isinstance(pct, (int, float)):
     return f"{model}  ctx {int(pct)}%"
   return str(model)

@@ -1,23 +1,114 @@
 agentSkills:
   portableLocal:
-    - linear-agent-tracking
     - dots
-  cloudflare:
-    source: cloudflare/skills
-    skills:
-      - agents-sdk
-      - cloudflare
-      - cloudflare-email-service
-      - cloudflare-one
-      - cloudflare-one-migrations
-      - durable-objects
-      - sandbox-migrate-to-next
-      - sandbox-next
-      - sandbox-stable
-      - turnstile-spin
-      - web-perf
-      - workers-best-practices
-      - wrangler
+    - frontier-sweep
+    - grilling
+    - linear-agent-tracking
+  packs:
+    mattpocock:
+      repo: mattpocock/skills
+      skills:
+        - ask-matt
+        - claude-handoff
+        - code-review
+        - codebase-design
+        - diagnosing-bugs
+        - domain-modeling
+        - git-guardrails-claude-code
+        - grill-me
+        - grill-with-docs
+        - handoff
+        - implement
+        - implement-spec
+        - improve-codebase-architecture
+        - loop-me
+        - migrate-to-shoehorn
+        - research
+        - resolving-merge-conflicts
+        - scaffold-exercises
+        - setup-matt-pocock-skills
+        - setup-pre-commit
+        - setup-ts-deep-modules
+        - tdd
+        - teach
+        - to-questionnaire
+        - to-spec
+        - to-tickets
+        - triage
+        - wait-what
+        - wayfinder
+        - wizard
+        - writing-beats
+        - writing-for-agents
+        - writing-fragments
+        - writing-shape
+    emil:
+      repo: emilkowalski/skills
+      skills:
+        - animate
+        - animate-expo
+        - animation-vocabulary
+        - apple-design
+        - ask-sonner
+        - emil-design-eng
+        - find-animation-opportunities
+        - improve-animations
+        - pick-ui-library
+        - prototype
+        - review-animations
+        - write-swift
+    remotion:
+      repo: remotion-dev/skills
+      skills:
+        - remotion-best-practices
+        - remotion-captions
+        - remotion-create
+        - remotion-docs
+        - remotion-interactivity
+        - remotion-maps
+        - remotion-markup
+        - remotion-multimedia
+        - remotion-render
+        - remotion-saas
+        - remotion-studio
+        - remotion-upgrade
+    supabase:
+      repo: supabase/agent-skills
+      skills: [supabase, supabase-postgres-best-practices]
+    diffusionstudio:
+      repo: diffusionstudio/skills
+      skills: [editor, watch]
+    vercel-labs:
+      repo: vercel-labs/skills
+      skills: [find-skills]
+    prime-skills:
+      repo: prime-skills/runcomfy-agent-skills
+      skills: [ai-image-generation]
+    agent-reach:
+      repo: Panniantong/Agent-Reach
+      skills: [agent-reach]
+    unlazy:
+      repo: Leonxlnx/unlazy
+      skills: [unlazy]
+    flyai:
+      repo: alibaba-flyai/flyai-skill
+      skills: [flyai]
+    cloudflare:
+      repo: cloudflare/skills
+      skills:
+        - agents-sdk
+        - cloudflare
+        - cloudflare-email-service
+        - cloudflare-one
+        - cloudflare-one-migrations
+        - durable-objects
+        - sandbox-migrate-to-next
+        - sandbox-next
+        - sandbox-stable
+        - turnstile-spin
+        - web-perf
+        - workers-best-practices
+        - wrangler
   sharedExtras:
     - name: diagnose-crash
       sourcePath: /usr/share/omarchy/default/agents/skills/diagnose-crash
