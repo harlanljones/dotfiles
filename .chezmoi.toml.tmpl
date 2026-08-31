@@ -1,8 +1,6 @@
-encryption = "age"
-
-[age]
-identity = "/home/harlan/.config/chezmoi/key.txt"
-recipient = "age1hf4200nhdqg0l3xs68v4gef6mn0nuvmh72573m3nfj8kqpcs7pnsmfkuw6"
-
 [data]
 machine = '{{ if eq .chezmoi.hostname "omarchy" }}augustus{{ else if eq .chezmoi.os "linux" }}augustus{{ else if eq .chezmoi.os "darwin" }}hadrian{{ else }}unknown{{ end }}'
+
+[remove]
+# Skip encrypted file — not using age encryption
+encrypted_private_dot_linear.toml.age = true
