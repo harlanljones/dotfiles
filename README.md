@@ -203,6 +203,7 @@ Declarative tracking for system-level packages that mise does not manage:
 │   ├── machines.yaml
 │   └── omarchy_plugins.yaml
 ├── .chezmoiignore.tmpl
+├── .gitignore
 ├── dot_Brewfile
 ├── dot_agents
 │   └── skills
@@ -227,6 +228,12 @@ Declarative tracking for system-level packages that mise does not manage:
 │   └── skills
 │       ├── dots
 │       │   └── SKILL.md
+│       ├── frontier-sweep
+│       │   └── SKILL.md
+│       ├── grilling
+│       │   ├── SKILL.md
+│       │   └── agents
+│       │       └── openai.yaml
 │       ├── linear-agent-tracking
 │       │   ├── SKILL.md
 │       │   ├── agents
@@ -431,6 +438,7 @@ Declarative tracking for system-level packages that mise does not manage:
 │   │   ├── executable_omarchy-opencode-go-usage-login.tmpl
 │   │   ├── executable_omarchy-opencode-go-usage-override.tmpl
 │   │   ├── executable_omarchy-opencode-go-usage-scrape.tmpl
+│   │   ├── executable_statusline.tmpl
 │   │   └── symlink_evot
 │   └── share
 │       └── applications
@@ -440,7 +448,6 @@ Declarative tracking for system-level packages that mise does not manage:
 │       └── skills
 │           └── symlink_project-doc-planner
 ├── dot_zshrc
-├── encrypted_private_dot_linear.toml.age
 ├── private_dot_grokbot
 │   └── settings.json
 ├── private_dot_ssh
