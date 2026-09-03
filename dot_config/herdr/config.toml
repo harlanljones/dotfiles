@@ -118,3 +118,9 @@ tab_bar_right = [{ type = "zoom" }, { type = "hostname" }]
 
 [experimental]
 kitty_graphics = true
+
+[[keys.command]]
+key = "prefix+l"
+type = "plugin_action"
+command = "harlan.corral.toggle"
+description = "Toggle the Linear panel"

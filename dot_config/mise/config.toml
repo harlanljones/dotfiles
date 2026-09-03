@@ -11,6 +11,13 @@ node = "latest"
 opencode = "latest"
 pnpm = "latest"
 python = "3.12.13"
+ruby = "latest"
 terraform = "latest"
 tflint = "latest"
 uv = "latest"
+
+[settings]
+idiomatic_version_file_enable_tools = ["ruby"]
+
+[settings.ruby]
+compile = false

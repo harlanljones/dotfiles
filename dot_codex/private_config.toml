@@ -1,4 +1,4 @@
-model = "gpt-5.6-sol"
+model = "gpt-5.6-terra"
 model_reasoning_effort = "medium"
 approvals_reviewer = "auto_review"
 plan_mode_reasoning_effort = "max"
@@ -99,6 +99,9 @@ trust_level = "trusted"
 trust_level = "trusted"
 
 [projects."/home/harlan/dev/monad"]
+trust_level = "trusted"
+
+[projects."/home/harlan/dev/second-brain"]
 trust_level = "trusted"
 
 [hooks.state]

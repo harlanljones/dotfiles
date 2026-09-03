@@ -22,6 +22,80 @@
         ]
       }
     ],
+    "startup": [
+      {
+        "command": [
+          "./target/release/corral",
+          "reconcile"
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "install-shim",
+        "title": "Install corral shim",
+        "description": "Symlink ~/.local/bin/corral so agents can bind themselves",
+        "command": [
+          "./target/release/corral",
+          "install-shim"
+        ]
+      },
+      {
+        "id": "pause",
+        "title": "Pause Linear write-back",
+        "command": [
+          "./target/release/corral",
+          "pause"
+        ]
+      },
+      {
+        "id": "toggle",
+        "title": "Toggle Linear panel",
+        "description": "Open or close the corral panel",
+        "contexts": [
+          "workspace",
+          "tab"
+        ],
+        "command": [
+          "./target/release/corral",
+          "open"
+        ]
+      }
+    ],
+    "events": [
+      {
+        "on": "pane.agent_detected",
+        "command": [
+          "./target/release/corral",
+          "event",
+          "pane.agent_detected"
+        ]
+      },
+      {
+        "on": "pane.agent_status_changed",
+        "command": [
+          "./target/release/corral",
+          "event",
+          "pane.agent_status_changed"
+        ]
+      },
+      {
+        "on": "pane.closed",
+        "command": [
+          "./target/release/corral",
+          "event",
+          "pane.closed"
+        ]
+      },
+      {
+        "on": "pane.exited",
+        "command": [
+          "./target/release/corral",
+          "event",
+          "pane.exited"
+        ]
+      }
+    ],
     "panes": [
       {
         "id": "panel",
