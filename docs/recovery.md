@@ -7,7 +7,7 @@ back to a fully applied setup.
 
 ## 1. The age key is the crown jewel
 
-Everything sensitive in this repo (currently `encrypted_private_dot_linear.toml.age`)
+Everything sensitive in this repo (such as `dot_config/opencode/encrypted_opencode.json.age`)
 is encrypted with [age](https://github.com/FiloSottile/age) against:
 
 | Item | Location / Value |

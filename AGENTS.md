@@ -28,7 +28,7 @@ Every entry in the source tree maps to a home-directory target by a filename pre
 | `dot_config/` | `~/.config/…` | `dot_config/starship.toml.tmpl` → `~/.config/starship.toml` |
 | `dot_local/` | `~/.local/…` | `dot_local/bin/executable_dots` → `~/.local/bin/dots` |
 | `private_dot_` | literal file in `~` with `0600` perms | `private_dot_ssh/config` → `~/.ssh/config` |
-| `encrypted_…age` | age-encrypted at rest | `encrypted_private_dot_linear.toml.age` → `~/.linear.toml` |
+| `encrypted_…age` | age-encrypted at rest | `dot_config/opencode/encrypted_opencode.json.age` → `~/.config/opencode/opencode.json` |
 | `executable_` | file becomes an executable | `executable_dots` → `~/.local/bin/dots` |
 | `symlink_` | file becomes a symlink | `symlink_evot` → `~/.local/bin/evot` |
 | `run_*.sh.tmpl` | executable apply script (not a dotfile) | see §3 |
@@ -59,7 +59,7 @@ ordering guarantee — treat each trigger class separately.
 | 22 | `run_onchange_after_22-setup-omarchy-cline-usage-scrape.sh.tmpl` | onchange | Cline rate-limit headless scraper |
 | 23 | `run_after_23-sync-agent-skills.sh.tmpl` | every apply | Reconcile shared `~/.agents/skills` into harnesses |
 | 24 | `run_once_after_24-setup-omarchy-agents.sh.tmpl` | once | Local state dirs + user systemd daemon |
-| 25 | `run_after_25-sync-omarchy-agents-workspace.sh.tmpl` | every apply | Validate/deploy `omarchy-agents` plugin builds |
+| 25 | `run_onchange_after_25-sync-omarchy-agents-workspace.sh.tmpl` | onchange | Validate/deploy `omarchy-agents` plugin builds |
 | 26 | `run_onchange_after_26-setup-omarchy-cursor.sh.tmpl` | onchange | Cursor usage collector setup |
 | 27 | `run_onchange_after_27-sync-claude-mcp.sh.tmpl` | onchange | Sync Claude Code MCP config |
 | 28 | `run_onchange_after_28-sync-claude-settings.sh.tmpl` | onchange | Sync Claude Code permissions/hooks |
@@ -69,16 +69,17 @@ ordering guarantee — treat each trigger class separately.
 
 | Path | What lives there |
 | --- | --- |
-| `dot_config/` | All per-tool configs under `~/.config` (starship, ghostty, git, nvim, hypr, mise, opencode, omarchy, systemd/user, …) |
+| `dot_config/` | All per-tool configs under `~/.config` (starship, ghostty, git, nvim, hypr, mise, opencode, omarchy, systemd/user, herdr, zoxide, btop, atuin, …) |
 | `dot_local/bin/` | Custom scripts, usage collectors, scrapers, agent hooks (installed to `~/.local/bin`) |
 | `dot_local/bin/cline-safety/` | `git` interceptor that refuses `commit`/`push` under Cline |
 | `dot_local/bin/executable_statusline.tmpl` | Shared cross-harness CLI statusline renderer (Claude Code + Cursor) → `~/.local/bin/statusline` |
 | `dot_agents/`, `dot_claude/`, `dot_cline/`, `dot_codex/`, `dot_gemini/`, `dot_grok/`, `dot_pi/` | Per-harness config, skills, rules, MCP, hooks |
+| `dot_evotai/` | EVOT LLM provider environment config (`~/.evotai/evot.env`) |
 | `.chezmoidata/` | YAML data sources read by `.tmpl`s (`machines`, `agent_skills`, `omarchy_plugins`, `claude_mcp`, `claude_settings`) |
 | `docs/` | Recovery guide + maintenance scripts (chezmoi-ignored, git-tracked) |
 | `Documents/` | Non-config content (Cline workflow docs) |
 | `.github/workflows/ci.yml` | CI: dry-run apply on Linux + macOS, shellcheck, actionlint |
-| `encrypted_private_dot_linear.toml.age` | Age-encrypted Linear CLI config |
+| `dot_config/opencode/encrypted_opencode.json.age` | Age-encrypted OpenCode auth & configuration |
 | `dotfiles-showcase/` | **Submodule** — interactive web app; never apply, never edit here |
 | `package.json` / `bun.lock` | Runtime CLI deps installed outside mise (see §5) |
 
@@ -92,10 +93,11 @@ Each CLI/runtime is owned by exactly one manager. Do not spread a tool across tw
 
 | Manager | Manifest | Tools |
 | --- | --- | --- |
-| mise | `dot_config/mise/config.toml` | bun, chezmoi, claude, codex, gh, node, `npm:playwright`, opencode, python, uv |
+| mise | `dot_config/mise/config.toml` | bun, chezmoi, claude, codex, copilot, gemini, gh, `github:can1357/oh-my-pi`, go, node, `npm:@xai-official/grok`, `npm:playwright`, opencode, pi, pnpm, python, ruby, terraform, tflint, uv |
 | node/bun (npm) | root `package.json` + `bun.lock` | @magnitudedev/cli, @nanonets/graft, @schpet/linear-cli, cline, freebuff, supabase, wrangler |
 | Homebrew (macOS) | `dot_Brewfile` | brews + casks (Ghostty, JetBrainsMono Nerd Font, …) |
 | pacman / paru (Linux) | `dot_config/pacman/pkglist.txt` + `aurlist.txt` | native + AUR packages |
+| standalone / scripts | `dot_local/bin/`, `~/.fly/bin` | flyctl (Fly.io CLI installer), evot (outpost integration symlink) |
 
 ## 6. Hard rules for agents
 

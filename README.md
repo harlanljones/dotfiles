@@ -33,14 +33,20 @@ An interactive, local-first web app that visualizes these dotfiles — headlined
 - **Bash** (`.bashrc` on Linux/Omarchy): Integrates with Omarchy shell defaults, Google Cloud SDK PATH and autocompletion, user PATH entries, coding-agent launch aliases (`codex`, `oc`, `cursor`, sandboxed `cline`), and guarded modern shell QoL hooks.
 - **[Starship](https://starship.rs/)** (`~/.config/starship.toml`): Fast, cyan-accented prompt displaying `user@host` (SSH sessions only), directory path with smart repo-root formatting, git branch with a compact dirty-repo dot indicator, in-progress rebase/merge state, detached-HEAD commit hash, and long command duration (`>=3s`).
 - **Prompt failure recoloring** (`.zshrc` + `.bashrc`): Both shells hook Starship so every prompt segment renders red after a non-zero exit status and returns to cyan on success — zsh via a `starship_status_prompt` PROMPT wrapper, bash via a `starship_precmd` override.
-- **Herdr** (`~/.config/herdr/config.toml`): Modern terminal multiplexer configured with tmux-parity keybindings (`Ctrl+Space` prefix), follow-CWD panes/splits, and terminal-native palette, layered with agent-orchestration settings: agent-pane navigation (`Ctrl+Alt+Shift+1..9`), a priority-sorted agent sidebar, desktop notifications when an agent finishes or needs input, and persistent pane history. Templated per machine so plugin paths and the Corral binding resolve on `hadrian` too. Pairs with [`herdr-outpost`](https://github.com/harlanljones/herdr-outpost) for remote dashboard/relay access.
+- **Herdr** (`~/.config/herdr/config.toml` & `~/.config/herdr/plugins.json`): Modern terminal multiplexer configured with tmux-parity keybindings (`Ctrl+Space` prefix), follow-CWD panes/splits, and terminal-native palette, layered with agent-orchestration settings: agent-pane navigation (`Ctrl+Alt+Shift+1..9`), a priority-sorted agent sidebar, desktop notifications when an agent finishes or needs input, and persistent pane history. Templated per machine (`config.toml.tmpl` and `plugins.json.tmpl`) with enabled plugins:
+  - **Corral** (`harlan.corral`): Linear issue panel (`prefix+l` on Augustus) and agent event binding (`~/dev/herdr-corral`).
+  - **Equalize Panes** (`ponko2.equalize-panes`): Automatic pane equalization across layout changes (`prefix+=`).
+  - **Ferry** (`shadowfax.ferry`): Move live panes/tabs or merge workspaces from a native popup (macOS).
+  - Pairs with [`herdr-outpost`](https://github.com/harlanljones/herdr-outpost) and `herdr-outpost-relay.service` for remote dashboard/relay access.
 - **[Ghostty](https://ghostty.org/)** (`~/.config/ghostty/config`): Terminal emulator config with Omarchy theme integration, JetBrainsMono Nerd Font, copy/paste keybindings, and split-resize bindings.
 - **[btop](https://github.com/aristocratos/btop)** (`~/.config/btop/btop.conf`, Linux): Adopted monitor settings (vim keys, truecolor, omarchy-managed theme) so upgrades stop clobbering them.
 - **Modern shell QoL** (both `.zshrc` and `.bashrc`, each guarded so missing tools never break the shell):
-  - **[zoxide](https://github.com/ajeetdsouza/zoxide)**: Smarter `cd` with directory jumping.
+  - **[zoxide](https://github.com/ajeetdsouza/zoxide)**: Smarter `cd` with directory jumping, configured via `~/.config/zoxide/config.toml` with symlink resolution, pwd tracking hooks, and directory ignore rules (`.git`, `node_modules`, `.venv`, `target`, `/tmp`, `/Volumes`, `/mnt`).
   - **[fzf](https://github.com/junegunn/fzf)**: Fuzzy keybindings and completion (`Ctrl-R` history, `Ctrl-T` files), with fd-backed default commands (`FZF_DEFAULT_COMMAND`, preview layout opts).
   - **[atuin](https://github.com/atuinsh/atuin)**: Searchable shell history synced across machines (`~/.config/atuin/config.toml`).
   - **[direnv](https://direnv.net/)**: Per-directory environment loading.
+  - **[flyctl](https://fly.io/docs/flyctl/)**: Fly.io CLI integration in `.bashrc` (`~/.fly/bin`).
+- **Chrome / Chromium flags** (`~/.config/chrome-flags.conf`, Linux): Ozone platform and display flags (`--ozone-platform=x11`).
 - **[ripgrep](https://github.com/BurntSushi/ripgrep) config** (`~/.config/ripgrep/rc`): Smart-case, column caps, hidden/followed files via `RIPGREP_CONFIG_PATH`.
 - **Man pages through [bat](https://github.com/sharkdp/bat)**: `MANPAGER` shim when bat is installed.
 - **[GitHub CLI](https://cli.github.com/)** (`~/.config/gh/config.yml`): Adopted config (editor/prompt settings, aliases); `hosts.yml` auth state deliberately unmanaged.
@@ -51,11 +57,21 @@ An interactive, local-first web app that visualizes these dotfiles — headlined
   - `chezmoi`
   - `claude`
   - `codex`
+  - `copilot`
+  - `gemini`
   - `gh`
+  - `github:can1357/oh-my-pi`
+  - `go`
   - `node`
+  - `npm:@xai-official/grok`
   - `npm:playwright`
   - `opencode`
+  - `pi`
+  - `pnpm`
   - `python`
+  - `ruby`
+  - `terraform`
+  - `tflint`
   - `uv`
 
 ### 🗂️ Dotfiles CLI (`dots`)
@@ -114,23 +130,26 @@ Declarative tracking for system-level packages that mise does not manage:
     - **OpenCode**: `~/.config/opencode/opencode.json` bash permission rules denying `git commit*` and `git push*`.
 
 ### 🔐 Secret Management & Issue Tracking
-- **[age Encryption](https://github.com/FiloSottile/age)** (`.chezmoi.toml.tmpl`): Chezmoi encrypts sensitive credentials and configurations at rest using age with identity key located at `~/.config/chezmoi/key.txt`.
+- **[age Encryption](https://github.com/FiloSottile/age)** (`.chezmoi.toml.tmpl`): Chezmoi encrypts sensitive credentials and configurations at rest using age with identity key located at `~/.config/chezmoi/key.txt` (e.g. `dot_config/opencode/encrypted_opencode.json.age`).
 - **SSH Config** (`~/.ssh/config`): Managed defaults with the **1Password SSH agent** first (`IdentityAgent ~/.1password/agent.sock`, keys served from `~/.config/1password/ssh/agent.toml`) and on-disk `~/.ssh` keys as fallback; private keys are deliberately NOT managed (see `docs/recovery.md`).
 - **Systemd user environment** (`~/.config/environment.d/10-defaults.conf`, Linux): `EDITOR`/`VISUAL`/`PAGER`/`LESS` for all user systemd services (dashboard, tunnel, analytics) which never inherit shell rc files.
 - **macOS Defaults** (`run_onchange_after_30-macos-defaults.sh.tmpl`, darwin only): Declarative `defaults write` preferences — screenshot location, Finder path bar/extensions, Dock autohide, key repeat.
-- **[Linear](https://linear.app/) Integration** (`encrypted_private_dot_linear.toml.age` -> `~/.linear.toml`):
-  - Encrypted configuration for `@schpet/linear-cli`.
+- **[Linear](https://linear.app/) Integration & CLI**:
+  - Encrypted configuration and tools for `@schpet/linear-cli`.
   - **Linear Agent Tracking Skill** (`dot_codex/skills/linear-agent-tracking/`): Enables coding agents to read/query issues, claim tasks, create Wayfinder decision maps, track dependencies, and update ticket statuses.
+  - **Linear Frontier Sweep Skill** (`dot_codex/skills/frontier-sweep/`): Orchestrates parallel autonomous coding agents across unblocked, unclaimed dependency frontier tickets into dedicated git worktrees without auto-committing.
+  - **Herdr Corral Plugin**: Live Linear panel (`prefix+l` on Augustus) and agent event tracking in Herdr terminal multiplexer.
 
 ### 🖥️ Window Management & Hardware (Linux / Omarchy)
 - **[Hyprland](https://hyprland.org/)** (`~/.config/hypr/`):
-  - **Monitors** (`monitors.lua`): Dual-monitor setup with DP-1 (32" 4K 60Hz on left, 1.6x scale) and DP-2 (27" 2K 240Hz on right, 1.25x scale).
+  - **Monitors** (`monitors.lua`, `hyprland.lua`): Dual-monitor setup with DP-1 (32" 4K 60Hz on left, 1.6x scale) and DP-2 (27" 2K 240Hz on right, 1.25x scale), with a guarded loader for `hyprmoncfg-monitors.lua`.
+  - **Bindings** (`bindings.lua`): Hyprland keybindings including the optional Oma Chord loader (`hypr.omachord`).
   - **Input** (`input.lua`): Pointer sensitivity and custom input overrides.
 
 ### 🤖 Omarchy & AI Coding Agent Integration
 - **Cross-Harness Agent Skills** (`.chezmoidata/agent_skills.yaml`, `run_onchange_before_09-install-agent-skills.sh.tmpl`, and `run_after_23-sync-agent-skills.sh.tmpl`):
   - Restores missing third-party skills and safely reconciles the complete shared `~/.agents/skills` catalog into Claude, Cline, Antigravity, Gemini, and Pi without replacing provider-owned variants. Codex and OpenCode consume the shared catalog directly.
-  - Keeps custom skills such as `grilling`, `project-doc-planner`, `dots`, and `linear-agent-tracking` in chezmoi while preserving harness-specific `impeccable` builds.
+  - Keeps custom skills such as `grilling`, `project-doc-planner`, `dots`, `frontier-sweep`, and `linear-agent-tracking` in chezmoi while preserving harness-specific `impeccable` builds.
 - **Plugin Management** (`.chezmoidata/omarchy_plugins.yaml` & `run_onchange_after_10-install-omarchy-plugins.sh.tmpl`):
   - Declarative tracking and automatic installation/updating of Omarchy desktop plugins:
     - `omarchy-resume`
@@ -141,7 +160,7 @@ Declarative tracking for system-level packages that mise does not manage:
     - `omarchy-sportsbar`
 - **Omarchy Agents Workspace** ([`harlanljones/omarchy-agents`](https://github.com/harlanljones/omarchy-agents), checked out at `~/dev/omarchy-agents/`):
   - Turborepo source of truth for the web dashboard and both Omarchy plugin forks. Chezmoi retains only machine configuration and invokes the workspace's deployment task after apply.
-  - Kept outside `.chezmoidata/omarchy_plugins.yaml` because the repository contains multiple apps; `run_after_25-sync-omarchy-agents-workspace.sh.tmpl` validates and deploys both plugin builds.
+  - Kept outside `.chezmoidata/omarchy_plugins.yaml` because the repository contains multiple apps; `run_onchange_after_25-sync-omarchy-agents-workspace.sh.tmpl` validates and deploys both plugin builds.
   - `run_once_after_24-setup-omarchy-agents.sh.tmpl` configures local state directories and user systemd daemon.
 - **Agent Leaderboard Plugin** (`~/dev/omarchy-agents/apps/omarchy-agent-leaderboard/`, deployed to `~/.config/omarchy/plugins/harlan.agent-leaderboard/`):
   - Custom bar widget (`harlan.agent-leaderboard`) ranking token usage across all coding agents (Antigravity, Claude, Cline, Codex, Cursor, Fireworks, OpenCode, Grok, Hermes) across daily, 7-day, and all-time windows.
@@ -160,6 +179,7 @@ Declarative tracking for system-level packages that mise does not manage:
   - **Automated Usage Scraper**: Headless scraping via Playwright (`omarchy-cursor-usage-scrape`) running periodically on a systemd timer (`omarchy-cursor-usage-scrape.timer`) to capture dashboard usage.
   - **Manual override fallback**: `omarchy-cursor-usage-override` allows setting manually-read percentage metrics.
   - `omarchy default agent cursor` / `omarchy agent` launches `cursor-agent --yolo`.
+  - **Cursor Settings & Desktop**: `~/.config/Cursor/User/settings.json` configuring auto color scheme detection, message steering, and composer density/usage summary settings; desktop entry (`cursor-desktop.desktop`) and `cursor` launcher script (`~/.local/bin/cursor`).
 - **OpenCode & OpenCode Go Integration**:
   - `omarchy-agent-usage-opencode`: SQLite collector parsing prompt history, session stats, token usage, and provider rate limits from `~/.local/share/opencode/opencode.db`.
   - **Automated OpenCode Go Scraper**: Headless browser scraper (`omarchy-opencode-go-usage-scrape`) running on a systemd timer (`omarchy-opencode-go-usage-scrape.timer`), interactive login helper (`omarchy-opencode-go-usage-login`), and manual override (`omarchy-opencode-go-usage-override`).
@@ -169,7 +189,15 @@ Declarative tracking for system-level packages that mise does not manage:
   - `omarchy-agent-usage-codex`: Collects Codex CLI session logs and app-server RPC metrics.
   - `~/.claude/settings.json`: Configures Claude Code tool execution permissions, git safety hooks, and session hooks for `herdr` agent state and codebase memory reminders.
   - **Shared CLI statusline** (`~/.local/bin/statusline`): Single cross-harness statusline renderer used by Claude Code (`statusLine.command` in `~/.claude/settings.json`) and Cursor (via `omarchy-cursor-statusline`). Reads the Claude-aligned JSON payload and renders model, cwd, git branch, context meter, line diff, session cost, and output style; drops the extras when absent. Codex uses native `[tui] status_line` widgets (no external-script support); opencode has no statusline slot today.
+- **Grok CLI Integration**:
+  - `grok` launcher via mise (`npm:@xai-official/grok`).
+  - Session start hooks (`~/.grok/hooks/herdr.json` and `executable_herdr-agent-state.sh`) reporting agent lifecycle to the Herdr terminal multiplexer.
+- **Gemini CLI & Persona Integration**:
+  - MCP configuration (`~/.gemini/config/mcp_config.json`) and agent personas (`~/.gemini/agents/`) configured with `codebase-memory-mcp` (`codebase-memory`, `codebase-memory-scout`, `codebase-memory-auditor`).
+- **EVOT AI Integration**:
+  - Provider environment configuration (`~/.evotai/evot.env`) and symlink `~/.local/bin/evot` pointing to `herdr-outpost` integrations.
 - **Background Systemd User Services & Timers** (`~/.config/systemd/user/`):
+  - `herdr-outpost-relay.service`: herdr-outpost relay daemon connecting herdr multiplexer to remote dashboard.
   - `omarchy-agents-dashboard.service`: Web dashboard server for agent monitoring.
   - `omarchy-agents-tunnel.service`: Cloudflare tunnel service exposing the local dashboard securely.
   - `omarchy-agents-analysis.service` & `omarchy-agents-analysis.timer`: Background agent analytics powered by local LLMs via Ollama.
@@ -187,6 +215,9 @@ Declarative tracking for system-level packages that mise does not manage:
   - `omarchy-cursor-usage-scrape`, `omarchy-cursor-usage-override`: Cursor limit scraping and override tools.
   - `omarchy-cline-usage-login`, `omarchy-cline-usage-scrape`, `omarchy-cline-usage-override`: ClinePass limit scraper and override utilities.
   - `omarchy-opencode-go-usage-login`, `omarchy-opencode-go-usage-scrape`, `omarchy-opencode-go-usage-override`: OpenCode Go limit scraper and override utilities.
+  - `cursor`: Launcher for Cursor IDE or fallback to Cursor agent.
+  - `grok`: Launcher running `@xai-official/grok` in the mise environment.
+  - `evot`: Symlink to `~/dev/herdr-outpost/integrations/evot`.
 
 ---
 
