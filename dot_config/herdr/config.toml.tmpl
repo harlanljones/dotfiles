@@ -67,6 +67,17 @@ next_tab = ["prefix+n", "alt+right"]
 move_tab_previous = "alt+shift+left"
 move_tab_next = "alt+shift+right"
 
+# Agents - no tmux equivalent. This box runs nine agent CLIs; these are the
+# only way to reach a specific agent pane without hunting through the sidebar.
+previous_agent = "prefix+ctrl+p"
+next_agent = "prefix+ctrl+n"
+focus_agent = "alt+shift+1..9"
+
+# Worktrees - new_worktree keeps its prefix+shift+g default. prefix+shift+w is
+# free because rename_workspace moved to prefix+shift+r above.
+open_worktree = "prefix+shift+w"
+remove_worktree = "prefix+shift+backspace"
+
 # Sessions -> workspaces
 new_workspace = "prefix+shift+c"
 rename_workspace = "prefix+shift+r"
@@ -85,12 +96,6 @@ key = "prefix+="
 type = "plugin_action"
 command = "ponko2.equalize-panes.equalize"
 description = "Equalize panes"
-
-[[keys.command]]
-key = "prefix+o"
-type = "plugin_action"
-command = "ports.open"
-description = "Open listening ports"
 
 [ui]
 accent = "blue"
@@ -115,12 +120,62 @@ mouse_capture = true
 tab_bar_right = [{ type = "zoom" }, { type = "hostname" }]
 
 # set -g set-titles on / set -g set-titles-string '#h:#W', where tmux's #W was
+# the window name - herdr's tab. Default is "{hostname}: {workspace}".
+window_title = "{hostname}: {tab}"
+
+# Agent-oriented additions with no tmux ancestry
+agent_panel_sort = "priority"            # attention queue: needs-input agents first
+status_indicators = "symbols"            # distinct glyphs, not just color - the
+                                         # "terminal" theme inherits whatever Omarchy
+                                         # palette is live, some of them low-contrast
+show_agent_labels_on_pane_borders = true # borders are on and tmux drew pane titles there
+
+# herdr captures the mouse, so ghostty's mouse-scroll-multiplier = 0.95 never
+# applies inside a pane. 2 lines/notch is the closest equivalent.
+mouse_scroll_lines = 2
+
+[ui.toast]
+# Agent finished / needs input goes to the Hyprland notification daemon, so it
+# is visible when herdr is not the focused window.
+delivery = "system"
+delay_seconds = 2   # don't fire on sub-2s agent turns
+
+# Show the model's own status line for Claude panes instead of just "claude"
+[ui.sidebar.agents.rows_by_agent]
+claude = [["state_icon", "workspace", "tab"], ["terminal_title_stripped"], ["agent"]]
+
+[server]
+# Layout size while no client is attached. Default 120x40 is far short of a
+# fullscreen ghostty on the 2048x1152 logical displays (JetBrainsMono @9,
+# 14px padding -> roughly 220x55).
+headless_cols = 200
+headless_rows = 50
+
+[session]
+# Agent panes come back as live conversations after a server restart
+resume_agents_on_restore = true
+
+[worktrees]
+directory = "~/.herdr/worktrees"
+
+[update]
+# Pinned: harlan.corral declares min_herdr_version 0.8.0
+channel = "stable"
+
+[advanced]
+# 10 MB default truncates long agent transcripts
+scrollback_limit_bytes = 50000000
 
 [experimental]
 kitty_graphics = true
+# Pane screen history survives a restart; pairs with resume_agents_on_restore
+pane_history = true
 
+{{ if eq .machine "augustus" -}}
+# Corral lives in ~/dev/herdr-corral, which only exists on augustus
 [[keys.command]]
 key = "prefix+l"
 type = "plugin_action"
 command = "harlan.corral.toggle"
 description = "Toggle the Linear panel"
+{{ end -}}

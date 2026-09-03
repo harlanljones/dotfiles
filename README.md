@@ -33,7 +33,7 @@ An interactive, local-first web app that visualizes these dotfiles — headlined
 - **Bash** (`.bashrc` on Linux/Omarchy): Integrates with Omarchy shell defaults, Google Cloud SDK PATH and autocompletion, user PATH entries, coding-agent launch aliases (`codex`, `oc`, `cursor`, sandboxed `cline`), and guarded modern shell QoL hooks.
 - **[Starship](https://starship.rs/)** (`~/.config/starship.toml`): Fast, cyan-accented prompt displaying `user@host` (SSH sessions only), directory path with smart repo-root formatting, git branch with a compact dirty-repo dot indicator, in-progress rebase/merge state, detached-HEAD commit hash, and long command duration (`>=3s`).
 - **Prompt failure recoloring** (`.zshrc` + `.bashrc`): Both shells hook Starship so every prompt segment renders red after a non-zero exit status and returns to cyan on success — zsh via a `starship_status_prompt` PROMPT wrapper, bash via a `starship_precmd` override.
-- **Herdr** (`~/.config/herdr/config.toml`): Modern terminal multiplexer configured with tmux-parity keybindings (`Ctrl+Space` prefix), follow-CWD panes/splits, and terminal-native palette. Pairs with [`herdr-outpost`](https://github.com/harlanljones/herdr-outpost) for remote dashboard/relay access.
+- **Herdr** (`~/.config/herdr/config.toml`): Modern terminal multiplexer configured with tmux-parity keybindings (`Ctrl+Space` prefix), follow-CWD panes/splits, and terminal-native palette, layered with agent-orchestration settings: agent-pane navigation (`Ctrl+Alt+Shift+1..9`), a priority-sorted agent sidebar, desktop notifications when an agent finishes or needs input, and persistent pane history. Templated per machine so plugin paths and the Corral binding resolve on `hadrian` too. Pairs with [`herdr-outpost`](https://github.com/harlanljones/herdr-outpost) for remote dashboard/relay access.
 - **[Ghostty](https://ghostty.org/)** (`~/.config/ghostty/config`): Terminal emulator config with Omarchy theme integration, JetBrainsMono Nerd Font, copy/paste keybindings, and split-resize bindings.
 - **[btop](https://github.com/aristocratos/btop)** (`~/.config/btop/btop.conf`, Linux): Adopted monitor settings (vim keys, truecolor, omarchy-managed theme) so upgrades stop clobbering them.
 - **Modern shell QoL** (both `.zshrc` and `.bashrc`, each guarded so missing tools never break the shell):
@@ -253,6 +253,7 @@ Declarative tracking for system-level packages that mise does not manage:
 │   │   └── config.toml
 │   ├── btop
 │   │   └── btop.conf
+│   ├── chrome-flags.conf
 │   ├── environment.d
 │   │   ├── 10-defaults.conf
 │   │   └── 10-machine.conf.tmpl
@@ -264,8 +265,8 @@ Declarative tracking for system-level packages that mise does not manage:
 │   │   ├── config.tmpl
 │   │   └── ignore
 │   ├── herdr
-│   │   ├── config.toml
-│   │   └── plugins.json
+│   │   ├── config.toml.tmpl
+│   │   └── plugins.json.tmpl
 │   ├── hypr
 │   │   ├── bindings.lua
 │   │   ├── hyprland.lua
