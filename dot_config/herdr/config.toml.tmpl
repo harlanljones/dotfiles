@@ -69,8 +69,8 @@ move_tab_next = "alt+shift+right"
 
 # Agents - no tmux equivalent. This box runs nine agent CLIs; these are the
 # only way to reach a specific agent pane without hunting through the sidebar.
-previous_agent = "prefix+ctrl+p"
-next_agent = "prefix+ctrl+n"
+previous_agent = "alt+shift+up"
+next_agent = "alt+shift+down"
 focus_agent = "alt+shift+1..9"
 
 # Worktrees - new_worktree keeps its prefix+shift+g default. prefix+shift+w is
@@ -84,12 +84,6 @@ rename_workspace = "prefix+shift+r"
 close_workspace = "prefix+shift+k"
 previous_workspace = ["prefix+shift+p", "alt+up"]
 next_workspace = ["prefix+shift+n", "alt+down"]
-
-[[keys.command]]
-key = "alt+shift+r"
-type = "plugin_action"
-command = "herdr-automatic-rename.reset"
-description = "Automatic Rename: reset"
 
 [[keys.command]]
 key = "prefix+="

@@ -30,3 +30,5 @@ o.bind("SUPER + ALT + N", "Clear notifications", "omarchy-shell notifications di
 -- o.bind("SUPER + SHIFT + S", nil, "omarchy-capture-screenshot")
 -- o.bind("SUPER + H", nil, "voxtype record toggle")
 -- o.bind("SUPER + PERIOD", nil, "omarchy-shell shell toggle omarchy.emojis")
+
+require("default.hypr.require_optional").module("hypr.omachord") -- Oma Chord managed loader

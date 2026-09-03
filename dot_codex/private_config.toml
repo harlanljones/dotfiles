@@ -104,6 +104,12 @@ trust_level = "trusted"
 [projects."/home/harlan/dev/second-brain"]
 trust_level = "trusted"
 
+[projects."/home/harlan/dev/herdr-corral"]
+trust_level = "trusted"
+
+[projects."/home/harlan/dev"]
+trust_level = "trusted"
+
 [hooks.state]
 
 [hooks.state."/home/harlan/.codex/hooks.json:session_start:0:0"]
