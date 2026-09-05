@@ -79,6 +79,7 @@ The table below is the orienting summary; the index is the detail.
 
 | Path | What lives there |
 | --- | --- |
+| `dot_config/shell/` | **Shell configuration.** Modules shared by bash and zsh, sourced in numeric order by both rc loaders; see its own `README.md`. Add shell config here, never to `dot_bashrc`/`dot_zshrc` |
 | `dot_config/` | All per-tool configs under `~/.config` (starship, ghostty, git, nvim, hypr, mise, opencode, omarchy, systemd/user, herdr, zoxide, btop, atuin, …) |
 | `dot_local/bin/` | Custom scripts, usage collectors, scrapers, agent hooks (installed to `~/.local/bin`) |
 | `dot_local/bin/cline-safety/` | `git` interceptor that refuses `commit`/`push` under Cline |
@@ -122,6 +123,12 @@ Each CLI/runtime is owned by exactly one manager. Do not spread a tool across tw
   intentionally git-tracked vs applied.
 - **Add new dotfiles with the correct prefix** (§2) and register them in
   `README.md` + this file if they add a tool or hook.
+- **Shell configuration goes in `dot_config/shell/`, not in the rc files.**
+  `dot_bashrc` and `dot_zshrc` are loaders and must stay that way. Each module
+  is a `*.sh` file with a shebang so CI shellchecks it, guards on the binary it
+  configures, and branches on `SHELL_KIND` rather than being duplicated per
+  shell. `60-prompt.sh` is deliberately divergent between the shells — see the
+  comment in it before "simplifying" it.
 - **After editing any `run_*` hook**, `git gc`/re-apply mentally: `run_onchange_*`
   will re-trigger if contents changed, which may re-run installs.
 - **`dots` CLI** is the human-friendly wrapper (`dots status/diff/update/push/doctor`).

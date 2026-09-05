@@ -40,10 +40,10 @@ An interactive, local-first web app that visualizes these dotfiles — headlined
 - Run locally: `bun install && bun run dev` (needs the `starship` binary on PATH). See `AGENTS.md` / `ROADMAP.md` in the showcase repo for architecture, milestones, and the Linear project.
 
 ### 🐚 Shell & Prompt
-- **Zsh** (`.zshrc` on macOS): Includes Starship prompt init with failure-recoloring wrapper, mise environment activation, editor defaults, `eza` alias shortcuts (`ls`, `lsa`, `lt`, `lta`), and guarded modern shell QoL hooks.
-- **Bash** (`.bashrc` on Linux/Omarchy): Integrates with Omarchy shell defaults, Google Cloud SDK PATH and autocompletion, user PATH entries, coding-agent launch aliases (`codex`, `oc`, `cursor`, sandboxed `cline`), and guarded modern shell QoL hooks.
+- **Shell modules** (`~/.config/shell/*.sh`): The real shell configuration, shared by bash and zsh and sourced in numeric order — `00-env` (PATH, editor), `10-tools` (ripgrep/fzf/pager exports), `20-integrations` (guarded zoxide/fzf/atuin/direnv hooks, mise on zsh), `30-navigation` (`zj`/`zp` jumps and bindings), `40-aliases` (`eza` shortcuts, traversal, agent launchers, `n`), `50-agents` (sandboxed `cline`), `55-apps` (`ft`), `60-prompt` (Starship + failure recolor), `70-cloud` (flyctl, Google Cloud SDK). `99-local.sh` is untracked and sourced last for machine-local additions. See [`dot_config/shell/README.md`](dot_config/shell/README.md).
+- **Zsh** (`.zshrc` on macOS) and **Bash** (`.bashrc` on Linux/Omarchy): Loaders. `.bashrc` establishes the Omarchy base layer first, then both source the module directory above and declare nothing themselves. Modules branch on `SHELL_KIND` where the shells genuinely differ, so nothing is written twice.
 - **[Starship](https://starship.rs/)** (`~/.config/starship.toml`): Fast, cyan-accented prompt displaying `user@host` (SSH sessions only), directory path with smart repo-root formatting, git branch with a compact dirty-repo dot indicator, in-progress rebase/merge state, detached-HEAD commit hash, and long command duration (`>=3s`).
-- **Prompt failure recoloring** (`.zshrc` + `.bashrc`): Both shells hook Starship so every prompt segment renders red after a non-zero exit status and returns to cyan on success — zsh via a `starship_status_prompt` PROMPT wrapper, bash via a `starship_precmd` override.
+- **Prompt failure recoloring** (`~/.config/shell/60-prompt.sh`): Both shells hook Starship so every prompt segment renders red after a non-zero exit status and returns to cyan on success — zsh via a `starship_status_prompt` PROMPT wrapper, bash via a `starship_precmd` override. The two implementations differ deliberately (bash recolors every foreground color, zsh recolors cyan only) and the showcase demonstrates that divergence.
 - **Herdr** (`~/.config/herdr/config.toml` & `~/.config/herdr/plugins.json`): Modern terminal multiplexer configured with tmux-parity keybindings (`Ctrl+Space` prefix), follow-CWD panes/splits, and terminal-native palette, layered with agent-orchestration settings: agent-pane navigation (`Ctrl+Alt+Shift+1..9`), a priority-sorted agent sidebar, desktop notifications when an agent finishes or needs input, and persistent pane history. Templated per machine (`config.toml.tmpl` and `plugins.json.tmpl`) with enabled plugins:
   - **Corral** (`harlan.corral`): Linear issue panel (`prefix+l` on Augustus) and agent event binding (`~/dev/herdr-corral`).
   - **Equalize Panes** (`ponko2.equalize-panes`): Automatic pane equalization across layout changes (`prefix+=`).
@@ -417,6 +417,17 @@ Declarative tracking for system-level packages that mise does not manage:
 │   │       └── settings.json
 │   ├── ripgrep
 │   │   └── rc
+│   ├── shell
+│   │   ├── 00-env.sh
+│   │   ├── 10-tools.sh
+│   │   ├── 20-integrations.sh
+│   │   ├── 30-navigation.sh
+│   │   ├── 40-aliases.sh
+│   │   ├── 50-agents.sh
+│   │   ├── 55-apps.sh
+│   │   ├── 60-prompt.sh
+│   │   ├── 70-cloud.sh
+│   │   └── README.md
 │   ├── starship.toml.tmpl
 │   ├── systemd
 │   │   └── user
