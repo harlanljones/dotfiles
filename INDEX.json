@@ -1,0 +1,1910 @@
+{
+  "$comment": "GENERATED FILE \u2014 DO NOT EDIT. Regenerate with `python3 docs/generate_index.py`; CI gates freshness.",
+  "schemaVersion": 1,
+  "generator": "docs/generate_index.py",
+  "summary": {
+    "total": 208,
+    "by_category": {
+      "shell": 3,
+      "prompt": 1,
+      "terminal": 4,
+      "editor": 11,
+      "desktop": 58,
+      "vcs": 4,
+      "navigation": 3,
+      "toolchain": 4,
+      "agents": 41,
+      "services": 14,
+      "scripts": 27,
+      "security": 2,
+      "hooks": 13,
+      "chezmoi": 7,
+      "repo": 16
+    }
+  },
+  "categories": [
+    {
+      "id": "shell",
+      "title": "Shell"
+    },
+    {
+      "id": "prompt",
+      "title": "Prompt"
+    },
+    {
+      "id": "terminal",
+      "title": "Terminal & multiplexer"
+    },
+    {
+      "id": "editor",
+      "title": "Editors"
+    },
+    {
+      "id": "desktop",
+      "title": "Desktop & window manager"
+    },
+    {
+      "id": "vcs",
+      "title": "Version control"
+    },
+    {
+      "id": "navigation",
+      "title": "Navigation & search"
+    },
+    {
+      "id": "toolchain",
+      "title": "Toolchain & packages"
+    },
+    {
+      "id": "agents",
+      "title": "AI agent harnesses"
+    },
+    {
+      "id": "services",
+      "title": "Background services"
+    },
+    {
+      "id": "scripts",
+      "title": "Custom executables"
+    },
+    {
+      "id": "security",
+      "title": "Credentials & SSH"
+    },
+    {
+      "id": "hooks",
+      "title": "Apply hooks (`run_*`)"
+    },
+    {
+      "id": "chezmoi",
+      "title": "Chezmoi control files"
+    },
+    {
+      "id": "repo",
+      "title": "Repository material (not applied)"
+    }
+  ],
+  "entries": [
+    {
+      "source": "dot_bash_profile",
+      "target": "~/.bash_profile",
+      "kind": "dotfile",
+      "category": "shell",
+      "attributes": [],
+      "subsystem": "bash"
+    },
+    {
+      "source": "dot_bashrc",
+      "target": "~/.bashrc",
+      "kind": "dotfile",
+      "category": "shell",
+      "attributes": [],
+      "subsystem": "bash"
+    },
+    {
+      "source": "dot_zshrc",
+      "target": "~/.zshrc",
+      "kind": "dotfile",
+      "category": "shell",
+      "attributes": [],
+      "subsystem": "zsh"
+    },
+    {
+      "source": "dot_config/starship.toml.tmpl",
+      "target": "~/.config/starship.toml",
+      "kind": "dotfile",
+      "category": "prompt",
+      "attributes": [
+        "template"
+      ],
+      "subsystem": "starship"
+    },
+    {
+      "source": "dot_config/btop/btop.conf",
+      "target": "~/.config/btop/btop.conf",
+      "kind": "dotfile",
+      "category": "terminal",
+      "attributes": [],
+      "subsystem": "btop"
+    },
+    {
+      "source": "dot_config/ghostty/config",
+      "target": "~/.config/ghostty/config",
+      "kind": "dotfile",
+      "category": "terminal",
+      "attributes": [],
+      "subsystem": "ghostty"
+    },
+    {
+      "source": "dot_config/herdr/config.toml.tmpl",
+      "target": "~/.config/herdr/config.toml",
+      "kind": "dotfile",
+      "category": "terminal",
+      "attributes": [
+        "template"
+      ],
+      "subsystem": "herdr multiplexer"
+    },
+    {
+      "source": "dot_config/herdr/plugins.json.tmpl",
+      "target": "~/.config/herdr/plugins.json",
+      "kind": "dotfile",
+      "category": "terminal",
+      "attributes": [
+        "template"
+      ],
+      "subsystem": "herdr multiplexer"
+    },
+    {
+      "source": "dot_config/nvim/lazyvim.json",
+      "target": "~/.config/nvim/lazyvim.json",
+      "kind": "dotfile",
+      "category": "editor",
+      "attributes": [],
+      "subsystem": "neovim / LazyVim"
+    },
+    {
+      "source": "dot_config/nvim/lua/config/keymaps.lua",
+      "target": "~/.config/nvim/lua/config/keymaps.lua",
+      "kind": "dotfile",
+      "category": "editor",
+      "attributes": [],
+      "subsystem": "neovim / LazyVim"
+    },
+    {
+      "source": "dot_config/nvim/lua/plugins/blink-cmp.lua",
+      "target": "~/.config/nvim/lua/plugins/blink-cmp.lua",
+      "kind": "dotfile",
+      "category": "editor",
+      "attributes": [],
+      "subsystem": "neovim / LazyVim"
+    },
+    {
+      "source": "dot_config/nvim/lua/plugins/copilot-lualine.lua",
+      "target": "~/.config/nvim/lua/plugins/copilot-lualine.lua",
+      "kind": "dotfile",
+      "category": "editor",
+      "attributes": [],
+      "subsystem": "neovim / LazyVim"
+    },
+    {
+      "source": "dot_config/nvim/lua/plugins/copilot.lua",
+      "target": "~/.config/nvim/lua/plugins/copilot.lua",
+      "kind": "dotfile",
+      "category": "editor",
+      "attributes": [],
+      "subsystem": "neovim / LazyVim"
+    },
+    {
+      "source": "dot_config/nvim/lua/plugins/empty_html-preview.lua",
+      "target": "~/.config/nvim/lua/plugins/html-preview.lua",
+      "kind": "dotfile",
+      "category": "editor",
+      "attributes": [
+        "empty"
+      ],
+      "subsystem": "neovim / LazyVim"
+    },
+    {
+      "source": "dot_config/nvim/lua/plugins/example.lua",
+      "target": "~/.config/nvim/lua/plugins/example.lua",
+      "kind": "dotfile",
+      "category": "editor",
+      "attributes": [],
+      "subsystem": "neovim / LazyVim"
+    },
+    {
+      "source": "dot_config/nvim/lua/plugins/faster-smear-cursor.lua",
+      "target": "~/.config/nvim/lua/plugins/faster-smear-cursor.lua",
+      "kind": "dotfile",
+      "category": "editor",
+      "attributes": [],
+      "subsystem": "neovim / LazyVim"
+    },
+    {
+      "source": "dot_config/nvim/lua/plugins/mini-animate-disable-cursor.lua",
+      "target": "~/.config/nvim/lua/plugins/mini-animate-disable-cursor.lua",
+      "kind": "dotfile",
+      "category": "editor",
+      "attributes": [],
+      "subsystem": "neovim / LazyVim"
+    },
+    {
+      "source": "dot_config/nvim/lua/plugins/vim-be-good.lua",
+      "target": "~/.config/nvim/lua/plugins/vim-be-good.lua",
+      "kind": "dotfile",
+      "category": "editor",
+      "attributes": [],
+      "subsystem": "neovim / LazyVim"
+    },
+    {
+      "source": "dot_config/private_Cursor/User/settings.json",
+      "target": "~/.config/Cursor/User/settings.json",
+      "kind": "dotfile",
+      "category": "editor",
+      "attributes": [
+        "private"
+      ],
+      "subsystem": "cursor"
+    },
+    {
+      "source": "dot_config/chrome-flags.conf",
+      "target": "~/.config/chrome-flags.conf",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "chromium"
+    },
+    {
+      "source": "dot_config/hypr/bindings.lua",
+      "target": "~/.config/hypr/bindings.lua",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "hyprland"
+    },
+    {
+      "source": "dot_config/hypr/hyprland.lua",
+      "target": "~/.config/hypr/hyprland.lua",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "hyprland"
+    },
+    {
+      "source": "dot_config/hypr/hyprmoncfg-monitors.lua",
+      "target": "~/.config/hypr/hyprmoncfg-monitors.lua",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "hyprland"
+    },
+    {
+      "source": "dot_config/hypr/input.lua",
+      "target": "~/.config/hypr/input.lua",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "hyprland"
+    },
+    {
+      "source": "dot_config/hypr/looknfeel.lua",
+      "target": "~/.config/hypr/looknfeel.lua",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "hyprland"
+    },
+    {
+      "source": "dot_config/hypr/monitors.lua",
+      "target": "~/.config/hypr/monitors.lua",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "hyprland"
+    },
+    {
+      "source": "dot_config/omarchy/create_private_shell.json.tmpl",
+      "target": "~/.config/omarchy/shell.json",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [
+        "create",
+        "private",
+        "template"
+      ],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/defaults/agent.tmpl",
+      "target": "~/.config/omarchy/defaults/agent",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [
+        "template"
+      ],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/aether.zed.json",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/aether.zed.json",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/alacritty.toml",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/alacritty.toml",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/backgrounds/5d0e5451240b8b7f.jpg",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/backgrounds/5d0e5451240b8b7f.jpg",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/btop.theme",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/btop.theme",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/chromium.theme",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/chromium.theme",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/colors.toml",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/colors.toml",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/foot.ini",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/foot.ini",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/ghostty.conf",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/ghostty.conf",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/hyprland.conf",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/hyprland.conf",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/hyprlock.conf",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/hyprlock.conf",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/icons.theme",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/icons.theme",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/kitty.conf",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/kitty.conf",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/mako.ini",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/mako.ini",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/neovim.lua",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/neovim.lua",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/swayosd.css",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/swayosd.css",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/vencord.theme.css",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/vencord.theme.css",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/vscode-extension/package.json",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/vscode-extension/package.json",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/vscode-extension/themes/aether-color-theme.json",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/vscode-extension/themes/aether-color-theme.json",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/vscode.json",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/vscode.json",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/walker.css",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/walker.css",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/warp.yaml",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/warp.yaml",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/waybar.css",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/waybar.css",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/wofi.css",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/wofi.css",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/zellij.kdl",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/zellij.kdl",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/aether.zed.json",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/aether.zed.json",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/alacritty.toml",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/alacritty.toml",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/backgrounds/5d0e5451240b8b7f.jpg",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/backgrounds/5d0e5451240b8b7f.jpg",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/btop.theme",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/btop.theme",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/chromium.theme",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/chromium.theme",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/colors.toml",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/colors.toml",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/foot.ini",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/foot.ini",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/ghostty.conf",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/ghostty.conf",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/hyprland.conf",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/hyprland.conf",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/hyprlock.conf",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/hyprlock.conf",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/icons.theme",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/icons.theme",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/kitty.conf",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/kitty.conf",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/mako.ini",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/mako.ini",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/neovim.lua",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/neovim.lua",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/swayosd.css",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/swayosd.css",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/vencord.theme.css",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/vencord.theme.css",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/vscode-extension/package.json",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/vscode-extension/package.json",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/vscode-extension/themes/aether-color-theme.json",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/vscode-extension/themes/aether-color-theme.json",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/vscode.json",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/vscode.json",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/walker.css",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/walker.css",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/warp.yaml",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/warp.yaml",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/waybar.css",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/waybar.css",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/wofi.css",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/wofi.css",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/zellij.kdl",
+      "target": "~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/zellij.kdl",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_local/share/applications/cursor-desktop.desktop",
+      "target": "~/.local/share/applications/cursor-desktop.desktop",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [],
+      "subsystem": "desktop entries"
+    },
+    {
+      "source": "dot_config/gh/config.yml",
+      "target": "~/.config/gh/config.yml",
+      "kind": "dotfile",
+      "category": "vcs",
+      "attributes": [],
+      "subsystem": "github cli"
+    },
+    {
+      "source": "dot_config/git/config.tmpl",
+      "target": "~/.config/git/config",
+      "kind": "dotfile",
+      "category": "vcs",
+      "attributes": [
+        "template"
+      ],
+      "subsystem": "git"
+    },
+    {
+      "source": "dot_config/git/ignore",
+      "target": "~/.config/git/ignore",
+      "kind": "dotfile",
+      "category": "vcs",
+      "attributes": [],
+      "subsystem": "git"
+    },
+    {
+      "source": "dot_config/lazygit/config.yml.tmpl",
+      "target": "~/.config/lazygit/config.yml",
+      "kind": "dotfile",
+      "category": "vcs",
+      "attributes": [
+        "template"
+      ],
+      "subsystem": "lazygit"
+    },
+    {
+      "source": "dot_config/atuin/config.toml",
+      "target": "~/.config/atuin/config.toml",
+      "kind": "dotfile",
+      "category": "navigation",
+      "attributes": [],
+      "subsystem": "atuin"
+    },
+    {
+      "source": "dot_config/ripgrep/rc",
+      "target": "~/.config/ripgrep/rc",
+      "kind": "dotfile",
+      "category": "navigation",
+      "attributes": [],
+      "subsystem": "ripgrep"
+    },
+    {
+      "source": "dot_config/zoxide/config.toml",
+      "target": "~/.config/zoxide/config.toml",
+      "kind": "dotfile",
+      "category": "navigation",
+      "attributes": [],
+      "subsystem": "zoxide"
+    },
+    {
+      "source": "dot_Brewfile",
+      "target": "~/.Brewfile",
+      "kind": "dotfile",
+      "category": "toolchain",
+      "attributes": [],
+      "subsystem": "homebrew"
+    },
+    {
+      "source": "dot_config/mise/config.toml",
+      "target": "~/.config/mise/config.toml",
+      "kind": "dotfile",
+      "category": "toolchain",
+      "attributes": [],
+      "subsystem": "mise"
+    },
+    {
+      "source": "dot_config/pacman/aurlist.txt",
+      "target": "~/.config/pacman/aurlist.txt",
+      "kind": "dotfile",
+      "category": "toolchain",
+      "attributes": [],
+      "subsystem": "pacman / AUR"
+    },
+    {
+      "source": "dot_config/pacman/pkglist.txt",
+      "target": "~/.config/pacman/pkglist.txt",
+      "kind": "dotfile",
+      "category": "toolchain",
+      "attributes": [],
+      "subsystem": "pacman / AUR"
+    },
+    {
+      "source": "dot_agents/skills/symlink_project-doc-planner",
+      "target": "~/.agents/skills/project-doc-planner",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "symlink"
+      ],
+      "subsystem": "shared skills"
+    },
+    {
+      "source": "dot_claude/skills/symlink_project-doc-planner",
+      "target": "~/.claude/skills/project-doc-planner",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "symlink"
+      ],
+      "subsystem": "claude code"
+    },
+    {
+      "source": "dot_cline/data/settings/global-settings.json",
+      "target": "~/.cline/data/settings/global-settings.json",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "cline"
+    },
+    {
+      "source": "dot_cline/skills/symlink_project-doc-planner",
+      "target": "~/.cline/skills/project-doc-planner",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "symlink"
+      ],
+      "subsystem": "cline"
+    },
+    {
+      "source": "dot_codex/hooks.json",
+      "target": "~/.codex/hooks.json",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "codex"
+    },
+    {
+      "source": "dot_codex/private_AGENTS.md",
+      "target": "~/.codex/AGENTS.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "private"
+      ],
+      "subsystem": "codex"
+    },
+    {
+      "source": "dot_codex/private_config.toml",
+      "target": "~/.codex/config.toml",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "private"
+      ],
+      "subsystem": "codex"
+    },
+    {
+      "source": "dot_codex/rules/default.rules",
+      "target": "~/.codex/rules/default.rules",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "codex"
+    },
+    {
+      "source": "dot_codex/skills/dots/SKILL.md",
+      "target": "~/.codex/skills/dots/SKILL.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "codex"
+    },
+    {
+      "source": "dot_codex/skills/frontier-sweep/SKILL.md",
+      "target": "~/.codex/skills/frontier-sweep/SKILL.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "codex"
+    },
+    {
+      "source": "dot_codex/skills/grilling/SKILL.md",
+      "target": "~/.codex/skills/grilling/SKILL.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "codex"
+    },
+    {
+      "source": "dot_codex/skills/grilling/agents/openai.yaml",
+      "target": "~/.codex/skills/grilling/agents/openai.yaml",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "codex"
+    },
+    {
+      "source": "dot_codex/skills/linear-agent-tracking/SKILL.md",
+      "target": "~/.codex/skills/linear-agent-tracking/SKILL.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "codex"
+    },
+    {
+      "source": "dot_codex/skills/linear-agent-tracking/agents/openai.yaml",
+      "target": "~/.codex/skills/linear-agent-tracking/agents/openai.yaml",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "codex"
+    },
+    {
+      "source": "dot_codex/skills/linear-agent-tracking/references/issue-tracker-linear.md",
+      "target": "~/.codex/skills/linear-agent-tracking/references/issue-tracker-linear.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "codex"
+    },
+    {
+      "source": "dot_codex/skills/linear-agent-tracking/references/linear-cli.md",
+      "target": "~/.codex/skills/linear-agent-tracking/references/linear-cli.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "codex"
+    },
+    {
+      "source": "dot_codex/skills/project-doc-planner/SKILL.md",
+      "target": "~/.codex/skills/project-doc-planner/SKILL.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "codex"
+    },
+    {
+      "source": "dot_codex/skills/project-doc-planner/agents/openai.yaml",
+      "target": "~/.codex/skills/project-doc-planner/agents/openai.yaml",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "codex"
+    },
+    {
+      "source": "dot_config/opencode/agents/private_codebase-memory-auditor.md",
+      "target": "~/.config/opencode/agents/codebase-memory-auditor.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "private"
+      ],
+      "subsystem": "opencode"
+    },
+    {
+      "source": "dot_config/opencode/agents/private_codebase-memory-scout.md",
+      "target": "~/.config/opencode/agents/codebase-memory-scout.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "private"
+      ],
+      "subsystem": "opencode"
+    },
+    {
+      "source": "dot_config/opencode/agents/private_codebase-memory.md",
+      "target": "~/.config/opencode/agents/codebase-memory.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "private"
+      ],
+      "subsystem": "opencode"
+    },
+    {
+      "source": "dot_config/opencode/dot_gitignore",
+      "target": "~/.config/opencode/.gitignore",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "opencode"
+    },
+    {
+      "source": "dot_config/opencode/encrypted_opencode.json.age",
+      "target": "~/.config/opencode/opencode.json",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "encrypted"
+      ],
+      "subsystem": "opencode"
+    },
+    {
+      "source": "dot_config/opencode/private_AGENTS.md",
+      "target": "~/.config/opencode/AGENTS.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "private"
+      ],
+      "subsystem": "opencode"
+    },
+    {
+      "source": "dot_config/opencode/skills/opencode-go-usage/SKILL.md",
+      "target": "~/.config/opencode/skills/opencode-go-usage/SKILL.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "opencode"
+    },
+    {
+      "source": "dot_config/opencode/skills/symlink_project-doc-planner",
+      "target": "~/.config/opencode/skills/project-doc-planner",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "symlink"
+      ],
+      "subsystem": "opencode"
+    },
+    {
+      "source": "dot_config/opencode/tui.json",
+      "target": "~/.config/opencode/tui.json",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "opencode"
+    },
+    {
+      "source": "dot_config/opencode/tui.jsonc",
+      "target": "~/.config/opencode/tui.jsonc",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "opencode"
+    },
+    {
+      "source": "dot_evotai/evot.env",
+      "target": "~/.evotai/evot.env",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "evot"
+    },
+    {
+      "source": "dot_gemini/agents/private_codebase-memory-auditor.md",
+      "target": "~/.gemini/agents/codebase-memory-auditor.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "private"
+      ],
+      "subsystem": "gemini"
+    },
+    {
+      "source": "dot_gemini/agents/private_codebase-memory-scout.md",
+      "target": "~/.gemini/agents/codebase-memory-scout.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "private"
+      ],
+      "subsystem": "gemini"
+    },
+    {
+      "source": "dot_gemini/agents/private_codebase-memory.md",
+      "target": "~/.gemini/agents/codebase-memory.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "private"
+      ],
+      "subsystem": "gemini"
+    },
+    {
+      "source": "dot_gemini/config/mcp_config.json",
+      "target": "~/.gemini/config/mcp_config.json",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "gemini"
+    },
+    {
+      "source": "dot_gemini/config/skills/symlink_project-doc-planner",
+      "target": "~/.gemini/config/skills/project-doc-planner",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "symlink"
+      ],
+      "subsystem": "gemini"
+    },
+    {
+      "source": "dot_gemini/private_GEMINI.md",
+      "target": "~/.gemini/GEMINI.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "private"
+      ],
+      "subsystem": "gemini"
+    },
+    {
+      "source": "dot_gemini/private_settings.json",
+      "target": "~/.gemini/settings.json",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "private"
+      ],
+      "subsystem": "gemini"
+    },
+    {
+      "source": "dot_gemini/skills/symlink_project-doc-planner",
+      "target": "~/.gemini/skills/project-doc-planner",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "symlink"
+      ],
+      "subsystem": "gemini"
+    },
+    {
+      "source": "dot_grok/hooks/executable_herdr-agent-state.sh",
+      "target": "~/.grok/hooks/herdr-agent-state.sh",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "grok"
+    },
+    {
+      "source": "dot_grok/hooks/herdr.json",
+      "target": "~/.grok/hooks/herdr.json",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "grok"
+    },
+    {
+      "source": "dot_pi/agent/skills/symlink_project-doc-planner",
+      "target": "~/.pi/agent/skills/project-doc-planner",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "symlink"
+      ],
+      "subsystem": "pi"
+    },
+    {
+      "source": "private_dot_grokbot/settings.json",
+      "target": "~/.grokbot/settings.json",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "private"
+      ],
+      "subsystem": "grokbot"
+    },
+    {
+      "source": "dot_config/environment.d/10-defaults.conf",
+      "target": "~/.config/environment.d/10-defaults.conf",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "session environment"
+    },
+    {
+      "source": "dot_config/environment.d/10-machine.conf.tmpl",
+      "target": "~/.config/environment.d/10-machine.conf",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [
+        "template"
+      ],
+      "subsystem": "session environment"
+    },
+    {
+      "source": "dot_config/systemd/user/herdr-outpost-relay.service",
+      "target": "~/.config/systemd/user/herdr-outpost-relay.service",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "user systemd units"
+    },
+    {
+      "source": "dot_config/systemd/user/ollama-omarchy-agents.service",
+      "target": "~/.config/systemd/user/ollama-omarchy-agents.service",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "user systemd units"
+    },
+    {
+      "source": "dot_config/systemd/user/omarchy-agents-analysis.service",
+      "target": "~/.config/systemd/user/omarchy-agents-analysis.service",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "user systemd units"
+    },
+    {
+      "source": "dot_config/systemd/user/omarchy-agents-analysis.timer",
+      "target": "~/.config/systemd/user/omarchy-agents-analysis.timer",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "user systemd units"
+    },
+    {
+      "source": "dot_config/systemd/user/omarchy-agents-dashboard.service",
+      "target": "~/.config/systemd/user/omarchy-agents-dashboard.service",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "user systemd units"
+    },
+    {
+      "source": "dot_config/systemd/user/omarchy-agents-tunnel.service",
+      "target": "~/.config/systemd/user/omarchy-agents-tunnel.service",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "user systemd units"
+    },
+    {
+      "source": "dot_config/systemd/user/omarchy-cline-usage-scrape.service",
+      "target": "~/.config/systemd/user/omarchy-cline-usage-scrape.service",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "user systemd units"
+    },
+    {
+      "source": "dot_config/systemd/user/omarchy-cline-usage-scrape.timer",
+      "target": "~/.config/systemd/user/omarchy-cline-usage-scrape.timer",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "user systemd units"
+    },
+    {
+      "source": "dot_config/systemd/user/omarchy-cursor-usage-scrape.service",
+      "target": "~/.config/systemd/user/omarchy-cursor-usage-scrape.service",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "user systemd units"
+    },
+    {
+      "source": "dot_config/systemd/user/omarchy-cursor-usage-scrape.timer",
+      "target": "~/.config/systemd/user/omarchy-cursor-usage-scrape.timer",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "user systemd units"
+    },
+    {
+      "source": "dot_config/systemd/user/omarchy-opencode-go-usage-scrape.service",
+      "target": "~/.config/systemd/user/omarchy-opencode-go-usage-scrape.service",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "user systemd units"
+    },
+    {
+      "source": "dot_config/systemd/user/omarchy-opencode-go-usage-scrape.timer",
+      "target": "~/.config/systemd/user/omarchy-opencode-go-usage-scrape.timer",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "user systemd units"
+    },
+    {
+      "source": "dot_local/bin/cline-safety/executable_git",
+      "target": "~/.local/bin/cline-safety/git",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "cline git interceptor"
+    },
+    {
+      "source": "dot_local/bin/executable_cursor",
+      "target": "~/.local/bin/cursor",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_dots",
+      "target": "~/.local/bin/dots",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_dots-push",
+      "target": "~/.local/bin/dots-push",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_grok",
+      "target": "~/.local/bin/grok",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_lazygit-ollama-commit.sh",
+      "target": "~/.local/bin/lazygit-ollama-commit.sh",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_ollama-commit-msg.sh",
+      "target": "~/.local/bin/ollama-commit-msg.sh",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_omarchy-agent-usage-antigravity.tmpl",
+      "target": "~/.local/bin/omarchy-agent-usage-antigravity",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable",
+        "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_omarchy-agent-usage-cline.tmpl",
+      "target": "~/.local/bin/omarchy-agent-usage-cline",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable",
+        "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_omarchy-agent-usage-codex.tmpl",
+      "target": "~/.local/bin/omarchy-agent-usage-codex",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable",
+        "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_omarchy-agent-usage-cursor.tmpl",
+      "target": "~/.local/bin/omarchy-agent-usage-cursor",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable",
+        "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_omarchy-agent-usage-opencode.tmpl",
+      "target": "~/.local/bin/omarchy-agent-usage-opencode",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable",
+        "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_omarchy-agent-usage-update.tmpl",
+      "target": "~/.local/bin/omarchy-agent-usage-update",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable",
+        "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_omarchy-agent.tmpl",
+      "target": "~/.local/bin/omarchy-agent",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable",
+        "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_omarchy-cline-usage-login.tmpl",
+      "target": "~/.local/bin/omarchy-cline-usage-login",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable",
+        "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_omarchy-cline-usage-override.tmpl",
+      "target": "~/.local/bin/omarchy-cline-usage-override",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable",
+        "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_omarchy-cline-usage-scrape.tmpl",
+      "target": "~/.local/bin/omarchy-cline-usage-scrape",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable",
+        "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_omarchy-cursor-statusline.tmpl",
+      "target": "~/.local/bin/omarchy-cursor-statusline",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable",
+        "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_omarchy-cursor-usage-override.tmpl",
+      "target": "~/.local/bin/omarchy-cursor-usage-override",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable",
+        "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_omarchy-cursor-usage-scrape.tmpl",
+      "target": "~/.local/bin/omarchy-cursor-usage-scrape",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable",
+        "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_omarchy-default-agent.tmpl",
+      "target": "~/.local/bin/omarchy-default-agent",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable",
+        "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_omarchy-dotfiles-sync",
+      "target": "~/.local/bin/omarchy-dotfiles-sync",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_omarchy-opencode-go-usage-login.tmpl",
+      "target": "~/.local/bin/omarchy-opencode-go-usage-login",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable",
+        "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_omarchy-opencode-go-usage-override.tmpl",
+      "target": "~/.local/bin/omarchy-opencode-go-usage-override",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable",
+        "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_omarchy-opencode-go-usage-scrape.tmpl",
+      "target": "~/.local/bin/omarchy-opencode-go-usage-scrape",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable",
+        "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_statusline.tmpl",
+      "target": "~/.local/bin/statusline",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable",
+        "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/symlink_evot",
+      "target": "~/.local/bin/evot",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "symlink"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_config/1password/ssh/agent.toml",
+      "target": "~/.config/1password/ssh/agent.toml",
+      "kind": "dotfile",
+      "category": "security",
+      "attributes": [],
+      "subsystem": "1password"
+    },
+    {
+      "source": "private_dot_ssh/config",
+      "target": "~/.ssh/config",
+      "kind": "dotfile",
+      "category": "security",
+      "attributes": [
+        "private"
+      ],
+      "subsystem": "ssh"
+    },
+    {
+      "source": "run_after_23-sync-agent-skills.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "always",
+        "trigger_description": "runs after every apply",
+        "phase": "after",
+        "order": 23,
+        "name": "sync-agent-skills",
+        "template": true
+      }
+    },
+    {
+      "source": "run_once_after_24-setup-omarchy-agents.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "once",
+        "trigger_description": "runs once ever",
+        "phase": "after",
+        "order": 24,
+        "name": "setup-omarchy-agents",
+        "template": true
+      }
+    },
+    {
+      "source": "run_once_before_00-verify-deps.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "once",
+        "trigger_description": "runs once ever",
+        "phase": "before",
+        "order": 0,
+        "name": "verify-deps",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_after_10-install-omarchy-plugins.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 10,
+        "name": "install-omarchy-plugins",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 20,
+        "name": "setup-omarchy-antigravity",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_after_21-setup-omarchy-cline.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 21,
+        "name": "setup-omarchy-cline",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_after_22-setup-omarchy-cline-usage-scrape.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 22,
+        "name": "setup-omarchy-cline-usage-scrape",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_after_25-sync-omarchy-agents-workspace.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 25,
+        "name": "sync-omarchy-agents-workspace",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_after_26-setup-omarchy-cursor.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 26,
+        "name": "setup-omarchy-cursor",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_after_27-sync-claude-mcp.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 27,
+        "name": "sync-claude-mcp",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_after_28-sync-claude-settings.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 28,
+        "name": "sync-claude-settings",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_after_30-macos-defaults.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 30,
+        "name": "macos-defaults",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_before_09-install-agent-skills.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "before",
+        "order": 9,
+        "name": "install-agent-skills",
+        "template": true
+      }
+    },
+    {
+      "source": ".chezmoi.toml.tmpl",
+      "kind": "chezmoi",
+      "category": "chezmoi",
+      "role": "Controls how chezmoi renders and applies this tree"
+    },
+    {
+      "source": ".chezmoidata/agent_skills.yaml",
+      "kind": "chezmoi",
+      "category": "chezmoi",
+      "role": "Controls how chezmoi renders and applies this tree"
+    },
+    {
+      "source": ".chezmoidata/claude_mcp.yaml",
+      "kind": "chezmoi",
+      "category": "chezmoi",
+      "role": "Controls how chezmoi renders and applies this tree"
+    },
+    {
+      "source": ".chezmoidata/claude_settings.yaml",
+      "kind": "chezmoi",
+      "category": "chezmoi",
+      "role": "Controls how chezmoi renders and applies this tree"
+    },
+    {
+      "source": ".chezmoidata/machines.yaml",
+      "kind": "chezmoi",
+      "category": "chezmoi",
+      "role": "Controls how chezmoi renders and applies this tree"
+    },
+    {
+      "source": ".chezmoidata/omarchy_plugins.yaml",
+      "kind": "chezmoi",
+      "category": "chezmoi",
+      "role": "Controls how chezmoi renders and applies this tree"
+    },
+    {
+      "source": ".chezmoiignore.tmpl",
+      "kind": "chezmoi",
+      "category": "chezmoi",
+      "role": "Controls how chezmoi renders and applies this tree"
+    },
+    {
+      "source": ".github/workflows/ci.yml",
+      "kind": "repo",
+      "category": "repo",
+      "role": "CI workflows"
+    },
+    {
+      "source": ".gitignore",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Git tracking rules"
+    },
+    {
+      "source": ".gitmodules",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Submodule registration"
+    },
+    {
+      "source": "AGENTS.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Authoritative contract for agents working in this repo"
+    },
+    {
+      "source": "Documents/Cline/Workflows/usage.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Non-config content (Cline workflow docs)"
+    },
+    {
+      "source": "INDEX.json",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Generated machine-readable index (this artifact)"
+    },
+    {
+      "source": "INDEX.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Generated human-readable index (this artifact)"
+    },
+    {
+      "source": "README.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Human-facing repository overview"
+    },
+    {
+      "source": "bun.lock",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Lockfile for the above"
+    },
+    {
+      "source": "docs/generate_index.py",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/generate_readme_tree.py",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/recovery.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/reorganization-proposal.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "dotfiles-showcase",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Submodule \u2014 the showcase web app; never applied"
+    },
+    {
+      "source": "package.json",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Runtime CLI deps installed outside mise"
+    },
+    {
+      "source": "to-questionnaire-dotfiles-sync-cli.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Scratch planning documents"
+    }
+  ]
+}

@@ -29,6 +29,8 @@ END = "<!-- END REPO TREE -->"
 SKIP = (
     "README.md",
     "AGENTS.md",
+    "INDEX.md",
+    "INDEX.json",
     "package.json",
     "bun.lock",
     ".github/",
