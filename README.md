@@ -4,6 +4,17 @@ Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [c
 
 ---
 
+## 🗺️ Finding things
+
+[`INDEX.md`](INDEX.md) is a categorized map of every tracked file — its
+home-directory target, chezmoi attributes, and subsystem — with
+[`INDEX.json`](INDEX.json) as the machine-readable equivalent that the showcase
+app and development agents read. Both are **generated** by
+`docs/generate_index.py` and verified by CI; edit the script, never the
+artifacts.
+
+---
+
 ## 🖥️ Machines
 
 This repository identifies each workstation by a canonical **machine name** resolved at apply time (see `.chezmoi.toml.tmpl` → `[data] machine`). Detection is hostname-first with an OS fallback, so a box is identified deterministically without renaming the system:
