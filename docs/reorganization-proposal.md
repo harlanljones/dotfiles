@@ -5,9 +5,11 @@ configuration*, project *Dotfiles Showcase*). Written after reading the existing
 Linear backlog so nothing here duplicates planned work — §4 records the overlap
 that was checked.
 
-The index (§2) is **implemented** in this change. §1 and §3 are proposals
-awaiting your call, because they change applied shell behaviour and touch files
-the showcase reads.
+**Status.** §1 (shell modularization) and §2 (the index) are both implemented.
+§3 records the QOL findings — two fixed, the rest still open.
+
+This document is kept as the design record. Where the implementation departed
+from the original plan, §1.5 says how and why.
 
 ---
 
@@ -99,6 +101,60 @@ Deliberately incremental; each phase is independently verifiable and revertible.
 | 3 | Reduce both rcs to the loader; add untracked `99-local.sh` | new login shell; `type ft cline zj` all resolve |
 | 4 | Update the showcase manifest + fallbacks (see below); regenerate the index | `python3 docs/generate_index.py --audit-showcase` clean |
 
+### 1.5 How the implementation departed from this plan
+
+Four deviations, all discovered while building it:
+
+1. **`ft()` moved out of `50-agents.sh` into a new `55-apps.sh`.** FreeToken is
+   a desktop panel, not a coding agent; naming the module after what it holds
+   beat matching a plan written before the contents were sorted. `50-agents.sh`
+   keeps the `cline` safety wrapper. A `70-cloud.sh` was also added for flyctl
+   and the Google Cloud SDK, which the plan had not placed anywhere.
+
+2. **`EDITOR`/`VISUAL` are now set for both shells.** The pre-split `.zshrc`
+   set them and `.bashrc` did not, leaving it to Omarchy's base rc. This is the
+   one deliberate behaviour change in the split, called out in `00-env.sh`.
+
+3. **Starship's zsh init is now guarded on the binary.** Every other tool in
+   the directory is guarded so a missing binary cannot break the shell;
+   starship was the sole exception, and since mise installs it, a freshly
+   bootstrapped machine opened zsh with `command not found: starship` and no
+   prompt wrapper. It now falls back to zsh's default prompt.
+
+4. **A real bug in the zsh recolor was found and fixed** — see below. It is the
+   reason point 3 of §1 (the linting argument) turned out to be the most
+   valuable part of this exercise.
+
+### 1.6 The zsh recolor was silently half-broken
+
+shellcheck flagged `SC2128` on `for style_prefix in $style_prefixes` in the zsh
+recolor. The first draft of `60-prompt.sh` waved it away with a disable comment
+reading "zsh word-splits a bare array; this is zsh-only code" — true, and the
+wrong conclusion.
+
+zsh word-splitting an unquoted array **drops empty elements**. The prefix list
+is `("" "1;" "2;" "3;" …)`, so the `""` entry — the unstyled `36m` and the
+unstyled truecolor sequence, which are the common cases — was never iterated.
+On macOS, a failed command recolored `1;36m` and its siblings but left plain
+cyan cyan.
+
+This was verified against the pre-split `dot_zshrc` from `main`, not just the
+refactor, so it is long-standing rather than introduced here:
+
+```
+$ zsh -c 'a=("" "1;" "2;"); for x in $a; do printf "[%s]" "$x"; done'
+[1;][2;]                      # 2 iterations of 3
+
+# pre-split dot_zshrc, status=1:
+%{^[[36m%}cyan   %{^[[1;31m%}bold   %{^[[38;2;46;222;250m%}true
+#      ^ still cyan                        ^ still cyan
+```
+
+The fix is `"${style_prefixes[@]}"`, which preserves empty elements in both
+shells. All three variants now recolor, matching what the showcase's
+`recolor.ts` has always implemented — the TypeScript port was correct and the
+shell original was not.
+
 ### Phase 4 is not optional
 
 The showcase's `shell-env` card reads `~/.zshrc`, `~/.bashrc`, and
@@ -108,6 +164,15 @@ rather than erroring, which is exactly the kind of failure nobody notices. The
 manifest must gain `~/.config/shell/` and `fallback/shell-env.json` must be
 refreshed. `--audit-showcase` (§2) is what catches this class of drift; it
 already caught two live instances of it (§3).
+
+**What phase 4 actually required.** More than a manifest line. Because the card
+reads the rc file and parses `export` statements out of it, a loader-shaped rc
+produced an *empty profile that still reported itself as live* — the one
+degradation the fallback cannot catch, since nothing is missing. The showcase
+now reads `~/.config/shell/*.sh` alongside each rc and parses them as one
+effective profile, and `rcProfile` learned to read `_path_prepend` calls, since
+PATH is no longer built with repeated `export PATH=` lines. Both are covered by
+new tests.
 
 ---
 

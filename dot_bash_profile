@@ -4,7 +4,4 @@
 
 [[ -f ~/.bashrc ]] && . ~/.bashrc
 
-
-# Added by Antigravity CLI installer
-export PATH="/home/harlan/.local/bin:$PATH"
-. "$HOME/.cargo/env"
+[[ -f "$HOME/.cargo/env" ]] && . "$HOME/.cargo/env"

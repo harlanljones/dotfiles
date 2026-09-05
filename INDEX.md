@@ -9,11 +9,11 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**208 tracked entries** across 15 categories.
+**218 tracked entries** across 15 categories.
 
 | Category | Entries |
 | --- | ---: |
-| [Shell](#shell) | 3 |
+| [Shell](#shell) | 13 |
 | [Prompt](#prompt) | 1 |
 | [Terminal & multiplexer](#terminal--multiplexer) | 4 |
 | [Editors](#editors) | 11 |
@@ -37,6 +37,16 @@ agents and the showcase app should read. This page is the same data for humans.
 | --- | --- | --- | --- |
 | `~/.bash_profile` | `dot_bash_profile` | bash | — |
 | `~/.bashrc` | `dot_bashrc` | bash | — |
+| `~/.config/shell/00-env.sh` | `dot_config/shell/00-env.sh` | shared shell modules | — |
+| `~/.config/shell/10-tools.sh` | `dot_config/shell/10-tools.sh` | shared shell modules | — |
+| `~/.config/shell/20-integrations.sh` | `dot_config/shell/20-integrations.sh` | shared shell modules | — |
+| `~/.config/shell/30-navigation.sh` | `dot_config/shell/30-navigation.sh` | shared shell modules | — |
+| `~/.config/shell/40-aliases.sh` | `dot_config/shell/40-aliases.sh` | shared shell modules | — |
+| `~/.config/shell/50-agents.sh` | `dot_config/shell/50-agents.sh` | shared shell modules | — |
+| `~/.config/shell/55-apps.sh` | `dot_config/shell/55-apps.sh` | shared shell modules | — |
+| `~/.config/shell/60-prompt.sh` | `dot_config/shell/60-prompt.sh` | shared shell modules | — |
+| `~/.config/shell/70-cloud.sh` | `dot_config/shell/70-cloud.sh` | shared shell modules | — |
+| `~/.config/shell/README.md` | `dot_config/shell/README.md` | shared shell modules | — |
 | `~/.zshrc` | `dot_zshrc` | zsh | — |
 
 ## Prompt
