@@ -123,6 +123,12 @@ Each CLI/runtime is owned by exactly one manager. Do not spread a tool across tw
   intentionally git-tracked vs applied.
 - **Add new dotfiles with the correct prefix** (§2) and register them in
   `README.md` + this file if they add a tool or hook.
+- **`dot_config/nvim/lazy-lock.json` was seeded from a snapshot, not from a
+  live machine.** It came from the showcase's `fallback/lazy-lock.json`, a
+  byte-identical FULL-COPY taken 2026-08-31. Before applying it to a second
+  machine, run `chezmoi re-add ~/.config/nvim/lazy-lock.json` on the box whose
+  plugin set is authoritative (Augustus), so an apply cannot roll plugins back
+  to those pins. After that first re-add this is an ordinary managed file.
 - **Shell configuration goes in `dot_config/shell/`, not in the rc files.**
   `dot_bashrc` and `dot_zshrc` are loaders and must stay that way. Each module
   is a `*.sh` file with a shebang so CI shellchecks it, guards on the binary it

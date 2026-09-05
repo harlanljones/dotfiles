@@ -9,14 +9,14 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**218 tracked entries** across 15 categories.
+**219 tracked entries** across 15 categories.
 
 | Category | Entries |
 | --- | ---: |
 | [Shell](#shell) | 13 |
 | [Prompt](#prompt) | 1 |
 | [Terminal & multiplexer](#terminal--multiplexer) | 4 |
-| [Editors](#editors) | 11 |
+| [Editors](#editors) | 12 |
 | [Desktop & window manager](#desktop--window-manager) | 58 |
 | [Version control](#version-control) | 4 |
 | [Navigation & search](#navigation--search) | 3 |
@@ -68,6 +68,7 @@ agents and the showcase app should read. This page is the same data for humans.
 
 | Target | Source | Subsystem | Attributes |
 | --- | --- | --- | --- |
+| `~/.config/nvim/lazy-lock.json` | `dot_config/nvim/lazy-lock.json` | neovim / LazyVim | — |
 | `~/.config/nvim/lazyvim.json` | `dot_config/nvim/lazyvim.json` | neovim / LazyVim | — |
 | `~/.config/nvim/lua/config/keymaps.lua` | `dot_config/nvim/lua/config/keymaps.lua` | neovim / LazyVim | — |
 | `~/.config/nvim/lua/plugins/blink-cmp.lua` | `dot_config/nvim/lua/plugins/blink-cmp.lua` | neovim / LazyVim | — |

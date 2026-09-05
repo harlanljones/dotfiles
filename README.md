@@ -321,6 +321,7 @@ Declarative tracking for system-level packages that mise does not manage:
 │   ├── mise
 │   │   └── config.toml
 │   ├── nvim
+│   │   ├── lazy-lock.json
 │   │   ├── lazyvim.json
 │   │   └── lua
 │   │       ├── config
