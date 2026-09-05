@@ -246,6 +246,7 @@ Declarative tracking for system-level packages that mise does not manage:
 │   └── omarchy_plugins.yaml
 ├── .chezmoiignore.tmpl
 ├── .gitignore
+├── .gitleaksignore
 ├── dot_Brewfile
 ├── dot_agents
 │   └── skills
