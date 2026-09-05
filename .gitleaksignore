@@ -1,0 +1,20 @@
+# Known, accepted gitleaks findings.
+#
+# An entry here does NOT make a secret safe -- it silences a scanner. Rotate
+# the credential at its provider first, then record it here so the scan blocks
+# NEW leaks instead of failing forever on an old one. Every entry must say what
+# it is, when it happened, and what was done about it.
+#
+# Format: <commit>:<path>:<rule-id>:<line>
+
+# bai-luna provider API key, committed in plaintext to a PUBLIC repo on
+# 2026-08-25 14:08 PDT (812c7da) and removed 16 minutes later in 403b241 when
+# the value moved to an environment variable. Removing it did not unpublish it:
+# 812c7da is reachable from main, so `git show` still returns the value to
+# anyone, and GitHub's public event stream is scraped continuously.
+#
+# STATUS: must be treated as compromised. Rotate at the provider.
+# This entry is why the scan can run over full history at all; it is not an
+# all-clear, and it should be deleted along with the commit if history is ever
+# rewritten to purge it.
+812c7da919116c5bdce32ad78eb1e97131a4d321:dot_config/opencode/opencode.json:generic-api-key:66

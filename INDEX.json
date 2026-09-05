@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 218,
+    "total": 219,
     "by_category": {
       "shell": 13,
       "prompt": 1,
@@ -17,6 +17,7 @@
       "services": 14,
       "scripts": 27,
       "security": 2,
+      "other": 1,
       "hooks": 13,
       "chezmoi": 7,
       "repo": 16
@@ -70,6 +71,10 @@
     {
       "id": "security",
       "title": "Credentials & SSH"
+    },
+    {
+      "id": "other",
+      "title": "Other configuration"
     },
     {
       "id": "hooks",
@@ -1678,6 +1683,13 @@
         "private"
       ],
       "subsystem": "ssh"
+    },
+    {
+      "source": ".gitleaksignore",
+      "target": "~/.gitleaksignore",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
     },
     {
       "source": "run_after_23-sync-agent-skills.sh.tmpl",

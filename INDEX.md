@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**218 tracked entries** across 15 categories.
+**219 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -25,6 +25,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Background services](#background-services) | 14 |
 | [Custom executables](#custom-executables) | 27 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
+| [Other configuration](#other-configuration) | 1 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 13 |
 | [Chezmoi control files](#chezmoi-control-files) | 7 |
 | [Repository material (not applied)](#repository-material-not-applied) | 16 |
@@ -272,6 +273,12 @@ agents and the showcase app should read. This page is the same data for humans.
 | --- | --- | --- | --- |
 | `~/.config/1password/ssh/agent.toml` | `dot_config/1password/ssh/agent.toml` | 1password | — |
 | `~/.ssh/config` | `private_dot_ssh/config` | ssh | private |
+
+## Other configuration
+
+| Target | Source | Subsystem | Attributes |
+| --- | --- | --- | --- |
+| `~/.gitleaksignore` | `.gitleaksignore` | — | — |
 
 ## Apply hooks (`run_*`)
 

@@ -14,3 +14,38 @@ Downloads/
 
 # Logs
 *.log
+
+# ---------------------------------------------------------------------------
+# Secrets — never commit these.
+#
+# AGENTS.md §6 has listed these as forbidden since the repo was set up, but the
+# rule was enforced by discipline alone, and on 2026-08-25 an API key reached
+# public history anyway (see .gitleaksignore). These patterns are the cheap
+# preventive half; the gitleaks job in CI is the detective half.
+# ---------------------------------------------------------------------------
+
+# age identities. The recipient (public key) is fine in the repo; the identity
+# is the one file that makes every encrypted entry readable.
+key.txt
+*.agekey
+age-key*.txt
+
+# Harness-local overrides, which routinely hold tokens.
+settings.local.json
+**/settings.local.json
+.linear.toml
+
+# Environment files (the systemd units deliberately read these from OUTSIDE the
+# repo — tunnel.env, config.env — and it should stay that way).
+.env
+.env.*
+*.env
+!dot_evotai/evot.env
+
+# SSH private material. Only ~/.ssh/config is managed.
+id_rsa
+id_ed25519
+id_ecdsa
+*.pem
+*.p12
+
