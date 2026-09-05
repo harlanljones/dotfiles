@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 204,
+    "total": 208,
     "by_category": {
       "shell": 3,
       "prompt": 1,
@@ -19,7 +19,7 @@
       "security": 2,
       "hooks": 13,
       "chezmoi": 7,
-      "repo": 12
+      "repo": 16
     }
   },
   "categories": [
@@ -1841,6 +1841,18 @@
       "role": "Non-config content (Cline workflow docs)"
     },
     {
+      "source": "INDEX.json",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Generated machine-readable index (this artifact)"
+    },
+    {
+      "source": "INDEX.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Generated human-readable index (this artifact)"
+    },
+    {
       "source": "README.md",
       "kind": "repo",
       "category": "repo",
@@ -1853,6 +1865,12 @@
       "role": "Lockfile for the above"
     },
     {
+      "source": "docs/generate_index.py",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
       "source": "docs/generate_readme_tree.py",
       "kind": "repo",
       "category": "repo",
@@ -1860,6 +1878,12 @@
     },
     {
       "source": "docs/recovery.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/reorganization-proposal.md",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"

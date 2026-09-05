@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**204 tracked entries** across 15 categories.
+**208 tracked entries** across 15 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -27,7 +27,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Credentials & SSH](#credentials--ssh) | 2 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 13 |
 | [Chezmoi control files](#chezmoi-control-files) | 7 |
-| [Repository material (not applied)](#repository-material-not-applied) | 12 |
+| [Repository material (not applied)](#repository-material-not-applied) | 16 |
 
 ---
 
@@ -302,10 +302,14 @@ agents and the showcase app should read. This page is the same data for humans.
 | `.gitmodules` | Submodule registration |
 | `AGENTS.md` | Authoritative contract for agents working in this repo |
 | `Documents/Cline/Workflows/usage.md` | Non-config content (Cline workflow docs) |
+| `INDEX.json` | Generated machine-readable index (this artifact) |
+| `INDEX.md` | Generated human-readable index (this artifact) |
 | `README.md` | Human-facing repository overview |
 | `bun.lock` | Lockfile for the above |
+| `docs/generate_index.py` | Recovery guide and repository maintenance scripts |
 | `docs/generate_readme_tree.py` | Recovery guide and repository maintenance scripts |
 | `docs/recovery.md` | Recovery guide and repository maintenance scripts |
+| `docs/reorganization-proposal.md` | Recovery guide and repository maintenance scripts |
 | `dotfiles-showcase` | Submodule — the showcase web app; never applied |
 | `package.json` | Runtime CLI deps installed outside mise |
 | `to-questionnaire-dotfiles-sync-cli.md` | Scratch planning documents |

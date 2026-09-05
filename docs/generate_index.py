@@ -226,9 +226,19 @@ HOOK_RE = re.compile(
 
 
 def git_files():
-    """Tracked paths, which is the only definition of 'in this repo' we use."""
+    """Tracked paths, which is the only definition of 'in this repo' we use.
+
+    The two generated artifacts are added unconditionally rather than taken
+    from `git ls-files`. They describe themselves, so their tracking state
+    would otherwise feed back into their own content: generated before they
+    are committed the index omits them, and the very act of committing it then
+    makes it stale — which is exactly how this first reached CI. Injecting them
+    makes the output identical whether or not they happen to be tracked yet.
+    """
     out = subprocess.check_output(["git", "ls-files"], cwd=ROOT)
-    return sorted(out.decode().splitlines())
+    tracked = set(out.decode().splitlines())
+    tracked.update((INDEX_JSON.name, INDEX_MD.name))
+    return sorted(tracked)
 
 
 def decode_component(component):
