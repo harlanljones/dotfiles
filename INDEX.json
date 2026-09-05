@@ -3,12 +3,12 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 219,
+    "total": 220,
     "by_category": {
       "shell": 13,
       "prompt": 1,
       "terminal": 4,
-      "editor": 11,
+      "editor": 12,
       "desktop": 58,
       "vcs": 4,
       "navigation": 3,
@@ -239,6 +239,14 @@
         "template"
       ],
       "subsystem": "herdr multiplexer"
+    },
+    {
+      "source": "dot_config/nvim/lazy-lock.json",
+      "target": "~/.config/nvim/lazy-lock.json",
+      "kind": "dotfile",
+      "category": "editor",
+      "attributes": [],
+      "subsystem": "neovim / LazyVim"
     },
     {
       "source": "dot_config/nvim/lazyvim.json",
