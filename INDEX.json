@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 220,
+    "total": 221,
     "by_category": {
       "shell": 13,
       "prompt": 1,
@@ -15,7 +15,7 @@
       "toolchain": 4,
       "agents": 41,
       "services": 14,
-      "scripts": 27,
+      "scripts": 28,
       "security": 2,
       "other": 1,
       "hooks": 13,
@@ -1429,6 +1429,16 @@
     {
       "source": "dot_local/bin/executable_grok",
       "target": "~/.local/bin/grok",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_herdr-agent-lifecycle",
+      "target": "~/.local/bin/herdr-agent-lifecycle",
       "kind": "dotfile",
       "category": "scripts",
       "attributes": [

@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**220 tracked entries** across 16 categories.
+**221 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -23,7 +23,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Toolchain & packages](#toolchain--packages) | 4 |
 | [AI agent harnesses](#ai-agent-harnesses) | 41 |
 | [Background services](#background-services) | 14 |
-| [Custom executables](#custom-executables) | 27 |
+| [Custom executables](#custom-executables) | 28 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
 | [Other configuration](#other-configuration) | 1 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 13 |
@@ -245,6 +245,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.local/bin/dots` | `dot_local/bin/executable_dots` | custom executables | executable |
 | `~/.local/bin/dots-push` | `dot_local/bin/executable_dots-push` | custom executables | executable |
 | `~/.local/bin/grok` | `dot_local/bin/executable_grok` | custom executables | executable |
+| `~/.local/bin/herdr-agent-lifecycle` | `dot_local/bin/executable_herdr-agent-lifecycle` | custom executables | executable |
 | `~/.local/bin/lazygit-ollama-commit.sh` | `dot_local/bin/executable_lazygit-ollama-commit.sh` | custom executables | executable |
 | `~/.local/bin/ollama-commit-msg.sh` | `dot_local/bin/executable_ollama-commit-msg.sh` | custom executables | executable |
 | `~/.local/bin/omarchy-agent-usage-antigravity` | `dot_local/bin/executable_omarchy-agent-usage-antigravity.tmpl` | custom executables | executable, template |
