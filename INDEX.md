@@ -23,12 +23,12 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Toolchain & packages](#toolchain--packages) | 4 |
 | [AI agent harnesses](#ai-agent-harnesses) | 41 |
 | [Background services](#background-services) | 14 |
-| [Custom executables](#custom-executables) | 27 |
+| [Custom executables](#custom-executables) | 28 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
 | [Other configuration](#other-configuration) | 1 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 13 |
 | [Chezmoi control files](#chezmoi-control-files) | 7 |
-| [Repository material (not applied)](#repository-material-not-applied) | 16 |
+| [Repository material (not applied)](#repository-material-not-applied) | 15 |
 
 ---
 
@@ -245,6 +245,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.local/bin/dots` | `dot_local/bin/executable_dots` | custom executables | executable |
 | `~/.local/bin/dots-push` | `dot_local/bin/executable_dots-push` | custom executables | executable |
 | `~/.local/bin/grok` | `dot_local/bin/executable_grok` | custom executables | executable |
+| `~/.local/bin/herdr-agent-lifecycle` | `dot_local/bin/executable_herdr-agent-lifecycle` | custom executables | executable |
 | `~/.local/bin/lazygit-ollama-commit.sh` | `dot_local/bin/executable_lazygit-ollama-commit.sh` | custom executables | executable |
 | `~/.local/bin/ollama-commit-msg.sh` | `dot_local/bin/executable_ollama-commit-msg.sh` | custom executables | executable |
 | `~/.local/bin/omarchy-agent-usage-antigravity` | `dot_local/bin/executable_omarchy-agent-usage-antigravity.tmpl` | custom executables | executable, template |
@@ -328,6 +329,5 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/generate_readme_tree.py` | Recovery guide and repository maintenance scripts |
 | `docs/recovery.md` | Recovery guide and repository maintenance scripts |
 | `docs/reorganization-proposal.md` | Recovery guide and repository maintenance scripts |
-| `dotfiles-showcase` | Submodule — the showcase web app; never applied |
 | `package.json` | Runtime CLI deps installed outside mise |
 | `to-questionnaire-dotfiles-sync-cli.md` | Scratch planning documents |
