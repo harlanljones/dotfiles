@@ -1,0 +1,52 @@
+#!/bin/sh
+# Reports Claude Code / Codex lifecycle state directly to herdr via hooks.
+#
+# Both CLIs' bundled herdr integration (`herdr integration install claude|codex`)
+# only reports session identity - herdr still derives idle/working/blocked from
+# screen-scraping for them, which drifts under load. This script makes the hook
+# itself the state authority for the pane instead, per herdr's documented
+# custom-integration pattern: https://herdr.dev/docs/integrations/#integrate-your-own-agent
+#
+# Usage: herdr-agent-lifecycle <agent-label> working|idle|blocked|release
+# Reads the hook's JSON payload on stdin (used only to detect and ignore
+# subagent-context hook firings, so a subagent's turn never overwrites the
+# main pane's reported state).
+set -eu
+
+agent="${1:?agent label required}"
+phase="${2:?phase required}"
+
+[ "${HERDR_ENV:-}" = "1" ] || exit 0
+[ -n "${HERDR_SOCKET_PATH:-}" ] || exit 0
+[ -n "${HERDR_PANE_ID:-}" ] || exit 0
+[ -n "${HERDR_BIN_PATH:-}" ] || exit 0
+
+hook_input="$(cat 2>/dev/null || true)"
+
+if command -v python3 >/dev/null 2>&1; then
+  agent_id="$(printf '%s' "$hook_input" | python3 -c '
+import json, sys
+try:
+    data = json.load(sys.stdin)
+except Exception:
+    data = {}
+print(data.get("agent_id") or "")
+' 2>/dev/null || true)"
+  [ -z "$agent_id" ] || exit 0
+fi
+
+source="custom:${agent}-lifecycle"
+
+case "$phase" in
+  working | idle | blocked)
+    "$HERDR_BIN_PATH" pane report-agent "$HERDR_PANE_ID" \
+      --source "$source" \
+      --agent "$agent" \
+      --state "$phase" >/dev/null 2>&1 || true
+    ;;
+  release)
+    "$HERDR_BIN_PATH" pane release-agent "$HERDR_PANE_ID" \
+      --source "$source" \
+      --agent "$agent" >/dev/null 2>&1 || true
+    ;;
+esac

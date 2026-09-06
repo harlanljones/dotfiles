@@ -19,6 +19,11 @@ alias codex="codex --approve-for-me"
 alias oc="opencode"
 alias cursor="agent"
 
+alias lg="lazygit"
+
+# Aliases managed by the Omarchy Alias Manager plugin (leoom.aliases)
+[ -r "$HOME/.config/omarchy/aliases" ] && source "$HOME/.config/omarchy/aliases"
+
 # `n` with no argument opens the current directory in nvim.
 n() {
   if [ "$#" -eq 0 ]; then

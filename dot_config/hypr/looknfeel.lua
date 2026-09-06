@@ -4,7 +4,7 @@
 hl.config({
   general = {
     -- gaps between windows or borders.
-    gaps_in = 0,
+    gaps_in = 2,
     gaps_out = 5,
     border_size = 1,
     --
@@ -17,11 +17,11 @@ hl.config({
 hl.config({
   decoration = {
     --     -- Use round window corners.
-    --     rounding = 8,
+    rounding = 8,
     --
     -- Dim unfocused windows (0.0 = no dim, 1.0 = fully dimmed).
-    dim_inactive = true,
-    dim_strength = 0.10,
+    -- dim_inactive = true,
+    -- dim_strength = 0.10,
   },
 })
 

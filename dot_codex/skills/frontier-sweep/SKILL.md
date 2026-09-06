@@ -1,6 +1,6 @@
 ---
 name: frontier-sweep
-description: Orchestrates parallel autonomous coding agents across Linear frontier tickets. Queries Linear for unblocked, unclaimed tickets at the dependency frontier, spawns subagents into git worktrees to implement each ticket, and loops until the frontier is clear. Agents write code and PR descriptions but never commit or push — the human reviews and commits. Use when the user says "frontier sweep", "sweep tickets", "clear the frontier", or wants autonomous parallel ticket implementation.
+description: Orchestrates parallel autonomous coding agents across Linear frontier tickets. Queries Linear for unblocked, unclaimed tickets at the dependency frontier, spawns subagents into herdr worktrees to implement each ticket, and loops until the frontier is clear. Agents write code and PR descriptions but never commit or push — the human reviews and commits. Use when the user says "frontier sweep", "sweep tickets", "clear the frontier", or wants autonomous parallel ticket implementation.
 disable-model-invocation: true
 ---
 
@@ -81,8 +81,10 @@ You are a focused implementation agent. Your job is to implement exactly one Lin
 
 ## Git Rules (CRITICAL)
 
-- CREATE a git worktree: `git worktree add ../ft/{TICKET_KEY}-{SHORT_SLUG} main`
-- Work INSIDE that worktree directory for all changes
+- CREATE a herdr worktree (this also opens it as its own herdr workspace, grouped
+  with the parent repo, so the human can see and jump to your pane from the sidebar):
+  `herdr worktree create --branch ft/{TICKET_KEY}-{SHORT_SLUG} --base main --path ../ft/{TICKET_KEY}-{SHORT_SLUG} --label {TICKET_KEY} --focus`
+- Work INSIDE that worktree directory (`../ft/{TICKET_KEY}-{SHORT_SLUG}`) for all changes
 - NEVER run `git commit`, `git push`, `gh pr create`, or any force-push
 - The human reviews and commits — your job ends at writing code + PR description
 
@@ -133,7 +135,7 @@ When done, report the worktree path and confirm PR_DESCRIPTION.md is written. Th
 
 | Allowed | Forbidden |
 |---------|-----------|
-| `git worktree add` | `git commit` |
+| `herdr worktree create` | `git commit` |
 | `git branch` | `git push` |
 | `git checkout -b` | `gh pr create` |
 | `git status`, `git diff` | `git push --force` / `--force-with-lease` |
@@ -151,7 +153,7 @@ Keep it minimal. After each round:
 [table of ticket → worktree → status]
 
 ### To review
-git worktree list
+herdr worktree list
 # then check each worktree's PR_DESCRIPTION.md
 
 ### Stalled / No Action
@@ -170,7 +172,7 @@ Worktrees ready for review:
   ft/ENG-42-add-auth
   ft/ENG-43-fix-login
 
-Review worktrees with: git worktree list
+Review worktrees with: herdr worktree list
 ```
 
 ---

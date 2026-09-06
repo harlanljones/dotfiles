@@ -60,17 +60,17 @@ new_tab = "prefix+c"
 rename_tab = "prefix+r"
 close_tab = "prefix+k"
 switch_tab = ["prefix+1..9", "alt+1..9"]
-previous_tab = ["prefix+p", "alt+left"]
-next_tab = ["prefix+n", "alt+right"]
+previous_tab = ["prefix+p", "alt+h"]
+next_tab = ["prefix+n", "alt+l"]
 
 # Like swap-window -t -1/+1 on M-S-Left/Right
-move_tab_previous = "alt+shift+left"
-move_tab_next = "alt+shift+right"
+move_tab_previous = "alt+shift+h"
+move_tab_next = "alt+shift+l"
 
 # Agents - no tmux equivalent. This box runs nine agent CLIs; these are the
 # only way to reach a specific agent pane without hunting through the sidebar.
-previous_agent = "alt+shift+up"
-next_agent = "alt+shift+down"
+previous_agent = "alt+shift+k"
+next_agent = "alt+shift+j"
 focus_agent = "alt+shift+1..9"
 
 # Worktrees - new_worktree keeps its prefix+shift+g default. prefix+shift+w is
@@ -82,8 +82,8 @@ remove_worktree = "prefix+shift+backspace"
 new_workspace = "prefix+shift+c"
 rename_workspace = "prefix+shift+r"
 close_workspace = "prefix+shift+k"
-previous_workspace = ["prefix+shift+p", "alt+up"]
-next_workspace = ["prefix+shift+n", "alt+down"]
+previous_workspace = ["prefix+shift+p", "alt+k"]
+next_workspace = ["prefix+shift+n", "alt+j"]
 
 [[keys.command]]
 key = "prefix+="
@@ -135,21 +135,25 @@ delivery = "system"
 delay_seconds = 2   # don't fire on sub-2s agent turns
 
 # Detailed statusline-level info for all agent harnesses/providers on machine
+# Line 1: workspace/tab, line 2: harness (own line), line 3: provider/model/
+# effort - $provider, $model, and $effort are custom metadata tokens, not
+# built-in ones, so they only render once something reports them via
+# `herdr pane report-metadata --token provider=... --token model=... --token effort=...`
 [ui.sidebar.agents]
-rows = [["state_icon", "workspace", "tab"], ["terminal_title_stripped"], ["agent"]]
+rows = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
 
 [ui.sidebar.agents.rows_by_agent]
-claude = [["state_icon", "workspace", "tab"], ["terminal_title_stripped"], ["agent"]]
-codex = [["state_icon", "workspace", "tab"], ["terminal_title_stripped"], ["agent"]]
-cursor = [["state_icon", "workspace", "tab"], ["terminal_title_stripped"], ["agent"]]
-gemini = [["state_icon", "workspace", "tab"], ["terminal_title_stripped"], ["agent"]]
-agy = [["state_icon", "workspace", "tab"], ["terminal_title_stripped"], ["agent"]]
-pi = [["state_icon", "workspace", "tab"], ["terminal_title_stripped"], ["agent"]]
-omp = [["state_icon", "workspace", "tab"], ["terminal_title_stripped"], ["agent"]]
-grok = [["state_icon", "workspace", "tab"], ["terminal_title_stripped"], ["agent"]]
-opencode = [["state_icon", "workspace", "tab"], ["terminal_title_stripped"], ["agent"]]
-cline = [["state_icon", "workspace", "tab"], ["terminal_title_stripped"], ["agent"]]
-copilot = [["state_icon", "workspace", "tab"], ["terminal_title_stripped"], ["agent"]]
+claude = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
+codex = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
+cursor = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
+gemini = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
+agy = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
+pi = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
+omp = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
+grok = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
+opencode = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
+cline = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
+copilot = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
 
 # Spaces sidebar: display git branch and status (useful workspace info not included in agents)
 [ui.sidebar.spaces]
