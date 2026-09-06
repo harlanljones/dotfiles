@@ -17,7 +17,35 @@ omarchyPlugins:
     enabled: true
   - url: https://github.com/maiosx/Runway.git
     enabled: true
-  - url: https://github.com/ryrobes/hazel.git
-    enabled: true
   - url: https://github.com/taufderl/omarchy.taufderl.ipinfo.git
+    enabled: true
+  - url: https://github.com/LetsFG/LetsFG.git
+    enabled: true
+  - url: https://github.com/anothaDev/omachord.git
+    enabled: true
+  - url: https://github.com/brianblakely/omarchy-plugins.git
+    enabled: true
+  - url: https://github.com/crmne/omarchy-hyprmoncfg.git
+    enabled: true
+  - url: https://github.com/esemczak/omarchy-theme-modes.git
+    enabled: true
+  - url: https://github.com/hzerrad/hzerrad.bottleneck.git
+    enabled: true
+  - url: https://github.com/imRYiUK/omarchy-workspace-profiles.git
+    enabled: true
+  - url: https://github.com/irhop/omarchy-mouse-odometer.git
+    enabled: true
+  - url: https://github.com/jankeesvw/omarchy-downloads.git
+    enabled: true
+  - url: https://github.com/leonaffi-byte/omarchy-alias-manager.git
+    enabled: true
+  - url: https://github.com/mtolhuys/omarchy-disk-lens.git
+    enabled: true
+  - url: https://github.com/njpatel/omapager.git
+    enabled: true
+  - url: https://github.com/omashift/omashift.git
+    enabled: true
+  - url: https://github.com/robzolkos/omarchy-github.git
+    enabled: true
+  - url: https://github.com/tymurbogach/omarchy-any-monitor.git
     enabled: true

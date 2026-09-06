@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**221 tracked entries** across 16 categories.
+**225 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -22,11 +22,11 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Navigation & search](#navigation--search) | 3 |
 | [Toolchain & packages](#toolchain--packages) | 4 |
 | [AI agent harnesses](#ai-agent-harnesses) | 41 |
-| [Background services](#background-services) | 14 |
-| [Custom executables](#custom-executables) | 28 |
+| [Background services](#background-services) | 16 |
+| [Custom executables](#custom-executables) | 29 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
 | [Other configuration](#other-configuration) | 1 |
-| [Apply hooks (`run_*`)](#apply-hooks-run) | 13 |
+| [Apply hooks (`run_*`)](#apply-hooks-run) | 14 |
 | [Chezmoi control files](#chezmoi-control-files) | 7 |
 | [Repository material (not applied)](#repository-material-not-applied) | 16 |
 
@@ -233,6 +233,8 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/systemd/user/omarchy-cline-usage-scrape.timer` | `dot_config/systemd/user/omarchy-cline-usage-scrape.timer` | user systemd units | — |
 | `~/.config/systemd/user/omarchy-cursor-usage-scrape.service` | `dot_config/systemd/user/omarchy-cursor-usage-scrape.service` | user systemd units | — |
 | `~/.config/systemd/user/omarchy-cursor-usage-scrape.timer` | `dot_config/systemd/user/omarchy-cursor-usage-scrape.timer` | user systemd units | — |
+| `~/.config/systemd/user/omarchy-drift-capture.path` | `dot_config/systemd/user/omarchy-drift-capture.path` | user systemd units | — |
+| `~/.config/systemd/user/omarchy-drift-capture.service` | `dot_config/systemd/user/omarchy-drift-capture.service` | user systemd units | — |
 | `~/.config/systemd/user/omarchy-opencode-go-usage-scrape.service` | `dot_config/systemd/user/omarchy-opencode-go-usage-scrape.service` | user systemd units | — |
 | `~/.config/systemd/user/omarchy-opencode-go-usage-scrape.timer` | `dot_config/systemd/user/omarchy-opencode-go-usage-scrape.timer` | user systemd units | — |
 
@@ -263,6 +265,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.local/bin/omarchy-cursor-usage-scrape` | `dot_local/bin/executable_omarchy-cursor-usage-scrape.tmpl` | custom executables | executable, template |
 | `~/.local/bin/omarchy-default-agent` | `dot_local/bin/executable_omarchy-default-agent.tmpl` | custom executables | executable, template |
 | `~/.local/bin/omarchy-dotfiles-sync` | `dot_local/bin/executable_omarchy-dotfiles-sync` | custom executables | executable |
+| `~/.local/bin/omarchy-drift-capture` | `dot_local/bin/executable_omarchy-drift-capture` | custom executables | executable |
 | `~/.local/bin/omarchy-opencode-go-usage-login` | `dot_local/bin/executable_omarchy-opencode-go-usage-login.tmpl` | custom executables | executable, template |
 | `~/.local/bin/omarchy-opencode-go-usage-override` | `dot_local/bin/executable_omarchy-opencode-go-usage-override.tmpl` | custom executables | executable, template |
 | `~/.local/bin/omarchy-opencode-go-usage-scrape` | `dot_local/bin/executable_omarchy-opencode-go-usage-scrape.tmpl` | custom executables | executable, template |
@@ -298,6 +301,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | 26 | `run_onchange_after_26-setup-omarchy-cursor.sh.tmpl` | runs when this script's contents change | after |
 | 27 | `run_onchange_after_27-sync-claude-mcp.sh.tmpl` | runs when this script's contents change | after |
 | 28 | `run_onchange_after_28-sync-claude-settings.sh.tmpl` | runs when this script's contents change | after |
+| 29 | `run_onchange_after_29-setup-omarchy-drift-capture.sh.tmpl` | runs when this script's contents change | after |
 | 30 | `run_onchange_after_30-macos-defaults.sh.tmpl` | runs when this script's contents change | after |
 
 ## Chezmoi control files

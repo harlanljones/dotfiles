@@ -10,6 +10,8 @@
 #   OLLAMA_COMMIT_MODEL   Model used for message generation
 #                         (default: qwen2.5-coder:7b)
 #   MAX_DIFF_LINES        Diff lines sent to Ollama (default: 400)
+#   DOTS_PUSH_NO_CAPTURE  Set to 1 to skip the omarchy template capture step
+#                         (used by `dots push`, which already captured).
 set -euo pipefail
 
 DOTFILES="${CHEZMOI_DIR:-$HOME/.local/share/chezmoi}"
@@ -17,6 +19,15 @@ MODEL="${OLLAMA_COMMIT_MODEL:-qwen2.5-coder:7b}"
 MAX_DIFF_LINES=400
 
 cd "$DOTFILES"
+
+# Capture `create_` templates (shell.json) + plugin manifest first:
+# `chezmoi re-add` below refuses templates, so without this step shell.json
+# drift would be silently left out of the commit. Best-effort — never block
+# the push. Skip with DOTS_PUSH_NO_CAPTURE=1 (used by `dots push --no-capture`
+# flows that already captured).
+if [[ "${DOTS_PUSH_NO_CAPTURE:-0}" != "1" ]] && command -v omarchy-dotfiles-sync >/dev/null 2>&1; then
+  omarchy-dotfiles-sync >/dev/null 2>&1 || echo "warning: template capture failed; continuing with re-add only." >&2
+fi
 
 chezmoi re-add >/dev/null 2>&1 || true
 

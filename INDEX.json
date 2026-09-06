@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 221,
+    "total": 225,
     "by_category": {
       "shell": 13,
       "prompt": 1,
@@ -14,11 +14,11 @@
       "navigation": 3,
       "toolchain": 4,
       "agents": 41,
-      "services": 14,
-      "scripts": 28,
+      "services": 16,
+      "scripts": 29,
       "security": 2,
       "other": 1,
-      "hooks": 13,
+      "hooks": 14,
       "chezmoi": 7,
       "repo": 16
     }
@@ -1373,6 +1373,22 @@
       "subsystem": "user systemd units"
     },
     {
+      "source": "dot_config/systemd/user/omarchy-drift-capture.path",
+      "target": "~/.config/systemd/user/omarchy-drift-capture.path",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "user systemd units"
+    },
+    {
+      "source": "dot_config/systemd/user/omarchy-drift-capture.service",
+      "target": "~/.config/systemd/user/omarchy-drift-capture.service",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "user systemd units"
+    },
+    {
       "source": "dot_config/systemd/user/omarchy-opencode-go-usage-scrape.service",
       "target": "~/.config/systemd/user/omarchy-opencode-go-usage-scrape.service",
       "kind": "dotfile",
@@ -1633,6 +1649,16 @@
       "subsystem": "custom executables"
     },
     {
+      "source": "dot_local/bin/executable_omarchy-drift-capture",
+      "target": "~/.local/bin/omarchy-drift-capture",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
       "source": "dot_local/bin/executable_omarchy-opencode-go-usage-login.tmpl",
       "target": "~/.local/bin/omarchy-opencode-go-usage-login",
       "kind": "dotfile",
@@ -1851,6 +1877,19 @@
         "phase": "after",
         "order": 28,
         "name": "sync-claude-settings",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_after_29-setup-omarchy-drift-capture.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 29,
+        "name": "setup-omarchy-drift-capture",
         "template": true
       }
     },

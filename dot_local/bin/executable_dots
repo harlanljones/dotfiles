@@ -25,6 +25,59 @@ get_source_dir() {
   chezmoi source-path 2>/dev/null || echo "$HOME/.local/share/chezmoi"
 }
 
+# ------------------------------------------------- template drift helpers ---
+# Files with the chezmoi `create_` attribute (e.g. omarchy shell.json) are
+# invisible to `chezmoi status/diff`: chezmoi never reports them as modified
+# after initial creation, and `chezmoi re-add` refuses to overwrite their
+# templates. Drift must be detected by comparing the rendered template
+# against the live target, and captured live -> repo via
+# omarchy-dotfiles-sync (single source of truth, never duplicated here).
+SHELL_LIVE_FILE="$HOME/.config/omarchy/shell.json"
+
+shell_template_path() {
+  printf '%s/dot_config/omarchy/create_private_shell.json.tmpl' "$(get_source_dir)"
+}
+
+# shell_template_drift: 0 = drifted, 1 = in sync, 2 = skipped (no live file,
+# missing template, or not an omarchy host). Prints a short reason on stdout
+# when skipped/drifted for callers that want it.
+shell_template_drift() {
+  local tmpl live rendered
+  tmpl="$(shell_template_path)"
+  live="$SHELL_LIVE_FILE"
+  [[ -f "$live" ]] || { echo "skipped (no live shell.json)"; return 2; }
+  [[ -f "$tmpl" ]] || { echo "skipped (template not present)"; return 2; }
+  rendered=$(chezmoi execute-template < "$tmpl" 2>/dev/null) || { echo "skipped (template render failed)"; return 2; }
+  [[ -n "$rendered" ]] || { echo "skipped (not an omarchy host)"; return 2; }
+  if cmp -s <(printf '%s\n' "$rendered") "$live"; then
+    return 1
+  fi
+  echo "drifted"
+  return 0
+}
+
+shell_template_diff() {
+  local tmpl live tmp
+  tmpl="$(shell_template_path)"
+  live="$SHELL_LIVE_FILE"
+  tmp="$(mktemp)"
+  chezmoi execute-template < "$tmpl" > "$tmp" 2>/dev/null || { rm -f "$tmp"; return 1; }
+  diff -u --label "chezmoi template (rendered)" --label "live $live" "$tmp" "$live" || true
+  rm -f "$tmp"
+}
+
+capture_templates() {
+  # Best-effort live -> repo capture for `create_` templates + plugin
+  # manifest. Never writes to $HOME. Pass-through args to the sync script
+  # (-n/--dry-run, --prune, --commit supported).
+  if command -v omarchy-dotfiles-sync >/dev/null 2>&1; then
+    omarchy-dotfiles-sync "$@" || return $?
+  else
+    echo -e "${YELLOW}warning:${NC} omarchy-dotfiles-sync not found; template capture skipped." >&2
+    return 1
+  fi
+}
+
 usage() {
   cat <<EOF
 ${BOLD}dots${NC} - Ergonomic Chezmoi Dotfiles Manager
@@ -36,12 +89,13 @@ ${BOLD}COMMANDS:${NC}
   ${CYAN}sync, apply${NC}       Apply managed dotfiles to your home directory
   ${CYAN}diff${NC}              Show clean diff of pending changes (scripts hidden by default)
   ${CYAN}status, st${NC}        Show state of managed files (modified, added, untracked)
-  ${CYAN}absorb, add${NC}       Re-add / capture live modified files back into chezmoi repo
+  ${CYAN}absorb, add${NC}       Capture live drift back into chezmoi repo (templates + re-add)
+  ${CYAN}capture, cap${NC}     Capture create_ templates + plugin manifest (live -> repo)
   ${CYAN}edit, ed${NC}          Edit the source template for a target managed file
   ${CYAN}cd${NC}                Open a shell or print the chezmoi source directory path
   ${CYAN}update, pull${NC}      Pull latest dotfiles from git remote and apply
-  ${CYAN}push, pp${NC}          Commit & push dotfiles repo with an Ollama-generated commit message
-  ${CYAN}doctor${NC}            Run diagnostics on tools, age keys, and agent skill links
+  ${CYAN}push, pp${NC}          Capture templates, commit & push with Ollama-generated message
+  ${CYAN}doctor${NC}            Run diagnostics on tools, age keys, agent links, template drift
   ${CYAN}help${NC}              Show this help message
 
 ${BOLD}OPTIONS FOR SYNC:${NC}
@@ -53,25 +107,47 @@ ${BOLD}OPTIONS FOR DIFF:${NC}
   -a, --all          Include generated script contents in the diff output
 
 ${BOLD}OPTIONS FOR PUSH:${NC}
-  Delegates to dots-push: re-adds locally modified targets, stages all
-  changes, generates a one-line conventional commit message with local
-  Ollama, commits, and pushes to origin. Falls back to a dated message
-  when Ollama is unavailable.
+  Captures `create_` templates (shell.json) + plugin manifest via
+  omarchy-dotfiles-sync, then delegates to dots-push: re-adds locally
+  modified targets, stages all changes, generates a one-line conventional
+  commit message with local Ollama, commits, and pushes to origin.
+  Falls back to a dated message when Ollama is unavailable.
+  Use --no-capture to skip the template capture step.
   Environment overrides:
     OLLAMA_COMMIT_MODEL   Model used for message generation
                           (default: qwen2.5-coder:7b)
     CHEZMOI_DIR           Chezmoi source directory
                           (default: ~/.local/share/chezmoi)
 
+${BOLD}OPTIONS FOR CAPTURE:${NC}
+  Standalone live -> repo capture for drift chezmoi cannot see: `create_`
+  templates (omarchy shell.json) + plugin manifest. Never writes to $HOME.
+  -n, --dry-run      Preview what would be captured without writing
+  --prune            Also drop plugin manifest entries no longer installed
+  --commit           Commit just the captured paths (same as sync script flag)
+
+${BOLD}OPTIONS FOR ABSORB:${NC}
+  No args: capture `create_` templates (shell.json) + plugin manifest, then
+  re-add all modified managed files. File args: re-add those targets; shell.json
+  is intercepted to template capture since `chezmoi re-add` refuses templates.
+  -n, --dry-run      Preview template capture + re-add without writing
+  --prune            Also drop plugin manifest entries no longer installed
+  --omarchy          Capture omarchy templates/manifest only (skip generic re-add)
+
 ${BOLD}EXAMPLES:${NC}
   dots sync                # Fast apply managed dotfiles
-  dots diff                # View clean config diff without template noise
+  dots diff                # View clean config diff (incl. create_ template drift)
   dots diff --all          # View full diff including run_* scripts
-  dots status              # View modified files
+  dots status              # View modified files (incl. create_ template drift)
+  dots absorb              # Capture templates + re-add all drift
+  dots absorb -n           # Preview template + re-add drift without writing
+  dots capture             # Capture create_ templates + plugin manifest only
+  dots capture -n          # Preview template/manifest drift without writing
   dots absorb ~/.zshrc     # Capture local changes into chezmoi source
+  dots absorb ~/.config/omarchy/shell.json  # Regenerate shell.json template (or: dots capture)
   dots update              # Pull remote changes and apply
-  dots push                # Stage, commit with AI-generated message, push
-  dots doctor              # Verify encryption keys, toolchains & agent links
+  dots push                # Capture templates, commit with AI message, push
+  dots doctor              # Verify keys, toolchains, links & template drift
 EOF
 }
 
@@ -138,6 +214,20 @@ cmd_diff() {
     # Default: filter out noisy script contents unless requested
     chezmoi diff --script-contents=false "${passthrough[@]}"
   fi
+
+  # `create_` templates are invisible to `chezmoi diff`; surface shell.json
+  # drift explicitly so it is never silently missed.
+  if [[ ${#passthrough[@]} -eq 0 ]]; then
+    local drift_reason
+    if drift_reason=$(shell_template_drift); then
+      echo
+      echo -e "${YELLOW}--- create_ template drift (invisible to chezmoi diff): $SHELL_LIVE_FILE ---${NC}"
+      shell_template_diff
+      echo -e "${DIM}Capture with: dots capture${NC}"
+    elif [[ "$drift_reason" == skipped* ]]; then
+      : # not applicable on this host; stay quiet
+    fi
+  fi
 }
 
 cmd_status() {
@@ -145,42 +235,137 @@ cmd_status() {
   local output
   output=$(chezmoi status "$@" 2>/dev/null || true)
 
-  if [[ -z "$output" ]]; then
+  local tmpl_state=""
+  local drift_reason
+  if [[ $# -eq 0 ]] && drift_reason=$(shell_template_drift); then
+    tmpl_state=" M $SHELL_LIVE_FILE (create_ template drift)"
+  fi
+
+  if [[ -z "$output" && -z "$tmpl_state" ]]; then
     echo -e "${GREEN}✓ Working tree clean (all managed files match source).${NC}"
     return 0
   fi
 
   echo -e "${BOLD}Managed Dotfiles Status:${NC}"
-  while IFS= read -r line; do
-    local state="${line:0:2}"
-    local file="${line:3}"
-    case "$state" in
-      " M"|"M ") echo -e "  ${YELLOW}modified:${NC}   $file" ;;
-      " A"|"A ") echo -e "  ${GREEN}added:${NC}      $file" ;;
-      " D"|"D ") echo -e "  ${RED}deleted:${NC}    $file" ;;
-      " ?"|"? ") echo -e "  ${DIM}untracked:${NC}  $file" ;;
-      *)         echo -e "  $state $file" ;;
+  if [[ -n "$output" ]]; then
+    while IFS= read -r line; do
+      local state="${line:0:2}"
+      local file="${line:3}"
+      case "$state" in
+        " M"|"M ") echo -e "  ${YELLOW}modified:${NC}   $file" ;;
+        " A"|"A ") echo -e "  ${GREEN}added:${NC}      $file" ;;
+        " D"|"D ") echo -e "  ${RED}deleted:${NC}    $file" ;;
+        " ?"|"? ") echo -e "  ${DIM}untracked:${NC}  $file" ;;
+        *)         echo -e "  $state $file" ;;
+      esac
+    done <<< "$output"
+  fi
+  if [[ -n "$tmpl_state" ]]; then
+    echo -e "  ${YELLOW}modified:${NC}   $SHELL_LIVE_FILE ${DIM}(create_ template drift; chezmoi hides this — run 'dots capture')${NC}"
+  fi
+}
+
+cmd_capture() {
+  ensure_chezmoi
+  local sync_args=()
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -n|--dry-run) sync_args+=("-n") ;;
+      --prune) sync_args+=("--prune") ;;
+      --commit) sync_args+=("--commit") ;;
+      -h|--help)
+        echo "Usage: dots capture [-n|--dry-run] [--prune] [--commit]"
+        echo "  Capture live -> repo drift that chezmoi cannot see: create_"
+        echo "  templates (omarchy shell.json) + plugin manifest. Never writes"
+        echo "  to \$HOME; never commits unless --commit is given."
+        return 0
+        ;;
+      -*) echo -e "${RED}error:${NC} Unknown capture flag '$1'." >&2; return 1 ;;
+      *) echo -e "${RED}error:${NC} dots capture takes no file arguments (use 'dots absorb <file>')." >&2; return 1 ;;
     esac
-  done <<< "$output"
+    shift
+  done
+
+  echo -e "${CYAN}Capturing live drift into chezmoi source (templates + plugin manifest)...${NC}"
+  capture_templates "${sync_args[@]}"
 }
 
 cmd_absorb() {
   ensure_chezmoi
-  if [[ $# -eq 0 ]]; then
-    # If no target file is given, check for omarchy-dotfiles-sync or prompt
-    if command -v omarchy-dotfiles-sync >/dev/null 2>&1; then
-      echo -e "${CYAN}Running omarchy-dotfiles-sync capture...${NC}"
-      omarchy-dotfiles-sync
-      return 0
-    else
-      echo -e "${YELLOW}Usage: dots absorb <file-path ...>${NC}"
-      echo "Re-adds modified file(s) from your home directory back into chezmoi source repo."
-      return 1
-    fi
+  local dry_run=0 prune=0 omarchy_only=0
+  local sync_args=() targets=()
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -n|--dry-run) dry_run=1; sync_args+=("-n") ;;
+      --prune) prune=1; sync_args+=("--prune") ;;
+      --omarchy) omarchy_only=1 ;;
+      -h|--help)
+        echo "Usage: dots absorb [-n|--dry-run] [--prune] [--omarchy] [<file-path ...>]"
+        echo "  No args: capture create_ templates + plugin manifest, then re-add all drift."
+        echo "  File args: re-add those targets (shell.json is routed to template capture)."
+        return 0
+        ;;
+      -*) echo -e "${RED}error:${NC} Unknown absorb flag '$1'." >&2; return 1 ;;
+      *) targets+=("$1") ;;
+    esac
+    shift
+  done
+
+  # Omarchy-only capture (templates + plugin manifest, no generic re-add).
+  if [[ $omarchy_only -eq 1 ]]; then
+    cmd_capture "${sync_args[@]}"
+    return $?
   fi
 
-  echo -e "${CYAN}Re-adding target(s) into chezmoi source:${NC} $*"
-  chezmoi re-add "$@"
+  # No targets: full capture — templates first, then generic re-add.
+  # (`chezmoi re-add` refuses `create_` templates, so the sync script must
+  # run first; it never writes to $HOME.)
+  if [[ ${#targets[@]} -eq 0 ]]; then
+    echo -e "${CYAN}Capturing create_ templates + plugin manifest...${NC}"
+    capture_templates "${sync_args[@]}" || true
+    if [[ $dry_run -eq 1 ]]; then
+      echo -e "${CYAN}Would re-add modified managed files (dry run):${NC}"
+      chezmoi status 2>/dev/null | sed 's/^/   /' || true
+    else
+      echo -e "${CYAN}Re-adding modified managed files...${NC}"
+      chezmoi re-add || true
+    fi
+    echo -e "${GREEN}✓ Absorb complete. Review with: dots status${NC}"
+    return 0
+  fi
+
+  # Targeted absorb: route shell.json to template capture, rest to re-add.
+  local readd_targets=()
+  local shell_requested=0
+  local t
+  for t in "${targets[@]}"; do
+    case "$t" in
+      *omarchy/shell.json|*create_private_shell.json.tmpl)
+        shell_requested=1 ;;
+      *) readd_targets+=("$t") ;;
+    esac
+  done
+
+  if [[ $shell_requested -eq 1 ]]; then
+    echo -e "${CYAN}Regenerating shell.json template from live (re-add refuses templates)...${NC}"
+    capture_templates "${sync_args[@]}" || true
+  fi
+  if [[ ${#readd_targets[@]} -gt 0 ]]; then
+    if [[ $dry_run -eq 1 ]]; then
+      echo -e "${CYAN}Would re-add target(s) (dry run):${NC} ${readd_targets[*]}"
+      chezmoi status "${readd_targets[@]}" 2>/dev/null | sed 's/^/   /' || true
+    else
+      echo -e "${CYAN}Re-adding target(s) into chezmoi source:${NC} ${readd_targets[*]}"
+      chezmoi re-add "${readd_targets[@]}"
+    fi
+  fi
+  # Surface any remaining template drift so a targeted absorb can't hide it.
+  local drift_reason
+  if drift_reason=$(shell_template_drift); then
+    echo -e "${YELLOW}!${NC} shell.json template still drifted — run 'dots capture' to capture it."
+  fi
   echo -e "${GREEN}✓ Target(s) updated in chezmoi source repo.${NC}"
 }
 
@@ -219,8 +404,23 @@ cmd_push() {
     echo -e "${RED}error:${NC} dots-push is not installed or not in PATH." >&2
     exit 1
   fi
+  local capture=1
+  local passthrough=()
+  for a in "$@"; do
+    case "$a" in
+      --no-capture) capture=0 ;;
+      *) passthrough+=("$a") ;;
+    esac
+  done
+  if [[ $capture -eq 1 ]]; then
+    echo -e "${CYAN}Capturing create_ templates before commit...${NC}"
+    capture_templates || echo -e "${YELLOW}warning:${NC} template capture failed; continuing with re-add only." >&2
+  fi
+  # dots-push captures on its own; the capture above already handled it
+  # (or the user explicitly opted out) — avoid running it twice.
+  export DOTS_PUSH_NO_CAPTURE=1
   echo -e "${CYAN}== Committing & pushing dotfiles repo (Ollama-generated message) ==${NC}"
-  exec dots-push "$@"
+  exec dots-push "${passthrough[@]}"
 }
 
 cmd_doctor() {
@@ -287,6 +487,43 @@ cmd_doctor() {
     echo -e " ${GREEN}✓${NC} ${BOLD}claude settings:${NC} present at $claude_settings (dynamic drift auto-merged)"
   fi
 
+  # 7. create_ template drift (invisible to `chezmoi status`; live -> repo only)
+  local drift_reason
+  if drift_reason=$(shell_template_drift); then
+    echo -e " ${YELLOW}!${NC} ${BOLD}shell.json template:${NC} DRIFTED — live $SHELL_LIVE_FILE differs from rendered template"
+    echo -e "   ${DIM}capture with: dots capture${NC}"
+  elif [[ "$drift_reason" == skipped* ]]; then
+    echo -e " ${DIM}–${NC} ${BOLD}shell.json template:${NC} $drift_reason"
+  else
+    echo -e " ${GREEN}✓${NC} ${BOLD}shell.json template:${NC} matches live $SHELL_LIVE_FILE"
+  fi
+
+  # 8. Omarchy plugin manifest vs installed plugins
+  local manifest plugins_dir
+  manifest="$src/.chezmoidata/omarchy_plugins.yaml"
+  plugins_dir="$HOME/.config/omarchy/plugins"
+  if [[ -f "$manifest" && -d "$plugins_dir" ]]; then
+    local declared installed_git
+    declared=$(grep -c -- '- url:' "$manifest" 2>/dev/null || echo 0)
+    installed_git=$(find "$plugins_dir" -maxdepth 3 -name HEAD -path '*/.git/*' 2>/dev/null | wc -l)
+    if [[ "$declared" -eq "$installed_git" ]]; then
+      echo -e " ${GREEN}✓${NC} ${BOLD}omarchy plugins:${NC} manifest matches ($declared git-backed)"
+    else
+      echo -e " ${YELLOW}!${NC} ${BOLD}omarchy plugins:${NC} manifest declares $declared, $installed_git installed — run 'dots capture' (--prune drops uninstalled)"
+    fi
+  fi
+
+  # 9. Drift watcher (auto-capture on live change; omarchy only)
+  if systemctl --user list-unit-files omarchy-drift-capture.path 2>/dev/null | grep -q '\.path'; then
+    local watcher_state
+    watcher_state=$(systemctl --user is-active omarchy-drift-capture.path 2>/dev/null || true)
+    if [[ "$watcher_state" == "active" ]]; then
+      echo -e " ${GREEN}✓${NC} ${BOLD}drift watcher:${NC} omarchy-drift-capture.path active (auto-capture + notify)"
+    else
+      echo -e " ${YELLOW}!${NC} ${BOLD}drift watcher:${NC} omarchy-drift-capture.path is $watcher_state — run 'dots sync' to enable"
+    fi
+  fi
+
   echo
   echo -e "${GREEN}Diagnostics complete.${NC}"
 }
@@ -301,6 +538,7 @@ main() {
     diff)           cmd_diff "$@" ;;
     status|st)      cmd_status "$@" ;;
     absorb|add)     cmd_absorb "$@" ;;
+    capture|cap)    cmd_capture "$@" ;;
     edit|ed)        cmd_edit "$@" ;;
     cd)             cmd_cd "$@" ;;
     update|pull)    cmd_update "$@" ;;

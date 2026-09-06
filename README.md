@@ -444,6 +444,8 @@ Declarative tracking for system-level packages that mise does not manage:
 │   │       ├── omarchy-cline-usage-scrape.timer
 │   │       ├── omarchy-cursor-usage-scrape.service
 │   │       ├── omarchy-cursor-usage-scrape.timer
+│   │       ├── omarchy-drift-capture.path
+│   │       ├── omarchy-drift-capture.service
 │   │       ├── omarchy-opencode-go-usage-scrape.service
 │   │       └── omarchy-opencode-go-usage-scrape.timer
 │   └── zoxide
@@ -493,6 +495,7 @@ Declarative tracking for system-level packages that mise does not manage:
 │   │   ├── executable_omarchy-cursor-usage-scrape.tmpl
 │   │   ├── executable_omarchy-default-agent.tmpl
 │   │   ├── executable_omarchy-dotfiles-sync
+│   │   ├── executable_omarchy-drift-capture
 │   │   ├── executable_omarchy-opencode-go-usage-login.tmpl
 │   │   ├── executable_omarchy-opencode-go-usage-override.tmpl
 │   │   ├── executable_omarchy-opencode-go-usage-scrape.tmpl
@@ -521,6 +524,7 @@ Declarative tracking for system-level packages that mise does not manage:
 ├── run_onchange_after_26-setup-omarchy-cursor.sh.tmpl
 ├── run_onchange_after_27-sync-claude-mcp.sh.tmpl
 ├── run_onchange_after_28-sync-claude-settings.sh.tmpl
+├── run_onchange_after_29-setup-omarchy-drift-capture.sh.tmpl
 ├── run_onchange_after_30-macos-defaults.sh.tmpl
 └── run_onchange_before_09-install-agent-skills.sh.tmpl
 ```

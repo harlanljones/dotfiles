@@ -8,25 +8,124 @@
           "id": "omarchy.indicators"
         },
         {
+          "id": "omarchy.keyboard-layout"
+        },
+        {
+          "id": "omarchy.system-update"
+        },
+        {
           "id": "omarchy.clock",
           "format": "ddd d MMM h:mm AP",
           "formatAlt": "d MMMM 'W'ww yyyy",
           "verticalFormat": "HH\n—\nmm"
         },
         {
-          "id": "omarchy.keyboard-layout"
+          "id": "io.github.patrickfanella.shelfish",
+          "groups": "[{\"id\":\"default\",\"name\":\"Agents\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"harlan.agents\",\"harlan.agent-leaderboard\",\"robzolkos.github\",\"io.github.rolfkoenders.umarchy\"]},{\"id\":\"work\",\"name\":\"This PC\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"im0001gt.hw-tooltip\",\"omarchy.network\",\"io.github.this-is-npc.dockmarchy\",\"crmne.hyprmoncfg\",\"io.github.mtolhuys.disk-lens\",\"hzerrad.bottleneck\",\"taufderl.ipinfo\",\"io.github.tymurbogach.any-monitor\"]},{\"id\":\"settings\",\"name\":\"Settings\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"omarchy.audio\",\"omarchy.bluetooth\",\"omarchy.monitor\",\"esemczak.theme-modes\",\"leoom.aliases\",\"io.github.imryiuk.workspace-profiles\"]},{\"id\":\"extras\",\"name\":\"Extras\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"omarchy.weather\",\"sportsbar\",\"cristianocorsi.countdown\",\"io.github.omashift.omashift\",\"io.github.letsfg.flights\",\"ryanyogan.hydrate\"]}]",
+          "activeGroupId": "work",
+          "watchedPaths": "{}",
+          "policies": "{}",
+          "revealSeconds": 8
+        },
+        {
+          "id": "io.github.patrickfanella.shelfish.group.default",
+          "source": "{{ .chezmoi.homeDir }}/.config/omarchy/plugins/io.github.patrickfanella.shelfish/GroupButton.qml",
+          "shelfishGroupId": "default"
+        },
+        {
+          "id": "harlan.agents"
+        },
+        {
+          "id": "harlan.agent-leaderboard"
+        },
+        {
+          "id": "robzolkos.github",
+          "linkBehavior": "Web app window",
+          "repositoryScope": "Owned and organizations",
+          "refreshIntervalSec": 600,
+          "includeForks": true
+        },
+        {
+          "id": "io.github.patrickfanella.shelfish.group.work",
+          "source": "{{ .chezmoi.homeDir }}/.config/omarchy/plugins/io.github.patrickfanella.shelfish/GroupButton.qml",
+          "shelfishGroupId": "work"
+        },
+        {
+          "id": "im0001gt.hw-tooltip"
+        },
+        {
+          "id": "omarchy.network"
+        },
+        {
+          "id": "io.github.this-is-npc.dockmarchy",
+          "language": "en"
+        },
+        {
+          "id": "crmne.hyprmoncfg"
+        },
+        {
+          "id": "io.github.mtolhuys.disk-lens"
+        },
+        {
+          "id": "hzerrad.bottleneck"
+        },
+        {
+          "id": "taufderl.ipinfo"
+        },
+        {
+          "id": "io.github.tymurbogach.any-monitor"
+        },
+        {
+          "id": "io.github.patrickfanella.shelfish.group.settings",
+          "source": "{{ .chezmoi.homeDir }}/.config/omarchy/plugins/io.github.patrickfanella.shelfish/GroupButton.qml",
+          "shelfishGroupId": "settings"
+        },
+        {
+          "id": "omarchy.audio"
+        },
+        {
+          "id": "omarchy.bluetooth"
+        },
+        {
+          "id": "omarchy.monitor"
+        },
+        {
+          "id": "esemczak.theme-modes"
+        },
+        {
+          "id": "leoom.aliases"
+        },
+        {
+          "id": "io.github.imryiuk.workspace-profiles"
+        },
+        {
+          "id": "io.github.patrickfanella.shelfish.group.extras",
+          "source": "{{ .chezmoi.homeDir }}/.config/omarchy/plugins/io.github.patrickfanella.shelfish/GroupButton.qml",
+          "shelfishGroupId": "extras"
         },
         {
           "id": "omarchy.weather"
         },
         {
-          "id": "gigor.notifications"
-        },
-        {
           "id": "sportsbar"
         },
         {
-          "id": "omarchy.system-update"
+          "id": "io.github.omashift.omashift"
+        },
+        {
+          "id": "io.github.letsfg.flights"
+        },
+        {
+          "id": "anothadev.omachord"
+        },
+        {
+          "id": "omarchy.tray",
+          "pinned": [],
+          "hidden": [
+            "Slack_status_icon_1",
+            "1Password_status_icon_1",
+            "chrome_status_icon_1"
+          ]
         }
       ],
       "left": [
@@ -39,53 +138,24 @@
       ],
       "right": [
         {
-          "id": "omarchy.tray",
-          "pinned": [
-            "1Password_status_icon_1",
-            "Slack_status_icon_1"
-          ],
-          "hidden": [
-            "chrome_status_icon_1"
-          ]
+          "id": "io.github.irhop.mouse-odometer",
+          "gamify": true,
+          "introSeen": true
         },
         {
-          "id": "lgse.backdrop"
+          "id": "jankeesvw.downloads"
         },
         {
-          "id": "io.github.patrickfanella.shelfish"
+          "id": "gigor.notifications"
         },
         {
-          "id": "io.github.patrickfanella.shelfish.group.default",
-          "source": "{{ .chezmoi.homeDir }}/.config/omarchy/plugins/io.github.patrickfanella.shelfish/GroupButton.qml",
-          "shelfishGroupId": "default"
-        },
-        {
-          "id": "harlan.agent-leaderboard"
-        },
-        {
-          "id": "io.github.this-is-npc.dockmarchy",
-          "language": "en"
-        },
-        {
-          "id": "im0001gt.hw-tooltip"
-        },
-        {
-          "id": "harlan.agents"
-        },
-        {
-          "id": "omarchy.bluetooth"
-        },
-        {
-          "id": "omarchy.network"
+          "id": "omarchy.background"
         },
         {
           "id": "omarchy.power"
         },
         {
-          "id": "omarchy.audio"
-        },
-        {
-          "id": "omarchy.monitor"
+          "id": "njpatel.omapager"
         }
       ]
     },
@@ -102,16 +172,18 @@
     },
     {
       "id": "anagrius.resume"
+    },
+    {
+      "id": "b.okomart"
     }
   ],
   "version": 1,
   "disabledPlugins": [
     "omarchy.lock",
-    "omarchy.background"
+    "omarchy.notifications"
   ],
   "cloneSourceRestores": [
-    "shmall.lock",
-    "lgse.backdrop"
+    "shmall.lock"
   ]
 }
 {{- end }}

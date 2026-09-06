@@ -1,0 +1,6 @@
+[Unit]
+Description=Capture omarchy live drift into chezmoi source (templates + manifest)
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/omarchy-drift-capture

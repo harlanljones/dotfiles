@@ -1,0 +1,18 @@
+{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+#!/bin/bash
+# Enables the path unit that auto-captures omarchy live drift (shell.json
+# template + plugin manifest) into the chezmoi source tree. Managed by chezmoi.
+#
+# Watched-unit hashes (re-runs enablement when the units change):
+#   drift-capture.path={{ include "dot_config/systemd/user/omarchy-drift-capture.path" | sha256sum }}
+#   drift-capture.service={{ include "dot_config/systemd/user/omarchy-drift-capture.service" | sha256sum }}
+
+set -euo pipefail
+
+if [[ ! -d "$HOME/.config/omarchy" ]]; then
+  exit 0
+fi
+
+systemctl --user daemon-reload
+systemctl --user enable --now omarchy-drift-capture.path
+{{- end -}}

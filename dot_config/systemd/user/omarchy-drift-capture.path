@@ -1,0 +1,9 @@
+[Unit]
+Description=Watch omarchy shell config for live drift
+
+[Path]
+PathChanged=%h/.config/omarchy/shell.json
+PathModified=%h/.config/omarchy/plugins
+
+[Install]
+WantedBy=paths.target

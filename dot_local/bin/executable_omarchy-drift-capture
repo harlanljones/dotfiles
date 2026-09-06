@@ -1,0 +1,65 @@
+#!/usr/bin/env bash
+# omarchy-drift-capture - Unattended live -> repo drift capture, triggered by
+# the omarchy-drift-capture.path unit when shell.json or the plugins dir changes.
+#
+# Auto-captures into the chezmoi working tree and sends a desktop notification
+# only when something actually changed. Never writes to $HOME and never
+# commits: review with `dots diff`, commit with `dots push`.
+#
+# Safe to run by hand or on a timer; concurrent runs are serialized via flock
+# and repeat runs are no-ops when already in sync.
+
+set -euo pipefail
+
+# Debounce: the shell rewrites shell.json on every settings tweak, so collapse
+# bursts into at most one capture per interval. Skips exit 0 (unit stays
+# healthy); the next trigger after the interval captures any pending drift.
+# (Done here instead of TriggerLimit*=, which would park the path unit in a
+# failure state until manually restarted.)
+DEBOUNCE_SEC=600
+STAMP_FILE="$HOME/.local/state/omarchy-drift-capture.last"
+now="$(date +%s)"
+if [[ -f "$STAMP_FILE" ]]; then
+  last_run="$(cat "$STAMP_FILE" 2>/dev/null || echo 0)"
+  if (( now - last_run < DEBOUNCE_SEC )); then
+    echo "omarchy-drift-capture: last run $(( (now - last_run) / 60 )) min ago, debouncing"
+    exit 0
+  fi
+fi
+
+LOCK_FILE="$HOME/.local/state/omarchy-drift-capture.lock"
+mkdir -p "$(dirname "$LOCK_FILE")"
+
+exec 9>"$LOCK_FILE"
+flock -n 9 || { echo "omarchy-drift-capture: another run in progress, skipping"; exit 0; }
+
+command -v chezmoi >/dev/null 2>&1 || { echo "chezmoi: not found" >&2; exit 1; }
+command -v omarchy-dotfiles-sync >/dev/null 2>&1 || { echo "omarchy-dotfiles-sync: not found" >&2; exit 1; }
+
+SOURCE="$(chezmoi source-path)"
+WATCH_PATHS=(.chezmoidata/omarchy_plugins.yaml dot_config/omarchy dot_config/hypr)
+
+before="$(git -C "$SOURCE" status --porcelain -- "${WATCH_PATHS[@]}" 2>/dev/null || true)"
+
+sync_out="$(omarchy-dotfiles-sync 2>&1)" && sync_ok=1 || sync_ok=0
+printf '%s\n' "$sync_out"
+
+after="$(git -C "$SOURCE" status --porcelain -- "${WATCH_PATHS[@]}" 2>/dev/null || true)"
+
+notify() {
+  if command -v notify-send >/dev/null 2>&1; then
+    notify-send -a dotfiles "$1" "$2" || true
+  fi
+}
+
+if [[ $sync_ok -eq 0 ]]; then
+  notify "Dotfiles capture failed" "omarchy-dotfiles-sync errored — see journal: journalctl --user -u omarchy-drift-capture.service"
+  exit 1
+fi
+
+# Stamp only successful runs, so a failure retries on the next trigger.
+date +%s > "$STAMP_FILE"
+
+if [[ "$before" != "$after" ]]; then
+  notify "Dotfiles drift captured" "shell.json/plugins changed live — review with: dots diff"
+fi
