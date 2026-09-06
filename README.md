@@ -474,6 +474,7 @@ Declarative tracking for system-level packages that mise does not manage:
 │   │   ├── executable_dots
 │   │   ├── executable_dots-push
 │   │   ├── executable_grok
+│   │   ├── executable_herdr-agent-lifecycle
 │   │   ├── executable_lazygit-ollama-commit.sh
 │   │   ├── executable_ollama-commit-msg.sh
 │   │   ├── executable_omarchy-agent-usage-antigravity.tmpl
