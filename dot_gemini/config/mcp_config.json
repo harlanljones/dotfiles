@@ -15,6 +15,9 @@
     "cloudflare-observability": {
       "serverUrl": "https://observability.mcp.cloudflare.com/mcp"
     },
-    "codebase-memory-mcp": {"command":"/home/harlan/.local/bin/codebase-memory-mcp","args":[]}
+    "codebase-memory-mcp": {"command":"/home/harlan/.local/bin/codebase-memory-mcp","args":[]},
+    "nomads": {
+      "serverUrl": "https://nomads.com/mcp"
+    }
   }
 }
