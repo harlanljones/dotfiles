@@ -17,12 +17,12 @@ artifacts.
 
 ## 🖥️ Machines
 
-This repository identifies each workstation by a canonical **machine name** resolved at apply time (see `.chezmoi.toml.tmpl` → `[data] machine`). Detection is hostname-first with an OS fallback, so a box is identified deterministically without renaming the system:
+This repository identifies each workstation by a canonical **machine name** resolved at apply time (see `.chezmoi.toml.tmpl` → `[data] machine`). Detection is hostname-first with an OS fallback, so a box is identified deterministically without renaming the system. Both machines are now pinned by hostname; the OS fallback only catches an unregistered box:
 
 | Machine | OS | System hostname |
 | --- | --- | --- |
 | **Augustus** | Linux (Omarchy / Arch) | `omarchy` |
-| **Hadrian** | macOS (M1 Pro) | *(darwin)* |
+| **Hadrian** | macOS (M1 Pro) | `MacBookPro` |
 
 The registry (display name, role, backstory, per-machine theme) lives in `.chezmoidata/machines.yaml` and is referenced from templates via `{{ index .machines .machine ... }}`. The resolved name is surfaced in the Starship prompt (SSH sessions) and exported as `MACHINE_NAME` via `environment.d` on Linux.
 
@@ -40,7 +40,7 @@ An interactive, local-first web app that visualizes these dotfiles — headlined
 - Run locally: `bun install && bun run dev` (needs the `starship` binary on PATH). See `AGENTS.md` / `ROADMAP.md` in the showcase repo for architecture, milestones, and the Linear project.
 
 ### 🐚 Shell & Prompt
-- **Shell modules** (`~/.config/shell/*.sh`): The real shell configuration, shared by bash and zsh and sourced in numeric order — `00-env` (PATH, editor), `10-tools` (ripgrep/fzf/pager exports), `20-integrations` (guarded zoxide/fzf/atuin/direnv hooks, mise on zsh), `30-navigation` (`zj`/`zp` jumps and bindings), `40-aliases` (`eza` shortcuts, traversal, agent launchers, `n`), `50-agents` (sandboxed `cline`), `55-apps` (`ft`), `60-prompt` (Starship + failure recolor), `70-cloud` (flyctl, Google Cloud SDK). `99-local.sh` is untracked and sourced last for machine-local additions. See [`dot_config/shell/README.md`](dot_config/shell/README.md).
+- **Shell modules** (`~/.config/shell/*.sh`): The real shell configuration, shared by bash and zsh and sourced in numeric order — `00-env` (PATH, editor), `10-tools` (ripgrep/fzf/pager exports), `20-integrations` (zsh completion system + `globdots`, then guarded zoxide/fzf/atuin/direnv hooks, mise on zsh), `30-navigation` (`zj`/`zp` jumps and bindings), `40-aliases` (`eza` shortcuts, traversal, agent launchers, `n`), `50-agents` (sandboxed `cline`), `55-apps` (`ft`), `60-prompt` (Starship + failure recolor), `70-cloud` (flyctl, Google Cloud SDK). `99-local.sh` is untracked and sourced last for machine-local additions. See [`dot_config/shell/README.md`](dot_config/shell/README.md).
 - **Zsh** (`.zshrc` on macOS) and **Bash** (`.bashrc` on Linux/Omarchy): Loaders. `.bashrc` establishes the Omarchy base layer first, then both source the module directory above and declare nothing themselves. Modules branch on `SHELL_KIND` where the shells genuinely differ, so nothing is written twice.
 - **[Starship](https://starship.rs/)** (`~/.config/starship.toml`): Fast, cyan-accented prompt displaying `user@host` (SSH sessions only), directory path with smart repo-root formatting, git branch with a compact dirty-repo dot indicator, in-progress rebase/merge state, detached-HEAD commit hash, and long command duration (`>=3s`).
 - **Prompt failure recoloring** (`~/.config/shell/60-prompt.sh`): Both shells hook Starship so every prompt segment renders red after a non-zero exit status and returns to cyan on success — zsh via a `starship_status_prompt` PROMPT wrapper, bash via a `starship_precmd` override. The two implementations differ deliberately (bash recolors every foreground color, zsh recolors cyan only) and the showcase demonstrates that divergence.
@@ -49,7 +49,7 @@ An interactive, local-first web app that visualizes these dotfiles — headlined
   - **Equalize Panes** (`ponko2.equalize-panes`): Automatic pane equalization across layout changes (`prefix+=`).
   - **Ferry** (`shadowfax.ferry`): Move live panes/tabs or merge workspaces from a native popup (macOS).
   - Pairs with [`herdr-outpost`](https://github.com/harlanljones/herdr-outpost) and `herdr-outpost-relay.service` for remote dashboard/relay access.
-- **[Ghostty](https://ghostty.org/)** (`~/.config/ghostty/config`): Terminal emulator config with Omarchy theme integration, JetBrainsMono Nerd Font, copy/paste keybindings, and split-resize bindings.
+- **[Ghostty](https://ghostty.org/)** (`~/.config/ghostty/config`, from `config.tmpl`): Terminal emulator config, templated per machine. `font-size` comes from `ghostty.fontSize` in `.chezmoidata/machines.yaml` — **9 on Augustus** (a 4K panel at 1.6x scale, where 9pt JetBrainsMono is already large) and **14 on Hadrian** (a 14" Retina laptop). The Omarchy theme `config-file`, `gtk-toolbar-style`, and `async-backend = epoll` are Linux-only and rendered only on Augustus; Hadrian instead gets `macos-option-as-alt = true`, without which the `Alt-Z`/`Alt-X` zoxide bindings from `30-navigation.sh` never reach the shell. Shared across both: JetBrainsMono Nerd Font, copy/paste keybindings, and split-resize bindings.
 - **[btop](https://github.com/aristocratos/btop)** (`~/.config/btop/btop.conf`, Linux): Adopted monitor settings (vim keys, truecolor, omarchy-managed theme) so upgrades stop clobbering them.
 - **Modern shell QoL** (both `.zshrc` and `.bashrc`, each guarded so missing tools never break the shell):
   - **[zoxide](https://github.com/ajeetdsouza/zoxide)**: Smarter `cd` with directory jumping, configured via `~/.config/zoxide/config.toml` with symlink resolution, pwd tracking hooks, and directory ignore rules (`.git`, `node_modules`, `.venv`, `target`, `/tmp`, `/Volumes`, `/mnt`).
@@ -109,7 +109,7 @@ An ergonomic wrapper around chezmoi (`~/.local/bin/dots`, managed by this repo) 
 
 ### 📦 System Package Manifests
 Declarative tracking for system-level packages that mise does not manage:
-- **macOS** (`~/.Brewfile`): Homebrew Bundle manifest (`brews` + `casks`, including Ghostty and JetBrainsMono Nerd Font).
+- **macOS** (`~/.Brewfile`): Homebrew Bundle manifest (`brews` + `casks`, including Ghostty and JetBrainsMono Nerd Font). Beyond the pacman-parity tools it pins `fd`, `bat`, `ripgrep`, and `jq`, which the shell modules depend on rather than merely prefer — `fd` backs `FZF_DEFAULT_COMMAND`, `bat` backs the `MANPAGER` shim, `ripgrep` reads `RIPGREP_CONFIG_PATH`, and `jq` drives the Claude settings/MCP sync scripts.
   - Restore: `brew bundle --file=~/.Brewfile`
 - **Linux / Arch** (`~/.config/pacman/pkglist.txt` + `aurlist.txt`): Explicit native packages and foreign (AUR) packages.
   - Restore: `pacman -S --needed - < pkglist.txt`, then `paru -S --needed - < aurlist.txt`
@@ -141,7 +141,8 @@ Declarative tracking for system-level packages that mise does not manage:
     - **OpenCode**: `~/.config/opencode/opencode.json` bash permission rules denying `git commit*` and `git push*`.
 
 ### 🔐 Secret Management & Issue Tracking
-- **[age Encryption](https://github.com/FiloSottile/age)** (`.chezmoi.toml.tmpl`): Chezmoi encrypts sensitive credentials and configurations at rest using age with identity key located at `~/.config/chezmoi/key.txt` (e.g. `dot_config/opencode/encrypted_opencode.json.age`).
+- **[age Encryption](https://github.com/FiloSottile/age)** (`.chezmoi.toml.tmpl`): Chezmoi encrypts sensitive credentials and configurations at rest using age with identity key located at `~/.config/chezmoi/key.txt` (e.g. `dot_config/opencode/encrypted_opencode.json.age`). `encryption` must sit **above** the first table header in `.chezmoi.toml.tmpl` — placed after `[data]`, TOML nests it inside that table and chezmoi silently falls back to no encryption.
+  - **Missing-key gate**: when `~/.config/chezmoi/key.txt` is absent, `.chezmoiignore.tmpl` hides the encrypted targets instead of letting `chezmoi apply` abort partway through the run. Restoring the key is enough to bring them back — `.chezmoiignore` is re-evaluated on every apply, while `.chezmoi.toml.tmpl` is only re-rendered by `chezmoi init`.
 - **SSH Config** (`~/.ssh/config`): Managed defaults with the **1Password SSH agent** first (`IdentityAgent ~/.1password/agent.sock`, keys served from `~/.config/1password/ssh/agent.toml`) and on-disk `~/.ssh` keys as fallback; private keys are deliberately NOT managed (see `docs/recovery.md`).
 - **Systemd user environment** (`~/.config/environment.d/10-defaults.conf`, Linux): `EDITOR`/`VISUAL`/`PAGER`/`LESS` for all user systemd services (dashboard, tunnel, analytics) which never inherit shell rc files.
 - **macOS Defaults** (`run_onchange_after_30-macos-defaults.sh.tmpl`, darwin only): Declarative `defaults write` preferences — screenshot location, Finder path bar/extensions, Dock autohide, key repeat.
@@ -303,7 +304,7 @@ Declarative tracking for system-level packages that mise does not manage:
 │   ├── gh
 │   │   └── config.yml
 │   ├── ghostty
-│   │   └── config
+│   │   └── config.tmpl
 │   ├── git
 │   │   ├── config.tmpl
 │   │   └── ignore

@@ -19,6 +19,19 @@ is encrypted with [age](https://github.com/FiloSottile/age) against:
 **Without `key.txt`, every encrypted file in the repo is permanently
 unreadable.** The repo alone is not a backup.
 
+A machine without the key is not *broken*, only reduced: `.chezmoiignore.tmpl`
+checks for `~/.config/chezmoi/key.txt` and hides the encrypted targets when it
+is missing, so `chezmoi apply` completes instead of aborting partway through
+and leaving the machine half-adopted. Drop the key back into place and the next
+apply picks the entries up — `.chezmoiignore` is re-evaluated on every run.
+
+`.chezmoi.toml.tmpl` is the exception: it is rendered only by `chezmoi init`.
+If you edit it (or restore a key on a machine whose `~/.config/chezmoi/chezmoi.toml`
+predates the encryption block), run `chezmoi init` once to re-render before
+applying. Note also that `encryption = "age"` must appear *above* the first
+table header in that template — below `[data]`, TOML nests it inside that table
+and chezmoi warns `'encryption' not set` and proceeds unencrypted.
+
 ### Back it up now
 
 1. Copy `key.txt` to at least one offline location:
@@ -60,6 +73,10 @@ mkdir -p ~/.config/chezmoi
 # 2. Initialize and apply
 chezmoi init --apply https://github.com/harlanljones/dotfiles.git
 ```
+
+Applying without the key first is safe and often the faster path on a new
+machine: the encrypted entries are skipped, everything else lands, and you can
+restore `key.txt` and re-apply whenever the backup is to hand.
 
 The first script that runs (`run_once_before_00-verify-deps.sh`) checks for
 `git` and `age` and fails early with install hints if they are missing.

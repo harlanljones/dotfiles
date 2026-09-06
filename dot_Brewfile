@@ -20,6 +20,21 @@ brew "zoxide"
 brew "atuin"
 brew "delta"
 
+# Depended on by the shell modules, not merely nice to have:
+#   fd       -> FZF_DEFAULT_COMMAND / FZF_ALT_C_COMMAND  (10-tools.sh)
+#   bat      -> MANPAGER shim                            (10-tools.sh)
+#   ripgrep  -> RIPGREP_CONFIG_PATH                      (10-tools.sh)
+#   jq       -> the claude settings/mcp sync scripts
+brew "fd"
+brew "bat"
+brew "ripgrep"
+brew "jq"
+
+# Repo tooling. CI lints every managed script with `shellcheck -S warning`
+# (.github/workflows/ci.yml), so having it locally is what lets you reproduce
+# that gate before pushing rather than after.
+brew "shellcheck"
+
 # Apps & fonts
 cask "ghostty"
-cask "font-jetbrainsmono-nerd-font"
+cask "font-jetbrains-mono-nerd-font"

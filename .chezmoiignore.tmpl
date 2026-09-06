@@ -18,6 +18,15 @@ dotfiles-showcase/**
 
 docs
 docs/**
+
+{{- if not (stat (joinPath .chezmoi.homeDir ".config" "chezmoi" "key.txt")) }}
+# No age identity on this machine, so the encrypted entries cannot be
+# decrypted. Hide them rather than letting `chezmoi apply` abort partway
+# through -- that failure is what left Hadrian half-adopted. Restore
+# ~/.config/chezmoi/key.txt (docs/recovery.md) and they come back on the next
+# apply; .chezmoiignore is re-evaluated every run.
+.config/opencode/opencode.json
+{{- end }}
 .gemini/antigravity-cli
 .gemini/antigravity-cli/**
 {{- if and (eq .chezmoi.os "linux") (ne .machine "augustus") }}
@@ -41,6 +50,11 @@ docs/**
 .config/btop/**
 .config/environment.d
 .config/environment.d/**
+.config/systemd
+.config/systemd/**
+.config/chrome-flags.conf
+.local/share/applications
+.local/share/applications/**
 .local/bin/omarchy-*
 .local/bin/lazygit-ollama-commit.sh
 .local/bin/ollama-commit-msg.sh

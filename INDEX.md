@@ -61,7 +61,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | Target | Source | Subsystem | Attributes |
 | --- | --- | --- | --- |
 | `~/.config/btop/btop.conf` | `dot_config/btop/btop.conf` | btop | — |
-| `~/.config/ghostty/config` | `dot_config/ghostty/config` | ghostty | — |
+| `~/.config/ghostty/config` | `dot_config/ghostty/config.tmpl` | ghostty | template |
 | `~/.config/herdr/config.toml` | `dot_config/herdr/config.toml.tmpl` | herdr multiplexer | template |
 | `~/.config/herdr/plugins.json` | `dot_config/herdr/plugins.json.tmpl` | herdr multiplexer | template |
 

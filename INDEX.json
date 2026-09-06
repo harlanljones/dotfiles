@@ -213,11 +213,13 @@
       "subsystem": "btop"
     },
     {
-      "source": "dot_config/ghostty/config",
+      "source": "dot_config/ghostty/config.tmpl",
       "target": "~/.config/ghostty/config",
       "kind": "dotfile",
       "category": "terminal",
-      "attributes": [],
+      "attributes": [
+        "template"
+      ],
       "subsystem": "ghostty"
     },
     {

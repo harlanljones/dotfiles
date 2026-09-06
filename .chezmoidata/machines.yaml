@@ -7,11 +7,17 @@ machines:
     backstory: "You built this machine from the ground up to establish order over the bare metal, making it the supreme ruler of your local network."
     theme:
       accent: "bold dimmed cyan"
+    # Ghostty font size. Augustus drives a 4K panel at 1.6x scale, where 9pt
+    # JetBrainsMono is already large; Hadrian is a 14" Retina laptop.
+    ghostty:
+      fontSize: 9
   hadrian:
     displayName: Hadrian
     os: darwin
-    hostname: "<hadrian-mac-hostname>"
+    hostname: MacBookPro
     role: "The roaming administrator"
     backstory: "Hadrian spent most of his reign traveling the empire inspecting borders, making it a fitting title for a mobile, highly engineered Unix daily driver."
     theme:
       accent: "bold purple"
+    ghostty:
+      fontSize: 14

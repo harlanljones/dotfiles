@@ -1,10 +1,13 @@
-# Dynamic theme colors
+{{ if eq .chezmoi.os "linux" -}}
+# Dynamic theme colors, written by Omarchy's theme switcher. The `?` prefix
+# makes it optional, but the path only ever exists on Augustus.
 config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"
 
+{{ end -}}
 # Font
 font-family = "JetBrainsMono Nerd Font"
 font-style = Regular
-font-size = 9
+font-size = {{ (index .machines .machine).ghostty.fontSize }}
 
 # Window
 window-theme = ghostty
@@ -12,7 +15,9 @@ window-padding-x = 14
 window-padding-y = 14
 confirm-close-surface=false
 resize-overlay = never
+{{- if eq .chezmoi.os "linux" }}
 gtk-toolbar-style = flat
+{{- end }}
 
 # Cursor styling
 cursor-style = "block"
@@ -21,6 +26,13 @@ cursor-style-blink = false
 # Cursor styling + SSH session terminfo
 # (all shell integration options must be passed together)
 shell-integration-features = no-cursor,ssh-env
+{{- if eq .chezmoi.os "darwin" }}
+
+# Send Option as Alt rather than composing accented characters. Without this
+# the Alt-Z / Alt-X zoxide jump bindings from ~/.config/shell/30-navigation.sh
+# never reach the shell on macOS.
+macos-option-as-alt = true
+{{- end }}
 
 # Keyboard bindings
 keybind = shift+insert=paste_from_clipboard
@@ -36,6 +48,9 @@ keybind = super+control+shift+alt+arrow_right=resize_split:right,100
 
 # Slowdown mouse scrolling
 mouse-scroll-multiplier = 0.95
+{{- if eq .chezmoi.os "linux" }}
 
-# Fix general slowness on hyprland (https://github.com/ghostty-org/ghostty/discussions/3224)
+# Fix general slowness on hyprland (https://github.com/ghostty-org/ghostty/discussions/3224).
+# epoll is Linux-only; macOS has no such backend.
 async-backend = epoll
+{{- end }}

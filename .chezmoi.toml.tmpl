@@ -1,6 +1,17 @@
-[data]
-machine = '{{ if eq .chezmoi.hostname "omarchy" }}augustus{{ else if eq .chezmoi.os "linux" }}augustus{{ else if eq .chezmoi.os "darwin" }}hadrian{{ else }}unknown{{ end }}'
+{{- /* Age encryption. `encryption` MUST precede the first table header or TOML
+       nests it under [data] and chezmoi silently ignores it. The identity is
+       deliberately NOT in this repo -- see docs/recovery.md. When key.txt is
+       absent, .chezmoiignore.tmpl hides the encrypted entries so `chezmoi
+       apply` still completes; restoring the key is enough to bring them back,
+       because .chezmoiignore is re-evaluated on every apply while this file is
+       only re-rendered by `chezmoi init`. */ -}}
+encryption = "age"
 
-[remove]
-# Skip encrypted file — not using age encryption
-encrypted_private_dot_linear.toml.age = true
+[age]
+identity = "~/.config/chezmoi/key.txt"
+recipient = "age1hf4200nhdqg0l3xs68v4gef6mn0nuvmh72573m3nfj8kqpcs7pnsmfkuw6"
+
+{{/* Machine identity. Hostname-first so a box is pinned deterministically,
+     with an OS fallback for a machine that has not been registered yet. */ -}}
+[data]
+machine = '{{ if eq .chezmoi.hostname "omarchy" }}augustus{{ else if eq .chezmoi.hostname "MacBookPro" }}hadrian{{ else if eq .chezmoi.os "linux" }}augustus{{ else if eq .chezmoi.os "darwin" }}hadrian{{ else }}unknown{{ end }}'
