@@ -1,0 +1,12 @@
+{
+  "status": "reviewed",
+  "disposition": "retain with authority corrections; candidate only",
+  "pack": "dotfiles (chezmoi machines, not universal core)",
+  "invocation": "task-triggered for managed dotfile work",
+  "execution": {"recommended": "in-session", "alternatives": "bounded independent inspection; worktrees do not isolate live HOME"},
+  "reviewedFiles": ["SKILL.md"],
+  "changes": [{"files": ["SKILL.md", "REVIEW.md", "review.json"], "summary": "Separate review, edit, capture, apply and publication authority; correct hook semantics; preserve targeted capture, template and age expertise."}],
+  "questions": [{"id": "Q-dots-apply", "question": "Should source edits imply apply authority?", "recommendation": "Keep source edit and live apply separately authorized.", "rationale": "Apply may trigger hooks and deploy unrelated pending changes.", "files": ["SKILL.md"]}],
+  "validation": ["Static walkthroughs of review-only, candidate-only, template edit, live capture and dirty-tree publication; inspected wrapper capture and git add -A behavior."],
+  "limitations": ["No live harness or wrapper workflow execution.", "No discovered license file; promotion and distribution remain human decisions.", "Pack membership and implicit apply policy are recommendations, not accepted settings."]
+}

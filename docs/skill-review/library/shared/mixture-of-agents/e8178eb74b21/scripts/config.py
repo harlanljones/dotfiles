@@ -1,0 +1,594 @@
+"""Lightweight config loader for the MoA-X harness.
+
+Resolves user-customizable knobs (models, efforts, timeouts, binary
+paths, layer/agent selection) from three sources. Precedence (highest
+first):
+
+    1. Shell / process environment variables (MOA_* namespace)
+    2. .env file at the repo root
+    3. harness/config.yaml (if present, next to this file's parent dir)
+
+Then falls back to built-in defaults inside run_moa.py / the adapters.
+
+CLI flags passed to run_moa.py still override everything — they are
+parsed after this module populates os.environ.
+
+Harnesses supported by the built-in adapters are {codex, claude, opencode,
+agy, gemini}. Curated named routes are declared in
+``BUILTIN_PROVIDERS`` below; user-defined entries in harness/config.yaml are
+layered on top.
+
+Typical usage:
+
+    # From run_moa.py, before argparse:
+    from config import apply_config_to_env
+    apply_config_to_env()
+
+    # In an adapter:
+    from config import resolve_bin
+    bin_path = resolve_bin("codex")   # → $MOA_CODEX_BIN or "codex"
+
+    # Resolve a named provider to a triple:
+    from config import resolve_provider
+    rp = resolve_provider("codex", user_providers={})
+    # rp.name == "codex", rp.harness == "codex", rp.model == "gpt-5.6-terra"
+
+The config.yaml schema is documented in harness/config.example.yaml.
+"""
+from __future__ import annotations
+
+import os
+import re
+from dataclasses import dataclass
+from pathlib import Path
+from typing import Any, Optional
+
+try:
+    import yaml  # type: ignore[import-untyped]
+    _HAVE_YAML = True
+except ImportError:
+    _HAVE_YAML = False
+
+
+REPO_ROOT = Path(__file__).resolve().parent.parent.parent
+HARNESS_DIR = Path(__file__).resolve().parent.parent
+DEFAULT_CONFIG_PATH = HARNESS_DIR / "config.yaml"
+DEFAULT_DOTENV_PATH = REPO_ROOT / ".env"
+_AGY_MODEL_DEPTH_RE = re.compile(
+    r"-(low|medium|high|xhigh|max)$", re.IGNORECASE
+)
+
+
+# --- binary names ----------------------------------------------------------
+
+_DEFAULT_BINS = {
+    "codex": "codex",
+    "claude": "claude",
+    "agy": "agy",
+    "gemini": "gemini",
+}
+SUPPORTED_HARNESSES = frozenset(
+    {"codex", "claude", "opencode", "agy", "gemini"}
+)
+
+
+@dataclass(frozen=True)
+class ResolvedProvider:
+    """A provider resolved from a layer config entry to an invocation record.
+
+    `timeout` is per-provider in seconds. None means "use the harness-level
+    default" (set by --codex-timeout / --sonnet-timeout CLI flags or their
+    MOA_*_TIMEOUT env equivalents). User-named providers
+    can set their own timeout via `providers.<name>.timeout` in
+    harness/config.yaml or MOA_<NAME>_TIMEOUT env var.
+    """
+    name: str                         # user-facing label, used as agent_id in payloads
+    harness: str                      # adapter: codex, claude, opencode, agy, gemini
+    model: str                        # model id passed to the harness
+    timeout: Optional[int] = None     # per-provider timeout in seconds; None → harness default
+    effort: Optional[str] = None      # provider-native reasoning effort / variant
+
+
+# Built-in named providers. Existing configs that reference the legacy
+# `codex-reviewer` and `codex-aggregator` names continue to resolve through
+# this table for back-compat; the curated UI uses `codex-sol` instead.
+# User-defined providers in
+# harness/config.yaml under `providers:` are layered on top in resolve_provider.
+# Most built-ins carry timeout=None so the existing CLI flag / harness-level
+# env path (MOA_CODEX_TIMEOUT etc.) continues to apply. Qwen has a bounded
+# 600-second default so a failed preview-model refinement cannot stall a run
+# for twenty minutes.
+BUILTIN_PROVIDERS: dict[str, ResolvedProvider] = {
+    "codex":          ResolvedProvider(name="codex",          harness="codex",    model="gpt-5.6-terra", effort="high"),
+    "codex-sol":      ResolvedProvider(name="codex-sol",      harness="codex",    model="gpt-5.6-sol", effort="xhigh"),
+    "codex-luna":     ResolvedProvider(name="codex-luna",     harness="codex",    model="gpt-5.6-luna", effort="medium"),
+    "codex-reviewer": ResolvedProvider(name="codex-reviewer", harness="codex",    model="gpt-5.6-sol", effort="high"),
+    "codex-aggregator": ResolvedProvider(name="codex-aggregator", harness="codex", model="gpt-5.6-sol", timeout=600, effort="xhigh"),
+    # Pin current canonical Anthropic ids. Claude Code's rolling `sonnet`
+    # alias still resolved to 4.6 on 2.1.220 while Sonnet 5 was available
+    # explicitly, so aliases would make the UI and recorded provenance lie.
+    "sonnet":         ResolvedProvider(name="sonnet",         harness="claude",   model="claude-sonnet-5", effort="high"),
+    "opus":           ResolvedProvider(name="opus",           harness="claude",   model="claude-opus-5", effort="high"),
+    "kimi":           ResolvedProvider(name="kimi",           harness="opencode", model="opencode-go/kimi-k3"),
+    "qwen":           ResolvedProvider(name="qwen",           harness="opencode", model="qwen-token-plan/qwen3.8-max-preview", timeout=600),
+    "qwen-opencode":  ResolvedProvider(name="qwen-opencode",  harness="opencode", model="opencode-go/qwen3.7-max"),
+    "grok":           ResolvedProvider(name="grok",           harness="opencode", model="opencode-go/grok-4.5"),
+    "glm":            ResolvedProvider(name="glm",            harness="opencode", model="opencode-go/glm-5.2"),
+    "deepseek":       ResolvedProvider(name="deepseek",       harness="opencode", model="opencode-go/deepseek-v4-pro"),
+    "deepseek-flash": ResolvedProvider(name="deepseek-flash", harness="opencode", model="opencode-go/deepseek-v4-flash"),
+    # Google runs through AGY, which reuses the account signed into the local
+    # Antigravity CLI. Gemini Pro is part of the shipped proposer defaults.
+    # AGY selects depth in the model slug itself (for example
+    # ``gemini-3.1-pro-high``), rather than with a separate --effort flag.
+    # Gemini Flash routes are intentionally not curated: Pro is the sole
+    # Google route exposed by MoA-X.
+    "agy-gemini-pro": ResolvedProvider(name="agy-gemini-pro", harness="agy",      model="gemini-3.1-pro-high", effort="high"),
+    # Fable is a deliberately gated, quota-intensive synthesis route through
+    # Claude Code. It is aggregator-only and never participates upstream.
+    "fable":          ResolvedProvider(name="fable",          harness="claude",   model="claude-fable-5", effort="xhigh"),
+}
+
+PROVIDER_ALLOWED_ROLES: dict[str, frozenset[str]] = {
+    "fable": frozenset({"aggregator"}),
+    "kimi": frozenset(),
+}
+
+
+def provider_allows_role(
+    name: str,
+    role: str,
+    model: str | None = None,
+) -> bool:
+    """Return whether a route is allowed in a pipeline role.
+
+    Fable is aggregator-only. Kimi K3 remains resolvable for archived
+    provenance but is blocked from every new pipeline role because its
+    OpenCode Go route currently rejects requests before inference.
+    """
+    model_id = str(model or "").lower()
+    if model_id.startswith("claude-fable-"):
+        return role == "aggregator"
+    if model_id.endswith("/kimi-k3"):
+        return False
+    return role in PROVIDER_ALLOWED_ROLES.get(
+        name, frozenset({"proposer", "refiner", "aggregator"})
+    )
+
+
+def resolve_provider(name: str, *, user_providers: dict[str, dict]) -> ResolvedProvider:
+    """Resolve a provider name to a ResolvedProvider record.
+
+    Lookup order:
+      1. user_providers (from harness/config.yaml `providers:` block)
+      2. BUILTIN_PROVIDERS (including the default AGY Gemini Pro route)
+
+    Then env-var overrides apply per-field:
+      - MOA_<NAME>_MODEL overrides .model
+      - MOA_<NAME>_TIMEOUT overrides .timeout
+      - MOA_<NAME>_EFFORT overrides .effort
+
+    Most built-in providers resolve with timeout=None so the existing
+    --codex-timeout / --sonnet-timeout CLI flag path continues to apply at
+    the harness level. Set MOA_<NAME>_TIMEOUT or a
+    YAML `timeout:` field to override per-provider.
+
+    Raises ValueError if the name resolves nowhere or if a timeout value
+    is malformed.
+    """
+    if name in user_providers:
+        spec = user_providers[name]
+        if not isinstance(spec, dict) or "harness" not in spec or "model" not in spec:
+            raise ValueError(
+                f"user provider {name!r} must be a mapping with 'harness' and 'model' keys; "
+                f"got {spec!r}"
+            )
+        yaml_timeout = spec.get("timeout")
+        if yaml_timeout is not None and not isinstance(yaml_timeout, int):
+            raise ValueError(
+                f"user provider {name!r} `timeout:` must be an integer (seconds); "
+                f"got {yaml_timeout!r}"
+            )
+        yaml_effort = spec.get("effort")
+        if yaml_effort is not None and not isinstance(yaml_effort, str):
+            raise ValueError(
+                f"user provider {name!r} `effort:` must be a string; "
+                f"got {yaml_effort!r}"
+            )
+        rp = ResolvedProvider(
+            name=name,
+            harness=spec["harness"],
+            model=spec["model"],
+            timeout=yaml_timeout,
+            effort=yaml_effort,
+        )
+    elif name in BUILTIN_PROVIDERS:
+        rp = BUILTIN_PROVIDERS[name]
+    else:
+        valid = sorted(set(BUILTIN_PROVIDERS) | set(user_providers))
+        raise ValueError(
+            f"unknown provider name {name!r}; valid names: {valid}"
+        )
+
+    if rp.harness not in SUPPORTED_HARNESSES:
+        retired = (
+            " Cursor support was removed because its headless success envelope "
+            "did not reliably contain a final structured result."
+            if rp.harness == "cursor"
+            else ""
+        )
+        raise ValueError(
+            f"provider {name!r} uses unsupported harness {rp.harness!r}; "
+            f"supported harnesses: {sorted(SUPPORTED_HARNESSES)}.{retired}"
+        )
+
+    env_prefix = f"MOA_{name.upper().replace('-', '_')}"
+
+    override_model = os.environ.get(f"{env_prefix}_MODEL")
+    if override_model:
+        rp = ResolvedProvider(
+            name=rp.name, harness=rp.harness, model=override_model,
+            timeout=rp.timeout, effort=rp.effort,
+        )
+
+    override_timeout_raw = os.environ.get(f"{env_prefix}_TIMEOUT")
+    if override_timeout_raw:
+        try:
+            override_timeout = int(override_timeout_raw)
+        except ValueError as e:
+            raise ValueError(
+                f"{env_prefix}_TIMEOUT must be an integer (seconds); got {override_timeout_raw!r}"
+            ) from e
+        rp = ResolvedProvider(
+            name=rp.name, harness=rp.harness, model=rp.model,
+            timeout=override_timeout, effort=rp.effort,
+        )
+
+    override_effort = os.environ.get(f"{env_prefix}_EFFORT")
+    if override_effort:
+        rp = ResolvedProvider(
+            name=rp.name, harness=rp.harness, model=rp.model,
+            timeout=rp.timeout, effort=override_effort,
+        )
+
+    # Antigravity CLI model ids already encode the allowed depth. Passing an
+    # additional --effort produces an invalid model/effort pair (and can fail
+    # before the model sees the prompt), so model depth is always authoritative.
+    if rp.harness == "agy":
+        match = _AGY_MODEL_DEPTH_RE.search(rp.model)
+        rp = ResolvedProvider(
+            name=rp.name,
+            harness=rp.harness,
+            model=rp.model,
+            timeout=rp.timeout,
+            effort=match.group(1).lower() if match else None,
+        )
+
+    return rp
+
+
+def resolve_layer(
+    names: list[str],
+    *,
+    user_providers: dict[str, dict],
+) -> list[ResolvedProvider]:
+    """Resolve a list of provider names to ResolvedProvider records.
+
+    Order is preserved. Duplicates are kept (caller handles self-moa-style
+    suffixing). Raises ValueError on the first unknown name with the list
+    of valid options.
+    """
+    return [resolve_provider(name, user_providers=user_providers) for name in names]
+
+
+def resolve_bin(provider: str) -> str:
+    """Return the binary name/path for a provider.
+
+    Honors MOA_<PROVIDER>_BIN (e.g. MOA_CODEX_BIN, MOA_CLAUDE_BIN) with a
+    default of the bare binary name on PATH. OpenCode resolves its own binary.
+    """
+    provider = provider.lower()
+    if provider not in _DEFAULT_BINS:
+        raise ValueError(
+            f"unsupported provider {provider!r}; "
+            f"must be one of {sorted(_DEFAULT_BINS)}"
+        )
+    env_key = f"MOA_{provider.upper()}_BIN"
+    return os.environ.get(env_key) or _DEFAULT_BINS[provider]
+
+
+# --- .env and config.yaml loading -----------------------------------------
+
+def _load_dotenv(path: Path) -> dict[str, str]:
+    """Parse a minimal .env file. Supports KEY=VALUE and # comments.
+
+    Quoted values (single or double) are unwrapped. Missing file -> {}.
+    This is intentionally tiny — no shell expansion, no export keyword.
+    Users who want the full thing can `source .env` before invoking.
+    """
+    if not path.exists():
+        return {}
+    out: dict[str, str] = {}
+    for raw in path.read_text(encoding="utf-8").splitlines():
+        line = raw.strip()
+        if not line or line.startswith("#"):
+            continue
+        if "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        key = key.strip()
+        value = value.strip()
+        if len(value) >= 2 and value[0] == value[-1] and value[0] in ("'", '"'):
+            value = value[1:-1]
+        if key:
+            out[key] = value
+    return out
+
+
+def _load_yaml(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    if not _HAVE_YAML:
+        raise RuntimeError(
+            f"{path} exists but PyYAML is not installed. "
+            "Install with `pip install pyyaml` or remove config.yaml "
+            "and use env vars only."
+        )
+    raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+    if not isinstance(raw, dict):
+        raise ValueError(f"{path} must be a YAML mapping at the top level")
+    return raw
+
+
+def _yaml_to_env(cfg: dict[str, Any]) -> dict[str, str]:
+    """Flatten the nested YAML schema into MOA_* env vars.
+
+    Only keys documented in config.example.yaml are honored. Unknown
+    keys are silently ignored so the loader doesn't surprise users who
+    sketch extra notes into the file.
+    """
+    env: dict[str, str] = {}
+
+    providers = cfg.get("providers") or {}
+    for name, spec in providers.items():
+        if not isinstance(spec, dict):
+            continue
+        key_upper = name.upper()
+        if "bin" in spec:
+            env[f"MOA_{key_upper}_BIN"] = str(spec["bin"])
+        if "model" in spec:
+            # Providers use MOA_<NAME>_MODEL naming, except the `claude`
+            # provider is exposed as the SONNET role (it's the claude binary
+            # in sonnet mode). We expose MOA_SONNET_MODEL for that role.
+            role = "SONNET" if name.lower() == "claude" else key_upper
+            env[f"MOA_{role}_MODEL"] = str(spec["model"])
+        if "effort" in spec:
+            env[f"MOA_{key_upper}_EFFORT"] = str(spec["effort"])
+        if "timeout" in spec:
+            role = "SONNET" if name.lower() == "claude" else key_upper
+            env[f"MOA_{role}_TIMEOUT"] = str(spec["timeout"])
+
+    layers = cfg.get("layers") or {}
+    if "proposers" in layers and isinstance(layers["proposers"], list):
+        env["MOA_PROPOSERS"] = ",".join(str(x) for x in layers["proposers"])
+    if "refiners" in layers and isinstance(layers["refiners"], list):
+        env["MOA_REFINERS"] = ",".join(str(x) for x in layers["refiners"])
+    if "aggregator" in layers and isinstance(layers["aggregator"], str):
+        env["MOA_AGGREGATOR"] = layers["aggregator"]
+    if layers.get("skip_refinement") is True:
+        env["MOA_SKIP_LAYER2"] = "1"
+
+    return env
+
+
+def _user_providers_from_yaml(cfg: dict[str, Any]) -> dict[str, dict]:
+    """Extract the `providers:` block from a parsed YAML config.
+
+    Returns a name → spec dict where spec is a mapping with at least
+    `harness` and `model` keys. Validation of harness/model values
+    happens at resolve_provider() time, not here.
+    """
+    raw = cfg.get("providers") or {}
+    if not isinstance(raw, dict):
+        raise ValueError(
+            "harness/config.yaml: top-level `providers:` must be a mapping"
+        )
+    out: dict[str, dict] = {}
+    for name, spec in raw.items():
+        if not isinstance(spec, dict):
+            raise ValueError(
+                f"harness/config.yaml: provider {name!r} must be a mapping with "
+                f"`harness:` and `model:` keys; got {type(spec).__name__}"
+            )
+        out[str(name)] = dict(spec)
+    return out
+
+
+# Harnesses a provider spec may target. Used to validate MOA_PROVIDER_* env
+# definitions loudly at parse time instead of failing deep in dispatch.
+_KNOWN_HARNESSES = frozenset(
+    {"codex", "claude", "opencode", "agy", "gemini"}
+)
+
+
+def _providers_from_env() -> dict[str, dict]:
+    """Parse `MOA_PROVIDER_<NAME>=<harness>:<model>` env vars into provider specs.
+
+    <NAME> is lowercased with `_` → `-`, so `MOA_PROVIDER_GLM_FW` defines the
+    provider `glm-fw`. This is a shell/.env shorthand for the YAML `providers:`
+    block, so a full roster swap needs no YAML file. YAML definitions win on a
+    name conflict (they can also set timeout/effort/bin); the MOA_<NAME>_MODEL /
+    MOA_<NAME>_TIMEOUT field overrides still apply on top in resolve_provider.
+
+    Raises ValueError on a malformed value (no colon, unknown harness, empty
+    model) — a broken provider definition should fail loudly, not silently.
+    """
+    prefix = "MOA_PROVIDER_"
+    out: dict[str, dict] = {}
+    for key, value in os.environ.items():
+        if not key.startswith(prefix):
+            continue
+        name = key[len(prefix):].lower().replace("_", "-")
+        if not name:
+            continue
+        if ":" not in value:
+            raise ValueError(
+                f"{key} must be '<harness>:<model>' "
+                f"(e.g. opencode:zhipuai/glm-5.2); got {value!r}"
+            )
+        harness, _, model = value.partition(":")
+        harness, model = harness.strip(), model.strip()
+        if harness not in _KNOWN_HARNESSES:
+            raise ValueError(
+                f"{key}: unknown harness {harness!r}; "
+                f"must be one of {sorted(_KNOWN_HARNESSES)}"
+            )
+        if not model:
+            raise ValueError(f"{key}: empty model in {value!r}")
+        out[name] = {"harness": harness, "model": model}
+    return out
+
+
+@dataclass(frozen=True)
+class LoadedConfig:
+    """Fully resolved config ready for run_moa.py to dispatch from."""
+    proposers: list[ResolvedProvider]
+    refiners: list[ResolvedProvider]
+    skip_refinement: bool
+    aggregator: Optional[ResolvedProvider] = None
+
+
+# Default layer assignments when no YAML / env override is set.
+_DEFAULT_PROPOSERS = ["agy-gemini-pro", "grok", "codex-luna"]
+_DEFAULT_REFINERS = ["qwen", "deepseek", "opus"]
+_DEFAULT_AGGREGATOR = "codex-sol"
+
+
+def _env_truthy(key: str) -> bool:
+    """Return True only for explicit affirmative environment values."""
+    return os.environ.get(key, "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def load_resolved_config(
+    *,
+    config_path: Optional[Path] = None,
+    dotenv_path: Optional[Path] = None,
+) -> LoadedConfig:
+    """Load YAML + .env and resolve all named providers in the layer assignments.
+
+    Caller is responsible for having previously called apply_config_to_env()
+    so MOA_PROPOSERS / MOA_REFINERS env vars (if set) are visible. The
+    `dotenv_path` argument is currently unused by this function (env state
+    has already been applied) but is reserved for future use; pass it for
+    parity with apply_config_to_env.
+    """
+    cfg_path = config_path or DEFAULT_CONFIG_PATH
+    cfg = _load_yaml(cfg_path)
+    # env-defined providers first, YAML layered on top (YAML wins name conflicts).
+    user_providers = {**_providers_from_env(), **_user_providers_from_yaml(cfg)}
+
+    proposer_names = _resolve_layer_names(
+        env_key="MOA_PROPOSERS",
+        yaml_value=(cfg.get("layers") or {}).get("proposers"),
+        default=_DEFAULT_PROPOSERS,
+    )
+    refiner_names = _resolve_layer_names(
+        env_key="MOA_REFINERS",
+        yaml_value=(cfg.get("layers") or {}).get("refiners"),
+        default=_DEFAULT_REFINERS,
+    )
+    layers = cfg.get("layers") or {}
+    aggregator_name = (
+        os.environ.get("MOA_AGGREGATOR")
+        or (layers.get("aggregator") if isinstance(layers.get("aggregator"), str) else None)
+        or _DEFAULT_AGGREGATOR
+    )
+
+    proposers = resolve_layer(proposer_names, user_providers=user_providers)
+    refiners = resolve_layer(refiner_names, user_providers=user_providers)
+    aggregator = resolve_provider(aggregator_name, user_providers=user_providers)
+    invalid_proposers = [
+        item.name for item in proposers
+        if not provider_allows_role(item.name, "proposer", item.model)
+    ]
+    invalid_refiners = [
+        item.name for item in refiners
+        if not provider_allows_role(item.name, "refiner", item.model)
+    ]
+    if invalid_proposers:
+        raise ValueError(
+            f"providers are not allowed as proposers: {invalid_proposers}"
+        )
+    if invalid_refiners:
+        raise ValueError(
+            f"providers are not allowed as refiners: {invalid_refiners}"
+        )
+    if not provider_allows_role(
+        aggregator.name, "aggregator", aggregator.model
+    ):
+        raise ValueError(
+            f"provider is not allowed as aggregator: {aggregator.name}"
+        )
+
+    skip_refinement = _env_truthy("MOA_SKIP_LAYER2") or bool(
+        (cfg.get("layers") or {}).get("skip_refinement")
+    )
+
+    return LoadedConfig(
+        proposers=proposers,
+        refiners=refiners,
+        skip_refinement=skip_refinement,
+        aggregator=aggregator,
+    )
+
+
+def load_provider_catalog(*, config_path: Optional[Path] = None) -> dict[str, ResolvedProvider]:
+    """Resolve every built-in and user-defined provider available to CLI flags."""
+    cfg_path = config_path or DEFAULT_CONFIG_PATH
+    cfg = _load_yaml(cfg_path)
+    user_providers = {**_providers_from_env(), **_user_providers_from_yaml(cfg)}
+    names = sorted(set(BUILTIN_PROVIDERS) | set(user_providers))
+    return {name: resolve_provider(name, user_providers=user_providers) for name in names}
+
+
+def _resolve_layer_names(
+    *, env_key: str, yaml_value: Any, default: list[str]
+) -> list[str]:
+    """Pick layer names from env > yaml > default."""
+    env_val = os.environ.get(env_key)
+    if env_val:
+        return [s.strip() for s in env_val.split(",") if s.strip()]
+    if isinstance(yaml_value, list):
+        return [str(s) for s in yaml_value]
+    return list(default)
+
+
+def apply_config_to_env(
+    *,
+    config_path: Optional[Path] = None,
+    dotenv_path: Optional[Path] = None,
+    overwrite: bool = False,
+) -> dict[str, str]:
+    """Populate os.environ from .env and config.yaml.
+
+    Precedence (highest wins):
+        1. Existing os.environ entries (shell export, systemd, etc.)
+        2. .env file values
+        3. config.yaml derived values
+
+    Pass overwrite=True only from tests. Returns the dict of keys that
+    were newly set (for logging).
+    """
+    cfg_path = config_path or DEFAULT_CONFIG_PATH
+    env_path = dotenv_path or DEFAULT_DOTENV_PATH
+
+    merged: dict[str, str] = {}
+    # Lowest priority first so we can .update() to layer higher ones on top.
+    merged.update(_yaml_to_env(_load_yaml(cfg_path)))
+    merged.update(_load_dotenv(env_path))
+
+    newly_set: dict[str, str] = {}
+    for k, v in merged.items():
+        if overwrite or k not in os.environ:
+            os.environ[k] = v
+            newly_set[k] = v
+    return newly_set

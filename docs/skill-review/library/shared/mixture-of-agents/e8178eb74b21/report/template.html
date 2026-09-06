@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>__PAGE_TITLE__</title>
+<style>
+/* ---------------------------------------------------------------------------
+   MoA-X run report — white surface (Driveline design language).
+   Pure white canvas, 8px Mine Shaft top bar, goldenrod sole accent,
+   ZERO box-shadows, hand-crafted SVG charts. No external requests.
+   Font strategy: use a portable system stack so this self-contained report
+   redistributes no font binaries and makes no external font requests.
+--------------------------------------------------------------------------- */
+:root {
+  --gold: #FFA300;
+  --burnt: #CF7F00;
+  --ink: #262626;
+  --black: #000000;
+  --white: #FFFFFF;
+  --panel: #F4F4F5;
+  --secondary: #6B7280;
+  --muted: #9CA3AF;
+  --track: #E5E7EB;
+  --green: #10B981;
+  --red: #EF4444;
+  --dist: #D1D5DB;
+  /* Monospace-forward, developer-tool aesthetic. All system fonts so the
+     single-file artifact stays self-contained (no external font requests). */
+  --font-head: 'JetBrains Mono', 'Cascadia Code', 'SFMono-Regular', 'SF Mono', 'Menlo', 'Consolas', 'DejaVu Sans Mono', 'Liberation Mono', monospace;
+  --font-body: 'JetBrains Mono', 'Cascadia Code', 'SFMono-Regular', 'SF Mono', 'Menlo', 'Consolas', 'DejaVu Sans Mono', 'Liberation Mono', monospace;
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', 'SFMono-Regular', 'SF Mono', 'Menlo', 'Consolas', 'DejaVu Sans Mono', 'Liberation Mono', monospace;
+}
+*, *::before, *::after { box-sizing: border-box; }
+svg, svg * { filter: none; }
+html { scroll-behavior: smooth; max-width: 100%; overflow-x: hidden; }
+body {
+  margin: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+  background: var(--white);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--burnt); text-decoration: none; border-bottom: 1px solid var(--track); overflow-wrap: anywhere; }
+a:hover { color: var(--gold); border-color: var(--gold); }
+
+.topbar { height: 8px; background: var(--ink); width: 100%; position: sticky; top: 0; z-index: 60; }
+
+.wrap { width: 100%; max-width: 1180px; min-width: 0; margin: 0 auto; padding: 0 28px; }
+
+h1, h2, h3, .head { font-family: var(--font-head); text-transform: uppercase; letter-spacing: 0.01em; font-weight: 800; }
+h2.section-title { font-size: 1.6rem; margin: 0 0 4px; }
+.section-kicker { font-family: var(--font-head); text-transform: uppercase; font-weight: 800; font-size: 0.7rem; letter-spacing: 0.14em; color: var(--gold); }
+.section-note { color: var(--secondary); font-size: 0.86rem; line-height: 1.55; max-width: 78ch; margin: 6px 0 20px; }
+.section-note b { color: var(--ink); }
+section.block { padding: 44px 0; border-top: 1px solid var(--track); }
+section.block:first-of-type { border-top: none; }
+
+/* ---- Header ---- */
+header.report-head { padding: 40px 0 30px; }
+.report-head .eyebrow { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.brandmark { font-family: var(--font-head); font-weight: 800; text-transform: uppercase; letter-spacing: 0.04em; font-size: 1.1rem; }
+.brandmark .x { color: var(--gold); }
+.report-head h1 { font-size: 2.5rem; line-height: 1.14; margin: 0 0 18px; max-width: 26ch; letter-spacing: 0.005em; }
+.head-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 0 0 22px; }
+.final-jump {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--ink);
+  border-radius: 8px;
+  background: var(--ink);
+  color: var(--white);
+  font-family: var(--font-head);
+  font-size: .76rem;
+  font-weight: 800;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+}
+.final-jump:hover, .final-jump:focus-visible { border-color: var(--gold); background: var(--gold); color: var(--ink); }
+.final-jump:focus-visible { outline: 3px solid rgba(255,163,0,.35); outline-offset: 3px; }
+.report-share-action { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 10px 16px; border: 1px solid var(--gold); border-radius: 8px; background: var(--white); color: var(--burnt); font-family: var(--font-head); font-size: .76rem; font-weight: 800; letter-spacing: .05em; text-transform: uppercase; cursor: pointer; }
+.report-share-action:hover, .report-share-action:focus-visible { background: #fff5dd; border-color: var(--burnt); color: var(--ink); }
+.report-share-action:focus-visible { outline: 3px solid rgba(255,163,0,.35); outline-offset: 3px; }
+.report-share-status { color: var(--secondary); font-size: .78rem; }
+.head-actions .action-note { color: var(--secondary); font-size: .78rem; }
+.meta-row { display: flex; flex-wrap: wrap; gap: 8px 26px; align-items: center; color: var(--secondary); font-size: 0.85rem; margin-bottom: 20px; }
+.meta-row b { color: var(--ink); font-weight: 700; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; max-width: 100%; align-items: center; gap: 7px; padding: 5px 12px; border: 1px solid var(--track); border-radius: 999px; font-size: 0.8rem; background: var(--white); overflow-wrap: anywhere; }
+.chip .lab-avatar { width: 24px; height: 24px; }
+.chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--gold); }
+.chip .role { color: var(--muted); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.06em; }
+.badge { display: inline-block; padding: 4px 11px; border-radius: 6px; font-family: var(--font-head); font-weight: 800; text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.08em; }
+.badge.ok { background: var(--gold); color: var(--white); }
+.badge.warn { background: var(--red); color: var(--white); }
+.badge.neutral { background: var(--panel); color: var(--ink); }
+.report-art { position: relative; margin: 22px 0 24px; overflow: hidden; border: 1px solid var(--track); border-radius: 12px; background: var(--panel); }
+.report-art img { width: 100%; height: 210px; display: block; object-fit: cover; object-position: center; }
+.report-art.hero-art { margin-top: 22px; }
+.report-art.hero-art img { height: clamp(240px, 31vw, 350px); object-position: center 44%; }
+.report-art.scout-art img { object-position: center 48%; }
+.report-art figcaption {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  max-width: min(78%, 560px);
+  padding: 8px 11px;
+  color: var(--white);
+  background: rgba(38, 38, 38, .88);
+  border-left: 3px solid var(--gold);
+  border-radius: 4px;
+  font-size: .72rem;
+  line-height: 1.35;
+}
+
+/* ---- Reader-first summary ---- */
+.executive-overview {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(220px, .5fr);
+  gap: 22px;
+  align-items: start;
+  margin: 0 0 22px;
+  padding: 22px;
+  border: 1px solid var(--track);
+  border-left: 5px solid var(--gold);
+  border-radius: 12px;
+  background: var(--white);
+}
+.executive-overview .label { color: var(--burnt); font-family: var(--font-head); font-size: .66rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+.executive-overview h3 { margin: 5px 0 8px; font-size: 1.1rem; line-height: 1.35; text-transform: none; }
+.executive-overview p { margin: 0; color: var(--secondary); }
+.executive-facts { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.executive-facts li { padding: 8px 10px; border-radius: 7px; background: var(--panel); font-size: .78rem; }
+.executive-facts b { color: var(--ink); }
+
+/* ---- Static contributor network ---- */
+.agent-network { margin-top: 24px; border: 1px solid var(--track); border-radius: 12px; overflow: hidden; }
+.agent-network .network-copy { padding: 20px 20px 0; }
+.agent-network .network-copy h3 { margin: 4px 0 6px; font-size: 1.08rem; text-transform: none; }
+.agent-network .network-copy p { margin: 0; color: var(--secondary); font-size: .84rem; }
+.agent-network .report-art { margin: 18px 20px; }
+.agent-network .report-art img { height: clamp(190px, 26vw, 280px); }
+.network-flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-top: 1px solid var(--track); }
+.network-stage { position: relative; min-width: 0; padding: 16px; border-right: 1px solid var(--track); }
+.network-stage:last-child { border-right: 0; }
+.network-stage .stage-n { color: var(--gold); font-family: var(--font-head); font-size: .62rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.network-stage .stage-title { margin: 3px 0 5px; font-weight: 800; }
+.network-stage .stage-desc { color: var(--secondary); font-size: .76rem; line-height: 1.45; }
+.network-roster { margin-top: 8px; color: var(--ink); font-family: var(--font-mono); font-size: .7rem; overflow-wrap: anywhere; }
+.network-labs { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
+.lab-avatar {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border: 1px solid var(--track);
+  border-bottom: 3px solid var(--gold);
+  border-radius: 7px;
+  background: var(--panel);
+  object-fit: cover;
+}
+.c-head > .lab-avatar { width: 36px; height: 36px; }
+
+/* ---- Sticky nav ---- */
+nav.mininav { position: sticky; top: 8px; z-index: 50; background: rgba(255,255,255,0.94); backdrop-filter: blur(4px); border-bottom: 1px solid var(--track); }
+nav.mininav .inner { display: flex; gap: 4px; overflow-x: auto; padding: 10px 0; }
+nav.mininav a { border: none; font-family: var(--font-head); text-transform: uppercase; font-weight: 700; font-size: 0.72rem; letter-spacing: 0.06em; color: var(--secondary); padding: 6px 12px; border-radius: 6px; white-space: nowrap; }
+nav.mininav a:hover { background: var(--panel); color: var(--ink); }
+nav.mininav a.active { color: var(--ink); background: var(--panel); box-shadow: inset 0 -2px 0 var(--gold); }
+
+/* ---- Stat tiles ---- */
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); background: var(--white); border: 1px solid var(--track); border-radius: 12px; overflow: hidden; }
+.tile { background: var(--white); padding: 18px 20px; border-right: 1px solid var(--track); border-bottom: 1px solid var(--track); }
+.tile .k { font-family: var(--font-head); font-weight: 800; text-transform: uppercase; font-size: 0.64rem; letter-spacing: 0.1em; color: var(--muted); margin-bottom: 8px; }
+.tile .v { font-family: var(--font-head); font-weight: 800; font-size: 1.9rem; line-height: 1; }
+.tile .v small { font-size: 0.9rem; color: var(--secondary); }
+
+/* ---- Collapsibles ---- */
+.collapse { max-width: 100%; min-width: 0; border: 1px solid var(--track); border-radius: 12px; margin-bottom: 14px; overflow: hidden; }
+.collapse > .c-head { display: flex; width: 100%; align-items: center; gap: 12px; padding: 16px 20px; cursor: pointer; user-select: none; background: var(--white); border: 0; color: var(--ink); font: inherit; text-align: left; }
+.collapse > .c-head:hover { background: var(--panel); }
+.collapse > .c-head:focus-visible { outline: 3px solid var(--gold); outline-offset: -3px; }
+.collapse > .c-head .c-title { min-width: 0; overflow-wrap: anywhere; font-family: var(--font-head); font-weight: 800; text-transform: uppercase; font-size: 0.92rem; letter-spacing: 0.02em; flex: 1; }
+.collapse > .c-head .caret { color: var(--muted); transition: transform 0.2s ease; font-size: 0.8rem; }
+.collapse.open > .c-head .caret { transform: rotate(90deg); }
+.collapse > .c-body { max-height: 0; overflow: hidden; transition: max-height 0.32s ease; }
+.collapse > .c-body, .collapse > .c-body > .pad { min-width: 0; }
+.collapse > .c-body > .pad { padding: 4px 20px 22px; }
+.reduced .collapse > .c-body { transition: none; }
+
+.c-head .status-pip { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.pip-ok { background: var(--green); }
+.pip-fail { background: var(--red); }
+.pip-warn { background: var(--gold); }
+.c-head .mini-stats { min-width: 0; display: flex; gap: 14px; color: var(--secondary); font-size: 0.76rem; overflow-wrap: anywhere; }
+.c-head .mini-stats span b { color: var(--ink); }
+
+/* ---- Text + code ---- */
+.summary-text { font-size: 1rem; line-height: 1.6; margin: 6px 0 18px; }
+.subhead { font-family: var(--font-head); font-weight: 800; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.1em; color: var(--muted); margin: 22px 0 10px; }
+code.inline { font-family: var(--font-mono); font-size: 0.85em; background: var(--panel); padding: 1px 6px; border-radius: 4px; }
+.codeblock { font-family: var(--font-mono); font-size: 0.82rem; background: var(--panel); border-radius: 10px; padding: 16px 18px; overflow-x: auto; white-space: pre-wrap; word-break: break-word; line-height: 1.5; }
+
+/* ---- Plan steps ---- */
+.step { border-left: 3px solid var(--track); padding: 4px 0 4px 18px; margin: 0 0 20px; }
+.step .step-n { font-family: var(--font-head); font-weight: 800; color: var(--gold); font-size: 0.8rem; }
+.step .step-title { font-weight: 700; margin: 2px 0 6px; }
+.step .why { color: var(--secondary); margin-bottom: 10px; }
+.ev-chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0; }
+.ev { display: inline-flex; max-width: 100%; align-items: center; gap: 6px; font-size: 0.74rem; padding: 3px 9px; border-radius: 6px; border: 1px solid var(--track); font-family: var(--font-mono); overflow-wrap: anywhere; white-space: normal; }
+.ev.code { background: var(--panel); }
+.ev.ext { background: var(--white); }
+.ev .tag { text-transform: uppercase; font-family: var(--font-head); font-size: 0.6rem; letter-spacing: 0.06em; color: var(--muted); }
+.files { display: flex; flex-wrap: wrap; gap: 6px; margin: 6px 0; }
+.file-tok { max-width: 100%; font-family: var(--font-mono); font-size: 0.74rem; color: var(--secondary); background: var(--panel); padding: 2px 7px; border-radius: 4px; overflow-wrap: anywhere; white-space: normal; }
+.risk { font-size: 0.82rem; color: var(--secondary); padding-left: 16px; position: relative; margin: 3px 0; }
+.risk::before { content: "△"; position: absolute; left: 0; color: var(--gold); font-size: 0.7rem; top: 2px; }
+
+/* ---- Tables ---- */
+.table-scroll { width: 100%; max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; -webkit-overflow-scrolling: touch; }
+table.dl { width: 100%; min-width: 620px; border-collapse: collapse; font-size: 0.88rem; }
+table.dl th, table.dl td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--track); }
+table.dl th { font-family: var(--font-head); text-transform: uppercase; font-size: 0.66rem; letter-spacing: 0.08em; color: var(--muted); font-weight: 800; }
+
+/* ---- Verdict matrix ---- */
+.matrix { width: 100%; max-width: 100%; overflow-x: auto; overscroll-behavior-inline: contain; -webkit-overflow-scrolling: touch; }
+.matrix table { border-collapse: separate; border-spacing: 6px; }
+.matrix th { font-family: var(--font-head); text-transform: uppercase; font-size: 0.66rem; letter-spacing: 0.06em; color: var(--secondary); padding: 4px 8px; text-align: center; font-weight: 800; }
+.matrix th.rowh { text-align: right; color: var(--ink); }
+.mcell { min-width: 108px; height: 52px; border-radius: 8px; padding: 7px 9px; cursor: default; display: flex; flex-direction: column; justify-content: center; gap: 2px; }
+.mcell .verdict { font-family: var(--font-head); text-transform: uppercase; font-size: 0.6rem; letter-spacing: 0.04em; font-weight: 800; }
+.mcell.v-accept_as_is { background: rgba(16,185,129,0.16); color: #0b7a5a; }
+.mcell.v-accept_with_changes { background: rgba(255,163,0,0.18); color: #9a6300; }
+.mcell.v-reject { background: rgba(239,68,68,0.15); color: #b3271e; }
+.mcell.v-none { background: var(--panel); color: var(--muted); }
+.grade-note { margin: 0 0 12px; color: var(--secondary); font-size: .78rem; }
+.grade-board { display: grid; grid-template-columns: repeat(auto-fit, minmax(185px, 1fr)); gap: 10px; margin: 0 0 18px; }
+.grade-card { min-width: 0; padding: 13px 14px; border: 1px solid var(--track); border-radius: 9px; background: var(--white); }
+.grade-card .grade-label { color: var(--muted); font-family: var(--font-head); font-size: .6rem; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+.grade-card .grade-main { display: flex; align-items: baseline; gap: 9px; margin-top: 3px; }
+.grade-card .grade-letter { color: var(--burnt); font-family: var(--font-head); font-size: 1.55rem; font-weight: 800; line-height: 1; }
+.grade-card .grade-name { min-width: 0; overflow-wrap: anywhere; font-weight: 800; }
+.grade-card .grade-detail { margin-top: 6px; color: var(--secondary); font-size: .7rem; line-height: 1.45; }
+
+/* ---- Verification dots ---- */
+.verif-row { margin: 14px 0; }
+.verif-row .vlabel { display: flex; gap: 10px; align-items: baseline; margin-bottom: 8px; }
+.verif-row .vlabel .name { font-family: var(--font-head); font-weight: 800; text-transform: uppercase; font-size: 0.8rem; }
+.verif-row .vlabel .counts { font-size: 0.78rem; color: var(--secondary); }
+.dots { display: flex; flex-wrap: wrap; gap: 6px; }
+.vdot { width: 28px; height: 28px; padding: 6px; border: 6px solid var(--white); border-radius: 8px; cursor: pointer; box-shadow: inset 0 0 0 2px currentColor; }
+.vdot:focus-visible { outline: 3px solid var(--gold); outline-offset: 2px; }
+.vdot.verified { background: var(--green); }
+.vdot.unverified { background: var(--track); }
+.vdot.contradicted { background: var(--red); }
+.vdetail { display: none; margin-top: 10px; font-size: 0.85rem; background: var(--panel); border-radius: 8px; padding: 12px 14px; }
+.vdetail.show { display: block; }
+.vdetail .vd-path { font-family: var(--font-mono); font-size: 0.78rem; color: var(--burnt); }
+
+/* ---- Cards / disagreements ---- */
+.cardgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: 14px; }
+.dcard { border: 1px solid var(--track); border-left: 3px solid var(--gold); border-radius: 10px; padding: 14px 16px; }
+.dcard .who { font-family: var(--font-head); text-transform: uppercase; font-weight: 800; font-size: 0.68rem; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 6px; }
+.dcard .pt { font-weight: 700; margin-bottom: 6px; }
+.dcard .lbl { font-family: var(--font-head); text-transform: uppercase; font-size: 0.62rem; letter-spacing: 0.06em; color: var(--gold); margin: 8px 0 2px; }
+.checklist { list-style: none; padding: 0; margin: 0; }
+.checklist li { padding-left: 24px; position: relative; margin: 7px 0; }
+.checklist li::before { content: "✓"; position: absolute; left: 0; color: var(--green); font-weight: 800; }
+.flaglist { list-style: none; padding: 0; margin: 0; }
+.flaglist li { padding-left: 24px; position: relative; margin: 7px 0; }
+.flaglist li::before { content: "!"; position: absolute; left: 3px; color: var(--red); font-weight: 800; font-family: var(--font-head); }
+
+/* ---- Pull quote (synthesis) ---- */
+.pullquote { position: relative; padding: 6px 0 6px 54px; margin: 6px 0; }
+.pullquote::before { content: "\201C"; position: absolute; left: 0; top: -14px; font-family: Georgia, serif; font-size: 5rem; color: var(--gold); line-height: 1; }
+.pullquote .q { font-size: 1.05rem; line-height: 1.55; font-style: italic; }
+.pullquote .by { font-family: var(--font-head); text-transform: uppercase; font-weight: 800; font-size: 0.72rem; letter-spacing: 0.06em; color: var(--secondary); margin-top: 8px; }
+
+/* ---- Logs ---- */
+.log-tabs { display: flex; gap: 4px; margin-bottom: 10px; }
+.log-tabs button { font-family: var(--font-head); text-transform: uppercase; font-weight: 700; font-size: 0.68rem; letter-spacing: 0.05em; padding: 6px 14px; border: 1px solid var(--track); background: var(--white); border-radius: 6px; cursor: pointer; color: var(--secondary); }
+.log-tabs button.active { background: var(--ink); color: var(--white); border-color: var(--ink); }
+.log-filter { width: 100%; padding: 8px 12px; border: 1px solid var(--track); border-radius: 8px; font-family: var(--font-mono); font-size: 0.8rem; margin-bottom: 10px; }
+.log-view { width: 100%; max-width: 100%; font-family: var(--font-mono); font-size: 0.78rem; background: var(--panel); border-radius: 10px; max-height: 460px; overflow: auto; padding: 12px 0; }
+.log-line { display: flex; padding: 0 14px; white-space: pre-wrap; word-break: break-word; }
+.log-line:hover { background: rgba(255,163,0,0.08); }
+.log-line .ln { color: var(--muted); user-select: none; min-width: 46px; text-align: right; padding-right: 14px; flex: none; }
+.log-line.hidden { display: none; }
+.log-empty { padding: 12px 14px; color: var(--muted); font-family: var(--font-body); }
+
+/* ---- Controls ---- */
+.controls { display: flex; gap: 8px; margin-bottom: 16px; }
+.btn { font-family: var(--font-head); text-transform: uppercase; font-weight: 700; font-size: 0.68rem; letter-spacing: 0.05em; padding: 7px 14px; border: 1px solid var(--track); background: var(--white); border-radius: 6px; cursor: pointer; color: var(--ink); }
+.btn:hover { background: var(--panel); }
+.btn:focus-visible { outline: 3px solid rgba(255,163,0,.35); outline-offset: 2px; }
+.btn.primary { min-height: 40px; padding: 9px 14px; border-color: var(--ink); background: var(--ink); color: var(--white); }
+.btn.primary:hover { border-color: var(--gold); background: var(--gold); color: var(--ink); }
+
+/* ---- Scope columns ---- */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+.two-col ul { padding-left: 18px; margin: 6px 0; }
+.qa { margin: 10px 0; }
+.qa .q { font-weight: 700; }
+.qa .a { color: var(--secondary); }
+
+/* ---- Final plan render ---- */
+.plan-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; margin: 0 0 18px; padding: 14px; border: 1px solid var(--track); border-radius: 10px; background: var(--panel); }
+.plan-actions .copy-status { color: var(--secondary); font-size: .78rem; }
+.plan-actions .copy-status.ok { color: #0b7a5a; font-weight: 700; }
+.plan-actions .copy-status.fail { color: #b3271e; font-weight: 700; }
+.plan-actions .copy-fallback { flex-basis: 100%; width: 100%; min-height: 150px; padding: 10px 12px; border: 1px solid var(--gold); border-radius: 7px; background: var(--white); color: var(--ink); font: .76rem/1.45 var(--font-mono); resize: vertical; }
+.plan-render h1, .plan-render h2, .plan-render h3 { text-transform: none; font-family: var(--font-head); margin: 22px 0 8px; }
+.plan-render h1 { font-size: 1.5rem; } .plan-render h2 { font-size: 1.2rem; } .plan-render h3 { font-size: 1rem; }
+.plan-render p { margin: 8px 0; } .plan-render ul, .plan-render ol { padding-left: 22px; }
+.plan-render li { margin: 4px 0; }
+.plan-render pre { font-family: var(--font-mono); font-size: 0.82rem; background: var(--panel); border-radius: 10px; padding: 14px 16px; overflow-x: auto; }
+.plan-render code { font-family: var(--font-mono); background: var(--panel); padding: 1px 5px; border-radius: 4px; font-size: 0.85em; }
+.plan-render pre code { background: none; padding: 0; }
+.plan-render .markdown-table-wrap { margin: 14px 0 20px; border: 1px solid var(--track); border-radius: 10px; }
+.plan-render .markdown-table { margin: 0; background: var(--white); }
+.plan-render .markdown-table th { background: var(--panel); color: var(--ink); }
+.plan-render .markdown-table th.align-center, .plan-render .markdown-table td.align-center { text-align: center; }
+.plan-render .markdown-table th.align-right, .plan-render .markdown-table td.align-right { text-align: right; }
+.plan-render .markdown-table td { vertical-align: top; line-height: 1.5; overflow-wrap: anywhere; }
+.plan-render .markdown-table tbody tr:last-child td { border-bottom: 0; }
+
+/* ---- Compact stage timeline ---- */
+.timeline-shell { border: 1px solid var(--track); border-radius: 12px; overflow: hidden; background: var(--white); }
+.timeline-stage { --timeline-color: var(--gold); padding: 18px 20px 20px; border-top: 1px solid var(--track); }
+.timeline-stage.stage-1 { --timeline-color: #f59e0b; }
+.timeline-stage.stage-2 { --timeline-color: #14b8a6; }
+.timeline-stage.stage-3 { --timeline-color: #6366f1; }
+.timeline-stage:first-child { border-top: 0; }
+.timeline-stage-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; margin-bottom: 14px; }
+.timeline-stage-title { display: flex; align-items: baseline; flex-wrap: wrap; gap: 8px 12px; min-width: 0; }
+.timeline-stage-title .number { color: var(--burnt); font-family: var(--font-head); font-size: .66rem; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+.timeline-stage-title h3 { margin: 0; font-size: .94rem; text-transform: none; }
+.timeline-stage-meta { color: var(--secondary); font-size: .72rem; text-align: right; }
+.timeline-gap { margin: -2px 0 14px; padding: 7px 10px; border-left: 3px solid var(--gold); background: rgba(255,163,0,.08); color: var(--secondary); font-size: .74rem; }
+.timeline-rows { display: grid; gap: 10px; }
+.timeline-row { display: grid; grid-template-columns: minmax(130px, 190px) minmax(180px, 1fr) 64px; align-items: center; gap: 12px; min-width: 0; }
+.timeline-who { min-width: 0; display: grid; grid-template-columns: 34px minmax(0, 1fr); column-gap: 9px; align-items: center; }
+.timeline-who .lab-avatar { grid-row: 1 / 3; width: 34px; height: 34px; }
+.timeline-who .name { overflow-wrap: anywhere; font-weight: 800; font-size: .78rem; }
+.timeline-who .role { color: var(--secondary); font-size: .68rem; text-transform: capitalize; }
+.timeline-track { position: relative; height: 22px; overflow: hidden; border-radius: 999px; background: var(--panel); }
+.timeline-bar { position: absolute; top: 0; bottom: 0; min-width: 5px; border-radius: 999px; background-color: var(--timeline-color); background-image: repeating-linear-gradient(135deg, rgba(255,255,255,.28) 0 7px, transparent 7px 14px); background-size: 20px 20px; animation: timeline-stripes 900ms linear infinite; }
+.timeline-bar.failed { background-color: var(--red); opacity: .72; }
+.timeline-bar.transient { background-color: var(--gold); opacity: .55; }
+.timeline-bar.previous { background-color: var(--secondary); opacity: .6; }
+.timeline-bar.retry { box-shadow: inset 0 0 0 2px rgba(0,0,0,.18); }
+.timeline-retry-wait { position: absolute; top: 3px; bottom: 3px; border-radius: 999px; background: repeating-linear-gradient(135deg, #fff2d8 0 6px, #f4c676 6px 12px); border: 1px dashed var(--burnt); opacity: .9; }
+.timeline-retry-summary { margin: -5px 0 11px; color: var(--burnt); font-size: .7rem; font-weight: 700; }
+.timeline-row.is-retry .timeline-who .role { color: var(--burnt); font-weight: 700; }
+@keyframes timeline-stripes { to { background-position: 20px 0; } }
+.timeline-duration { color: var(--secondary); font-size: .72rem; white-space: nowrap; }
+.timeline-legend { margin: 12px 0 0; color: var(--secondary); font-size: .72rem; line-height: 1.5; }
+
+/* ---- Decision lineage explorer ---- */
+.lineage-shell { width: 100%; max-width: 100%; min-width: 0; border: 1px solid var(--track); border-radius: 12px; overflow: hidden; background: var(--white); }
+.lineage-summary { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 18px 20px; border-bottom: 1px solid var(--track); background: var(--panel); }
+.lineage-summary .copy { min-width: 0; max-width: 76ch; }
+.lineage-summary .title { font-family: var(--font-head); text-transform: uppercase; font-weight: 800; font-size: 0.82rem; }
+.lineage-summary .desc { color: var(--secondary); font-size: 0.82rem; margin-top: 4px; overflow-wrap: anywhere; }
+.confidence { flex: none; border: 1px solid var(--track); background: var(--white); border-radius: 999px; padding: 5px 10px; font-family: var(--font-head); font-size: 0.64rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; }
+.confidence.high { border-color: rgba(16,185,129,0.55); color: #0b7a5a; }
+.confidence.medium { border-color: rgba(255,163,0,0.75); color: #9a6300; }
+.confidence.low { border-color: rgba(239,68,68,0.55); color: #b3271e; }
+.lineage-layout { width: 100%; max-width: 100%; min-width: 0; display: grid; grid-template-columns: 270px minmax(0, 1fr); min-height: 470px; }
+.lineage-steps { border-right: 1px solid var(--track); padding: 14px; background: #fafafa; }
+.lineage-step-btn { display: block; width: 100%; text-align: left; border: 1px solid transparent; background: transparent; color: var(--ink); padding: 11px 12px; border-radius: 8px; cursor: pointer; font-family: var(--font-body); margin-bottom: 5px; }
+.lineage-step-btn:hover { background: var(--white); border-color: var(--track); }
+.lineage-step-btn.active { background: var(--white); border-color: var(--gold); box-shadow: inset 3px 0 0 var(--gold); }
+.lineage-step-btn .n { display: block; color: var(--muted); font-family: var(--font-head); font-size: 0.62rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.07em; }
+.lineage-step-btn .t { display: block; font-size: 0.8rem; font-weight: 700; line-height: 1.35; margin-top: 2px; }
+.lineage-main { min-width: 0; display: flex; flex-direction: column; }
+.lineage-legend { display: flex; flex-wrap: wrap; gap: 10px 18px; padding: 12px 16px 0; color: var(--secondary); font-size: 0.68rem; }
+.lineage-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.lineage-legend i { display: inline-block; width: 24px; height: 0; border-top: 2px solid var(--green); }
+.lineage-legend i.adapted { border-color: var(--gold); border-top-style: dashed; }
+.lineage-legend i.review { border-color: var(--ink); border-top-style: dotted; }
+.lineage-legend .hint { margin-left: auto; color: var(--muted); font-style: italic; }
+.lineage-viewport { width: 100%; max-width: 100%; min-width: 0; overflow-x: auto; overscroll-behavior-inline: contain; -webkit-overflow-scrolling: touch; padding: 2px 10px 0; }
+.lineage-viewport svg { display: block; min-width: 760px; }
+.lineage-node { cursor: pointer; filter: url(#lineage-card-shadow); transition: opacity 160ms ease; }
+.lineage-node rect { transition: stroke-width 160ms ease, fill 160ms ease; }
+.lineage-node:focus { outline: 3px solid var(--gold); outline-offset: 3px; }
+.lineage-node:focus rect, .lineage-node:hover rect, .lineage-node.is-highlighted rect { stroke: var(--gold); stroke-width: 3; fill: #fffdf7; }
+.lineage-node.is-muted { opacity: .32; }
+.lineage-edge { transition: opacity 160ms ease, stroke-width 160ms ease; stroke-linecap: round; }
+.lineage-edge.is-muted { opacity: .12 !important; }
+.lineage-edge.is-highlighted { opacity: 1 !important; stroke-width: 3.5 !important; }
+.lineage-edge-halo { fill: none; stroke-linecap: round; pointer-events: none; }
+.lineage-detail { border-top: 1px solid var(--track); padding: 14px 18px 18px; min-height: 112px; }
+.lineage-detail .kind { color: var(--burnt); font-family: var(--font-head); font-size: 0.64rem; text-transform: uppercase; font-weight: 800; letter-spacing: 0.07em; }
+.lineage-detail .detail-title { font-weight: 800; margin: 3px 0 5px; }
+.lineage-detail .detail-body { color: var(--secondary); font-size: 0.84rem; }
+.lineage-detail .detail-note { margin-top: 8px; border-left: 3px solid var(--gold); padding-left: 10px; font-size: 0.8rem; }
+.lineage-files { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 9px; }
+.lineage-rejected { border-top: 1px solid var(--track); padding: 14px 18px; }
+.lineage-rejected summary { cursor: pointer; font-family: var(--font-head); text-transform: uppercase; font-weight: 800; font-size: 0.68rem; letter-spacing: 0.06em; }
+.lineage-rejected ul { margin-bottom: 0; }
+.lineage-warning { margin-top: 12px; }
+
+/* ---- Tooltip ---- */
+#tooltip { position: fixed; z-index: 100; pointer-events: none; background: rgba(0,0,0,0.9); color: #fff; font-size: 0.76rem; line-height: 1.4; padding: 8px 11px; border-radius: 8px; max-width: 320px; display: none; }
+#tooltip .tt-h { color: var(--gold); font-family: var(--font-head); text-transform: uppercase; font-size: 0.62rem; letter-spacing: 0.06em; margin-bottom: 3px; }
+
+/* ---- Flowchart footer ---- */
+.flow svg { width: 100%; height: auto; }
+footer.foot { border-top: 1px solid var(--track); padding: 30px 0 60px; color: var(--muted); font-size: 0.8rem; }
+
+.notice { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3); border-radius: 10px; padding: 14px 18px; margin-bottom: 18px; color: #b3271e; }
+.notice.info { background: var(--panel); border-color: var(--track); color: var(--ink); }
+.empty-note { color: var(--muted); font-style: italic; }
+
+@media (max-width: 720px) {
+  .wrap { padding: 0 16px; }
+  .report-head h1 { font-size: 2rem; }
+  .executive-overview { grid-template-columns: 1fr; padding: 18px; }
+  .network-flow { grid-template-columns: 1fr 1fr; }
+  .network-stage:nth-child(2) { border-right: 0; }
+  .network-stage:nth-child(-n+2) { border-bottom: 1px solid var(--track); }
+  .report-art img { height: 180px; }
+  .report-art.hero-art img { height: 220px; }
+  .report-art figcaption { position: static; max-width: none; border-radius: 0; }
+  .two-col { grid-template-columns: 1fr; }
+  .lineage-layout { grid-template-columns: 1fr; }
+  .lineage-steps { width: 100%; max-width: 100%; min-width: 0; border-right: 0; border-bottom: 1px solid var(--track); display: flex; overflow-x: auto; overscroll-behavior-inline: contain; gap: 6px; }
+  .lineage-step-btn { min-width: 210px; margin-bottom: 0; }
+  .lineage-summary { flex-direction: column; }
+  .c-head { flex-wrap: wrap; }
+  .c-head .mini-stats { width: 100%; padding-left: 22px; flex-wrap: wrap; }
+  .timeline-stage { padding: 16px; }
+  .timeline-stage-head { display: block; }
+  .timeline-stage-meta { margin-top: 5px; text-align: left; }
+  .timeline-row { grid-template-columns: 1fr 56px; gap: 6px 10px; }
+  .timeline-who { grid-column: 1 / -1; }
+}
+@media (prefers-reduced-motion: reduce) { .timeline-bar { animation: none; } }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+@media print {
+  nav.mininav, .controls, .log-filter, .log-tabs, .lineage-steps { display: none !important; }
+  .collapse > .c-body { max-height: none !important; }
+  section.block { padding: 20px 0; }
+}
+__DECISION_MAP_STYLE__
+</style>
+</head>
+<body>
+<div class="topbar"></div>
+
+<script type="application/json" id="moa-data">__MOA_DATA_JSON__</script>
+
+<nav class="mininav"><div class="wrap"><div class="inner" id="mininav-inner"></div></div></nav>
+
+<div class="wrap" id="app"></div>
+
+<div id="tooltip"></div>
+
+<script>
+__DECISION_MAP_SCRIPT__
+</script>
+<script>
+"use strict";
+(function () {
+  var DATA = JSON.parse(document.getElementById("moa-data").textContent);
+  var ART = __REPORT_ASSET_JSON__;
+  var REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (REDUCED) document.body.classList.add("reduced");
+
+  var C = { gold: "#FFA300", green: "#10B981", red: "#EF4444", ink: "#262626", track: "#E5E7EB", muted: "#9CA3AF" };
+
+  // ---- tiny DOM helper ----
+  function el(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    if (attrs) for (var k in attrs) {
+      if (k === "class") n.className = attrs[k];
+      else if (k === "html") n.innerHTML = attrs[k];
+      else if (k === "text") n.textContent = attrs[k];
+      else if (k.slice(0, 2) === "on" && typeof attrs[k] === "function") n.addEventListener(k.slice(2), attrs[k]);
+      else if (attrs[k] != null) n.setAttribute(k, attrs[k]);
+    }
+    if (kids != null) (Array.isArray(kids) ? kids : [kids]).forEach(function (c) {
+      if (c == null) return;
+      n.appendChild(typeof c === "string" ? document.createTextNode(c) : c);
+    });
+    return n;
+  }
+  function esc(s) { var d = document.createElement("div"); d.textContent = s == null ? "" : String(s); return d.innerHTML; }
+  function fmtDur(s) { if (s == null) return "—"; if (s < 60) return s.toFixed(1) + "s"; var m = Math.floor(s / 60); return m + "m " + Math.round(s - m * 60) + "s"; }
+  function statusPip(r) { return r.success ? "pip-ok" : (r.transient_empty ? "pip-warn" : "pip-fail"); }
+  function labIdFor(value) {
+    value = value || {};
+    if (value.lab_id && DATA.model_labs && DATA.model_labs[value.lab_id]) return value.lab_id;
+    var route = DATA.route_labs && DATA.route_labs[value.name || value.agent_id];
+    return route && route.lab_id || "independent";
+  }
+  function labPortrait(value, kind, altSuffix) {
+    var labId = labIdFor(value), lab = DATA.model_labs && DATA.model_labs[labId] || { label: "Independent lab" };
+    var src = ART["lab_" + labId + "_" + (kind || "avatar")] || ART.lab_independent_avatar;
+    return el("img", {
+      class: "lab-avatar",
+      src: src,
+      alt: lab.label + (altSuffix || " model-lab portrait"),
+      loading: "lazy"
+    });
+  }
+
+  var app = document.getElementById("app");
+  var sections = [];
+  function addSection(id, navLabel, node) { sections.push({ id: id, label: navLabel }); app.appendChild(node); }
+  function reportArt(key, alt, caption, className) {
+    if (!ART[key]) return null;
+    return el("figure", { class: "report-art " + (className || "") }, [
+      el("img", { src: ART[key], alt: alt, loading: key === "hero" ? "eager" : "lazy" }),
+      el("figcaption", { text: caption })
+    ]);
+  }
+  function scrollTable(table) {
+    return el("div", { class: "table-scroll", tabindex: "0", role: "region", "aria-label": "Scrollable table" }, table);
+  }
+
+  // Only the authenticated Web UI artifact route has a job identity. Reports
+  // opened from disk or through a public link remain portable and network-free.
+  function currentArtifactJobId() {
+    var match = window.location.pathname.match(/^\/api\/jobs\/([^/]+)\/artifacts\/report\.html$/);
+    return match ? decodeURIComponent(match[1]) : null;
+  }
+  function summarizeLineageFinding(value, maxLength) {
+    var text = String(value || "").replace(/\s+/g, " ").trim();
+    if (text.length <= maxLength) return text;
+    return text.slice(0, Math.max(1, maxLength - 1)).replace(/[\s,;:.-]+$/, "") + "…";
+  }
+  async function shareCurrentWebReport(jobId, button, status) {
+    button.disabled = true;
+    status.textContent = "Creating a revocable link…";
+    try {
+      var response = await fetch("/api/jobs/" + encodeURIComponent(jobId) + "/share", { method: "POST", credentials: "same-origin" });
+      var payload = await response.json().catch(function () { return {}; });
+      if (!response.ok || !payload.url) throw new Error(payload.error || "Could not create a share link.");
+      var url = new URL(payload.url, window.location.origin).href;
+      try {
+        await navigator.clipboard.writeText(url);
+        status.textContent = "Share link copied. Creating another link or revoking it in the run view disables this one.";
+        button.textContent = "Link copied";
+      } catch (_) {
+        status.textContent = "Share link ready: " + url;
+        button.textContent = "Link ready";
+      }
+    } catch (error) {
+      status.textContent = error.message || "Could not create a share link.";
+      button.textContent = "Share report";
+    } finally {
+      button.disabled = false;
+    }
+  }
+
+  // ---------------------------------------------------------------- Header
+  (function () {
+    var head = el("header", { class: "report-head" });
+    head.appendChild(el("div", { class: "eyebrow" }, [
+      el("div", { class: "brandmark", html: 'MoA<span class="x">-X</span> &nbsp;RUN REPORT' }),
+      el("div", { class: "badge " + (DATA.partial ? "warn" : "neutral"), text: DATA.partial ? "Partial (recommendations only)" : "Full session" })
+    ]));
+    head.appendChild(el("h1", { text: DATA.title || DATA.session_id }));
+    var actions = el("div", { class: "head-actions" }, [
+      el("a", { class: "final-jump", href: "#plan", text: DATA.final_plan_html ? "Jump to final recommendation →" : "Check recommendation status →" })
+    ]);
+    var jobId = currentArtifactJobId();
+    if (jobId) {
+      var shareStatus = el("span", { class: "report-share-status", "aria-live": "polite" });
+      var shareButton = el("button", { class: "report-share-action", type: "button", text: "Share report" });
+      shareButton.addEventListener("click", function () { shareCurrentWebReport(jobId, shareButton, shareStatus); });
+      actions.appendChild(shareButton);
+      actions.appendChild(shareStatus);
+    }
+    actions.appendChild(el("span", { class: "action-note", text: DATA.final_plan_html ? "Skip the process details and start with the answer." : "This run may still need its final synthesis." }));
+    head.appendChild(actions);
+    head.appendChild(reportArt(
+      "hero",
+      "Independent researchers sending evidence toward one coherent architectural blueprint",
+      "Independent model lanes. One evidence-backed decision trail.",
+      "hero-art"
+    ));
+    var l2badge;
+    if (DATA.layer2_mode === "broadcast") l2badge = el("span", { class: "badge ok", text: "all recommendations reviewed" });
+    else if (DATA.layer2_mode === "degraded_non_broadcast") l2badge = el("span", { class: "badge warn", text: "limited review" });
+    else l2badge = el("span", { class: "badge neutral", text: DATA.layer2_mode || "n/a" });
+    var l2span = el("span", {}, ["Review mode "]); l2span.appendChild(l2badge);
+    head.appendChild(el("div", { class: "meta-row" }, [
+      el("span", { html: "Session <b>" + esc(DATA.session_id) + "</b>" }),
+      el("span", { html: "Generated <b>" + esc(DATA.generated_at) + "</b>" }),
+      el("span", { html: "Wall-clock <b>" + fmtDur(DATA.duration_seconds) + "</b>" }),
+      l2span
+    ]));
+    if (DATA.timing_normalized) head.appendChild(el("div", { class: "notice info", text: "Timing repaired for a legacy phase-split manifest: wall-clock and chart offsets use the earliest retained agent start instead of the Layer 2 invocation start." }));
+    var chips = el("div", { class: "chips" });
+    (DATA.config && DATA.config.proposers || []).forEach(function (p) { chips.appendChild(providerChip(p, "proposer")); });
+    (DATA.config && DATA.config.refiners || []).forEach(function (p) { chips.appendChild(providerChip(p, "refiner")); });
+    if (DATA.config && DATA.config.aggregator) chips.appendChild(providerChip(DATA.config.aggregator, "aggregator"));
+    if (DATA.config && DATA.config.proposer_instances) DATA.config.proposer_instances.forEach(function (n) { chips.appendChild(providerChip({ name: n, harness: "claude" }, "proposer")); });
+    if (DATA.config && DATA.config.refiner_instances) DATA.config.refiner_instances.forEach(function (n) { chips.appendChild(providerChip({ name: n, harness: "claude" }, "refiner")); });
+    head.appendChild(chips);
+    app.appendChild(head);
+  })();
+  function providerChip(p, role) {
+    return el("span", { class: "chip" }, [
+      labPortrait(p, "avatar", " model-lab avatar"),
+      el("span", { html: "<b>" + esc(p.name) + "</b>" }),
+      el("span", { class: "role", text: p.model || p.harness || role })
+    ]);
+  }
+
+  // ---------------------------------------------------------------- Overview tiles
+  (function () {
+    var l1 = DATA.layer1 || [], l2 = DATA.layer2 || [], l3 = DATA.layer3 || [];
+    var agentSecs = l1.concat(l2, l3).reduce(function (a, r) { return a + (r.duration_seconds || 0); }, 0);
+    var sec = el("section", { class: "block", id: "overview" });
+    sec.appendChild(el("div", { class: "section-kicker", text: "Start here" }));
+    sec.appendChild(el("h2", { class: "section-title", text: "What happened and what to read" }));
+    sec.appendChild(buildExecutiveOverview(l1, l2, l3));
+    var tiles = el("div", { class: "tiles" });
+    function tile(k, v, sub) { return el("div", { class: "tile" }, [el("div", { class: "k", text: k }), el("div", { class: "v", html: v + (sub ? ' <small>' + sub + '</small>' : '') })]); }
+    tiles.appendChild(tile("Independent plans", l1.filter(function (r) { return r.success; }).length + "/" + l1.length));
+    tiles.appendChild(tile("Reviews", l2.filter(function (r) { return r.success; }).length + "/" + l2.length));
+    if (l3.length) tiles.appendChild(tile("Final synthesis", l3.filter(function (r) { return r.success; }).length + "/" + l3.length));
+    tiles.appendChild(tile("Total model time", fmtDur(agentSecs)));
+    tiles.appendChild(tile("Elapsed time", fmtDur(DATA.duration_seconds)));
+    var speedup = DATA.duration_seconds ? (agentSecs / DATA.duration_seconds).toFixed(1) + "×" : "—";
+    tiles.appendChild(tile("Parallel speed-up", speedup));
+    sec.appendChild(tiles);
+    var health = DATA.summary || {}, healthItems = [];
+    if ((health.timeout_failures || []).length) healthItems.push("Timed out: " + health.timeout_failures.join(", "));
+    if ((health.transient_empty_proposers || []).length) healthItems.push("Transient-empty proposers: " + health.transient_empty_proposers.join(", "));
+    if ((health.transient_empty_refiners || []).length) healthItems.push("Transient-empty refiners: " + health.transient_empty_refiners.join(", "));
+    if ((health.agent_id_mismatches || []).length) healthItems.push("Identity mismatches: " + health.agent_id_mismatches.map(function (m) { return m.agent_id + " reported " + m.reported_agent_id; }).join(", "));
+    if ((health.workspace_mutation_failures || []).length) healthItems.push("Workspace mutation failures: " + health.workspace_mutation_failures.join(", "));
+    if (healthItems.length) {
+      var healthNotice = el("div", { class: "notice" });
+      healthNotice.appendChild(el("b", { text: "Run health needs attention" }));
+      healthNotice.appendChild(ul(healthItems));
+      sec.appendChild(healthNotice);
+    }
+    sec.appendChild(buildAgentNetwork());
+    addSection("overview", "Summary", sec);
+  })();
+  function buildExecutiveOverview(l1, l2, l3) {
+    var lineage = DATA.final_plan_lineage || {};
+    var hasFinal = !!DATA.final_plan_html;
+    var successful = l1.concat(l2, l3).filter(function (r) { return r.success; }).length;
+    var total = l1.length + l2.length + l3.length;
+    var box = el("div", { class: "executive-overview" });
+    box.appendChild(el("div", {}, [
+      el("div", { class: "label", text: hasFinal ? "Executive overview" : "Run status" }),
+      el("h3", { text: lineage.title || (hasFinal ? "A final recommendation is ready" : "The final recommendation is not available yet") }),
+      el("p", { text: lineage.summary || (hasFinal
+        ? "The team produced a final recommendation from the independent plans and review findings below. Start with the recommendation, then use the decision trail when you need to understand why a step was chosen."
+        : "The recorded work is still useful, but this report does not yet contain a final recommendation. Review the completed plans and checks below, then finish aggregation and regenerate the report.") })
+    ]));
+    box.appendChild(el("ul", { class: "executive-facts" }, [
+      el("li", { html: "<b>" + successful + " of " + total + "</b> recorded contributors completed successfully" }),
+      el("li", { html: "<b>" + l1.length + "</b> independent plan" + (l1.length === 1 ? "" : "s") + " and <b>" + l2.length + "</b> review" + (l2.length === 1 ? "" : "s") }),
+      el("li", { html: hasFinal ? "<b>Final recommendation:</b> available below" : "<b>Final recommendation:</b> not yet recorded" })
+    ]));
+    return box;
+  }
+  function buildAgentNetwork() {
+    var l1 = DATA.layer1 || [], l2 = DATA.layer2 || [], l3 = DATA.layer3 || [];
+    var sb = DATA.scout_brief || {};
+    var agg = DATA.config && DATA.config.aggregator;
+    var card = el("div", { class: "agent-network", role: "group", "aria-label": "How the recommendation was built" });
+    card.appendChild(el("div", { class: "network-copy" }, [
+      el("div", { class: "section-kicker", text: "Who contributed" }),
+      el("h3", { text: "How the recommendation came together" }),
+      el("p", { text: "The same work is shown as a simple four-stage flow: define the problem, collect independent recommendations, challenge them, and produce one final answer." })
+    ]));
+    var art = reportArt(
+      ART.lineage ? "lineage" : "synthesis",
+      "Illustrated network of independent contributors feeding evidence into one final recommendation",
+      "Independent viewpoints converge only after review.",
+      "network-art"
+    );
+    if (art) card.appendChild(art);
+    var flow = el("div", { class: "network-flow" });
+    function names(rows) {
+      if (!rows.length) return "Not run";
+      return rows.map(function (r) { return r.agent_id + (r.success ? "" : " (did not complete)"); }).join(" · ");
+    }
+    function stage(number, title, desc, roster, rows) {
+      var node = el("div", { class: "network-stage" }, [
+        el("div", { class: "stage-n", text: "Stage " + number }),
+        el("div", { class: "stage-title", text: title }),
+        el("div", { class: "stage-desc", text: desc }),
+        el("div", { class: "network-roster", text: roster })
+      ]);
+      if (rows && rows.length) {
+        var portraits = el("div", { class: "network-labs", "aria-label": "Contributing model labs" });
+        rows.forEach(function (row) { portraits.appendChild(labPortrait(row, "avatar", " contributor")); });
+        node.appendChild(portraits);
+      }
+      return node;
+    }
+    flow.appendChild(stage("01", "Frame the task", sb.frozen_spec ? "A written brief fixed the goal and boundaries before recommendations began." : "The run recorded the task context available to the team.", "Scout brief", []));
+    flow.appendChild(stage("02", "Develop options", l1.length + " independent contributor" + (l1.length === 1 ? "" : "s") + " worked from the same brief.", names(l1), l1));
+    flow.appendChild(stage("03", "Review the options", l2.length ? l2.length + " reviewer" + (l2.length === 1 ? "" : "s") + " checked the recommendations and their evidence." : "No review stage was recorded for this run.", names(l2), l2));
+    flow.appendChild(stage("04", "Choose a direction", DATA.final_plan_html ? "The reviewed material was combined into the final recommendation." : "A final recommendation has not yet been recorded.", l3.length ? names(l3) : (agg ? [agg.name, agg.model].filter(Boolean).join(" · ") : "Configured parent session"), l3.length ? l3 : (agg ? [agg] : [])));
+    card.appendChild(flow);
+    return card;
+  }
+
+  // ---------------------------------------------------------------- Timeline (SVG Gantt)
+  (function () {
+    var sec = el("section", { class: "block", id: "timeline" });
+    sec.appendChild(el("div", { class: "section-kicker", text: "Timeline" }));
+    sec.appendChild(el("h2", { class: "section-title", text: "Who worked when" }));
+    sec.appendChild(buildGantt());
+    addSection("timeline", "Timeline", sec);
+  })();
+
+  // ---------------------------------------------------------------- Scout brief
+  (function () {
+    var sb = DATA.scout_brief || {};
+    var sec = el("section", { class: "block", id: "scout" });
+    sec.appendChild(el("div", { class: "section-kicker", text: "Starting point" }));
+    sec.appendChild(el("h2", { class: "section-title", text: "What the team was asked to solve" }));
+    sec.appendChild(reportArt("scout", "Research scout organizing repository evidence into a mission brief", "The brief freezes scope before any model proposes a solution.", "scout-art"));
+    var body = el("div");
+    if (sb.frozen_spec) { body.appendChild(el("div", { class: "subhead", text: "Frozen spec" })); body.appendChild(el("div", { class: "codeblock", text: sb.frozen_spec })); }
+    var cols = el("div", { class: "two-col" });
+    if (sb.in_scope) cols.appendChild(el("div", {}, [el("div", { class: "subhead", text: "In scope" }), ul(sb.in_scope)]));
+    if (sb.out_of_scope) cols.appendChild(el("div", {}, [el("div", { class: "subhead", text: "Out of scope" }), ul(sb.out_of_scope)]));
+    body.appendChild(cols);
+    if (sb.focus_files && sb.focus_files.length) { body.appendChild(el("div", { class: "subhead", text: "Focus files" })); var ff = el("div", { class: "files" }); sb.focus_files.forEach(function (f) { ff.appendChild(el("span", { class: "file-tok", text: f })); }); body.appendChild(ff); }
+    if (sb.clarifications && sb.clarifications.length) {
+      body.appendChild(el("div", { class: "subhead", text: "Clarifications" }));
+      sb.clarifications.forEach(function (c) {
+        var m = /^Q:\s*(.*?)\s*A:\s*(.*)$/s.exec(c);
+        if (m) body.appendChild(el("div", { class: "qa" }, [el("div", { class: "q", text: "Q: " + m[1] }), el("div", { class: "a", text: "A: " + m[2] })]));
+        else body.appendChild(el("div", { class: "qa" }, el("div", { class: "a", text: c })));
+      });
+    }
+    if (sb.notes) { body.appendChild(el("div", { class: "subhead", text: "Notes" })); body.appendChild(el("p", { text: sb.notes })); }
+    sec.appendChild(collapsible("Scout brief", "pip-ok", null, body, false));
+    addSection("scout", "Task brief", sec);
+  })();
+  function ul(items) { var u = el("ul"); (items || []).forEach(function (i) { u.appendChild(el("li", { text: i })); }); return u; }
+
+  // ---------------------------------------------------------------- Layer 1 proposers
+  (function () {
+    var sec = el("section", { class: "block", id: "proposers" });
+    sec.appendChild(el("div", { class: "section-kicker", text: "Independent input" }));
+    sec.appendChild(el("h2", { class: "section-title", text: "Independent recommendations" }));
+    sec.appendChild(reportArt("proposers", "Independent researchers developing parallel architecture proposals", "Parallel lanes preserve genuinely different approaches before review."));
+    sec.appendChild(controlBar("proposers"));
+    (DATA.layer1 || []).forEach(function (r) { sec.appendChild(proposerCard(r)); });
+    if (!(DATA.layer1 || []).length) sec.appendChild(el("p", { class: "empty-note", text: "No proposer results recorded." }));
+    addSection("proposers", "Recommendations", sec);
+  })();
+  function proposerCard(r) {
+    var body = el("div");
+    if (!r.success) {
+      body.appendChild(el("div", { class: "notice", html: "<b>" + esc(r.agent_id) + " failed.</b> " + esc(r.error || "unknown error") }));
+    }
+    var p = r.payload;
+    if (p) {
+      if (p.summary) body.appendChild(el("div", { class: "summary-text", text: p.summary }));
+      if (p.plan && p.plan.length) {
+        body.appendChild(el("div", { class: "subhead", text: "Plan — " + p.plan.length + " steps" }));
+        p.plan.forEach(function (s, i) { body.appendChild(planStep(s, i)); });
+      }
+      if (p.open_questions && p.open_questions.length) { body.appendChild(el("div", { class: "subhead", text: "Open questions" })); body.appendChild(ul(p.open_questions)); }
+      if (p.alternatives_rejected && p.alternatives_rejected.length) {
+        body.appendChild(el("div", { class: "subhead", text: "Alternatives rejected" }));
+        p.alternatives_rejected.forEach(function (a) { body.appendChild(el("div", { class: "qa" }, [el("div", { class: "q", text: a.approach }), el("div", { class: "a", text: a.reason })])); });
+      }
+      if (p.research_sources && p.research_sources.length) {
+        body.appendChild(el("div", { class: "subhead", text: "Research sources (" + p.research_sources.length + ")" }));
+        var t = el("table", { class: "dl" }); t.appendChild(el("tr", {}, [el("th", { text: "Source" }), el("th", { text: "Why it matters" })]));
+        p.research_sources.forEach(function (s) {
+          t.appendChild(el("tr", {}, [
+            el("td", {}, s.url ? el("a", { href: s.url, target: "_blank", rel: "noopener", text: s.title || s.url }) : document.createTextNode(s.title || "")),
+            el("td", { text: s.relevance || s.summary || "" })
+          ]));
+        });
+        body.appendChild(scrollTable(t));
+      }
+    }
+    var stats = [];
+    if (p && p.plan) stats.push(["steps", p.plan.length]);
+    if (p && p.plan) stats.push(["evidence", p.plan.reduce(function (a, s) { return a + ((s.evidence || []).length); }, 0)]);
+    stats.push(["dur", fmtDur(r.duration_seconds)]);
+    return collapsible(r.agent_id + " recommendation", statusPip(r), stats, body, false, r);
+  }
+  function planStep(s, i) {
+    var d = el("div", { class: "step" });
+    d.appendChild(el("div", { class: "step-n", text: "STEP " + (i + 1) }));
+    d.appendChild(el("div", { class: "step-title", text: s.step }));
+    if (s.why) d.appendChild(el("div", { class: "why", text: s.why }));
+    if (s.files_touched && s.files_touched.length) { var f = el("div", { class: "files" }); s.files_touched.forEach(function (x) { f.appendChild(el("span", { class: "file-tok", text: x })); }); d.appendChild(f); }
+    if (s.evidence && s.evidence.length) {
+      var ec = el("div", { class: "ev-chips" });
+      s.evidence.forEach(function (e) {
+        if (e.type === "external" && e.url) {
+          var a = el("a", { class: "ev ext", href: e.url, target: "_blank", rel: "noopener", "data-tip": e.claim || "", "data-tiph": "External source" }, [el("span", { class: "tag", text: "ext" }), document.createTextNode(shorten(e.url, 40))]);
+          ec.appendChild(a);
+        } else {
+          var loc = (e.file || "?") + (e.line != null ? ":" + e.line : "");
+          ec.appendChild(el("span", { class: "ev code", "data-tip": e.claim || "", "data-tiph": "Code citation" }, [el("span", { class: "tag", text: "code" }), document.createTextNode(loc)]));
+        }
+      });
+      d.appendChild(ec);
+    }
+    if (s.risks && s.risks.length) s.risks.forEach(function (rk) { d.appendChild(el("div", { class: "risk", text: rk })); });
+    return d;
+  }
+  function shorten(u, n) { u = u.replace(/^https?:\/\//, ""); return u.length > n ? u.slice(0, n - 1) + "…" : u; }
+
+  // ---------------------------------------------------------------- Layer 2 refiners
+  (function () {
+    var all = DATA.layer2 || [];
+    var l2 = all.filter(function (r) { return r.success && r.payload; });
+    var failed = all.filter(function (r) { return !(r.success && r.payload); });
+    var sec = el("section", { class: "block", id: "refiners" });
+    sec.appendChild(el("div", { class: "section-kicker", text: "Review" }));
+    sec.appendChild(el("h2", { class: "section-title", text: "Review and challenge" }));
+    sec.appendChild(reportArt("refiners", "Reviewers comparing every proposal and tracing risks across them", "Every refiner sees every proposal, making disagreement and verification visible."));
+    if (DATA.layer2_mode === "degraded_non_broadcast")
+      sec.appendChild(el("div", { class: "notice", html: "<b>Limited review.</b> Only one independent recommendation completed, so reviewers saw a single perspective. Treat their findings with lower confidence." }));
+    // A failed refiner must stay visible — hiding it makes a broken refinement
+    // pass look like a smaller-but-healthy run.
+    failed.forEach(function (r) {
+      sec.appendChild(el("div", { class: "notice", html: "<b>" + esc(r.agent_id) + " review failed.</b> " + esc(r.error || "unknown error") }));
+    });
+    if (!l2.length) {
+      sec.appendChild(el("p", { class: "empty-note", text: DATA.layer2_mode === "skipped" ? "Layer 2 was skipped for this run." : "No successful refiner outputs." }));
+      addSection("refiners", "Review", sec); return;
+    }
+    sec.appendChild(el("div", { class: "subhead", text: "How each reviewer assessed each recommendation" }));
+    sec.appendChild(el("p", { class: "grade-note", text: "Consensus grades summarize structured reviewer verdicts (accept as-is = 4, accept with changes = 3, reject = 0); they are a transparent review signal, not a model-generated score." }));
+    sec.appendChild(proposerReviewGrades(l2));
+    sec.appendChild(verdictMatrix(l2));
+    sec.appendChild(el("div", { class: "subhead", text: "Evidence verification" }));
+    l2.forEach(function (r) { sec.appendChild(verificationRow(r)); });
+    l2.forEach(function (r) { sec.appendChild(refinerDetail(r)); });
+    addSection("refiners", "Review", sec);
+  })();
+  function lineageInfluenceCounts() {
+    var proposerSteps = {}, refinerSteps = {};
+    ((DATA.final_plan_lineage || {}).steps || []).forEach(function (step) {
+      (step.proposer_refs || []).forEach(function (ref) {
+        if (!proposerSteps[ref.agent_id]) proposerSteps[ref.agent_id] = {};
+        proposerSteps[ref.agent_id][step.id] = true;
+      });
+      (step.refiner_refs || []).forEach(function (ref) {
+        if (!refinerSteps[ref.agent_id]) refinerSteps[ref.agent_id] = {};
+        refinerSteps[ref.agent_id][step.id] = true;
+      });
+    });
+    function count(items) { return Object.keys(items || {}).length; }
+    return { proposer: Object.keys(proposerSteps).reduce(function (out, id) { out[id] = count(proposerSteps[id]); return out; }, {}), refiner: Object.keys(refinerSteps).reduce(function (out, id) { out[id] = count(refinerSteps[id]); return out; }, {}) };
+  }
+  function proposerReviewGrades(l2) {
+    var byProposer = {}, values = { accept_as_is: 4, accept_with_changes: 3, reject: 0 };
+    l2.forEach(function (reviewer) {
+      (reviewer.payload.per_proposer_verdicts || []).forEach(function (verdict) {
+        if (!byProposer[verdict.proposer]) byProposer[verdict.proposer] = [];
+        byProposer[verdict.proposer].push(verdict.verdict);
+      });
+    });
+    var influence = lineageInfluenceCounts().proposer;
+    var board = el("div", { class: "grade-board", "aria-label": "Reviewer consensus grades" });
+    Object.keys(byProposer).sort().forEach(function (proposer) {
+      var verdicts = byProposer[proposer], total = verdicts.reduce(function (sum, verdict) { return sum + (values[verdict] || 0); }, 0), average = total / verdicts.length;
+      var grade = average >= 3.6 ? "A" : (average >= 2.6 ? "B" : (average >= 1.6 ? "C" : "D"));
+      var accepted = verdicts.filter(function (verdict) { return verdict === "accept_as_is"; }).length;
+      var changed = verdicts.filter(function (verdict) { return verdict === "accept_with_changes"; }).length;
+      var rejected = verdicts.filter(function (verdict) { return verdict === "reject"; }).length;
+      var finalUse = influence[proposer] || 0;
+      board.appendChild(el("div", { class: "grade-card", "data-tip": "Derived from the verdicts in the matrix below; final-decision use is counted from the recorded lineage.", "data-tiph": proposer + " review consensus" }, [
+        el("div", { class: "grade-label", text: "Review consensus" }),
+        el("div", { class: "grade-main" }, [el("span", { class: "grade-letter", text: grade }), el("span", { class: "grade-name", text: proposer })]),
+        el("div", { class: "grade-detail", text: accepted + " accepted · " + changed + " with changes · " + rejected + " rejected · cited in " + finalUse + " final decision" + (finalUse === 1 ? "" : "s") })
+      ]));
+    });
+    return board;
+  }
+  function verdictMatrix(l2) {
+    var proposers = {};
+    l2.forEach(function (r) { (r.payload.per_proposer_verdicts || []).forEach(function (v) { proposers[v.proposer] = 1; }); });
+    var props = Object.keys(proposers);
+    var wrap = el("div", { class: "matrix" });
+    var t = el("table");
+    var hr = el("tr"); hr.appendChild(el("th", { class: "rowh", text: "" }));
+    props.forEach(function (p) { hr.appendChild(el("th", { text: p })); });
+    t.appendChild(hr);
+    l2.forEach(function (r) {
+      var row = el("tr");
+      row.appendChild(el("th", { class: "rowh", text: r.agent_id }));
+      var byProp = {}; (r.payload.per_proposer_verdicts || []).forEach(function (v) { byProp[v.proposer] = v; });
+      props.forEach(function (p) {
+        var v = byProp[p];
+        var cell = el("td");
+        if (v) cell.appendChild(el("div", { class: "mcell v-" + v.verdict, "data-tip": v.summary || "", "data-tiph": r.agent_id + " on " + p }, [el("span", { class: "verdict", text: v.verdict.replace(/_/g, " ") })]));
+        else cell.appendChild(el("div", { class: "mcell v-none" }, [el("span", { class: "verdict", text: "—" })]));
+        row.appendChild(cell);
+      });
+      t.appendChild(row);
+    });
+    wrap.appendChild(t);
+    return wrap;
+  }
+  function verificationRow(r) {
+    var vs = r.payload.verifications || [];
+    var counts = { verified: 0, unverified: 0, contradicted: 0 };
+    vs.forEach(function (v) { if (counts[v.status] != null) counts[v.status]++; });
+    var row = el("div", { class: "verif-row" });
+    row.appendChild(el("div", { class: "vlabel" }, [
+      el("span", { class: "name", text: r.agent_id }),
+      el("span", { class: "counts", html: '<span style="color:var(--green)">' + counts.verified + " verified</span> · " + counts.unverified + " unverified · " + '<span style="color:var(--red)">' + counts.contradicted + " contradicted</span>" })
+    ]));
+    var dots = el("div", { class: "dots" });
+    var detail = el("div", { class: "vdetail" });
+    vs.forEach(function (v) {
+      var dot = el("button", { type: "button", class: "vdot " + v.status, "aria-label": v.proposer + " " + v.claim_index_path + " — " + v.status, "data-tip": v.actual_finding || "", "data-tiph": v.proposer + " " + v.claim_index_path + " — " + v.status });
+      dot.addEventListener("click", function () {
+        detail.className = "vdetail show";
+        detail.innerHTML = "";
+        detail.appendChild(el("div", { class: "vd-path", text: v.proposer + " · " + v.claim_index_path + " · " + v.status }));
+        detail.appendChild(el("div", { text: v.actual_finding || "" }));
+        if (v.source_url) detail.appendChild(el("div", { style: "margin-top:6px" }, el("a", { href: v.source_url, target: "_blank", rel: "noopener", text: v.source_url })));
+      });
+      dots.appendChild(dot);
+    });
+    row.appendChild(dots); row.appendChild(detail);
+    return row;
+  }
+  function refinerDetail(r) {
+    var p = r.payload, body = el("div");
+    body.appendChild(el("div", { class: "notice info", html: "<b>Overall verdict:</b> " + esc((p.overall_verdict || "").replace(/_/g, " ")) }));
+    if (p.synthesis_recommendation) body.appendChild(el("div", { class: "pullquote" }, [el("div", { class: "q", text: p.synthesis_recommendation }), el("div", { class: "by", text: "— " + r.agent_id + ", synthesis recommendation" })]));
+    if (p.agreements && p.agreements.length) { body.appendChild(el("div", { class: "subhead", text: "Agreements" })); var au = el("ul", { class: "checklist" }); p.agreements.forEach(function (a) { au.appendChild(el("li", { text: a })); }); body.appendChild(au); }
+    if (p.disagreements && p.disagreements.length) {
+      body.appendChild(el("div", { class: "subhead", text: "Disagreements" }));
+      var g = el("div", { class: "cardgrid" });
+      p.disagreements.forEach(function (d) {
+        g.appendChild(el("div", { class: "dcard" }, [
+          el("div", { class: "who", text: "vs " + d.proposer }),
+          el("div", { class: "pt", text: d.point }),
+          el("div", { class: "lbl", text: "Why" }), el("div", { text: d.why }),
+          el("div", { class: "lbl", text: "Instead" }), el("div", { text: d.what_to_do_instead })
+        ]));
+      });
+      body.appendChild(g);
+    }
+    if (p.cross_proposer_observations && p.cross_proposer_observations.length) { body.appendChild(el("div", { class: "subhead", text: "Cross-proposer observations" })); body.appendChild(ul(p.cross_proposer_observations)); }
+    if (p.missing_steps && p.missing_steps.length) { body.appendChild(el("div", { class: "subhead", text: "Missing steps" })); var mu = el("ul", { class: "flaglist" }); p.missing_steps.forEach(function (m) { mu.appendChild(el("li", { text: m })); }); body.appendChild(mu); }
+    if (p.incorrect_steps && p.incorrect_steps.length) {
+      body.appendChild(el("div", { class: "subhead", text: "Incorrect steps" }));
+      var iu = el("ul", { class: "flaglist" });
+      p.incorrect_steps.forEach(function (s) { iu.appendChild(el("li", { text: s.proposer + " step " + s.step_index + ": " + s.what_is_wrong })); });
+      body.appendChild(iu);
+    }
+    if (p.additional_research && p.additional_research.length) {
+      body.appendChild(el("div", { class: "subhead", text: "Additional research" }));
+      var t = el("table", { class: "dl" }); t.appendChild(el("tr", {}, [el("th", { text: "Source" }), el("th", { text: "What it adds" })]));
+      p.additional_research.forEach(function (s) { t.appendChild(el("tr", {}, [el("td", {}, s.url ? el("a", { href: s.url, target: "_blank", rel: "noopener", text: s.title || s.url }) : document.createTextNode(s.title || "")), el("td", { text: s.what_it_adds || "" })])); });
+      body.appendChild(scrollTable(t));
+    }
+    var reviewed = (r.reviewing || []).join(", ");
+    var finalUses = lineageInfluenceCounts().refiner[r.agent_id] || 0;
+    return collapsible(r.agent_id + " review — full findings", statusPip(r), [["reviewed", reviewed || "—"], ["final", finalUses + " cited"], ["dur", fmtDur(r.duration_seconds)]], body, false, r);
+  }
+
+  // Evidence-weighted living decision map with legacy-lineage fallback.
+  // Decision lineage — why each step survived (retained exact-reference view).
+  // ---------------------------------------------------------------- Decision map
+  (function () {
+    var sec = el("section", { class: "block", id: "lineage" });
+    sec.appendChild(el("div", { class: "section-kicker", text: "Evidence quality" }));
+    sec.appendChild(el("h2", { class: "section-title", text: "Living decision map" }));
+    sec.appendChild(el("p", { class: "section-note", text: "Inspect evidence receipts, atomic claims, independent review, and final decisions as one trace. Confidence is capped by deterministic quality gates, not model agreement alone." }));
+    sec.appendChild(reportArt("lineage", "Archivist tracing evidence and review findings into a final architecture decision", "Follow each accepted decision back to its evidence receipt and independent reviewer signal."));
+    if (DATA.decision_map && window.MoaDecisionMap) {
+      var mapHost = el("div", { class: "report-decision-map" });
+      sec.appendChild(mapHost);
+      window.MoaDecisionMap.render(mapHost, DATA.decision_map, { mode: "report", maxClaims: 16 });
+    }
+    if (DATA.final_plan_lineage) {
+      if (DATA.decision_map) {
+        sec.appendChild(el("h3", { class: "subhead", text: "Exact final-step lineage" }));
+        sec.appendChild(el("p", { class: "section-note", text: "Use the detailed explorer below when you need the exact proposer step and refiner finding indexes retained by the final-plan contract." }));
+      }
+      sec.appendChild(buildLineageExplorer(DATA.final_plan_lineage));
+    } else if (!DATA.decision_map) {
+      sec.appendChild(el("div", { class: "notice info", text: "This run does not yet include enough retained evidence to build a decision map. Finish the proposal stage and regenerate the report." }));
+    }
+    if (DATA.decision_map_warnings && DATA.decision_map_warnings.length) {
+      var mapWarn = el("div", { class: "notice lineage-warning" });
+      mapWarn.appendChild(el("b", { text: "Decision-map validation warnings (" + DATA.decision_map_warnings.length + ")" }));
+      mapWarn.appendChild(ul(DATA.decision_map_warnings));
+      sec.appendChild(mapWarn);
+    }
+    if (DATA.lineage_warnings && DATA.lineage_warnings.length) {
+      var warn = el("div", { class: "notice lineage-warning" });
+      warn.appendChild(el("b", { text: "Lineage validation warnings (" + DATA.lineage_warnings.length + ")" }));
+      warn.appendChild(ul(DATA.lineage_warnings));
+      sec.appendChild(warn);
+    }
+    addSection("lineage", "Decision map", sec);
+  })();
+
+  function buildLineageExplorer(lineage) {
+    var shell = el("div", { class: "lineage-shell" });
+    var summary = el("div", { class: "lineage-summary" });
+    summary.appendChild(el("div", { class: "copy" }, [
+      el("div", { class: "title", text: lineage.title || "Final plan" }),
+      el("div", { class: "desc", text: lineage.summary || "" })
+    ]));
+    var confidence = lineage.confidence || {};
+    summary.appendChild(el("span", {
+      class: "confidence " + (confidence.level || "low"),
+      text: (confidence.level || "unknown") + " confidence",
+      "data-tip": confidence.rationale || "",
+      "data-tiph": "Confidence rationale"
+    }));
+    shell.appendChild(summary);
+
+    var layout = el("div", { class: "lineage-layout" });
+    var rail = el("div", { class: "lineage-steps", role: "tablist", "aria-label": "Final plan steps" });
+    var main = el("div", { class: "lineage-main" });
+    var legend = el("div", { class: "lineage-legend" }, [
+      el("span", {}, [el("i"), document.createTextNode("used as written")]),
+      el("span", {}, [el("i", { class: "adapted" }), document.createTextNode("revised")]),
+      el("span", {}, [el("i", { class: "review" }), document.createTextNode("reviewer influence")]),
+      el("span", { class: "hint", text: "Hover a card to trace its influence" })
+    ]);
+    var viewport = el("div", { class: "lineage-viewport", role: "tabpanel", id: "lineage-panel" });
+    var detail = el("div", { class: "lineage-detail", "aria-live": "polite" });
+    main.appendChild(legend); main.appendChild(viewport); main.appendChild(detail);
+    layout.appendChild(rail); layout.appendChild(main); shell.appendChild(layout);
+
+    var steps = lineage.steps || [];
+    if (!steps.length) {
+      rail.appendChild(el("div", { class: "empty-note", text: "No final steps" }));
+      viewport.appendChild(el("div", { class: "notice", style: "margin:16px", text: "The aggregator rejected the available inputs; inspect the rejected-input list below." }));
+      showLineageDetail(detail, "Rejected synthesis", "No final step was accepted.", confidence.rationale || "", [], "Decision");
+    }
+
+    function selectStep(index) {
+      Array.prototype.forEach.call(rail.querySelectorAll(".lineage-step-btn"), function (b, i) {
+        b.classList.toggle("active", i === index);
+        b.setAttribute("aria-selected", i === index ? "true" : "false");
+        b.setAttribute("tabindex", i === index ? "0" : "-1");
+      });
+      viewport.innerHTML = "";
+      var step = steps[index];
+      if (!step) return;
+      viewport.appendChild(buildLineageGraph(step, detail));
+      showLineageDetail(detail, step.title, step.description, step.adjudication, step.files_touched, "Final step · " + step.decision);
+    }
+
+    steps.forEach(function (step, i) {
+      var button = el("button", {
+        class: "lineage-step-btn" + (i === 0 ? " active" : ""),
+        role: "tab",
+        "aria-selected": i === 0 ? "true" : "false",
+        "aria-controls": "lineage-panel",
+        tabindex: i === 0 ? "0" : "-1"
+      }, [
+        el("span", { class: "n", text: "Step " + (i + 1) + " · " + step.decision }),
+        el("span", { class: "t", text: step.title })
+      ]);
+      button.addEventListener("click", function () { selectStep(i); });
+      button.addEventListener("keydown", function (event) {
+        var next = i;
+        if (event.key === "ArrowDown" || event.key === "ArrowRight") next = (i + 1) % steps.length;
+        else if (event.key === "ArrowUp" || event.key === "ArrowLeft") next = (i - 1 + steps.length) % steps.length;
+        else if (event.key === "Home") next = 0;
+        else if (event.key === "End") next = steps.length - 1;
+        else return;
+        event.preventDefault(); selectStep(next);
+        rail.querySelectorAll(".lineage-step-btn")[next].focus();
+      });
+      rail.appendChild(button);
+    });
+    if (steps.length) selectStep(0);
+
+    var rejected = lineage.rejected_inputs || [];
+    if (rejected.length) {
+      var rejectedBox = el("details", { class: "lineage-rejected" });
+      rejectedBox.appendChild(el("summary", { text: rejected.length + " rejected proposal input" + (rejected.length === 1 ? "" : "s") }));
+      var list = el("ul");
+      rejected.forEach(function (r) {
+        list.appendChild(el("li", { text: r.proposer + " step " + (r.step_index + 1) + " — " + r.reason }));
+      });
+      rejectedBox.appendChild(list); shell.appendChild(rejectedBox);
+    }
+    return shell;
+  }
+
+  function showLineageDetail(host, title, body, note, files, kind) {
+    host.innerHTML = "";
+    host.appendChild(el("div", { class: "kind", text: kind || "Source" }));
+    host.appendChild(el("div", { class: "detail-title", text: title || "Untitled" }));
+    if (body) host.appendChild(el("div", { class: "detail-body", text: body }));
+    if (note) host.appendChild(el("div", { class: "detail-note", text: note }));
+    if (files && files.length) {
+      var fileBox = el("div", { class: "lineage-files" });
+      files.forEach(function (f) { fileBox.appendChild(el("span", { class: "file-tok", text: f })); });
+      host.appendChild(fileBox);
+    }
+  }
+
+  function buildLineageGraph(step, detail) {
+    var proposerRefs = step.proposer_refs || [], refinerRefs = step.refiner_refs || [];
+    var maxNodes = Math.max(proposerRefs.length, refinerRefs.length, 1);
+    var H = Math.max(300, 92 + maxNodes * 82), W = 900, finalY = H / 2;
+    var svg = svgEl("svg", { viewBox: "0 0 " + W + " " + H, width: "100%", height: H, role: "img", "aria-label": "Decision lineage for " + step.title });
+    var defs = svgEl("defs", {}), marker = svgEl("marker", { id: "lineage-arrow-" + step.id, viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 6, markerHeight: 6, orient: "auto-start-reverse" });
+    marker.appendChild(svgEl("path", { d: "M 0 0 L 10 5 L 0 10 z", fill: C.muted })); defs.appendChild(marker);
+    var shadow = svgEl("filter", { id: "lineage-card-shadow", x: "-10%", y: "-10%", width: "130%", height: "140%" });
+    shadow.appendChild(svgEl("feDropShadow", { dx: "0", dy: "3", "stdDeviation": "2.5", "flood-color": "#1f2937", "flood-opacity": ".16" })); defs.appendChild(shadow); svg.appendChild(defs);
+    [[18, 32, 250, H - 50, "#fffaf0"], [328, 32, 245, H - 50, "#f5fbf8"], [638, 32, 244, H - 50, "#f7f8ff"]].forEach(function (lane) {
+      svg.appendChild(svgEl("rect", { x: lane[0], y: lane[1], width: lane[2], height: lane[3], rx: 18, fill: lane[4], stroke: "#e5e7eb", "stroke-width": 1 }));
+    });
+    svg.appendChild(svgText(32, 24, "SOURCE RECOMMENDATIONS", { fill: C.muted, "font-size": 10, "font-weight": 800, "letter-spacing": "0.08em" }));
+    svg.appendChild(svgText(338, 24, "REVIEW FINDINGS", { fill: C.muted, "font-size": 10, "font-weight": 800, "letter-spacing": "0.08em" }));
+    svg.appendChild(svgText(650, 24, "FINAL DECISION", { fill: C.muted, "font-size": 10, "font-weight": 800, "letter-spacing": "0.08em" }));
+
+    function ys(count) {
+      if (count <= 1) return [finalY];
+      var gap = Math.min(100, (H - 100) / (count - 1));
+      var first = finalY - gap * (count - 1) / 2;
+      return Array.apply(null, Array(count)).map(function (_, i) { return first + i * gap; });
+    }
+    var propY = ys(proposerRefs.length), refY = ys(refinerRefs.length);
+    function edge(x1, y1, x2, y2, color, dash, key) {
+      var d = "M " + x1 + " " + y1 + " C " + (x1 + 75) + " " + y1 + ", " + (x2 - 75) + " " + y2 + ", " + x2 + " " + y2;
+      svg.appendChild(svgEl("path", { d: d, class: "lineage-edge-halo", stroke: color, "stroke-width": 7, opacity: .10 }));
+      var p = svgEl("path", { d: d, class: "lineage-edge edge-" + key, fill: "none", stroke: color, "stroke-width": 2.25, "marker-end": "url(#lineage-arrow-" + step.id + ")", opacity: 0.82 });
+      if (dash) p.setAttribute("stroke-dasharray", dash);
+      svg.appendChild(p);
+    }
+    proposerRefs.forEach(function (r, i) { edge(250, propY[i], 650, finalY, r.relationship === "adopted" ? C.green : C.gold, r.relationship === "adapted" ? "8 6" : "", "p" + i); });
+    refinerRefs.forEach(function (r, i) {
+      var resolved = resolveRefinerLineage(r), color = resolved.status === "contradicted" ? C.red : (resolved.status === "unverified" ? C.muted : C.ink);
+      edge(560, refY[i], 650, finalY, color, "2 6", "r" + i);
+    });
+
+    proposerRefs.forEach(function (r, i) {
+      var source = resolveProposerLineage(r), label = r.agent_id + " · step " + (r.step_index + 1);
+      addLineageNode(svg, 30, propY[i] - 31, 220, 62, label, source.title || r.note, r.relationship, ["p" + i], function () {
+        showLineageDetail(detail, source.title || label, source.body, r.note, source.files, "Proposer · " + r.relationship);
+      });
+    });
+    refinerRefs.forEach(function (r, i) {
+      var source = resolveRefinerLineage(r), label = r.agent_id + " · " + r.kind.replace(/_/g, " ");
+      addLineageNode(svg, 340, refY[i] - 31, 220, 62, label, source.title || r.note, source.status || "review", ["r" + i], function () {
+        showLineageDetail(detail, source.title || label, source.body, r.note, source.files, "Refiner · " + (source.status || r.kind));
+      });
+    });
+    addLineageNode(svg, 650, finalY - 43, 220, 86, "FINAL · " + step.decision, step.title, "final-" + step.decision, proposerRefs.map(function (_, i) { return "p" + i; }).concat(refinerRefs.map(function (_, i) { return "r" + i; })), function () {
+      showLineageDetail(detail, step.title, step.description, step.adjudication, step.files_touched, "Final step · " + step.decision);
+    });
+    return svg;
+  }
+
+  function addLineageNode(svg, x, y, w, h, eyebrow, title, state, edgeKeys, onActivate) {
+    var colors = { adopted: C.green, adapted: C.gold, verified: C.green, contradicted: C.red, unverified: C.muted, "final-accepted": C.green, "final-revised": C.gold, "final-new": C.ink };
+    var g = svgEl("g", { class: "lineage-node", role: "button", tabindex: "0", "aria-label": eyebrow + ": " + title });
+    var tooltip = svgEl("title", {});
+    tooltip.textContent = eyebrow + ": " + title + ". Hover or focus to trace this influence.";
+    g.appendChild(tooltip);
+    g.appendChild(svgEl("rect", { x: x, y: y, width: w, height: h, rx: 10, fill: "#fff", stroke: colors[state] || C.track, "stroke-width": 2 }));
+    g.appendChild(svgText(x + 13, y + 20, eyebrow.toUpperCase(), { fill: colors[state] || C.muted, "font-size": 9, "font-weight": 800, "letter-spacing": "0.05em" }));
+    var lines = wrapLineageText(title, 31, 2);
+    lines.forEach(function (line, i) { g.appendChild(svgText(x + 13, y + 40 + i * 15, line, { fill: C.ink, "font-size": 12, "font-weight": 700 })); });
+    g.addEventListener("click", onActivate);
+    g.addEventListener("pointerenter", function () { setLineageFocus(svg, g, edgeKeys, onActivate); });
+    g.addEventListener("pointerleave", function () { clearLineageFocus(svg); });
+    g.addEventListener("focus", function () { setLineageFocus(svg, g, edgeKeys, onActivate); });
+    g.addEventListener("blur", function () { clearLineageFocus(svg); });
+    g.addEventListener("keydown", function (e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onActivate(); } });
+    svg.appendChild(g);
+  }
+
+  function setLineageFocus(svg, node, edgeKeys, onActivate) {
+    Array.prototype.forEach.call(svg.querySelectorAll(".lineage-node"), function (item) { item.classList.toggle("is-muted", item !== node); });
+    Array.prototype.forEach.call(svg.querySelectorAll(".lineage-edge"), function (edge) {
+      var hit = edgeKeys.some(function (key) { return edge.classList.contains("edge-" + key); });
+      edge.classList.toggle("is-highlighted", hit); edge.classList.toggle("is-muted", !hit);
+    });
+    node.classList.add("is-highlighted"); onActivate();
+  }
+
+  function clearLineageFocus(svg) {
+    Array.prototype.forEach.call(svg.querySelectorAll(".lineage-node, .lineage-edge"), function (item) { item.classList.remove("is-muted", "is-highlighted"); });
+  }
+
+  function wrapLineageText(value, width, maxLines) {
+    var words = String(value || "").split(/\s+/), lines = [], line = "";
+    words.forEach(function (word) {
+      var candidate = line ? line + " " + word : word;
+      if (candidate.length > width && line) { lines.push(line); line = word; }
+      else line = candidate;
+    });
+    if (line) lines.push(line);
+    if (lines.length > maxLines) {
+      lines = lines.slice(0, maxLines);
+      lines[maxLines - 1] = lines[maxLines - 1].slice(0, Math.max(1, width - 1)) + "…";
+    }
+    return lines;
+  }
+
+  function resolveProposerLineage(ref) {
+    var agent = (DATA.layer1 || []).find(function (r) { return r.agent_id === ref.agent_id; });
+    var step = agent && agent.payload && (agent.payload.plan || [])[ref.step_index];
+    return step ? { title: step.step, body: step.why || "", files: step.files_touched || [] } : { title: ref.agent_id + " step " + (ref.step_index + 1), body: "Source payload is unavailable.", files: [] };
+  }
+
+  function resolveRefinerLineage(ref) {
+    var agent = (DATA.layer2 || []).find(function (r) { return r.agent_id === ref.agent_id; });
+    var p = agent && agent.payload;
+    if (!p) return { title: ref.kind, body: "Source payload is unavailable.", status: "review", files: [] };
+    var keyByKind = { verification: "verifications", missing_step: "missing_steps", incorrect_step: "incorrect_steps", disagreement: "disagreements" };
+    if (ref.kind === "synthesis_recommendation") return { title: "Recommendation: " + summarizeLineageFinding(p.synthesis_recommendation, 66), body: p.synthesis_recommendation || "", status: "review", files: [] };
+    var item = (p[keyByKind[ref.kind]] || [])[ref.index];
+    if (ref.kind === "verification" && item) return { title: "Verified: " + summarizeLineageFinding(item.actual_finding || (item.proposer + " " + item.claim_index_path), 66), body: item.actual_finding || "", status: item.status, files: item.source_url ? [item.source_url] : [] };
+    if (ref.kind === "incorrect_step" && item) return { title: "Issue: " + summarizeLineageFinding(item.what_is_wrong || (item.proposer + " step " + (item.step_index + 1)), 66), body: item.what_is_wrong || "", status: "contradicted", files: [] };
+    if (ref.kind === "disagreement" && item) return { title: "Disagreement: " + summarizeLineageFinding(item.point || item.what_to_do_instead || item.proposer, 66), body: (item.point || "") + " — " + (item.why || "") + " Instead: " + (item.what_to_do_instead || ""), status: "review", files: [] };
+    if (ref.kind === "missing_step" && item != null) return { title: "Missing: " + summarizeLineageFinding(item, 66), body: String(item), status: "review", files: [] };
+    return { title: ref.kind.replace(/_/g, " "), body: "Referenced finding is unavailable.", status: "review", files: [] };
+  }
+
+  // ---------------------------------------------------------------- Aggregation
+  (function () {
+    var sec = el("section", { class: "block", id: "plan" });
+    sec.appendChild(el("div", { class: "section-kicker", text: "Recommendation" }));
+    sec.appendChild(el("h2", { class: "section-title", text: "Final recommendation" }));
+    sec.appendChild(reportArt("synthesis", "Lead architect combining proposal fragments into one coherent master plan", "The aggregator reconciles alternatives into one implementable plan."));
+    var aggregator = DATA.config && DATA.config.aggregator, layer3 = DATA.layer3 || [];
+    var aggregatorLabel = aggregator ? esc(aggregator.name) + " / " + esc(aggregator.model) : "Codex / gpt-5.6-sol (xhigh)";
+    if (layer3.length) sec.appendChild(el("p", { class: "section-note", html: "The final recommendation was produced by <b>" + aggregatorLabel + "</b>. Its runtime appears in the timeline and its captured output is available in Technical logs." }));
+    else sec.appendChild(el("p", { class: "section-note", html: "The final recommendation is produced in the configured parent session (" + aggregatorLabel + ")." }));
+    if (DATA.final_plan_html) {
+      if (DATA.final_plan_markdown) sec.appendChild(buildPlanCopyControl());
+      sec.appendChild(el("div", { class: "plan-render", html: DATA.final_plan_html }));
+    } else sec.appendChild(el("div", { class: "notice info", text: "No final recommendation has been recorded yet. Finish the final synthesis, then regenerate this report to include the recommendation and its decision trail." }));
+    addSection("plan", "Final recommendation", sec);
+  })();
+  function buildPlanCopyControl() {
+    var status = el("span", { class: "copy-status", role: "status", "aria-live": "polite", text: "Copies the complete recommendation with headings, lists, and links intact." });
+    var fallback = el("textarea", {
+      class: "copy-fallback",
+      hidden: "hidden",
+      readonly: "readonly",
+      "aria-label": "Final plan Markdown ready to copy"
+    });
+    var button = el("button", {
+      class: "btn primary",
+      type: "button",
+      text: "Copy final plan as Markdown",
+      onclick: function () { copyFinalPlanMarkdown(button, status, fallback); }
+    });
+    return el("div", { class: "plan-actions" }, [button, status, fallback]);
+  }
+  function copyFinalPlanMarkdown(button, status, fallback) {
+    var markdown = DATA.final_plan_markdown || "";
+    var originalLabel = "Copy final plan as Markdown";
+    button.disabled = true;
+    status.className = "copy-status";
+    status.textContent = "Copying…";
+
+    function showManualFallback() {
+      button.textContent = originalLabel;
+      button.disabled = false;
+      status.className = "copy-status fail";
+      status.textContent = "Automatic copy is unavailable on this connection. The Markdown is selected below—press Ctrl+C or Cmd+C.";
+      fallback.value = markdown;
+      fallback.hidden = false;
+      fallback.focus();
+      fallback.select();
+    }
+
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+      navigator.clipboard.writeText(markdown).then(function () {
+        button.textContent = "Copied";
+        status.className = "copy-status ok";
+        status.textContent = "Final plan copied as Markdown.";
+      }).catch(showManualFallback).finally(function () {
+        button.disabled = false;
+        window.setTimeout(function () {
+          if (button.textContent === "Copied") button.textContent = originalLabel;
+        }, 2400);
+      });
+    } else {
+      showManualFallback();
+    }
+  }
+
+  // ---------------------------------------------------------------- Raw logs
+  (function () {
+    var all = (DATA.layer1 || []).concat(DATA.layer2 || [], DATA.layer3 || []);
+    var sec = el("section", { class: "block", id: "logs" });
+    sec.appendChild(el("div", { class: "section-kicker", text: "Technical details" }));
+    sec.appendChild(el("h2", { class: "section-title", text: "Raw contributor logs" }));
+    sec.appendChild(controlBar("logs"));
+    all.forEach(function (r) {
+      if (!r.log || (!r.log.stdout && !r.log.stderr)) return;
+      sec.appendChild(collapsible(r.agent_id + " · " + r.role, statusPip(r), [["dur", fmtDur(r.duration_seconds)]], logViewer(r), false, r));
+    });
+    addSection("logs", "Technical logs", sec);
+  })();
+  function logViewer(r) {
+    var box = el("div");
+    var tabs = el("div", { class: "log-tabs" });
+    var filter = el("input", { class: "log-filter", placeholder: "Filter lines…", type: "text" });
+    var view = el("div", { class: "log-view" });
+    function render(which) {
+      view.innerHTML = "";
+      var text = (r.log[which] || "").replace(/\s+$/, "");
+      if (!text) { view.appendChild(el("div", { class: "log-empty", text: "(empty)" })); return; }
+      text.split("\n").forEach(function (line, i) {
+        view.appendChild(el("div", { class: "log-line" }, [el("span", { class: "ln", text: i + 1 }), el("span", { class: "lc", text: line })]));
+      });
+      applyFilter();
+    }
+    function applyFilter() {
+      var q = filter.value.toLowerCase();
+      Array.prototype.forEach.call(view.querySelectorAll(".log-line"), function (ln) {
+        var hit = !q || ln.querySelector(".lc").textContent.toLowerCase().indexOf(q) !== -1;
+        ln.className = "log-line" + (hit ? "" : " hidden");
+      });
+    }
+    filter.addEventListener("input", applyFilter);
+    [["stdout", "STDOUT"], ["stderr", "STDERR"]].forEach(function (t, idx) {
+      var b = el("button", { class: idx === 0 ? "active" : "", text: t[1] });
+      b.addEventListener("click", function () { Array.prototype.forEach.call(tabs.children, function (c) { c.className = ""; }); b.className = "active"; render(t[0]); });
+      tabs.appendChild(b);
+    });
+    box.appendChild(tabs); box.appendChild(filter); box.appendChild(view);
+    render("stdout");
+    return box;
+  }
+
+  // ---------------------------------------------------------------- Reading guide
+  (function () {
+    var sec = el("section", { class: "block flow", id: "how" });
+    sec.appendChild(el("div", { class: "section-kicker", text: "Reading guide" }));
+    sec.appendChild(el("h2", { class: "section-title", text: "How to use this report" }));
+    sec.appendChild(el("p", { class: "section-note", text: "Start with the final recommendation. Use the decision trail to understand why a step was selected, the review section to see challenges and checks, and the technical logs only when you need the raw model output." }));
+    app.appendChild(sec);
+    var f = el("footer", { class: "foot" });
+    f.appendChild(el("div", { class: "wrap", html: "Generated by <code class='inline'>harness/scripts/report.py</code> · MoA-X mixture-of-agents harness · self-contained, no network required." }));
+    document.body.appendChild(f);
+  })();
+
+  // ---------------------------------------------------------------- shared: collapsible
+  var collapseSequence = 0;
+  function collapsible(title, pipClass, stats, bodyNode, openByDefault, agent) {
+    var wrap = el("div", { class: "collapse" + (openByDefault ? " open" : "") });
+    var sequence = ++collapseSequence, headId = "collapse-head-" + sequence, bodyId = "collapse-body-" + sequence;
+    var head = el("button", { class: "c-head", type: "button", id: headId, "aria-expanded": openByDefault ? "true" : "false", "aria-controls": bodyId });
+    head.appendChild(el("span", { class: "status-pip " + (pipClass || "pip-ok"), "aria-hidden": "true" }));
+    if (agent) head.appendChild(labPortrait(agent, "avatar", " model-lab avatar"));
+    head.appendChild(el("span", { class: "c-title", text: title }));
+    if (stats) { var ms = el("span", { class: "mini-stats" }); stats.forEach(function (s) { ms.appendChild(el("span", { html: esc(s[0]) + " <b>" + esc(s[1]) + "</b>" })); }); head.appendChild(ms); }
+    head.appendChild(el("span", { class: "caret", text: "▶", "aria-hidden": "true" }));
+    var bodyWrap = el("div", { class: "c-body", id: bodyId, role: "region", "aria-labelledby": headId, "aria-hidden": openByDefault ? "false" : "true" });
+    bodyWrap.inert = !openByDefault;
+    var pad = el("div", { class: "pad" }); pad.appendChild(bodyNode); bodyWrap.appendChild(pad);
+    head.addEventListener("click", function () { toggleCollapse(wrap, bodyWrap, head); });
+    wrap.appendChild(head); wrap.appendChild(bodyWrap);
+    if (openByDefault) setTimeout(function () { bodyWrap.style.maxHeight = REDUCED ? "none" : bodyWrap.scrollHeight + "px"; }, 0);
+    return wrap;
+  }
+  function toggleCollapse(wrap, bodyWrap, head) {
+    var open = wrap.classList.toggle("open");
+    head = head || wrap.querySelector(".c-head");
+    if (head) head.setAttribute("aria-expanded", open ? "true" : "false");
+    bodyWrap.setAttribute("aria-hidden", open ? "false" : "true");
+    bodyWrap.inert = !open;
+    if (REDUCED) { bodyWrap.style.maxHeight = open ? "none" : "0"; return; }
+    if (open) {
+      bodyWrap.style.maxHeight = bodyWrap.scrollHeight + "px";
+      setTimeout(function () { if (wrap.classList.contains("open")) bodyWrap.style.maxHeight = "none"; }, 340);
+    } else {
+      bodyWrap.style.maxHeight = bodyWrap.scrollHeight + "px";
+      requestAnimationFrame(function () { bodyWrap.style.maxHeight = "0"; });
+    }
+  }
+  function controlBar(scope) {
+    var bar = el("div", { class: "controls" });
+    bar.appendChild(el("button", { class: "btn", text: "Expand all", onclick: function () { setAll(scope, true); } }));
+    bar.appendChild(el("button", { class: "btn", text: "Collapse all", onclick: function () { setAll(scope, false); } }));
+    return bar;
+  }
+  function setAll(scope, open) {
+    var sec = document.getElementById(scope);
+    Array.prototype.forEach.call(sec.querySelectorAll(".collapse"), function (w) {
+      var b = w.querySelector(".c-body");
+      var h = w.querySelector(".c-head");
+      var isOpen = w.classList.contains("open");
+      if (open && !isOpen) toggleCollapse(w, b, h);
+      if (!open && isOpen) toggleCollapse(w, b, h);
+    });
+  }
+
+  // ---------------------------------------------------------------- Compact stage timeline
+  function buildGantt() {
+    var l1 = DATA.layer1 || [], l2 = DATA.layer2 || [], l3 = DATA.layer3 || [];
+    var t0 = typeof DATA.started_at === "number" ? DATA.started_at : 0;
+    var definitions = [
+      { number: 1, title: "Independent recommendations", rows: l1 },
+      { number: 2, title: "Review and challenge", rows: l2 },
+      { number: 3, title: "Final decision", rows: l3 }
+    ].filter(function (stage) { return stage.rows.length; });
+    if (!definitions.length) return el("p", { class: "empty-note", text: "No timing data." });
+
+    var shell = el("div", { class: "timeline-shell", role: "group", "aria-label": "Contributor timing by stage" });
+    var derivedStart = 0, previousEnd = 0;
+    definitions.forEach(function (definition) {
+      var spans = [];
+      definition.rows.forEach(function (r) {
+        if (r.previous_attempt) {
+          var prior = r.previous_attempt;
+          var priorRecorded = typeof prior.started_at === "number" && t0 ? prior.started_at - t0 : null;
+          spans.push({ r: r, attempt: prior, previous: true, start: Math.max(0, priorRecorded == null ? derivedStart : priorRecorded), dur: Math.max(0, Number(prior.duration_seconds) || 0) });
+        }
+        var recorded = typeof r.started_at === "number" && t0 ? r.started_at - t0 : null;
+        spans.push({ r: r, attempt: r, previous: false, start: Math.max(0, recorded == null ? derivedStart : recorded), dur: Math.max(0, Number(r.duration_seconds) || 0) });
+      });
+      var stageStart = spans.reduce(function (value, span) { return Math.min(value, span.start); }, Infinity);
+      if (!isFinite(stageStart)) stageStart = derivedStart;
+      var stageEnd = spans.reduce(function (value, span) { return Math.max(value, span.start + span.dur); }, stageStart);
+      var activeWindow = Math.max(1, stageEnd - stageStart);
+      var handoffDelay = Math.max(0, stageStart - previousEnd);
+      var retryCount = definition.rows.filter(function (r) { return Boolean(r.previous_attempt); }).length;
+
+      var stage = el("section", { class: "timeline-stage stage-" + definition.number, "aria-label": "Stage " + definition.number + ": " + definition.title });
+      stage.appendChild(el("div", { class: "timeline-stage-head" }, [
+        el("div", { class: "timeline-stage-title" }, [
+          el("span", { class: "number", text: "Stage " + definition.number }),
+          el("h3", { text: definition.title })
+        ]),
+        el("div", { class: "timeline-stage-meta", text: "Began " + fmtOffset(stageStart) + " · active for " + fmtDur(activeWindow) })
+      ]));
+      if (definition.number > 1 && handoffDelay > 5) {
+        stage.appendChild(el("div", {
+          class: "timeline-gap",
+          text: fmtDur(handoffDelay) + " between stages for handoff, waiting, or retries."
+        }));
+      }
+      if (retryCount) {
+        stage.appendChild(el("div", {
+          class: "timeline-retry-summary",
+          text: retryCount + " lane" + (retryCount === 1 ? " was" : "s were") + " rerun after incomplete output; the hatched interval is the wait before that retry began."
+        }));
+      }
+
+      var rows = el("div", { class: "timeline-rows" });
+      spans.forEach(function (span) {
+        var left = Math.max(0, Math.min(100, (span.start - stageStart) / activeWindow * 100));
+        var width = Math.max(.8, Math.min(100 - left, span.dur / activeWindow * 100));
+        var state = span.attempt.success ? "completed" : (span.attempt.transient_empty ? "returned no usable response" : "did not complete");
+        var retry = !span.previous && Number(span.r.attempt || 1) > 1;
+        var retryWait = null;
+        if (retry && span.r.previous_attempt) {
+          var priorStart = typeof span.r.previous_attempt.started_at === "number" && t0 ? span.r.previous_attempt.started_at - t0 : stageStart;
+          var priorEnd = Math.max(stageStart, priorStart + (Number(span.r.previous_attempt.duration_seconds) || 0));
+          if (span.start - priorEnd > 5) {
+            retryWait = {
+              left: Math.max(0, Math.min(100, (priorEnd - stageStart) / activeWindow * 100)),
+              width: Math.max(.8, Math.min(100, (span.start - priorEnd) / activeWindow * 100)),
+              duration: span.start - priorEnd
+            };
+          }
+        }
+        var barClass = "timeline-bar" + (span.attempt.success ? "" : (span.attempt.transient_empty ? " transient" : " failed")) + (span.previous ? " previous" : "") + (retry ? " retry" : "");
+        var rowStatus = span.previous
+          ? (span.attempt.transient_empty ? "initial attempt — incomplete response" : "initial attempt failed")
+          : (retry ? "rerun completed" : state);
+        var track = el("div", {
+          class: "timeline-track",
+          role: "img",
+          "aria-label": span.r.agent_id + " attempt " + (span.attempt.attempt || 1) + " " + state + " in " + fmtDur(span.dur) + (retryWait ? "; retry queued for " + fmtDur(retryWait.duration) + " after incomplete output" : "")
+        });
+        if (retryWait) track.appendChild(el("span", { class: "timeline-retry-wait", title: "Retry queued after incomplete output: " + fmtDur(retryWait.duration), style: "left:" + retryWait.left.toFixed(2) + "%;width:" + retryWait.width.toFixed(2) + "%" }));
+        track.appendChild(el("span", { class: barClass, style: "left:" + left.toFixed(2) + "%;width:" + width.toFixed(2) + "%" }));
+        rows.appendChild(el("div", { class: "timeline-row" + (retry || span.previous ? " is-retry" : "") }, [
+          el("div", { class: "timeline-who" }, [
+            labPortrait(span.r, "avatar", " timeline contributor"),
+            el("div", { class: "name", text: span.r.agent_id + ((span.attempt.attempt || 1) > 1 || span.previous ? " · attempt " + (span.attempt.attempt || 1) : "") }),
+            el("div", { class: "role", text: String(span.r.role || "contributor").replace(/-/g, " ") + " · " + rowStatus })
+          ]),
+          track,
+          el("div", { class: "timeline-duration", text: fmtDur(span.dur) })
+        ]));
+      });
+      stage.appendChild(rows);
+      shell.appendChild(stage);
+      previousEnd = Math.max(previousEnd, stageEnd);
+      derivedStart = previousEnd;
+    });
+    shell.appendChild(el("p", {
+      class: "timeline-legend",
+      style: "padding:0 20px 16px",
+      text: "Stage 1, 2, and 3 use distinct striped colors. A gray retry row is the replaced attempt; the amber hatch marks time queued before the rerun started. Each stage uses its own readable scale."
+    }));
+    return shell;
+  }
+  function fmtOffset(seconds) { return seconds < 1 ? "at run start" : fmtDur(seconds) + " into the run"; }
+
+  // ---------------------------------------------------------------- SVG helpers
+  function svgEl(tag, attrs) { var n = document.createElementNS("http://www.w3.org/2000/svg", tag); for (var k in attrs) n.setAttribute(k, attrs[k]); return n; }
+  function svgText(x, y, text, attrs) { var t = svgEl("text", Object.assign({ x: x, y: y, "font-family": "Arial, sans-serif" }, attrs || {})); t.textContent = text; return t; }
+
+  // ---------------------------------------------------------------- Nav + scrollspy
+  (function () {
+    var inner = document.getElementById("mininav-inner");
+    sections.forEach(function (s) { inner.appendChild(el("a", { href: "#" + s.id, text: s.label })); });
+    var links = Array.prototype.slice.call(inner.querySelectorAll("a"));
+    function spy() {
+      var y = window.scrollY + 120, cur = sections[0].id;
+      sections.forEach(function (s) { var e = document.getElementById(s.id); if (e && e.offsetTop <= y) cur = s.id; });
+      links.forEach(function (a) { a.className = a.getAttribute("href") === "#" + cur ? "active" : ""; });
+    }
+    window.addEventListener("scroll", spy); spy();
+  })();
+
+  // ---------------------------------------------------------------- Tooltip
+  (function () {
+    var tip = document.getElementById("tooltip");
+    document.addEventListener("mouseover", function (e) {
+      var t = e.target.closest ? e.target.closest("[data-tip]") : null;
+      if (!t || !t.getAttribute("data-tip")) return;
+      tip.innerHTML = (t.getAttribute("data-tiph") ? '<div class="tt-h">' + esc(t.getAttribute("data-tiph")) + "</div>" : "") + esc(t.getAttribute("data-tip"));
+      tip.style.display = "block";
+    });
+    document.addEventListener("mousemove", function (e) {
+      if (tip.style.display !== "block") return;
+      var x = e.clientX + 14, y = e.clientY + 16;
+      if (x + tip.offsetWidth > window.innerWidth - 10) x = e.clientX - tip.offsetWidth - 14;
+      if (y + tip.offsetHeight > window.innerHeight - 10) y = e.clientY - tip.offsetHeight - 16;
+      tip.style.left = x + "px"; tip.style.top = y + "px";
+    });
+    document.addEventListener("mouseout", function (e) {
+      var t = e.target.closest ? e.target.closest("[data-tip]") : null;
+      if (t) tip.style.display = "none";
+    });
+  })();
+})();
+</script>
+</body>
+</html>

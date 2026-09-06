@@ -76,6 +76,11 @@ jobs:
       - name: Scan full history
         run: gitleaks detect --source . --no-banner --redact --exit-code 1
 
+      - name: Secret-scan exception regression tests
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: python3 docs/test_gitleaks.py -v
+
   lint:
     name: Lint (shellcheck + actionlint)
     runs-on: ubuntu-latest
@@ -95,7 +100,15 @@ jobs:
         run: |
           export PATH="$HOME/.local/bin:$PATH"
           status=0
-          for file in $(find . -name '*.sh' -o -name '*.sh.tmpl' -o -path './dot_local/bin/*' -name '*.tmpl' | sort -u); do
+          while IFS= read -r -d '' file; do
+            # Review copies under docs/ are evidence, not managed scripts.
+            case "$file" in
+              docs/*|dotfiles-showcase/*) continue ;;
+            esac
+            case "$file" in
+              *.sh|*.sh.tmpl|dot_local/bin/*.tmpl) ;;
+              *) continue ;;
+            esac
             if [[ "$file" == *.tmpl ]]; then
               out="/tmp/sc_$(echo "$file" | tr '/' '_')"
               chezmoi execute-template --source "$PWD" --override-data '{"chezmoi":{"osRelease":{"id":"omarchy"}}}' < "$file" > "$out"
@@ -111,7 +124,7 @@ jobs:
               shellcheck -S warning "$target" || status=1
               echo "::endgroup::"
             fi
-          done
+          done < <(git ls-files -z)
           exit $status
 
       - name: actionlint
@@ -122,3 +135,14 @@ jobs:
 
       - name: Dotfiles index is up to date
         run: python3 docs/generate_index.py --check
+
+      - name: Install review test dependencies
+        run: sudo apt-get install -y python3-yaml
+
+      - name: Review tooling fixtures (never execute copied skill workflows)
+        env:
+          PYTHONDONTWRITEBYTECODE: '1'
+        run: |
+          python3 docs/skill-review/test_inventory.py -v
+          python3 docs/skill-review/test_review.py -v
+          python3 docs/skill-review/evaluations/test_local.py -v

@@ -63,6 +63,7 @@ ordering guarantee — treat each trigger class separately.
 | 26 | `run_onchange_after_26-setup-omarchy-cursor.sh.tmpl` | onchange | Cursor usage collector setup |
 | 27 | `run_onchange_after_27-sync-claude-mcp.sh.tmpl` | onchange | Sync Claude Code MCP config |
 | 28 | `run_onchange_after_28-sync-claude-settings.sh.tmpl` | onchange | Sync Claude Code permissions/hooks |
+| 29 | `run_onchange_after_29-setup-omarchy-drift-capture.sh.tmpl` | onchange | Set up Omarchy shell drift capture |
 | 30 | `run_onchange_after_30-macos-defaults.sh.tmpl` | onchange (darwin) | Declarative `defaults write` preferences |
 
 ## 4. Contents map
@@ -88,6 +89,7 @@ The table below is the orienting summary; the index is the detail.
 | `dot_evotai/` | EVOT LLM provider environment config (`~/.evotai/evot.env`) |
 | `.chezmoidata/` | YAML data sources read by `.tmpl`s (`machines`, `agent_skills`, `omarchy_plugins`, `claude_mcp`, `claude_settings`) |
 | `docs/` | Recovery guide, reorganization proposal, and generator scripts (chezmoi-ignored, git-tracked) |
+| `docs/agents/`, `docs/skill-review/` | Cross-agent tracking guide and candidate-only skill review evidence; never deploy or execute copied workflows as repo automation |
 | `INDEX.json` / `INDEX.md` | **Generated** file index (see above); never hand-edit |
 | `Documents/` | Non-config content (Cline workflow docs) |
 | `.github/workflows/ci.yml` | CI: dry-run apply on Linux + macOS, shellcheck, actionlint |
@@ -114,6 +116,11 @@ Each CLI/runtime is owned by exactly one manager. Do not spread a tool across tw
 
 ## 6. Hard rules for agents
 
+- **Before selecting, claiming, delegating or updating tracked work**, read
+  [`docs/agents/issue-tracker.md`](docs/agents/issue-tracker.md). It defines the
+  Skills Review Linear destination, agent capability tiers, human-only tasks,
+  ownership protocol and blocker-discovery limits. Use it across harnesses;
+  task labels alone are not dispatch authority.
 - **Never apply or edit `dotfiles-showcase/`.** It's an independent git submodule with
   its own `AGENTS.md`/`ROADMAP.md`. Changes belong in the submodule repo.
 - **Never commit secrets.** Do not add `.linear.toml`, `key.txt`, age keys, SSH
@@ -121,6 +128,10 @@ Each CLI/runtime is owned by exactly one manager. Do not spread a tool across tw
   new secrets (`encrypted_*.age`).
 - **Keep repo-level `.gitignore` and `.chezmoiignore` in sync** with what is
   intentionally git-tracked vs applied.
+- **Review artifacts are repository material.** Track `docs/skill-review/` trees,
+  licenses, inventory and evidence; keep `.unlazy/` coordination local via the
+  shared ignore rules, not only `.git/info/exclude`. CI runs review-tool fixtures,
+  not copied candidate scripts. Regenerate the root index after publishing files.
 - **Add new dotfiles with the correct prefix** (§2) and register them in
   `README.md` + this file if they add a tool or hook.
 - **`dot_config/nvim/lazy-lock.json` was seeded from a snapshot, not from a

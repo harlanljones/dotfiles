@@ -5,6 +5,12 @@ bun/
 # Python tooling (docs/generate_readme_tree.py is stdlib-only, but stay safe)
 __pycache__/
 *.pyc
+.venv/
+.pytest_cache/
+
+# Agent coordination is local state; review evidence under docs/ is tracked.
+.unlazy/
+.unlazy-hook-state.json
 
 # OS cruft
 .DS_Store
@@ -49,3 +55,5 @@ id_ecdsa
 *.pem
 *.p12
 
+# Local secret-scan reports may contain sensitive matches.
+gitleaks-report.*

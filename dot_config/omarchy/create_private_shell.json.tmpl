@@ -14,18 +14,18 @@
           "id": "omarchy.system-update"
         },
         {
-          "id": "omarchy.clock",
           "format": "ddd d MMM h:mm AP",
           "formatAlt": "d MMMM 'W'ww yyyy",
+          "id": "omarchy.clock",
           "verticalFormat": "HH\n—\nmm"
         },
         {
+          "activeGroupId": "settings",
+          "groups": "[{\"id\":\"default\",\"name\":\"Agents\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"harlan.agents\",\"harlan.agent-leaderboard\",\"robzolkos.github\",\"io.github.rolfkoenders.umarchy\"]},{\"id\":\"work\",\"name\":\"This PC\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"im0001gt.hw-tooltip\",\"omarchy.network\",\"io.github.this-is-npc.dockmarchy\",\"io.github.mtolhuys.disk-lens\",\"hzerrad.bottleneck\",\"taufderl.ipinfo\",\"io.github.tymurbogach.any-monitor\"]},{\"id\":\"settings\",\"name\":\"Settings\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"omarchy.audio\",\"omarchy.bluetooth\",\"omarchy.monitor\",\"esemczak.theme-modes\",\"leoom.aliases\",\"crmne.hyprmoncfg\",\"io.github.imryiuk.workspace-profiles\"]},{\"id\":\"extras\",\"name\":\"Extras\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"omarchy.weather\",\"sportsbar\",\"cristianocorsi.countdown\",\"io.github.omashift.omashift\",\"io.github.letsfg.flights\",\"ryanyogan.hydrate\"]}]",
           "id": "io.github.patrickfanella.shelfish",
-          "groups": "[{\"id\":\"default\",\"name\":\"Agents\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"harlan.agents\",\"harlan.agent-leaderboard\",\"robzolkos.github\",\"io.github.rolfkoenders.umarchy\"]},{\"id\":\"work\",\"name\":\"This PC\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"im0001gt.hw-tooltip\",\"omarchy.network\",\"io.github.this-is-npc.dockmarchy\",\"crmne.hyprmoncfg\",\"io.github.mtolhuys.disk-lens\",\"hzerrad.bottleneck\",\"taufderl.ipinfo\",\"io.github.tymurbogach.any-monitor\"]},{\"id\":\"settings\",\"name\":\"Settings\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"omarchy.audio\",\"omarchy.bluetooth\",\"omarchy.monitor\",\"esemczak.theme-modes\",\"leoom.aliases\",\"io.github.imryiuk.workspace-profiles\"]},{\"id\":\"extras\",\"name\":\"Extras\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"omarchy.weather\",\"sportsbar\",\"cristianocorsi.countdown\",\"io.github.omashift.omashift\",\"io.github.letsfg.flights\",\"ryanyogan.hydrate\"]}]",
-          "activeGroupId": "work",
-          "watchedPaths": "{}",
           "policies": "{}",
-          "revealSeconds": 8
+          "revealSeconds": 8,
+          "watchedPaths": "{}"
         },
         {
           "id": "io.github.patrickfanella.shelfish.group.default",
@@ -40,10 +40,10 @@
         },
         {
           "id": "robzolkos.github",
+          "includeForks": true,
           "linkBehavior": "Web app window",
-          "repositoryScope": "Owned and organizations",
           "refreshIntervalSec": 600,
-          "includeForks": true
+          "repositoryScope": "Owned and organizations"
         },
         {
           "id": "io.github.patrickfanella.shelfish.group.work",
@@ -59,9 +59,6 @@
         {
           "id": "io.github.this-is-npc.dockmarchy",
           "language": "en"
-        },
-        {
-          "id": "crmne.hyprmoncfg"
         },
         {
           "id": "io.github.mtolhuys.disk-lens"
@@ -96,6 +93,9 @@
           "id": "leoom.aliases"
         },
         {
+          "id": "crmne.hyprmoncfg"
+        },
+        {
           "id": "io.github.imryiuk.workspace-profiles"
         },
         {
@@ -119,13 +119,13 @@
           "id": "anothadev.omachord"
         },
         {
-          "id": "omarchy.tray",
-          "pinned": [],
           "hidden": [
             "Slack_status_icon_1",
             "1Password_status_icon_1",
             "chrome_status_icon_1"
-          ]
+          ],
+          "id": "omarchy.tray",
+          "pinned": []
         }
       ],
       "left": [
@@ -138,8 +138,8 @@
       ],
       "right": [
         {
-          "id": "io.github.irhop.mouse-odometer",
           "gamify": true,
+          "id": "io.github.irhop.mouse-odometer",
           "introSeen": true
         },
         {
@@ -156,12 +156,22 @@
         },
         {
           "id": "njpatel.omapager"
+        },
+        {
+          "id": "mohamedmansour.finance"
         }
       ]
     },
     "position": "top",
-    "transparent": false
+    "transparent": true
   },
+  "cloneSourceRestores": [
+    "shmall.lock"
+  ],
+  "disabledPlugins": [
+    "omarchy.lock",
+    "omarchy.notifications"
+  ],
   "idle": {
     "lock": 300,
     "screensaver": 150
@@ -177,13 +187,6 @@
       "id": "b.okomart"
     }
   ],
-  "version": 1,
-  "disabledPlugins": [
-    "omarchy.lock",
-    "omarchy.notifications"
-  ],
-  "cloneSourceRestores": [
-    "shmall.lock"
-  ]
+  "version": 1
 }
 {{- end }}

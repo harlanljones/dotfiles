@@ -13,6 +13,14 @@ app and development agents read. Both are **generated** by
 `docs/generate_index.py` and verified by CI; edit the script, never the
 artifacts.
 
+Agent work is coordinated through [the tracker guide](docs/agents/issue-tracker.md).
+The [Skills Review library](docs/skill-review/README.md) contains tracked candidate
+copies and evidence, not active skills. `docs/` is excluded from chezmoi apply;
+local `.unlazy/` coordination state is excluded from both Git and apply.
+Secret scanning retains all default rules and full-history coverage. Narrow,
+verified example exceptions live in `.gitleaks.toml` and are regression-tested;
+`.gitleaksignore` separately records the historical compromised credential.
+
 ---
 
 ## 🖥️ Machines
@@ -246,8 +254,6 @@ Declarative tracking for system-level packages that mise does not manage:
 │   ├── machines.yaml
 │   └── omarchy_plugins.yaml
 ├── .chezmoiignore.tmpl
-├── .gitignore
-├── .gitleaksignore
 ├── dot_Brewfile
 ├── dot_agents
 │   └── skills
@@ -627,5 +633,3 @@ Templates use `.chezmoiignore.tmpl` to ensure only platform-relevant configurati
 - **[`This-Is-NPC/dockmarchy`](https://github.com/This-Is-NPC/dockmarchy)**: Dock and launcher integration.
 - **[`shmall03/omarchy-shmall.lock-plugin`](https://github.com/shmall03/omarchy-shmall.lock-plugin)**: Screen lock and authentication plugin.
 - **[`cgmccarron/omarchy-sportsbar`](https://github.com/cgmccarron/omarchy-sportsbar)**: Live sports scores and status widget.
-
-

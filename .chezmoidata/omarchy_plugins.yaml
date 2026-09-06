@@ -49,3 +49,5 @@ omarchyPlugins:
     enabled: true
   - url: https://github.com/tymurbogach/omarchy-any-monitor.git
     enabled: true
+  - url: https://github.com/mohamedmansour/omafinance.git
+    enabled: true

@@ -1,0 +1,12 @@
+{
+  "status": "reviewed",
+  "disposition": "retain dependency-aware interview; comparison with related skills pending",
+  "pack": "planning-interviews (optional)",
+  "invocation": "task-triggered by a requested grilling or stress-test interview",
+  "execution": {"recommended": "interactive in-session", "alternatives": "bounded read-only fact lookup; no Herdr/worktree for the interview"},
+  "reviewedFiles": ["SKILL.md", "agents/openai.yaml"],
+  "changes": [{"files": ["SKILL.md", "REVIEW.md", "review.json"], "summary": "Preserve design-tree frontier and human decisions; bound large rounds, make fact delegation optional and distinguish blocked or deferred branches from completion."}],
+  "questions": [{"id": "Q-grilling-round-size", "question": "Preserve whole-frontier rounds or cap large rounds?", "recommendation": "Use the whole frontier for small sets; visibly split large independent sets.", "rationale": "Maintains decision coverage without overwhelming the interviewee.", "files": ["SKILL.md"]}],
+  "validation": ["Static walkthroughs of dependency waits, large frontiers, unavailable facts, user pauses and confirmation without implementation authority; agent metadata retained after full read."],
+  "limitations": ["No live interview/harness evaluation.", "Related grilling variants remain unreviewed; no retirement approved.", "No discovered license; distribution and pack recommendation require human review."]
+}

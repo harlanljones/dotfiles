@@ -1,0 +1,15 @@
+{
+  "status": "reviewed",
+  "disposition": "retain explicit orchestration with corrected coordination",
+  "pack": "engineering-orchestration (optional)",
+  "invocation": "explicit; retained disable-model-invocation requires provider verification",
+  "execution": {"recommended": "single in-session dispatcher with bounded independent workers and isolated worktrees for concurrent code writes", "alternatives": "sequential in-session implementation; authorized Herdr topology for visibility"},
+  "reviewedFiles": ["SKILL.md"],
+  "changes": [{"files": ["SKILL.md", "REVIEW.md", "review.json"], "summary": "Replace false atomic claim guarantees, direct API fallback, hardcoded main/focus and artifact-only completion with scoped dispatcher claims, base validation, evidence and explicit review state."}],
+  "questions": [
+    {"id": "Q-frontier-sweep-dispatch", "question": "Should one dispatcher own all claims and tracker updates?", "recommendation": "Yes; workers return evidence rather than mutating shared ticket state.", "rationale": "Shared self-assignment is not an atomic lock and hides child races.", "files": ["SKILL.md"]},
+    {"id": "Q-frontier-sweep-herdr", "question": "Does a sweep request alone authorize new Herdr topology?", "recommendation": "Confirm topology separately unless already specified; allow sequential execution.", "rationale": "Visibility and write isolation differ, and new workspaces consume shared resources.", "files": ["SKILL.md"]}
+  ],
+  "validation": ["Static scenarios for shared identities, missing code prerequisites, untracked diffs, review-state dependencies, empty frontier, failed capacity and interruption."],
+  "limitations": ["No live agent, worktree, build or ticket workflow executed by candidate.", "Provider invocation metadata and current Herdr CLI must be verified before promotion.", "No discovered license; external dispatchers can still race."]
+}

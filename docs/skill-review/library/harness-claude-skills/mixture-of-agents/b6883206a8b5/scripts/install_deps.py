@@ -1,0 +1,375 @@
+#!/usr/bin/env python3
+"""install_deps.py — config-aware preflight for the mixture-of-agents skill.
+
+Loads the resolved config (harness/config.yaml + .env + built-in defaults via
+the same path run_moa.py uses) and verifies coherence:
+
+  - Which harnesses are actually needed (proposers + refiners + aggregator)
+  - Each needed harness's check_available() (CLI present + auth probe)
+  - Schema-pattern coherence: every resolved provider name matches the
+    regex pattern in proposer/refiner schemas. Catches the kind of
+    runtime mismatch that surfaced when user-named providers ran
+    against schemas hardcoded to a fixed provider set.
+  - Skill assets and schema strict-mode lint.
+
+Harnesses NOT referenced by any provider in the resolved layers are
+skipped. Reported as 'unused' at the end so users aren't confused.
+
+Run with any system Python:
+    python3 harness/scripts/install_deps.py   # from the moa-x repo root
+    # or
+    python3 ~/.claude/skills/mixture-of-agents/scripts/install_deps.py
+"""
+from __future__ import annotations
+
+import json
+import os
+import re
+import subprocess
+import sys
+from pathlib import Path
+from typing import TYPE_CHECKING
+
+# Add scripts/ to sys.path so adapters and config import. install_deps lives in
+# scripts/, so its parent IS scripts/parent — but we add scripts/ explicitly
+# so 'from adapters import ...' works the same as in run_moa.py.
+SCRIPT_DIR = Path(__file__).resolve().parent
+if str(SCRIPT_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPT_DIR))
+
+import config as harness_config  # noqa: E402
+
+if TYPE_CHECKING:
+    from config import LoadedConfig, ResolvedProvider
+
+
+ALL_HARNESSES = ("codex", "claude", "opencode", "agy", "gemini")
+
+
+def _check(label: str, cmd: list[str]) -> tuple[bool, str]:
+    """Run a quick command and return (ok, version_or_error_string)."""
+    import shutil as _shutil
+    if not _shutil.which(cmd[0]):
+        return False, f"{cmd[0]} not on PATH"
+    try:
+        proc = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
+    except subprocess.TimeoutExpired:
+        return False, f"{label} version check timed out"
+    output = (proc.stdout + proc.stderr).strip().splitlines()
+    return proc.returncode == 0, (output[0] if output else "(no output)")
+
+
+def _check_python(failures: list[str]) -> None:
+    py_version = sys.version_info
+    if py_version < (3, 9):
+        print(f"  python: {py_version.major}.{py_version.minor} — FAIL (need 3.9+)")
+        failures.append("python<3.9")
+    else:
+        print(f"  python: {py_version.major}.{py_version.minor}.{py_version.micro} — OK")
+
+
+def _print_provider_summary(loaded_cfg: "LoadedConfig") -> None:
+    print("")
+    print("  resolved providers (from harness/config.yaml + builtins):")
+    print("    proposers: " + (
+        ", ".join(f"{p.name} ({p.harness} → {p.model})" for p in loaded_cfg.proposers)
+        or "(none)"
+    ))
+    print("    refiners:  " + (
+        ", ".join(f"{p.name} ({p.harness} → {p.model})" for p in loaded_cfg.refiners)
+        or "(none — refinement skipped)"
+    ))
+    print(
+        "    aggregator: "
+        f"{loaded_cfg.aggregator.name} ({loaded_cfg.aggregator.harness} → "
+        f"{loaded_cfg.aggregator.model})"
+    )
+
+
+def _check_provider_credentials(loaded_cfg: "LoadedConfig", failures: list[str]) -> None:
+    """Catch credentials required by custom built-ins before a paid run."""
+    active = list(loaded_cfg.proposers)
+    if not loaded_cfg.skip_refinement:
+        active += loaded_cfg.refiners
+    if loaded_cfg.aggregator is not None:
+        active.append(loaded_cfg.aggregator)
+    qwen = [p.name for p in active if p.model.startswith("qwen-token-plan/")]
+    if not qwen:
+        return
+    print("")
+    print("  provider-specific credentials:")
+    key = os.environ.get("QWEN_TOKEN_PLAN_API_KEY", "")
+    if key.startswith("sk-sp-"):
+        print(f"    Qwen Token Plan ({', '.join(qwen)}): OK — dedicated key present")
+    else:
+        print(
+            f"    Qwen Token Plan ({', '.join(qwen)}): FAIL — set "
+            "QWEN_TOKEN_PLAN_API_KEY=sk-sp-... in .env or the shell"
+        )
+        failures.append("Qwen Token Plan credential")
+
+
+def _check_needed_harnesses(loaded_cfg: "LoadedConfig", failures: list[str]) -> set[str]:
+    """Run check_available() per needed harness; return the set we checked."""
+    # Mirror run_moa's preflight: when refinement is skipped, the refiner
+    # harnesses are never used, so don't gate the run on installing them.
+    providers = list(loaded_cfg.proposers)
+    if not loaded_cfg.skip_refinement:
+        providers += loaded_cfg.refiners
+    if loaded_cfg.aggregator is not None:
+        providers.append(loaded_cfg.aggregator)
+    needed = {p.harness for p in providers}
+    print("")
+    print(f"  required harnesses (from layer assignments): {sorted(needed)}")
+
+    # Lazy-import adapters so missing optional deps don't crash the whole script
+    from adapters import codex as codex_adapter
+    from adapters import claude as claude_adapter
+    from adapters import opencode as opencode_adapter
+    from adapters import agy as agy_adapter
+    from adapters import gemini as gemini_adapter
+
+    adapter_for = {
+        "codex": codex_adapter,
+        "claude": claude_adapter,
+        "opencode": opencode_adapter,
+        "agy": agy_adapter,
+        "gemini": gemini_adapter,
+    }
+    install_hint = {
+        "codex":  "npm i -g @openai/codex && codex login",
+        "claude": "see https://docs.claude.com/en/docs/claude-code/quickstart",
+        "opencode": "curl -fsSL https://opencode.ai/install | bash  (then: opencode auth login, "
+                    "or export ZHIPU_API_KEY / MOONSHOT_API_KEY / FIREWORKS_API_KEY / "
+                    "QWEN_TOKEN_PLAN_API_KEY)",
+        "agy": "install/update Antigravity CLI, then run agy interactively to sign in",
+        "gemini": "authenticate Gemini CLI with an eligible enterprise/API/Cloud account; "
+                  "consumer Google accounts should use an agy-* provider",
+    }
+
+    for harness in sorted(needed):
+        adapter = adapter_for.get(harness)
+        if adapter is None:
+            print(f"  harness {harness}: FAIL — unknown harness (no adapter)")
+            failures.append(f"unknown harness {harness}")
+            continue
+        ok, msg = adapter.check_available()
+        if ok:
+            print(f"  harness {harness}: OK — {msg}")
+        else:
+            print(f"  harness {harness}: FAIL — {msg}")
+            print(f"    fix: {install_hint.get(harness, '(no hint available)')}")
+            failures.append(f"{harness} preflight")
+
+    return needed
+
+
+def _check_schema_coherence(loaded_cfg: "LoadedConfig", failures: list[str]) -> None:
+    """Verify every resolved provider name matches the agent_id pattern in
+    proposer.schema.json and the proposer-id pattern in refiner.schema.json.
+
+    Catches runtime mismatches like the c-gpt/c-gemini/c-opus case where
+    user-named providers were rejected by hardcoded enums."""
+    print("")
+    print("  schema coherence (provider names vs schema patterns):")
+
+    proposer_schema_path = SCRIPT_DIR / "schemas" / "proposer.schema.json"
+    refiner_schema_path = SCRIPT_DIR / "schemas" / "refiner.schema.json"
+
+    try:
+        proposer_schema = json.loads(proposer_schema_path.read_text(encoding="utf-8"))
+        refiner_schema = json.loads(refiner_schema_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as e:
+        print(f"    FAIL — could not load schemas: {e}")
+        failures.append("schema load")
+        return
+
+    proposer_pattern = (
+        proposer_schema.get("properties", {}).get("agent_id", {}).get("pattern")
+    )
+    if not proposer_pattern:
+        print("    FAIL — proposer schema has no agent_id pattern (was the regex relaxation reverted?)")
+        failures.append("missing proposer.agent_id pattern")
+        return
+
+    proposer_re = re.compile(proposer_pattern)
+    bad_proposer_names = [p.name for p in loaded_cfg.proposers if not proposer_re.fullmatch(p.name)]
+    if bad_proposer_names:
+        print(f"    proposer.agent_id pattern {proposer_pattern!r}: FAIL")
+        print(f"      names that violate pattern: {bad_proposer_names}")
+        print("      fix: rename providers in harness/config.yaml to match the pattern (lowercase, dash-separated, ≤32 chars)")
+        failures.append("proposer name pattern")
+    else:
+        print(f"    proposer.agent_id pattern {proposer_pattern!r}: OK ({len(loaded_cfg.proposers)} names)")
+
+    # All five proposer-id reference sites in the refiner schema use the same pattern.
+    # We sample one (refiner.agent_id) to derive it, then assume the five sites match —
+    # if they don't, the strict-mode lint or a future test will catch it.
+    refiner_pattern = (
+        refiner_schema.get("properties", {}).get("agent_id", {}).get("pattern")
+    )
+    if not refiner_pattern:
+        print("    FAIL — refiner schema has no agent_id pattern")
+        failures.append("missing refiner.agent_id pattern")
+        return
+
+    refiner_re = re.compile(refiner_pattern)
+    # Refiners reference proposers in reviewing[], per_proposer_verdicts[].proposer, etc.
+    # so check both refiner names AND that the proposer names match the refiner's regex
+    # (in practice the patterns are identical, but compute defensively).
+    bad_refiner_names = [p.name for p in loaded_cfg.refiners if not refiner_re.fullmatch(p.name)]
+    bad_proposer_refs = [p.name for p in loaded_cfg.proposers if not refiner_re.fullmatch(p.name)]
+    if bad_refiner_names or bad_proposer_refs:
+        print(f"    refiner agent/proposer pattern {refiner_pattern!r}: FAIL")
+        if bad_refiner_names:
+            print(f"      refiner names violating pattern: {bad_refiner_names}")
+        if bad_proposer_refs:
+            print(f"      proposer names that refiners would echo: {bad_proposer_refs}")
+        failures.append("refiner pattern")
+    else:
+        n = len(loaded_cfg.refiners) + len(loaded_cfg.proposers)
+        print(f"    refiner agent/proposer pattern {refiner_pattern!r}: OK ({n} names)")
+
+
+def _check_agy_models(loaded_cfg: "LoadedConfig", needed: set[str], failures: list[str]) -> None:
+    """Fail early when an AGY provider names a model the signed-in account lacks."""
+    if "agy" not in needed:
+        return
+    providers = [
+        p
+        for p in loaded_cfg.proposers + loaded_cfg.refiners
+        + ([loaded_cfg.aggregator] if loaded_cfg.aggregator is not None else [])
+        if p.harness == "agy"
+    ]
+    if not providers:
+        return
+    print("")
+    print("  AGY model availability (current persisted account):")
+    from adapters import agy as agy_adapter
+    ok, models, detail = agy_adapter.list_models()
+    if not ok:
+        print(f"    FAIL — {detail}")
+        failures.append("agy models")
+        return
+    available = set(models)
+    for provider in providers:
+        if provider.model in available:
+            print(f"    {provider.name} → {provider.model}: OK")
+        else:
+            print(
+                f"    {provider.name} → {provider.model}: FAIL — not visible "
+                "to the signed-in AGY account"
+            )
+            failures.append(f"agy model {provider.model}")
+
+
+def _check_assets(failures: list[str]) -> None:
+    skill_dir = SCRIPT_DIR.parent
+    required = [
+        skill_dir / "SKILL.md",
+        skill_dir / "scripts" / "run_moa.py",
+        skill_dir / "scripts" / "decision_map.py",
+        skill_dir / "scripts" / "adapters" / "codex.py",
+        skill_dir / "scripts" / "adapters" / "opencode.py",
+        skill_dir / "scripts" / "adapters" / "claude.py",
+        skill_dir / "scripts" / "adapters" / "agy.py",
+        skill_dir / "scripts" / "adapters" / "gemini.py",
+        skill_dir / "scripts" / "schemas" / "proposer.schema.json",
+        skill_dir / "scripts" / "schemas" / "refiner.schema.json",
+        skill_dir / "scripts" / "schemas" / "final-plan.schema.json",
+        skill_dir / "scripts" / "schemas" / "decision-map.schema.json",
+        skill_dir / "prompts" / "scout.md",
+        skill_dir / "prompts" / "proposer.md",
+        skill_dir / "prompts" / "refiner.md",
+        skill_dir / "prompts" / "aggregator.md",
+        skill_dir / "webui" / "static" / "css" / "decision-map.css",
+        skill_dir / "webui" / "static" / "js" / "decision-map.js",
+    ]
+    print("")
+    print("  skill assets:")
+    for path in required:
+        rel = path.relative_to(skill_dir)
+        if path.exists():
+            print(f"    {rel}: OK")
+        else:
+            print(f"    {rel}: MISSING")
+            failures.append(f"asset {rel}")
+
+
+def _check_strict_lint(failures: list[str]) -> None:
+    print("")
+    print("  schema strict-mode lint:")
+    try:
+        import run_moa  # noqa: E402
+    except ImportError as e:
+        print(f"    SKIPPED — could not import run_moa: {e}")
+        failures.append("run_moa import")
+        return
+
+    for label, schema_name in (
+        ("proposer", "proposer.schema.json"),
+        ("refiner", "refiner.schema.json"),
+        ("final plan", "final-plan.schema.json"),
+    ):
+        schema_path = SCRIPT_DIR / "schemas" / schema_name
+        if not schema_path.exists():
+            continue
+        try:
+            schema_doc = json.loads(schema_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as e:
+            print(f"    {label}: FAIL (load error: {e})")
+            failures.append(f"schema lint {label} load")
+            continue
+        violations = run_moa.lint_schema_openai_strict(schema_doc)
+        if violations:
+            print(f"    {label}: FAIL ({len(violations)} strict-mode violations)")
+            for v in violations[:3]:
+                print(f"      - {v[:180]}")
+            failures.append(f"schema lint {label}")
+        else:
+            print(f"    {label}: OK (strict-mode clean)")
+
+
+def main() -> int:
+    print("Mixture-of-Agents skill — config-aware preflight")
+    print("=" * 60)
+
+    failures: list[str] = []
+
+    _check_python(failures)
+
+    # Load resolved config. Falls back to built-in defaults if no config.yaml.
+    try:
+        harness_config.apply_config_to_env()
+        loaded_cfg = harness_config.load_resolved_config()
+    except (ValueError, FileNotFoundError, RuntimeError) as e:
+        print(f"  config: FAIL — {e}")
+        print("  fix: check harness/config.yaml syntax (see harness/config.example.yaml)")
+        return 1
+
+    _print_provider_summary(loaded_cfg)
+    _check_provider_credentials(loaded_cfg, failures)
+    needed = _check_needed_harnesses(loaded_cfg, failures)
+    _check_schema_coherence(loaded_cfg, failures)
+    _check_agy_models(loaded_cfg, needed, failures)
+    _check_assets(failures)
+    _check_strict_lint(failures)
+
+    unused = set(ALL_HARNESSES) - needed
+    if unused:
+        print("")
+        print(f"  unused harnesses (not checked): {sorted(unused)}")
+
+    print("")
+    print("=" * 60)
+    if not failures:
+        print("All checks passed. /mixture-of-agents is ready to run.")
+        return 0
+    print(f"{len(failures)} issue(s) — fix the items above before invoking /mixture-of-agents:")
+    for f in failures:
+        print(f"  - {f}")
+    return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

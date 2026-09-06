@@ -37,6 +37,9 @@ SKIP = (
     "docs/",
     "Documents/",
     ".gitmodules",
+    ".gitignore",
+    ".gitleaksignore",
+    ".gitleaks.toml",
     "dotfiles-showcase",
     "to-questionnaire-",
 )

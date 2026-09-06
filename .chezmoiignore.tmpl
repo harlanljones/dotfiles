@@ -3,6 +3,8 @@ AGENTS.md
 INDEX.md
 INDEX.json
 .gitignore
+.gitleaksignore
+.gitleaks.toml
 package.json
 bun.lock
 to-questionnaire-*.md
@@ -16,8 +18,33 @@ dotfiles-showcase/**
 .gitmodules
 
 
+# Repository evidence and candidate libraries are tracked, never deployed.
 docs
 docs/**
+
+# Local tooling/state may exist in the source tree even when Git ignores it.
+node_modules
+node_modules/**
+bun
+bun/**
+.venv
+.venv/**
+.pytest_cache
+.pytest_cache/**
+.unlazy
+.unlazy/**
+.unlazy-hook-state.json
+**/__pycache__
+**/__pycache__/**
+**/*.pyc
+Downloads
+Downloads/**
+.DS_Store
+gitleaks-report.*
+.linear.toml
+.env
+.env.*
+settings.local.json
 
 {{- if not (stat (joinPath .chezmoi.homeDir ".config" "chezmoi" "key.txt")) }}
 # No age identity on this machine, so the encrypted entries cannot be

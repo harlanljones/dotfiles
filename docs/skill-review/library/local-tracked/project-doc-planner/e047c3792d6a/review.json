@@ -1,0 +1,15 @@
+{
+  "status": "reviewed",
+  "disposition": "retain evidence-backed critic/planner roles with explicit writing authority",
+  "pack": "planning-documents (optional)",
+  "invocation": "task-triggered for project assessment and execution-plan requests",
+  "execution": {"recommended": "two in-session analytical passes for small inputs", "alternatives": "bounded critic/planner delegation for substantial independent work, one guidance writer; no default Herdr"},
+  "reviewedFiles": ["SKILL.md", "agents/openai.yaml"],
+  "changes": [{"files": ["SKILL.md", "REVIEW.md", "review.json"], "summary": "Preserve scorecard, measurable roadmap and traceability expertise; remove invocation-implied policy writes and mandatory parallelism; reconcile read-only proposals and define evidence-based completion."}],
+  "questions": [
+    {"id": "Q-project-doc-planner-write", "question": "Should explicit invocation alone permit AGENTS.md and ROADMAP.md writes?", "recommendation": "Require a request to create or update those files.", "rationale": "Writable filesystem and skill invocation do not imply authority to change agent policy.", "files": ["SKILL.md"]},
+    {"id": "Q-project-doc-planner-delegation", "question": "Require two agents for every assessment?", "recommendation": "Retain two analytical roles, delegate only when scale and capacity justify it.", "rationale": "Small inputs can be assessed directly without losing critic/planner separation.", "files": ["SKILL.md"]}
+  ],
+  "validation": ["Static walkthroughs of read-only planning, named-file writing, one-writer delegation, unknown metrics and findings-to-roadmap reconciliation; all provider metadata read and retained."],
+  "limitations": ["No live project-planning/harness comparison.", "Local distribution mismatch remains integration work; no links or manifests changed.", "No discovered license; write-authority and pack recommendations await human review."]
+}

@@ -1,0 +1,59 @@
+title = "Dotfiles secret scanning"
+
+[extend]
+useDefault = true
+
+# Reviewed against gitleaks 8.21.2. Require BOTH path and known non-secret text.
+# Never exclude the library or inventory. See VERIFICATION.md, Publication Repair.
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
+description = "Frozen skill identity plus verified tree SHA-256, not credentials"
+condition = "AND"
+paths = ['''^docs/skill-review/(inventory|INDEX)\.json$''']
+regexTarget = "secret"
+regexes = [
+  '''^(d8defc49130007dbadf35291ddf7a1c5364979d38acc8b82da3e3326aed7c0ce|9b19a2160019a684233595ca0814fd7ad548b616a0093078ec85334228a8e77a|8b8023e0f484689d557ba3903e9a4e11af73ec68bce233c83517758610b43206|1dc50c7a10ea48ebbd1073f38eddc69a45a7a4d2f6fefbe7030779e33d526ec2|4762cc4cb878d0f16274a655632dd79bea33905f6303ec74a65ccda2299ccfc1|130574e43a366749d771f9b54fa357d111fbebf828e8c927999781bf3e093e13|0f9991f131ad0e325aace0db58201aa2b91393b1d9f8475902706d2d65324cfa|768f8283591a70b530232cf62194503e077b3fa9e5ea8284a266ac80cf0a4eb7|6f1c83059c0c5d4a91175e50af4b168d6dc3e077637d1083c56fa543b930a84a|38e30091bb977873514f12a4dde3e0dd651ccaf14eafda869d7d27bfde43a772|56c28735f794f1a176a21f8417c2c1e541cbae5355907eb74ffc512ec8070dd5|6e08a6d554affeeb3c686aca83166e497b04618664151d6e61ecfeda58cf85b3|cfaba683a555709e8368f3a3558d08e7414a254473d400cc4bae8e4982a07e29|5ac25e41ed8dbfb7495421d2c385c3aaa0e6f9332324a35c24dd0aa3efc36e4c)$''',
+]
+
+[[rules.allowlists]]
+description = "8.21.2 directory chunk ends after 44 bytes of the verified constructor tree hash"
+condition = "AND"
+paths = ['''^docs/skill-review/inventory\.json$''']
+regexTarget = "secret"
+regexes = ['''^0f9991f131ad0e325aace0db58201aa2b91393b1d9f8$''']
+
+[[rules.allowlists]]
+description = "Cloudflare hardcoded-credential anti-pattern placeholder"
+condition = "AND"
+paths = ['''^docs/skill-review/library/(pack-cloudflare/cloudflare/cb252c0fc395|plugin-cursor-cloudflare/cloudflare/8c6094f0be19)/references/bindings/patterns\.md$''']
+regexTarget = "secret"
+regexes = ['''^sk_live_abc123$''']
+
+[[rules.allowlists]]
+description = "Workers anti-pattern placeholder, including literal ellipsis"
+condition = "AND"
+paths = ['''^docs/skill-review/library/pack-cloudflare/workers-best-practices/703a2d204941/references/rules\.md$''']
+regexTarget = "secret"
+regexes = ['''^sk-live-abc123\.\.\.$''']
+
+[[rules.allowlists]]
+description = "Grafana localhost configuration example placeholder"
+condition = "AND"
+paths = ['''^docs/skill-review/library/plugin-cursor-grafana-assistant/grafana-assistant-cli/926d52c7e602/SKILL\.md$''']
+regexTarget = "secret"
+regexes = ['''^glsa_abcd1234$''']
+
+[[rules]]
+id = "curl-auth-header"
+
+[[rules.allowlists]]
+description = "Cloudflare curl documentation uses the literal YOUR_API_TOKEN"
+condition = "AND"
+paths = [
+  '''^docs/skill-review/library/(pack-cloudflare/cloudflare/cb252c0fc395|plugin-cursor-cloudflare/cloudflare/8c6094f0be19)/references/argo-smart-routing/(README|api)\.md$''',
+  '''^docs/skill-review/library/plugin-cursor-cloudflare/cloudflare/8c6094f0be19/references/pipelines/api\.md$''',
+]
+regexTarget = "secret"
+regexes = ['''^YOUR_API_TOKEN$''']

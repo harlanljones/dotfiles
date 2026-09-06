@@ -1,0 +1,12 @@
+{
+  "status": "reviewed",
+  "disposition": "retain shared tracker mechanics with coordinated claims",
+  "pack": "engineering-tracking (workflow dependency, not universal core)",
+  "invocation": "task-triggered or reached by a composing tracker workflow",
+  "execution": {"recommended": "single in-session tracker driver", "alternatives": "bounded read-only issue/source inspection; worktrees do not isolate Linear"},
+  "reviewedFiles": ["SKILL.md", "references/linear-cli.md", "references/issue-tracker-linear.md", "agents/openai.yaml"],
+  "changes": [{"files": ["SKILL.md", "references/linear-cli.md", "references/issue-tracker-linear.md", "REVIEW.md", "review.json"], "summary": "Correct non-atomic claims across entrypoint and references; preserve CLI mechanics, add failed-loader guard, project-only scope, lowest-number selection and acceptance-aware transitions."}],
+  "questions": [{"id": "Q-linear-agent-tracking-dispatch", "question": "Make one dispatcher the default for shared-account claims?", "recommendation": "Yes, with worker identity and exclusive file scope recorded.", "rationale": "Shared self-assignment and read-after-write do not prove exclusive ownership.", "files": ["SKILL.md"]}],
+  "validation": ["Full-tree static review and walkthroughs of shared identity, native blockers, explicit task destination, loader failure, partial writes and acceptance-aware resolution.", "Driver observed CLI 2.5.0 help and HJ-729 read-only issue/relations; synthetic loader evidence is recorded in batch validation."],
+  "limitations": ["No atomic tracker exclusion is available; external dispatchers may race.", "Credential snippet is Bash and supports only the managed single-line format.", "No live provider metadata evaluation or discovered license; promotion not authorized."]
+}

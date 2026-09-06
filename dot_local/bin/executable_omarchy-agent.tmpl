@@ -31,9 +31,7 @@ while (($#)); do
   esac
 done
 
-if [[ $PWD == "$HOME" && -d $HOME/Work ]]; then
-  cd "$HOME/Work" || exit 1
-fi
+cd "$HOME" || exit 1
 
 agent=$(omarchy-default-agent 2>/dev/null || cat "$HOME/.config/omarchy/defaults/agent" 2>/dev/null || true)
 

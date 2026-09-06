@@ -72,6 +72,8 @@ REPO_MATERIAL = (
     ("package.json", "Runtime CLI deps installed outside mise"),
     ("bun.lock", "Lockfile for the above"),
     (".gitignore", "Git tracking rules"),
+    (".gitleaksignore", "Documented secret-scan finding fingerprints"),
+    (".gitleaks.toml", "Secret-scan defaults and narrow verified example exceptions"),
     (".gitmodules", "Submodule registration"),
     ("dotfiles-showcase", "Submodule — the showcase web app; never applied"),
     ("to-questionnaire-", "Scratch planning documents"),

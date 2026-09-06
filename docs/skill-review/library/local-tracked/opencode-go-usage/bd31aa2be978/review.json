@@ -1,0 +1,12 @@
+{
+  "status": "reviewed",
+  "disposition": "retain provider-local quota workflow with honest freshness and write boundaries",
+  "pack": "opencode-usage (provider-local)",
+  "invocation": "task-triggered for Go quota or stale Go monitor figures only",
+  "execution": {"recommended": "in-session authorized observation", "alternatives": "user-provided dashboard readings when browser access is absent; no delegated credentials or Herdr"},
+  "reviewedFiles": ["SKILL.md"],
+  "changes": [{"files": ["SKILL.md", "REVIEW.md", "review.json"], "summary": "Preserve Go windows and override mechanics; separate read from refresh, verify workspace and freshness, distinguish input percentages/output fractions and recorded payload from panel success."}],
+  "questions": [{"id": "Q-opencode-go-usage-refresh", "question": "Should a usage question implicitly refresh the monitor?", "recommendation": "No; observation by default, explicit refresh authority for writers.", "rationale": "Scraper invokes an override and refresh; successful write does not prove display success.", "files": ["SKILL.md"]}],
+  "validation": ["Read complete scraper and override source; static cases for stale snapshots, fixed workspace identity, payload failures, absent resets, percentage units and suppressed panel refresh errors."],
+  "limitations": ["No authenticated dashboard, scraper, override or monitor execution.", "Current quota API availability and collector lifetime/fallback are not established by this candidate.", "No discovered license; provider-local distribution remains a proposed policy."]
+}
