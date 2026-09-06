@@ -4,7 +4,7 @@ chezmoi = "latest"
 claude = "latest"
 codex = "latest"
 copilot = "latest"
-gemini = { version = "latest", allow_builds = "@github/keytar,node-pty" }
+gemini = { version = "latest", allow_builds = ["@github/keytar", "node-pty"] }
 gh = "latest"
 "github:can1357/oh-my-pi" = "latest"
 go = "1.26.5"
