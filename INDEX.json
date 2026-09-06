@@ -15,12 +15,12 @@
       "toolchain": 4,
       "agents": 41,
       "services": 14,
-      "scripts": 27,
+      "scripts": 28,
       "security": 2,
       "other": 1,
       "hooks": 13,
       "chezmoi": 7,
-      "repo": 16
+      "repo": 15
     }
   },
   "categories": [
@@ -1437,6 +1437,16 @@
       "subsystem": "custom executables"
     },
     {
+      "source": "dot_local/bin/executable_herdr-agent-lifecycle",
+      "target": "~/.local/bin/herdr-agent-lifecycle",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
       "source": "dot_local/bin/executable_lazygit-ollama-commit.sh",
       "target": "~/.local/bin/lazygit-ollama-commit.sh",
       "kind": "dotfile",
@@ -1987,12 +1997,6 @@
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
-    },
-    {
-      "source": "dotfiles-showcase",
-      "kind": "repo",
-      "category": "repo",
-      "role": "Submodule \u2014 the showcase web app; never applied"
     },
     {
       "source": "package.json",
