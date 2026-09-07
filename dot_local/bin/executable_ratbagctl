@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Shim for /usr/bin/ratbagctl.
+#
+# The packaged script starts with `#!/usr/bin/env python3`, and python3 on PATH
+# is mise's interpreter (3.12), which has no `evdev` module. python-evdev is
+# installed for the system interpreter (3.14) only, so the packaged script dies
+# with ModuleNotFoundError. Run it under the system interpreter instead.
+exec /usr/bin/python3 /usr/bin/ratbagctl "$@"

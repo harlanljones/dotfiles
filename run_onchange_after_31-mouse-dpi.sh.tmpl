@@ -1,0 +1,62 @@
+{{- if eq .chezmoi.os "linux" -}}
+#!/bin/bash
+# Pin Logitech mice to 400 DPI in their onboard memory via libratbag.
+#
+# These settings live in the mouse, not in a file, so chezmoi cannot track them
+# as state. This script re-asserts them whenever its content changes and on a
+# fresh machine. Safe to run with no mice attached: it exits 0.
+#
+# Companion setting: ~/.config/hypr/input.lua sets accel_profile = "flat" and
+# sensitivity = 0, so these DPI values map 1:1 with no libinput acceleration.
+# Changing one without the other will not give you a true 400 DPI feel.
+
+set -uo pipefail
+
+# /usr/bin/ratbagctl is `#!/usr/bin/env python3`; python3 on PATH may be a mise
+# interpreter without the evdev module. Prefer our shim, else system python.
+if [[ -x "$HOME/.local/bin/ratbagctl" ]]; then
+  RBC=("$HOME/.local/bin/ratbagctl")
+elif [[ -x /usr/bin/ratbagctl ]]; then
+  RBC=(/usr/bin/python3 /usr/bin/ratbagctl)
+else
+  echo "mouse-dpi: ratbagctl not installed, skipping"
+  exit 0
+fi
+
+# ratbagd assigns each device a random codename that is not stable across
+# machines or restarts, so resolve by product name instead.
+resolve() {
+  "${RBC[@]}" list 2>/dev/null | awk -F: -v want="$1" \
+    'index($0, want) { gsub(/[[:space:]]/, "", $1); print $1; exit }'
+}
+
+set_400() {
+  local dev="$1"
+  "${RBC[@]}" "$dev" profile 0 resolution 0 dpi set 400
+  "${RBC[@]}" "$dev" profile 0 resolution active set 0
+}
+
+dev="$(resolve "Logitech G305")"
+if [[ -n "$dev" ]]; then
+  echo "mouse-dpi: Logitech G305 -> 400 DPI ($dev)"
+  set_400 "$dev"
+  # Button 5 is the DPI button behind the wheel. Its stock 'resolution-cycle-up'
+  # action silently cycles the device to 800/1600/3200 while libratbag keeps
+  # reporting the stored 400, which makes the drift very hard to diagnose.
+  "${RBC[@]}" "$dev" profile 0 button 5 action set disabled
+else
+  echo "mouse-dpi: Logitech G305 not connected, skipping"
+fi
+
+dev="$(resolve "Logitech PRO X")"
+if [[ -n "$dev" ]]; then
+  echo "mouse-dpi: Logitech PRO X -> 400 DPI ($dev)"
+  # This device exposes 5 profiles and reports a disabled profile as "active".
+  # Writing to the active profile silently goes nowhere, so target profile 0.
+  set_400 "$dev"
+else
+  echo "mouse-dpi: Logitech PRO X not connected, skipping"
+fi
+
+exit 0
+{{- end -}}
