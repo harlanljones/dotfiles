@@ -5,7 +5,7 @@
   "compactionEnabled": true,
   "planActMode": "act",
   "toolAutoApprove": true,
-  "tuiTheme": "dark",
+  "tuiTheme": "auto",
   "tools": {
     "web_search": {
       "enabled": true

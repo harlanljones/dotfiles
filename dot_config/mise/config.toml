@@ -1,8 +1,6 @@
 [tools]
 bun = "latest"
 chezmoi = "latest"
-claude = "latest"
-codex = "latest"
 copilot = "latest"
 gemini = { version = "latest", allow_builds = ["@github/keytar", "node-pty"] }
 gh = "latest"

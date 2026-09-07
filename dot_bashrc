@@ -25,3 +25,7 @@ for _shell_module in "${XDG_CONFIG_HOME:-$HOME/.config}"/shell/*.sh; do
   [ -r "$_shell_module" ] && source "$_shell_module"
 done
 unset _shell_module
+
+# >>> Codex installer >>>
+export PATH="/home/harlan/.local/bin:$PATH"
+# <<< Codex installer <<<
