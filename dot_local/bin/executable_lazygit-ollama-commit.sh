@@ -6,8 +6,9 @@
 # ollama-commit-msg.sh, then opens it in $EDITOR (via `git commit --edit`)
 # for review/tweaking before finalizing.
 #
-# Bound to <c-g> in ~/.config/lazygit/config.yml (output: terminal), so lazygit
-# suspends while this runs and resumes once it exits.
+# Bound to <c-g> (commit + push) and <c-n> (commit only, via
+# LAZYGIT_OLLAMA_NO_PUSH=1) in ~/.config/lazygit/config.yml (output:
+# terminal), so lazygit suspends while this runs and resumes once it exits.
 #
 
 set -eu

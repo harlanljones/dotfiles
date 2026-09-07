@@ -41,13 +41,16 @@ if vim.fn.maparg("<leader>cc", "n") == "" then
   })
 end
 
--- Save all, git commit (message drafted by ollama), git push, quit all
-vim.keymap.set("n", "<leader>P", function()
+-- Save all, git commit (message drafted by ollama), optionally push, quit
+-- all. Shared by <leader>P (push) and <leader>C (commit only, no push).
+local function commit_workflow(should_push)
   -- When nvim is git's editor (lazygit <c-g>, `git commit`, rebase todo), the
   -- outer git process owns the commit. Committing from in here moves HEAD out
   -- from under it and it dies with "cannot lock ref 'HEAD'" (exit 128), so
-  -- just save the message and hand control back. Approved via <leader>P only;
-  -- every other exit path aborts (see ExitPre above).
+  -- just save the message and hand control back. Approved via <leader>P or
+  -- <leader>C only; every other exit path aborts (see ExitPre above). Push
+  -- decisions for this path belong to the outer script, not nvim, since nvim
+  -- never pushes here regardless of should_push.
   local ft = vim.bo.filetype
   local bufname = vim.fn.expand("%:t")
   local git_buf = is_git_editor_session()
@@ -84,7 +87,15 @@ vim.keymap.set("n", "<leader>P", function()
 
   local dirty = vim.trim(git("status", "--porcelain").stdout) ~= ""
 
-  local function push_and_quit(committed_msg)
+  local function finish_and_quit(committed_msg)
+    if not should_push then
+      vim.notify(committed_msg and ("Committed: " .. committed_msg) or "Nothing to commit. Bye!", vim.log.levels.INFO)
+      vim.schedule(function()
+        vim.cmd("qa!")
+      end)
+      return
+    end
+
     local push = git("push")
     if push.code ~= 0 then
       return fail(push, "git push failed")
@@ -99,7 +110,7 @@ vim.keymap.set("n", "<leader>P", function()
   end
 
   if not dirty then
-    return push_and_quit(nil)
+    return finish_and_quit(nil)
   end
 
   -- Stage everything first so the generator sees the same diff we'll commit.
@@ -119,7 +130,7 @@ vim.keymap.set("n", "<leader>P", function()
       if commit.code ~= 0 then
         return fail(commit, "git commit failed")
       end
-      push_and_quit(msg)
+      finish_and_quit(msg)
     end)
   end
 
@@ -142,4 +153,18 @@ vim.keymap.set("n", "<leader>P", function()
       prompt_and_commit(subject)
     end)
   end)
-end, { desc = "Write all, Git commit (ollama msg), push, quit all" })
+end
+
+vim.keymap.set(
+  "n",
+  "<leader>P",
+  function() commit_workflow(true) end,
+  { desc = "Write all, Git commit (ollama msg), push, quit all" }
+)
+
+vim.keymap.set(
+  "n",
+  "<leader>C",
+  function() commit_workflow(false) end,
+  { desc = "Write all, Git commit (ollama msg), quit all (no push)" }
+)

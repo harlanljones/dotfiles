@@ -5,6 +5,12 @@ customCommands:
     command: '~/.local/bin/lazygit-ollama-commit.sh'
     loadingText: 'Generating commit message with Ollama...'
     output: terminal
+  - key: '<c-n>'
+    context: 'files'
+    description: 'Generate commit message with Ollama (no push)'
+    command: 'LAZYGIT_OLLAMA_NO_PUSH=1 ~/.local/bin/lazygit-ollama-commit.sh'
+    loadingText: 'Generating commit message with Ollama...'
+    output: terminal
 {{ if lookPath "delta" -}}
 git:
   # Only rendered when delta is installed

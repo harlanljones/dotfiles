@@ -16,8 +16,23 @@ alias ....='cd ../../..'
 
 # Coding-agent launchers.
 alias codex="codex --approve-for-me"
+alias cx="codex"
+alias cr="codex -m gpt-reserve"
 alias oc="opencode"
 alias cursor="agent"
+
+# Git and dotfile workflows.
+alias gs='git status -sb'
+alias gd='git diff --stat --patch'
+alias gl='git log --oneline --decorate --graph -20'
+alias gp='git pull --rebase'
+alias ds='dots status'
+alias dd='dots diff'
+alias du='dots update'
+
+# mise workflows.
+alias mi='mise install'
+alias mr='mise run'
 
 alias lg="lazygit"
 
