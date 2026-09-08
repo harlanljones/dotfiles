@@ -219,7 +219,7 @@ Review worktrees with: herdr worktree list
 
 ## Edge Cases
 
-- **No Linear MCP tools available**: Fall back to Linear API via `curl` or `req`. Ask the human for their Linear API key if not in environment.
+- **No Linear MCP tools available**: Use the repository's configured Linear CLI/authentication path. If access is unavailable, report the blocker and ask the human to authenticate through the supported flow; never request, copy or log an API key.
 - **Model or effort missing**: Stop before claiming or spawning and ask the human for an explicit model/reasoning-effort mapping for every tier in the round. Never infer from defaults, prior turns, ticket labels or cost.
 - **Herdr client/server mismatch**: Stop before creating worktrees or agents, show `herdr status server`, and ask the human whether to update/restart. Never switch to an invisible alternate socket to bypass the problem.
 - **Herdr worktree not visible**: Verify `--cwd`, `herdr worktree list`, `herdr workspace list`, and `herdr pane list`; open/reuse the existing worktree in the current visible server before starting a worker.
