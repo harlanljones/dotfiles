@@ -1,0 +1,41 @@
+{
+  "status": "reviewed",
+  "disposition": "revise before promotion; retain as candidate",
+  "pack": "optional creative-media pack",
+  "invocation": "task-triggered for raster generation or editing; explicit opt-in for CLI/API mode",
+  "execution": {
+    "recommended": "in-session built-in image generation",
+    "alternatives": "CLI/API only with explicit credential, network, cost, and output-write authority"
+  },
+  "reviewedFiles": [
+    "LICENSE.txt",
+    "SKILL.md",
+    "agents/openai.yaml",
+    "assets/imagegen-small.svg",
+    "assets/imagegen.png",
+    "references/cli.md",
+    "references/codex-network.md",
+    "references/image-api.md",
+    "references/prompting.md",
+    "references/sample-prompts.md",
+    "scripts/image_gen.py",
+    "scripts/remove_chroma_key.py"
+  ],
+  "changes": [
+    {
+      "files": ["REVIEW.md", "review.json"],
+      "summary": "Add a bounded source-grounded review identifying stale transparent-background routing and a batch output collision risk without changing retained candidate bytes."
+    }
+  ],
+  "questions": [],
+  "validation": [
+    "Read every retained instruction, reference, script, metadata file, asset, and license; visually inspected PNG assets and read SVG source.",
+    "Compared time-sensitive model claims with current official OpenAI image-generation and model documentation.",
+    "Traced the batch orchestration call graph and inspected exact source; ran repository review-schema and baseline-preservation checks only."
+  ],
+  "limitations": [
+    "No candidate workflow, API request, image generation, install, or dependency operation was executed.",
+    "Concurrent output collision behavior was assessed statically, not reproduced.",
+    "Promotion and pack membership remain human decisions."
+  ]
+}

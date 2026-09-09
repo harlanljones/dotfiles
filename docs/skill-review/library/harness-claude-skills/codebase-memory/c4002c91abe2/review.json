@@ -1,0 +1,70 @@
+{
+  "status": "reviewed",
+  "disposition": "revise volatile interface claims and mutation boundaries before promotion while retaining graph evidence discipline",
+  "pack": "codebase-intelligence (optional; requires an advertised codebase-memory MCP interface)",
+  "invocation": {
+    "mode": "task-triggered",
+    "tasks": "structural code discovery, architecture, tracing, impact analysis and bounded quality analysis",
+    "exclusions": "ordinary literal or non-code search, and any mutation without explicit authority"
+  },
+  "execution": {
+    "recommended": "in-session read-only graph discovery and verification for small or interactive scopes",
+    "alternatives": "bounded delegation for independent analysis after the parent passes exact project, generation, tier, symbols, pagination and coverage evidence; no default Herdr or worktree",
+    "mutations": "index creation, project deletion, ADR updates and trace ingestion require explicit authority"
+  },
+  "reviewedFiles": [
+    "QUESTIONS.md",
+    "SKILL.md"
+  ],
+  "changes": [
+    {
+      "files": [
+        "QUESTIONS.md",
+        "REVIEW.md",
+        "review.json"
+      ],
+      "summary": "Add a source-grounded review that preserves graph evidence tiers and fallback discipline, requires corrections for schema drift and cross-service tracing, separates read-only analysis from mutations, and records promotion questions without changing frozen source bytes."
+    }
+  ],
+  "questions": [
+    {
+      "id": "Q-codebase-memory-schema",
+      "question": "Should a promoted guide pin a fixed tool count and edge taxonomy?",
+      "recommendation": "No; use the live advertised tools and get_graph_schema as authoritative, with static names labeled as examples.",
+      "rationale": "Tool and edge availability can vary by server generation and project, so an exhaustive static list becomes a false contract.",
+      "files": [
+        "QUESTIONS.md"
+      ]
+    },
+    {
+      "id": "Q-codebase-memory-efficiency",
+      "question": "Should the numeric token-efficiency comparison be retained?",
+      "recommendation": "Remove it unless a reproducible benchmark, workload and measurement date are supplied.",
+      "rationale": "The frozen tree provides no evidence for the numeric comparison, and a plausible benefit is not a measured result.",
+      "files": [
+        "QUESTIONS.md"
+      ]
+    }
+  ],
+  "validation": [
+    {
+      "kind": "full-tree static review",
+      "result": "Read all 76 lines of the sole retained file, including inline Cypher examples; confirmed there are no additional scripts, reference/example files, metadata files, assets or licenses in the candidate tree."
+    },
+    {
+      "kind": "static scenarios",
+      "result": "Walked through positive discovery, bounded caller audit, dead-code candidate analysis, partial-coverage fallback, cross-service mode, child-context handoff and mutation-authority refusal; no candidate workflow executed."
+    },
+    {
+      "kind": "read-only interface comparison",
+      "result": "Compared candidate claims with the currently advertised codebase-memory tool schemas and one current project graph schema; confirmed that trace_path cross-service traversal uses a separate mode and that search_graph does not accept the candidate's direction argument; treated results as time- and project-bounded observations."
+    }
+  ],
+  "limitations": [
+    "No live candidate workflow, harness comparison, mutation, paid service or performance benchmark was executed.",
+    "Upstream, version and maintenance owner are unknown; no license was discovered in bounded ancestry.",
+    "Provider frontmatter and automatic-discovery behavior across the 13 recorded mirrors remain unverified.",
+    "The current graph schema is project-specific and the advertised tool interface may change; it is evidence of drift risk, not a universal taxonomy.",
+    "Initial inventory graph extraction timed out for inventory.json, so its exact candidate entry was read directly with jq; a later generation reported no recorded coverage issue, but graph coverage remains best-effort."
+  ]
+}

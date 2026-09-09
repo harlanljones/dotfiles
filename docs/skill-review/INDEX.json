@@ -2,129 +2,917 @@
   "candidates": [
     {
       "candidatePath": "library/builtin-codex/imagegen/6e733e799e52",
-      "changedPaths": [],
-      "errors": [
-        "REVIEW.md must be a regular file",
-        "review.json must be a regular file"
+      "changedPaths": [
+        "REVIEW.md",
+        "review.json"
       ],
+      "errors": [],
       "id": "imagegen:6e733e799e52a6ce8b42ee5b5501cb42de1aad22c535046dd11d75e546d2816a",
       "identity": "imagegen",
       "missingFiles": [],
-      "review": null,
+      "review": {
+        "changes": [
+          {
+            "files": [
+              "REVIEW.md",
+              "review.json"
+            ],
+            "summary": "Add a bounded source-grounded review identifying stale transparent-background routing and a batch output collision risk without changing retained candidate bytes."
+          }
+        ],
+        "disposition": "revise before promotion; retain as candidate",
+        "execution": {
+          "alternatives": "CLI/API only with explicit credential, network, cost, and output-write authority",
+          "recommended": "in-session built-in image generation"
+        },
+        "invocation": "task-triggered for raster generation or editing; explicit opt-in for CLI/API mode",
+        "limitations": [
+          "No candidate workflow, API request, image generation, install, or dependency operation was executed.",
+          "Concurrent output collision behavior was assessed statically, not reproduced.",
+          "Promotion and pack membership remain human decisions."
+        ],
+        "pack": "optional creative-media pack",
+        "questions": [],
+        "reviewedFiles": [
+          "LICENSE.txt",
+          "SKILL.md",
+          "agents/openai.yaml",
+          "assets/imagegen-small.svg",
+          "assets/imagegen.png",
+          "references/cli.md",
+          "references/codex-network.md",
+          "references/image-api.md",
+          "references/prompting.md",
+          "references/sample-prompts.md",
+          "scripts/image_gen.py",
+          "scripts/remove_chroma_key.py"
+        ],
+        "status": "reviewed",
+        "validation": [
+          "Read every retained instruction, reference, script, metadata file, asset, and license; visually inspected PNG assets and read SVG source.",
+          "Compared time-sensitive model claims with current official OpenAI image-generation and model documentation.",
+          "Traced the batch orchestration call graph and inspected exact source; ran repository review-schema and baseline-preservation checks only."
+        ]
+      },
       "source": "builtin-codex",
-      "state": "unreviewed"
+      "state": "contract-valid"
     },
     {
       "candidatePath": "library/builtin-codex/openai-docs/1de75a2e0091",
-      "changedPaths": [],
-      "errors": [
-        "REVIEW.md must be a regular file",
-        "review.json must be a regular file"
+      "changedPaths": [
+        "REVIEW.md",
+        "review.json"
       ],
+      "errors": [],
       "id": "openai-docs:1de75a2e0091e8a008e5984d4f0ca6187f62b210d039562417136e9f78431716",
       "identity": "openai-docs",
       "missingFiles": [],
-      "review": null,
+      "review": {
+        "changes": [
+          {
+            "files": [
+              "REVIEW.md",
+              "review.json"
+            ],
+            "summary": "Add a bounded review preserving the official-source-first design while identifying the stale bundled latest-model fallback."
+          }
+        ],
+        "disposition": "retain with fallback freshness correction; candidate only",
+        "execution": {
+          "alternatives": "bounded parallel retrieval only for genuinely broad synthesis",
+          "recommended": "in-session read-only official documentation retrieval"
+        },
+        "invocation": "task-triggered for OpenAI product, API, model, migration, or Codex documentation questions",
+        "limitations": [
+          "Candidate network fetchers and model resolvers were not executed.",
+          "Availability, aliases, and model guidance remain time-sensitive and require live official verification.",
+          "Promotion and pack membership remain human decisions."
+        ],
+        "pack": "OpenAI and Codex documentation pack",
+        "questions": [],
+        "reviewedFiles": [
+          "LICENSE.txt",
+          "SKILL.md",
+          "agents/openai.yaml",
+          "assets/openai-small.svg",
+          "assets/openai.png",
+          "references/codex-self-knowledge.md",
+          "references/latest-model.md",
+          "references/mcp-diagnostics.md",
+          "references/model-migration.md",
+          "references/model-selection.md",
+          "references/official-docs.md",
+          "references/prompting-guide.md",
+          "references/upgrade-guide.md",
+          "references/upgrading-to-gpt-5p6-sol.md",
+          "scripts/fetch-codex-manual.mjs",
+          "scripts/resolve-latest-model-info",
+          "scripts/resolve-latest-model-info.cjs"
+        ],
+        "status": "reviewed",
+        "validation": [
+          "Read every retained instruction, reference, script, metadata file, asset, and license; visually inspected PNG assets and read SVG source.",
+          "Compared the latest-model fallback and named-model claims with current official OpenAI documentation.",
+          "Byte-compared the retained SKILL.md with the installed source and ran repository review-schema and baseline-preservation checks only."
+        ]
+      },
       "source": "builtin-codex",
-      "state": "unreviewed"
+      "state": "contract-valid"
     },
     {
       "candidatePath": "library/builtin-codex/plugin-creator/ede23896a590",
-      "changedPaths": [],
-      "errors": [
-        "REVIEW.md must be a regular file",
-        "review.json must be a regular file"
+      "changedPaths": [
+        "REVIEW.md",
+        "review.json"
       ],
+      "errors": [],
       "id": "plugin-creator:ede23896a590f87501cc3df336bc2e8dc823e89e4ea9020205f84f6e014a1e13",
       "identity": "plugin-creator",
       "missingFiles": [],
-      "review": null,
+      "review": {
+        "changes": [
+          {
+            "files": [
+              "REVIEW.md",
+              "review.json"
+            ],
+            "summary": "Add a bounded review identifying the malformed defaultPrompt scaffold, installation-authority gap, format positioning, and missing license."
+          }
+        ],
+        "disposition": "revise before promotion; retain as candidate",
+        "execution": {
+          "alternatives": "personal marketplace mutation, marketplace registration, and install or reinstall only with separate explicit authority",
+          "recommended": "in-session within an explicitly authorized workspace"
+        },
+        "invocation": "explicit only because normal use writes plugin and marketplace files and may install plugins",
+        "limitations": [
+          "No candidate scaffold, validator, cachebuster, marketplace, plugin CLI, or installation workflow was executed.",
+          "No license file was discovered; distribution permission is unresolved.",
+          "Promotion, pack membership, and implicit policy remain human decisions."
+        ],
+        "pack": "optional Codex plugin-authoring pack",
+        "questions": [],
+        "reviewedFiles": [
+          "SKILL.md",
+          "agents/openai.yaml",
+          "assets/plugin-creator-small.svg",
+          "assets/plugin-creator.png",
+          "references/installing-and-updating.md",
+          "references/plugin-json-spec.md",
+          "scripts/create_basic_plugin.py",
+          "scripts/identifier_validation.py",
+          "scripts/read_marketplace_name.py",
+          "scripts/update_plugin_cachebuster.py",
+          "scripts/validate_plugin.py"
+        ],
+        "status": "reviewed",
+        "validation": [
+          "Read every retained instruction, reference, script, metadata file, and asset; visually inspected PNG assets and read SVG source.",
+          "Compared manifest claims with the candidate schema reference and current official OpenAI plugin packaging documentation.",
+          "Traced the validator entry point and inspected exact source; ran repository review-schema and baseline-preservation checks only."
+        ]
+      },
       "source": "builtin-codex",
-      "state": "unreviewed"
+      "state": "contract-valid"
     },
     {
       "candidatePath": "library/builtin-codex/review-agent/91ab275699ee",
-      "changedPaths": [],
-      "errors": [
-        "REVIEW.md must be a regular file",
-        "review.json must be a regular file"
+      "changedPaths": [
+        "REVIEW.md",
+        "review.json"
       ],
+      "errors": [],
       "id": "review-agent:91ab275699ee36a67874d900ffe2fdf797b22cba6208d68ae7c743acf515d4c3",
       "identity": "review-agent",
       "missingFiles": [],
-      "review": null,
+      "review": {
+        "changes": [
+          {
+            "files": [
+              "REVIEW.md",
+              "review.json"
+            ],
+            "summary": "Add a bounded review identifying missing untracked-file coverage while preserving the narrow read-only design."
+          }
+        ],
+        "disposition": "retain with diff-coverage correction; candidate only",
+        "execution": {
+          "alternatives": "in-session review when no dedicated agent is available; no further delegation needed",
+          "recommended": "dedicated read-only review agent with local repository context"
+        },
+        "invocation": "explicit delegated invocation only",
+        "limitations": [
+          "The candidate review agent was not invoked and runtime finding quality was not measured.",
+          "No license file was discovered; distribution permission is unresolved.",
+          "Promotion and pack membership remain human decisions."
+        ],
+        "pack": "code-review agent pack",
+        "questions": [],
+        "reviewedFiles": [
+          "SKILL.md",
+          "agents/openai.yaml"
+        ],
+        "status": "reviewed",
+        "validation": [
+          "Read both retained files in full and statically walked through each comparison mode and the finding output contract.",
+          "Checked the review instructions against the rubric requirement to cover staged, unstaged, and untracked implementation changes.",
+          "Ran repository review-schema and baseline-preservation checks only."
+        ]
+      },
       "source": "builtin-codex",
-      "state": "unreviewed"
+      "state": "contract-valid"
     },
     {
       "candidatePath": "library/builtin-codex/skill-creator/5be1693bd421",
-      "changedPaths": [],
-      "errors": [
-        "REVIEW.md must be a regular file",
-        "review.json must be a regular file"
+      "changedPaths": [
+        "REVIEW.md",
+        "review-notes.md",
+        "review.json"
       ],
+      "errors": [],
       "id": "skill-creator:5be1693bd421e1fe66cacbc0a62d72c6c58ce2966b1e3c1d4d05fcd29b066020",
       "identity": "skill-creator",
       "missingFiles": [],
-      "review": null,
+      "review": {
+        "changes": [
+          {
+            "files": [
+              "REVIEW.md",
+              "review-notes.md",
+              "review.json"
+            ],
+            "summary": "Add a full-tree review, source-specific remediation proposals, execution alternatives, a stable human decision, validation evidence, and promotion boundaries while preserving all frozen provider bytes."
+          }
+        ],
+        "disposition": "retain as a provider-owned Codex builtin; revise validator and initializer failure behavior before shared promotion",
+        "execution": {
+          "alternatives": "bounded independent forward evaluation only for sufficiently complex or risky skills when authorized; no default delegation",
+          "recommended": "direct in-session authoring with isolated temporary validation"
+        },
+        "invocation": "task-triggered for creating or updating a skill, with normal implicit discovery",
+        "limitations": [
+          "Installed Codex tree has unknown upstream version and provider-owned update behavior.",
+          "No live harness comparison, paid evaluation, installation, publication, or provider update check was performed.",
+          "Cross-harness agents/openai.yaml and invocation-policy support remains unverified.",
+          "Graph indexing excluded the SVG and PNG by suffix; both were inspected directly.",
+          "Authoring and verification were performed by the same reviewer."
+        ],
+        "pack": "skill-authoring (optional outside the Codex builtin set)",
+        "questions": [
+          {
+            "files": [
+              "review-notes.md"
+            ],
+            "id": "Q-skill-creator-transaction",
+            "question": "Should the bundled initializer guarantee that a failed initialization leaves no partial skill directory?",
+            "rationale": "Current metadata or resource failures can leave an incomplete tree that also blocks a clean retry.",
+            "recommendation": "Make initialization transactional and expose the destination only after all requested files succeed."
+          }
+        ],
+        "reviewedFiles": [
+          "SKILL.md",
+          "agents/openai.yaml",
+          "assets/skill-creator-small.svg",
+          "assets/skill-creator.png",
+          "license.txt",
+          "references/openai_yaml.md",
+          "review-notes.md",
+          "scripts/generate_openai_yaml.py",
+          "scripts/init_skill.py",
+          "scripts/quick_validate.py"
+        ],
+        "status": "reviewed",
+        "validation": [
+          "Read all nine baseline files plus the added review notes; directly inspected both icon assets and both metadata links.",
+          "Parsed all three Python files with ast and parsed agents/openai.yaml plus SKILL.md frontmatter as YAML.",
+          "Executed isolated temporary fixtures with no network or live destination: the actual candidate validates, empty required values are currently accepted, and a metadata failure leaves a partial scaffold.",
+          "Static walkthroughs covered narrow updates, new scaffolds, metadata preservation, requested resources, failure cleanup, and conditional forward evaluation."
+        ]
+      },
       "source": "builtin-codex",
-      "state": "unreviewed"
+      "state": "contract-valid"
     },
     {
       "candidatePath": "library/builtin-codex/skill-installer/bd391a97dbae",
-      "changedPaths": [],
-      "errors": [
-        "REVIEW.md must be a regular file",
-        "review.json must be a regular file"
+      "changedPaths": [
+        "REVIEW.md",
+        "review-notes.md",
+        "review.json"
       ],
+      "errors": [],
       "id": "skill-installer:bd391a97dbaef49c3d2126167e3924866ae62a3fa089629d9aa0e03909639bdb",
       "identity": "skill-installer",
       "missingFiles": [],
-      "review": null,
+      "review": {
+        "changes": [
+          {
+            "files": [
+              "REVIEW.md",
+              "review-notes.md",
+              "review.json"
+            ],
+            "summary": "Add a full-tree review, source-specific overwrite and batch-safety proposals, execution alternatives, stable human decisions, validation evidence, and promotion boundaries while preserving all frozen provider bytes."
+          }
+        ],
+        "disposition": "retain as a provider-owned Codex builtin after correcting overwrite guidance and multi-install failure semantics",
+        "execution": {
+          "alternatives": "multi-skill installation only after complete preflight and atomic publish, or with explicit partial-result reporting; no delegation or Herdr by default",
+          "recommended": "direct read-only listing; one in-session install at a time after explicit source and destination authority"
+        },
+        "invocation": "task-triggered for listing installable skills or explicitly installing from the curated collection or a GitHub repository",
+        "limitations": [
+          "Installed Codex tree has unknown upstream version and provider-owned update behavior.",
+          "No network request, Git command, credential access, live install, overwrite, or provider behavior test was performed.",
+          "Cross-harness destination, agents/openai.yaml, and next-turn availability behavior remain unverified.",
+          "The installer validates containment and basic layout, not remote source trust, signatures, semantic correctness, or later runtime safety.",
+          "Graph indexing excluded the SVG and PNG by suffix; both were inspected directly.",
+          "Authoring and verification were performed by the same reviewer."
+        ],
+        "pack": "skill-management (optional outside the Codex builtin set)",
+        "questions": [
+          {
+            "files": [
+              "review-notes.md"
+            ],
+            "id": "Q-skill-installer-system-overwrite",
+            "question": "Should the generic installer ever overwrite a provider-managed .system skill?",
+            "rationale": "The current implementation refuses existing destinations, and generic overwrite would blur provider ownership and recovery authority.",
+            "recommendation": "Do not overwrite system skills; route repair or upgrades to a separately authorized provider update mechanism."
+          },
+          {
+            "files": [
+              "review-notes.md"
+            ],
+            "id": "Q-skill-installer-batch-atomicity",
+            "question": "Should a multi-skill request be all-or-none?",
+            "rationale": "The current sequential copy loop can leave earlier skills installed while returning failure for a later member.",
+            "recommendation": "Preflight and stage the complete batch, then publish only when every member passes."
+          }
+        ],
+        "reviewedFiles": [
+          "LICENSE.txt",
+          "SKILL.md",
+          "agents/openai.yaml",
+          "assets/skill-installer-small.svg",
+          "assets/skill-installer.png",
+          "review-notes.md",
+          "scripts/github_utils.py",
+          "scripts/install-skill-from-github.py",
+          "scripts/list-skills.py"
+        ],
+        "status": "reviewed",
+        "validation": [
+          "Read all eight baseline files plus the added review notes; directly inspected both icon assets and both metadata links.",
+          "Parsed all three Python files with ast and parsed agents/openai.yaml plus SKILL.md frontmatter as YAML.",
+          "Executed isolated temporary fixtures with mocked repository and listing data and no network or live destination: URL parsing/list sorting passed, relative and ZIP traversal were rejected, and a missing second skill left the first copied while returning failure.",
+          "Static walkthroughs covered curated and experimental listing, public and private sources, destination collision, arbitrary-source trust, system-skill ownership, credentials, and batch failure."
+        ]
+      },
       "source": "builtin-codex",
-      "state": "unreviewed"
+      "state": "contract-valid"
     },
     {
       "candidatePath": "library/harness-claude-skills/codebase-memory/c4002c91abe2",
-      "changedPaths": [],
-      "errors": [
-        "REVIEW.md must be a regular file",
-        "review.json must be a regular file"
+      "changedPaths": [
+        "QUESTIONS.md",
+        "REVIEW.md",
+        "review.json"
       ],
+      "errors": [],
       "id": "codebase-memory:c4002c91abe206c6bd76629d040cc4d5bca57b451a0ab50ef5bb06bf5d66d16a",
       "identity": "codebase-memory",
       "missingFiles": [],
-      "review": null,
+      "review": {
+        "changes": [
+          {
+            "files": [
+              "QUESTIONS.md",
+              "REVIEW.md",
+              "review.json"
+            ],
+            "summary": "Add a source-grounded review that preserves graph evidence tiers and fallback discipline, requires corrections for schema drift and cross-service tracing, separates read-only analysis from mutations, and records promotion questions without changing frozen source bytes."
+          }
+        ],
+        "disposition": "revise volatile interface claims and mutation boundaries before promotion while retaining graph evidence discipline",
+        "execution": {
+          "alternatives": "bounded delegation for independent analysis after the parent passes exact project, generation, tier, symbols, pagination and coverage evidence; no default Herdr or worktree",
+          "mutations": "index creation, project deletion, ADR updates and trace ingestion require explicit authority",
+          "recommended": "in-session read-only graph discovery and verification for small or interactive scopes"
+        },
+        "invocation": {
+          "exclusions": "ordinary literal or non-code search, and any mutation without explicit authority",
+          "mode": "task-triggered",
+          "tasks": "structural code discovery, architecture, tracing, impact analysis and bounded quality analysis"
+        },
+        "limitations": [
+          "No live candidate workflow, harness comparison, mutation, paid service or performance benchmark was executed.",
+          "Upstream, version and maintenance owner are unknown; no license was discovered in bounded ancestry.",
+          "Provider frontmatter and automatic-discovery behavior across the 13 recorded mirrors remain unverified.",
+          "The current graph schema is project-specific and the advertised tool interface may change; it is evidence of drift risk, not a universal taxonomy.",
+          "Initial inventory graph extraction timed out for inventory.json, so its exact candidate entry was read directly with jq; a later generation reported no recorded coverage issue, but graph coverage remains best-effort."
+        ],
+        "pack": "codebase-intelligence (optional; requires an advertised codebase-memory MCP interface)",
+        "questions": [
+          {
+            "files": [
+              "QUESTIONS.md"
+            ],
+            "id": "Q-codebase-memory-schema",
+            "question": "Should a promoted guide pin a fixed tool count and edge taxonomy?",
+            "rationale": "Tool and edge availability can vary by server generation and project, so an exhaustive static list becomes a false contract.",
+            "recommendation": "No; use the live advertised tools and get_graph_schema as authoritative, with static names labeled as examples."
+          },
+          {
+            "files": [
+              "QUESTIONS.md"
+            ],
+            "id": "Q-codebase-memory-efficiency",
+            "question": "Should the numeric token-efficiency comparison be retained?",
+            "rationale": "The frozen tree provides no evidence for the numeric comparison, and a plausible benefit is not a measured result.",
+            "recommendation": "Remove it unless a reproducible benchmark, workload and measurement date are supplied."
+          }
+        ],
+        "reviewedFiles": [
+          "QUESTIONS.md",
+          "SKILL.md"
+        ],
+        "status": "reviewed",
+        "validation": [
+          {
+            "kind": "full-tree static review",
+            "result": "Read all 76 lines of the sole retained file, including inline Cypher examples; confirmed there are no additional scripts, reference/example files, metadata files, assets or licenses in the candidate tree."
+          },
+          {
+            "kind": "static scenarios",
+            "result": "Walked through positive discovery, bounded caller audit, dead-code candidate analysis, partial-coverage fallback, cross-service mode, child-context handoff and mutation-authority refusal; no candidate workflow executed."
+          },
+          {
+            "kind": "read-only interface comparison",
+            "result": "Compared candidate claims with the currently advertised codebase-memory tool schemas and one current project graph schema; confirmed that trace_path cross-service traversal uses a separate mode and that search_graph does not accept the candidate's direction argument; treated results as time- and project-bounded observations."
+          }
+        ]
+      },
       "source": "harness-claude-skills",
-      "state": "unreviewed"
+      "state": "contract-valid"
     },
     {
       "candidatePath": "library/harness-claude-skills/impeccable/6c5d5e55dd40",
-      "changedPaths": [],
-      "errors": [
-        "REVIEW.md must be a regular file",
-        "review.json must be a regular file"
+      "changedPaths": [
+        "QUESTIONS.md",
+        "REVIEW.md",
+        "review.json"
       ],
+      "errors": [],
       "id": "impeccable:6c5d5e55dd406c10c556431531e9440f1f26a1ee2a2daa5b88a4c44ce2053168",
       "identity": "impeccable",
       "missingFiles": [],
-      "review": null,
+      "review": {
+        "changes": [
+          {
+            "files": [
+              "SKILL.md",
+              "reference/live.md",
+              "reference/new-work.md",
+              "scripts/concept-seed.mjs",
+              "scripts/context.mjs"
+            ],
+            "summary": "Record these pre-existing tracked candidate-source modifications as a preservation failure. They were not authored, repaired, approved, or validated as implementation by the final-handoff work and must be excluded from the proposed review-artifact change."
+          },
+          {
+            "files": [
+              "QUESTIONS.md",
+              "REVIEW.md",
+              "review.json"
+            ],
+            "summary": "Add the candidate review and machine-readable contract, grounded in the frozen inventory and HEAD baseline, with the five-file preservation failure and worktree-dependent question-token limitation disclosed."
+          }
+        ],
+        "disposition": "retain the design expertise but revise authority, network, cost, live-mode, provider, evidence, and licensing boundaries before promotion",
+        "execution": {
+          "alternatives": "bounded fresh delegation only when the harness supports it and task scale warrants it; otherwise use documented degraded roles",
+          "privileged": "live mode, hooks, pinning, doctor fixes, image generation, concept service calls, and automated copy-edit agents require separate opt-in and target/process/network/cost disclosure",
+          "recommended": "in-session for small read-only or bounded project-edit work"
+        },
+        "invocation": {
+          "boundaries": "planning and review remain read-only; project writes, processes, harness configuration, external network, credentials, paid calls, local agents, installation, and publication require matching authority",
+          "default": "bare invocation presents a menu",
+          "mode": "task-triggered with explicit subcommands"
+        },
+        "limitations": [
+          "Five tracked candidate source files were already modified at final-handoff start. This preservation failure was not repaired because the dispatcher explicitly required the source mutations to remain untouched.",
+          "The six Q-* tokens are carried by the additive QUESTIONS.md review artifact; the five dirty candidate-source files remain excluded and are separately recorded as a preservation failure.",
+          "No candidate workflow, server, hook, browser injection, detector, network endpoint, model, image API, local agent, installer, apply, credential, paid service, commit, push, Linear mutation, or Herdr operation was exercised.",
+          "Upstream identity, update ownership, authoritative license text, third-party notices, private concept-service payload, provider build pipeline, named subagent packaging, remote design specification, privacy terms, and model-quality measurements were unavailable or unverified.",
+          "Authoring and final verification were performed by the same agent; no independent second-model review is claimed.",
+          "Graph coverage is best-effort and does not prove completeness; direct HEAD/inventory reads are the baseline authority for this candidate."
+        ],
+        "pack": "frontend-design-advanced (optional; privileged live, hook, pin, network, generation, and agent branches separately invoked)",
+        "questions": [
+          {
+            "files": [
+              "QUESTIONS.md"
+            ],
+            "id": "Q-impeccable-authority",
+            "question": "Should one general Impeccable invocation authorize every Bash and Node capability in the tree?",
+            "rationale": "The exposed branches range from read-only review to persistent source/config mutation, servers, agents, network calls, and paid generation.",
+            "recommendation": "No; separate read, project-write, process, harness-config, external-network, credential, paid-call, and local-agent capabilities, and require request-level authority or inline confirmation for each material escalation."
+          },
+          {
+            "files": [
+              "QUESTIONS.md"
+            ],
+            "id": "Q-impeccable-network",
+            "question": "May mandatory setup perform version checks, and may concept selection send roll or choice telemetry by default?",
+            "rationale": "The baseline performs external requests in setup and concept selection without a complete privacy and consent contract in the frozen tree.",
+            "recommendation": "Make choice telemetry opt-in and disclose endpoint, fields, owner, retention, timeout, cache writes, and offline fallback before network contact; keep version checks separately disableable."
+          },
+          {
+            "files": [
+              "QUESTIONS.md"
+            ],
+            "id": "Q-impeccable-paid-generation",
+            "question": "May availability of OPENAI_API_KEY make a multi-image generation round mandatory?",
+            "rationale": "Credential availability does not establish authority to incur cost or transmit prompts.",
+            "recommendation": "No; require explicit cost and credential-use confirmation before the first paid call and retain a no-image or code-led route."
+          },
+          {
+            "files": [
+              "QUESTIONS.md"
+            ],
+            "id": "Q-impeccable-live",
+            "question": "Should live mode be promoted as part of ordinary design execution?",
+            "rationale": "Live mode starts services, injects framework code, mutates source, and can spawn coding agents; ordinary design invocation is insufficient authority.",
+            "recommendation": "Retain it only as an advanced explicit command with process/file/network/agent preflight, bounded roots, rollback receipts, and deterministic cleanup."
+          },
+          {
+            "files": [
+              "QUESTIONS.md"
+            ],
+            "id": "Q-impeccable-provider",
+            "question": "Is the Claude allowed-tools and degraded-agent packaging contract verified for this exact tree and portable to other harnesses?",
+            "rationale": "Cross-provider references do not establish equivalent enforcement or packaging.",
+            "recommendation": "Keep this variant Claude-specific until provider fixtures prove permissions, named-agent availability, invocation names, and metadata behavior."
+          },
+          {
+            "files": [
+              "QUESTIONS.md"
+            ],
+            "id": "Q-impeccable-license",
+            "question": "Is the Apache-2.0 frontmatter declaration sufficient for redistribution of this full tree and bundled third-party code?",
+            "rationale": "No license file was discovered in bounded ancestry, and the tree includes a vendored browser bundle.",
+            "recommendation": "Require authoritative license text plus applicable third-party notices and version-matched provenance before promotion."
+          }
+        ],
+        "reviewedFiles": [
+          "QUESTIONS.md",
+          "SKILL.md",
+          "reference/adapt.md",
+          "reference/adapt.native.md",
+          "reference/android.md",
+          "reference/animate.md",
+          "reference/audit.md",
+          "reference/audit.native.md",
+          "reference/bolder.md",
+          "reference/clarify.md",
+          "reference/colorize.md",
+          "reference/craft-floor.md",
+          "reference/craft.md",
+          "reference/critique.md",
+          "reference/degraded/asset-producer.md",
+          "reference/degraded/documenter.md",
+          "reference/degraded/finish-reviewer.md",
+          "reference/degraded/manual-edit-applier.md",
+          "reference/delight.md",
+          "reference/distill.md",
+          "reference/doctor.md",
+          "reference/document.md",
+          "reference/extract.md",
+          "reference/harden.md",
+          "reference/hooks.md",
+          "reference/init.md",
+          "reference/ios.md",
+          "reference/layout.md",
+          "reference/live-setup.md",
+          "reference/live.md",
+          "reference/new-work.md",
+          "reference/onboard.md",
+          "reference/operate.md",
+          "reference/optimize.md",
+          "reference/overdrive.md",
+          "reference/polish.md",
+          "reference/quieter.md",
+          "reference/routing.md",
+          "reference/shape.md",
+          "reference/typeset.md",
+          "reference/visualize.md",
+          "scripts/command-metadata.json",
+          "scripts/concept-seed.mjs",
+          "scripts/context-signals.mjs",
+          "scripts/context.mjs",
+          "scripts/critique-storage.mjs",
+          "scripts/detect-csp.mjs",
+          "scripts/detect.mjs",
+          "scripts/detector/browser/injected/index.mjs",
+          "scripts/detector/cli/main.mjs",
+          "scripts/detector/design-system.mjs",
+          "scripts/detector/detect-antipatterns-browser.js",
+          "scripts/detector/detect-antipatterns.mjs",
+          "scripts/detector/engines/browser/detect-url.mjs",
+          "scripts/detector/engines/regex/detect-text.mjs",
+          "scripts/detector/engines/static-html/css-cascade.mjs",
+          "scripts/detector/engines/static-html/detect-html.mjs",
+          "scripts/detector/engines/visual/screenshot-contrast.mjs",
+          "scripts/detector/findings.mjs",
+          "scripts/detector/node/file-system.mjs",
+          "scripts/detector/profile/profiler.mjs",
+          "scripts/detector/registry/antipatterns.mjs",
+          "scripts/detector/rules/checks.mjs",
+          "scripts/detector/shared/color.mjs",
+          "scripts/detector/shared/constants.mjs",
+          "scripts/detector/shared/fonts.mjs",
+          "scripts/detector/shared/inline-ignores.mjs",
+          "scripts/detector/shared/page.mjs",
+          "scripts/doctor.mjs",
+          "scripts/embed-prompt.mjs",
+          "scripts/generate-image.mjs",
+          "scripts/hook-admin.mjs",
+          "scripts/hook-before-edit.mjs",
+          "scripts/hook-lib.mjs",
+          "scripts/hook.mjs",
+          "scripts/lib/artifact-schema.mjs",
+          "scripts/lib/composition-catalog.mjs",
+          "scripts/lib/concept-catalog.mjs",
+          "scripts/lib/design-parser.mjs",
+          "scripts/lib/impeccable-config.mjs",
+          "scripts/lib/impeccable-paths.mjs",
+          "scripts/lib/is-generated.mjs",
+          "scripts/lib/open-system-browser.mjs",
+          "scripts/lib/provider.mjs",
+          "scripts/lib/roll-selection.mjs",
+          "scripts/lib/staleness-deep.mjs",
+          "scripts/lib/staleness-notice.mjs",
+          "scripts/lib/staleness.mjs",
+          "scripts/lib/surface-briefs.mjs",
+          "scripts/lib/target-args.mjs",
+          "scripts/lib/target-slug.mjs",
+          "scripts/lib/template-extensions.mjs",
+          "scripts/live/accept-css.mjs",
+          "scripts/live/accept-verify.mjs",
+          "scripts/live/browser-script-parts.mjs",
+          "scripts/live/completion.mjs",
+          "scripts/live/event-validation.mjs",
+          "scripts/live/frameworks/astro.mjs",
+          "scripts/live/frameworks/detect-utils.mjs",
+          "scripts/live/frameworks/index.mjs",
+          "scripts/live/frameworks/journal.mjs",
+          "scripts/live/frameworks/nextjs.mjs",
+          "scripts/live/frameworks/nuxt.mjs",
+          "scripts/live/frameworks/script-src.mjs",
+          "scripts/live/frameworks/static-html.mjs",
+          "scripts/live/frameworks/sveltekit.mjs",
+          "scripts/live/frameworks/tag-strategy.mjs",
+          "scripts/live/frameworks/tanstack-start.mjs",
+          "scripts/live/frameworks/vite-generic.mjs",
+          "scripts/live/generation-preflight.mjs",
+          "scripts/live/insert-ui.mjs",
+          "scripts/live/instructions.mjs",
+          "scripts/live/manual-apply.mjs",
+          "scripts/live/manual-edit-routes.mjs",
+          "scripts/live/manual-edits-buffer.mjs",
+          "scripts/live/poll-lanes.mjs",
+          "scripts/live/roots.mjs",
+          "scripts/live/session-store.mjs",
+          "scripts/live/source-lock.mjs",
+          "scripts/live/source-search.mjs",
+          "scripts/live/svelte-ast.mjs",
+          "scripts/live/svelte-component.mjs",
+          "scripts/live/sveltekit-adapter.mjs",
+          "scripts/live/tanstack-adapter.mjs",
+          "scripts/live/ui-surfaces.mjs",
+          "scripts/live/vocabulary.mjs",
+          "scripts/live-accept.mjs",
+          "scripts/live-browser-dom.js",
+          "scripts/live-browser-session.js",
+          "scripts/live-browser.js",
+          "scripts/live-commit-manual-edits.mjs",
+          "scripts/live-complete.mjs",
+          "scripts/live-copy-edit-agent.mjs",
+          "scripts/live-discard-manual-edits.mjs",
+          "scripts/live-inject.mjs",
+          "scripts/live-insert.mjs",
+          "scripts/live-manual-edit-evidence.mjs",
+          "scripts/live-poll.mjs",
+          "scripts/live-resume.mjs",
+          "scripts/live-server.mjs",
+          "scripts/live-status.mjs",
+          "scripts/live-target.mjs",
+          "scripts/live-wrap.mjs",
+          "scripts/live.mjs",
+          "scripts/modern-screenshot.umd.js",
+          "scripts/palette.mjs",
+          "scripts/pin.mjs",
+          "scripts/serve-question.mjs",
+          "scripts/surface-brief.mjs"
+        ],
+        "status": "reviewed",
+        "validation": [
+          {
+            "kind": "full-tree static review",
+            "result": "Completed eight bounded passes covering all 148 frozen regular files (3255891 bytes); exact baseline paths, hashes, sizes, and pass assignments are recorded in evaluations/HJ-736-impeccable.md."
+          },
+          {
+            "kind": "baseline comparison",
+            "result": "Compared the candidate to HEAD and the frozen inventory; exactly five tracked candidate files differ, totaling 41 insertions and 8 deletions. Exact before/after hashes are recorded as a failed preservation condition."
+          },
+          {
+            "kind": "static scenarios",
+            "result": "Walked through bare invocation, read-only commands, bounded refinements, native audit, live-mode refusal/fallback, paid generation consent, hook/pin removal, and delegation fallback without executing candidate workflows."
+          },
+          {
+            "kind": "bounded syntax and repository validation",
+            "result": "See evaluations/HJ-736-impeccable.md and PR_DESCRIPTION.md for exact commands and outcomes; candidate scripts were syntax-checked from HEAD blobs only, not run."
+          }
+        ]
+      },
       "source": "harness-claude-skills",
-      "state": "unreviewed"
+      "state": "contract-valid"
     },
     {
       "candidatePath": "library/harness-claude-skills/mixture-of-agents/b6883206a8b5",
-      "changedPaths": [],
-      "errors": [
-        "REVIEW.md must be a regular file",
-        "review.json must be a regular file"
+      "changedPaths": [
+        "EVIDENCE.md",
+        "REVIEW.md",
+        "review.json"
       ],
+      "errors": [],
       "id": "mixture-of-agents:b6883206a8b5a4743192f3ed4af13329f050d586a42d86291ba674e185bedb57",
       "identity": "mixture-of-agents",
       "missingFiles": [],
-      "review": null,
+      "review": {
+        "changes": [
+          {
+            "files": [
+              "EVIDENCE.md",
+              "REVIEW.md",
+              "review.json"
+            ],
+            "summary": "Add the full-tree disposition, six-pass evidence, provider and Web UI promotion boundaries, open policy questions, validation, and limitations without changing any baseline source, asset, or license bytes."
+          }
+        ],
+        "disposition": "retain as an unpromoted candidate; remediate and split the Web UI boundary before optional promotion",
+        "execution": {
+          "alternatives": "single-model in-session planning; CLI-only promotion without the Flask control room",
+          "recommended": "in-session scout, then bounded external read-only proposers/refiners and recorded aggregation only after confirmation",
+          "webui": "exclude from promotion pending a real access-control and network-origin boundary"
+        },
+        "invocation": {
+          "notAuthorized": "automatic paid dispatch, implementation, install, login, publish, commit, or deployment",
+          "recommended": "explicit user invocation only, followed by a second confirmation of the resolved roster, time, quota, and provider routes"
+        },
+        "limitations": [
+          "No candidate workflow, provider call, web research, installer, network service, or live browser/provider evaluation was executed.",
+          "Model names, CLI flags, permission enforcement, authentication probes, and provider availability are time-sensitive and require current upstream verification before promotion.",
+          "No license was discovered in bounded ancestry; redistribution permission and upstream/version provenance are unknown.",
+          "Git-visible mutation detection is after-the-fact and cannot prevent, undo, or observe every external side effect.",
+          "The same reviewer authored and verified the artifacts; no independent second-model review is claimed."
+        ],
+        "pack": "planning-orchestration (optional)",
+        "questions": [
+          {
+            "files": [
+              "EVIDENCE.md"
+            ],
+            "id": "Q-mixture-agents-invocation",
+            "question": "Should a high-stakes task implicitly activate a multi-provider run?",
+            "rationale": "The workflow consumes shared provider quota and can run for 12-25 minutes or longer.",
+            "recommendation": "No; require explicit invocation and retain the second pre-dispatch roster/time/quota confirmation."
+          },
+          {
+            "files": [
+              "EVIDENCE.md"
+            ],
+            "id": "Q-mixture-agents-claims",
+            "question": "Should the cited paper support measured-sounding claims about this repo-planning implementation?",
+            "rationale": "The paper evaluates a different chat-answer setting and this review ran no comparative live evaluation.",
+            "recommendation": "No; preserve the citation as provenance and label extrapolated quality or wall-clock claims as unmeasured hypotheses."
+          },
+          {
+            "files": [
+              "EVIDENCE.md"
+            ],
+            "id": "Q-mixture-agents-webui",
+            "question": "Should the Flask control room ship in the same optional skill candidate?",
+            "rationale": "A self-issued profile isolates browser data but does not authenticate a machine user, while jobs inherit provider credentials and may inspect the default home-directory workspace root.",
+            "recommendation": "Not yet; split or disable it until localhost enforcement, real non-loopback access control, origin defenses, narrower workspace roots, and explicit dispatch authorization exist."
+          }
+        ],
+        "reviewedFiles": [
+          "EVIDENCE.md",
+          "README.md",
+          "SKILL.md",
+          "config.example.yaml",
+          "prompts/aggregator.md",
+          "prompts/proposer.md",
+          "prompts/refiner.md",
+          "prompts/scout.md",
+          "report/assets/report-hero.webp",
+          "report/assets/report-lineage.webp",
+          "report/assets/report-proposers.webp",
+          "report/assets/report-refiners.webp",
+          "report/assets/report-scout.webp",
+          "report/assets/report-synthesis.webp",
+          "report/template.html",
+          "scripts/adapters/__init__.py",
+          "scripts/adapters/agy.py",
+          "scripts/adapters/claude.py",
+          "scripts/adapters/codex.py",
+          "scripts/adapters/gemini.py",
+          "scripts/adapters/opencode.py",
+          "scripts/attachments.py",
+          "scripts/config.py",
+          "scripts/decision_map.py",
+          "scripts/install_deps.py",
+          "scripts/model_labs.py",
+          "scripts/report.py",
+          "scripts/run_moa.py",
+          "scripts/schemas/decision-map.schema.json",
+          "scripts/schemas/final-plan.schema.json",
+          "scripts/schemas/proposer.schema.json",
+          "scripts/schemas/refiner.schema.json",
+          "scripts/test_offline.py",
+          "webui/__init__.py",
+          "webui/__main__.py",
+          "webui/app.py",
+          "webui/github.py",
+          "webui/monitoring.py",
+          "webui/prompt_coach.py",
+          "webui/providers.py",
+          "webui/static/css/app.css",
+          "webui/static/css/decision-map.css",
+          "webui/static/images/context-brief.webp",
+          "webui/static/images/context-effort.webp",
+          "webui/static/images/context-github.webp",
+          "webui/static/images/context-roster.webp",
+          "webui/static/images/context-upload.webp",
+          "webui/static/images/control-room-hero.webp",
+          "webui/static/images/favicon.png",
+          "webui/static/images/lab-alibaba-avatar.webp",
+          "webui/static/images/lab-alibaba-pixel.webp",
+          "webui/static/images/lab-anthropic-avatar.webp",
+          "webui/static/images/lab-anthropic-pixel.webp",
+          "webui/static/images/lab-deepseek-avatar.webp",
+          "webui/static/images/lab-deepseek-pixel.webp",
+          "webui/static/images/lab-google-avatar.webp",
+          "webui/static/images/lab-google-pixel.webp",
+          "webui/static/images/lab-independent-avatar.webp",
+          "webui/static/images/lab-independent-pixel.webp",
+          "webui/static/images/lab-moonshot-avatar.webp",
+          "webui/static/images/lab-moonshot-pixel.webp",
+          "webui/static/images/lab-openai-avatar.webp",
+          "webui/static/images/lab-openai-pixel.webp",
+          "webui/static/images/lab-xai-avatar.webp",
+          "webui/static/images/lab-xai-pixel.webp",
+          "webui/static/images/lab-zhipu-avatar.webp",
+          "webui/static/images/lab-zhipu-pixel.webp",
+          "webui/static/images/moax-mark.webp",
+          "webui/static/images/prompt-coach-teacher.webp",
+          "webui/static/images/state-complete.webp",
+          "webui/static/images/state-parallel.webp",
+          "webui/static/images/state-queued.webp",
+          "webui/static/images/state-review.webp",
+          "webui/static/images/state-scouting.webp",
+          "webui/static/images/state-synthesis.webp",
+          "webui/static/images/workflow-01-scout.webp",
+          "webui/static/images/workflow-02-propose.webp",
+          "webui/static/images/workflow-03-broadcast.webp",
+          "webui/static/images/workflow-04-refine.webp",
+          "webui/static/images/workflow-05-synthesize.webp",
+          "webui/static/images/workflow-06-lineage.webp",
+          "webui/static/images/workflow-07-report.webp",
+          "webui/static/images/workflow-strip.webp",
+          "webui/static/js/api.js",
+          "webui/static/js/app.js",
+          "webui/static/js/decision-map.js",
+          "webui/store.py",
+          "webui/templates/base.html",
+          "webui/templates/index.html",
+          "webui/tests/__init__.py",
+          "webui/tests/test_decision_map_browser.py",
+          "webui/tests/test_effort_controls_browser.py",
+          "webui/tests/test_webui.py",
+          "webui/worker.py"
+        ],
+        "status": "reviewed",
+        "validation": [
+          "Tier 2 graph-assisted structural review with direct source fallback for every reported coverage gap.",
+          "All four JSON schemas parsed; all Python production files passed syntax compilation with generated bytecode removed afterward.",
+          "All 47 binary assets decoded, dimension-checked, SHA-256 matched to the frozen baseline, and were visually inspected without modification.",
+          "Candidate offline suite passed 139/139 tests; repository inventory, review-contract, and local-candidate fixture suites passed 13/13, 34/34, and 2/2 tests with no provider authentication or live dispatch.",
+          "Static walkthroughs covered explicit invocation, partial provider failure, schema rejection, timeout teardown, workspace mutation, stale artifacts, attachment containment, browser profile isolation, remote-bind exposure, and paid dispatch authority."
+        ]
+      },
       "source": "harness-claude-skills",
-      "state": "unreviewed"
+      "state": "contract-valid"
     },
     {
       "candidatePath": "library/harness-config-opencode-skills/impeccable/82d09480e480",
@@ -245,7 +1033,9 @@
         "SKILL.md",
         "review.json"
       ],
-      "errors": [],
+      "errors": [
+        "Original bytes unavailable for binary preservation check: SKILL.md"
+      ],
       "id": "frontier-sweep:df026dc35123d02c77a818db6100c2c422b2d079becb9e8ab247d8f1cdd0ad88",
       "identity": "frontier-sweep",
       "missingFiles": [],
@@ -301,7 +1091,7 @@
         ]
       },
       "source": "local-tracked",
-      "state": "contract-valid"
+      "state": "invalid"
     },
     {
       "candidatePath": "library/local-tracked/grilling/7bf7d17482da",
@@ -69270,13 +70060,13 @@
   "schemaVersion": 1,
   "summary": {
     "allSelectedContractsValid": false,
-    "contractValid": 6,
-    "invalidReviews": 0,
+    "contractValid": 14,
+    "invalidReviews": 1,
     "inventoryGaps": 16,
     "missingCandidates": 0,
-    "missingReviews": 476,
+    "missingReviews": 467,
     "selectedVariants": 482,
     "totalVariants": 482,
-    "unreviewed": 476
+    "unreviewed": 468
   }
 }

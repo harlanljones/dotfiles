@@ -1,0 +1,57 @@
+{
+  "status": "reviewed",
+  "disposition": "retain as a provider-owned Codex builtin after correcting overwrite guidance and multi-install failure semantics",
+  "pack": "skill-management (optional outside the Codex builtin set)",
+  "invocation": "task-triggered for listing installable skills or explicitly installing from the curated collection or a GitHub repository",
+  "execution": {
+    "recommended": "direct read-only listing; one in-session install at a time after explicit source and destination authority",
+    "alternatives": "multi-skill installation only after complete preflight and atomic publish, or with explicit partial-result reporting; no delegation or Herdr by default"
+  },
+  "reviewedFiles": [
+    "LICENSE.txt",
+    "SKILL.md",
+    "agents/openai.yaml",
+    "assets/skill-installer-small.svg",
+    "assets/skill-installer.png",
+    "review-notes.md",
+    "scripts/github_utils.py",
+    "scripts/install-skill-from-github.py",
+    "scripts/list-skills.py"
+  ],
+  "changes": [
+    {
+      "files": ["REVIEW.md", "review-notes.md", "review.json"],
+      "summary": "Add a full-tree review, source-specific overwrite and batch-safety proposals, execution alternatives, stable human decisions, validation evidence, and promotion boundaries while preserving all frozen provider bytes."
+    }
+  ],
+  "questions": [
+    {
+      "id": "Q-skill-installer-system-overwrite",
+      "question": "Should the generic installer ever overwrite a provider-managed .system skill?",
+      "recommendation": "Do not overwrite system skills; route repair or upgrades to a separately authorized provider update mechanism.",
+      "rationale": "The current implementation refuses existing destinations, and generic overwrite would blur provider ownership and recovery authority.",
+      "files": ["review-notes.md"]
+    },
+    {
+      "id": "Q-skill-installer-batch-atomicity",
+      "question": "Should a multi-skill request be all-or-none?",
+      "recommendation": "Preflight and stage the complete batch, then publish only when every member passes.",
+      "rationale": "The current sequential copy loop can leave earlier skills installed while returning failure for a later member.",
+      "files": ["review-notes.md"]
+    }
+  ],
+  "validation": [
+    "Read all eight baseline files plus the added review notes; directly inspected both icon assets and both metadata links.",
+    "Parsed all three Python files with ast and parsed agents/openai.yaml plus SKILL.md frontmatter as YAML.",
+    "Executed isolated temporary fixtures with mocked repository and listing data and no network or live destination: URL parsing/list sorting passed, relative and ZIP traversal were rejected, and a missing second skill left the first copied while returning failure.",
+    "Static walkthroughs covered curated and experimental listing, public and private sources, destination collision, arbitrary-source trust, system-skill ownership, credentials, and batch failure."
+  ],
+  "limitations": [
+    "Installed Codex tree has unknown upstream version and provider-owned update behavior.",
+    "No network request, Git command, credential access, live install, overwrite, or provider behavior test was performed.",
+    "Cross-harness destination, agents/openai.yaml, and next-turn availability behavior remain unverified.",
+    "The installer validates containment and basic layout, not remote source trust, signatures, semantic correctness, or later runtime safety.",
+    "Graph indexing excluded the SVG and PNG by suffix; both were inspected directly.",
+    "Authoring and verification were performed by the same reviewer."
+  ]
+}

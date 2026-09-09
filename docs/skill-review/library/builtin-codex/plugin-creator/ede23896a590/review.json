@@ -1,0 +1,40 @@
+{
+  "status": "reviewed",
+  "disposition": "revise before promotion; retain as candidate",
+  "pack": "optional Codex plugin-authoring pack",
+  "invocation": "explicit only because normal use writes plugin and marketplace files and may install plugins",
+  "execution": {
+    "recommended": "in-session within an explicitly authorized workspace",
+    "alternatives": "personal marketplace mutation, marketplace registration, and install or reinstall only with separate explicit authority"
+  },
+  "reviewedFiles": [
+    "SKILL.md",
+    "agents/openai.yaml",
+    "assets/plugin-creator-small.svg",
+    "assets/plugin-creator.png",
+    "references/installing-and-updating.md",
+    "references/plugin-json-spec.md",
+    "scripts/create_basic_plugin.py",
+    "scripts/identifier_validation.py",
+    "scripts/read_marketplace_name.py",
+    "scripts/update_plugin_cachebuster.py",
+    "scripts/validate_plugin.py"
+  ],
+  "changes": [
+    {
+      "files": ["REVIEW.md", "review.json"],
+      "summary": "Add a bounded review identifying the malformed defaultPrompt scaffold, installation-authority gap, format positioning, and missing license."
+    }
+  ],
+  "questions": [],
+  "validation": [
+    "Read every retained instruction, reference, script, metadata file, and asset; visually inspected PNG assets and read SVG source.",
+    "Compared manifest claims with the candidate schema reference and current official OpenAI plugin packaging documentation.",
+    "Traced the validator entry point and inspected exact source; ran repository review-schema and baseline-preservation checks only."
+  ],
+  "limitations": [
+    "No candidate scaffold, validator, cachebuster, marketplace, plugin CLI, or installation workflow was executed.",
+    "No license file was discovered; distribution permission is unresolved.",
+    "Promotion, pack membership, and implicit policy remain human decisions."
+  ]
+}

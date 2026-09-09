@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 4543,
+    "total": 4545,
     "by_category": {
       "shell": 13,
       "prompt": 1,
@@ -15,9 +15,9 @@
       "toolchain": 4,
       "agents": 41,
       "services": 16,
-      "scripts": 29,
+      "scripts": 30,
       "security": 2,
-      "hooks": 14,
+      "hooks": 15,
       "chezmoi": 7,
       "repo": 4335
     }
@@ -1440,16 +1440,6 @@
       "subsystem": "custom executables"
     },
     {
-      "source": "dot_local/bin/executable_grok",
-      "target": "~/.local/bin/grok",
-      "kind": "dotfile",
-      "category": "scripts",
-      "attributes": [
-        "executable"
-      ],
-      "subsystem": "custom executables"
-    },
-    {
       "source": "dot_local/bin/executable_herdr-agent-lifecycle",
       "target": "~/.local/bin/herdr-agent-lifecycle",
       "kind": "dotfile",
@@ -1687,6 +1677,26 @@
       "subsystem": "custom executables"
     },
     {
+      "source": "dot_local/bin/executable_piper",
+      "target": "~/.local/bin/piper",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_ratbagctl",
+      "target": "~/.local/bin/ratbagctl",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
       "source": "dot_local/bin/executable_statusline.tmpl",
       "target": "~/.local/bin/statusline",
       "kind": "dotfile",
@@ -1891,6 +1901,19 @@
         "phase": "after",
         "order": 30,
         "name": "macos-defaults",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_after_31-mouse-dpi.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 31,
+        "name": "mouse-dpi",
         "template": true
       }
     },

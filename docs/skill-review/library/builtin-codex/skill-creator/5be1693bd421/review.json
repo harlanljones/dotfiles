@@ -1,0 +1,50 @@
+{
+  "status": "reviewed",
+  "disposition": "retain as a provider-owned Codex builtin; revise validator and initializer failure behavior before shared promotion",
+  "pack": "skill-authoring (optional outside the Codex builtin set)",
+  "invocation": "task-triggered for creating or updating a skill, with normal implicit discovery",
+  "execution": {
+    "recommended": "direct in-session authoring with isolated temporary validation",
+    "alternatives": "bounded independent forward evaluation only for sufficiently complex or risky skills when authorized; no default delegation"
+  },
+  "reviewedFiles": [
+    "SKILL.md",
+    "agents/openai.yaml",
+    "assets/skill-creator-small.svg",
+    "assets/skill-creator.png",
+    "license.txt",
+    "references/openai_yaml.md",
+    "review-notes.md",
+    "scripts/generate_openai_yaml.py",
+    "scripts/init_skill.py",
+    "scripts/quick_validate.py"
+  ],
+  "changes": [
+    {
+      "files": ["REVIEW.md", "review-notes.md", "review.json"],
+      "summary": "Add a full-tree review, source-specific remediation proposals, execution alternatives, a stable human decision, validation evidence, and promotion boundaries while preserving all frozen provider bytes."
+    }
+  ],
+  "questions": [
+    {
+      "id": "Q-skill-creator-transaction",
+      "question": "Should the bundled initializer guarantee that a failed initialization leaves no partial skill directory?",
+      "recommendation": "Make initialization transactional and expose the destination only after all requested files succeed.",
+      "rationale": "Current metadata or resource failures can leave an incomplete tree that also blocks a clean retry.",
+      "files": ["review-notes.md"]
+    }
+  ],
+  "validation": [
+    "Read all nine baseline files plus the added review notes; directly inspected both icon assets and both metadata links.",
+    "Parsed all three Python files with ast and parsed agents/openai.yaml plus SKILL.md frontmatter as YAML.",
+    "Executed isolated temporary fixtures with no network or live destination: the actual candidate validates, empty required values are currently accepted, and a metadata failure leaves a partial scaffold.",
+    "Static walkthroughs covered narrow updates, new scaffolds, metadata preservation, requested resources, failure cleanup, and conditional forward evaluation."
+  ],
+  "limitations": [
+    "Installed Codex tree has unknown upstream version and provider-owned update behavior.",
+    "No live harness comparison, paid evaluation, installation, publication, or provider update check was performed.",
+    "Cross-harness agents/openai.yaml and invocation-policy support remains unverified.",
+    "Graph indexing excluded the SVG and PNG by suffix; both were inspected directly.",
+    "Authoring and verification were performed by the same reviewer."
+  ]
+}

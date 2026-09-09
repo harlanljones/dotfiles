@@ -2,23 +2,173 @@
 
 Recommendations are not accepted policy. Invalid contracts are labelled.
 
-Contract errors for library/builtin-codex/imagegen/6e733e799e52: ["REVIEW.md must be a regular file", "review.json must be a regular file"]
+## Q-skill-creator-transaction
 
-Contract errors for library/builtin-codex/openai-docs/1de75a2e0091: ["REVIEW.md must be a regular file", "review.json must be a regular file"]
+Candidate: library/builtin-codex/skill-creator/5be1693bd421 (contract-valid)
 
-Contract errors for library/builtin-codex/plugin-creator/ede23896a590: ["REVIEW.md must be a regular file", "review.json must be a regular file"]
+Question: Should the bundled initializer guarantee that a failed initialization leaves no partial skill directory?
 
-Contract errors for library/builtin-codex/review-agent/91ab275699ee: ["REVIEW.md must be a regular file", "review.json must be a regular file"]
+Recommendation: Make initialization transactional and expose the destination only after all requested files succeed.
 
-Contract errors for library/builtin-codex/skill-creator/5be1693bd421: ["REVIEW.md must be a regular file", "review.json must be a regular file"]
+Rationale: Current metadata or resource failures can leave an incomplete tree that also blocks a clean retry.
 
-Contract errors for library/builtin-codex/skill-installer/bd391a97dbae: ["REVIEW.md must be a regular file", "review.json must be a regular file"]
+Files: ["review-notes.md"]
 
-Contract errors for library/harness-claude-skills/codebase-memory/c4002c91abe2: ["REVIEW.md must be a regular file", "review.json must be a regular file"]
+## Q-skill-installer-system-overwrite
 
-Contract errors for library/harness-claude-skills/impeccable/6c5d5e55dd40: ["REVIEW.md must be a regular file", "review.json must be a regular file"]
+Candidate: library/builtin-codex/skill-installer/bd391a97dbae (contract-valid)
 
-Contract errors for library/harness-claude-skills/mixture-of-agents/b6883206a8b5: ["REVIEW.md must be a regular file", "review.json must be a regular file"]
+Question: Should the generic installer ever overwrite a provider-managed .system skill?
+
+Recommendation: Do not overwrite system skills; route repair or upgrades to a separately authorized provider update mechanism.
+
+Rationale: The current implementation refuses existing destinations, and generic overwrite would blur provider ownership and recovery authority.
+
+Files: ["review-notes.md"]
+
+## Q-skill-installer-batch-atomicity
+
+Candidate: library/builtin-codex/skill-installer/bd391a97dbae (contract-valid)
+
+Question: Should a multi-skill request be all-or-none?
+
+Recommendation: Preflight and stage the complete batch, then publish only when every member passes.
+
+Rationale: The current sequential copy loop can leave earlier skills installed while returning failure for a later member.
+
+Files: ["review-notes.md"]
+
+## Q-codebase-memory-schema
+
+Candidate: library/harness-claude-skills/codebase-memory/c4002c91abe2 (contract-valid)
+
+Question: Should a promoted guide pin a fixed tool count and edge taxonomy?
+
+Recommendation: No; use the live advertised tools and get_graph_schema as authoritative, with static names labeled as examples.
+
+Rationale: Tool and edge availability can vary by server generation and project, so an exhaustive static list becomes a false contract.
+
+Files: ["QUESTIONS.md"]
+
+## Q-codebase-memory-efficiency
+
+Candidate: library/harness-claude-skills/codebase-memory/c4002c91abe2 (contract-valid)
+
+Question: Should the numeric token-efficiency comparison be retained?
+
+Recommendation: Remove it unless a reproducible benchmark, workload and measurement date are supplied.
+
+Rationale: The frozen tree provides no evidence for the numeric comparison, and a plausible benefit is not a measured result.
+
+Files: ["QUESTIONS.md"]
+
+## Q-impeccable-authority
+
+Candidate: library/harness-claude-skills/impeccable/6c5d5e55dd40 (contract-valid)
+
+Question: Should one general Impeccable invocation authorize every Bash and Node capability in the tree?
+
+Recommendation: No; separate read, project-write, process, harness-config, external-network, credential, paid-call, and local-agent capabilities, and require request-level authority or inline confirmation for each material escalation.
+
+Rationale: The exposed branches range from read-only review to persistent source/config mutation, servers, agents, network calls, and paid generation.
+
+Files: ["QUESTIONS.md"]
+
+## Q-impeccable-network
+
+Candidate: library/harness-claude-skills/impeccable/6c5d5e55dd40 (contract-valid)
+
+Question: May mandatory setup perform version checks, and may concept selection send roll or choice telemetry by default?
+
+Recommendation: Make choice telemetry opt-in and disclose endpoint, fields, owner, retention, timeout, cache writes, and offline fallback before network contact; keep version checks separately disableable.
+
+Rationale: The baseline performs external requests in setup and concept selection without a complete privacy and consent contract in the frozen tree.
+
+Files: ["QUESTIONS.md"]
+
+## Q-impeccable-paid-generation
+
+Candidate: library/harness-claude-skills/impeccable/6c5d5e55dd40 (contract-valid)
+
+Question: May availability of OPENAI_API_KEY make a multi-image generation round mandatory?
+
+Recommendation: No; require explicit cost and credential-use confirmation before the first paid call and retain a no-image or code-led route.
+
+Rationale: Credential availability does not establish authority to incur cost or transmit prompts.
+
+Files: ["QUESTIONS.md"]
+
+## Q-impeccable-live
+
+Candidate: library/harness-claude-skills/impeccable/6c5d5e55dd40 (contract-valid)
+
+Question: Should live mode be promoted as part of ordinary design execution?
+
+Recommendation: Retain it only as an advanced explicit command with process/file/network/agent preflight, bounded roots, rollback receipts, and deterministic cleanup.
+
+Rationale: Live mode starts services, injects framework code, mutates source, and can spawn coding agents; ordinary design invocation is insufficient authority.
+
+Files: ["QUESTIONS.md"]
+
+## Q-impeccable-provider
+
+Candidate: library/harness-claude-skills/impeccable/6c5d5e55dd40 (contract-valid)
+
+Question: Is the Claude allowed-tools and degraded-agent packaging contract verified for this exact tree and portable to other harnesses?
+
+Recommendation: Keep this variant Claude-specific until provider fixtures prove permissions, named-agent availability, invocation names, and metadata behavior.
+
+Rationale: Cross-provider references do not establish equivalent enforcement or packaging.
+
+Files: ["QUESTIONS.md"]
+
+## Q-impeccable-license
+
+Candidate: library/harness-claude-skills/impeccable/6c5d5e55dd40 (contract-valid)
+
+Question: Is the Apache-2.0 frontmatter declaration sufficient for redistribution of this full tree and bundled third-party code?
+
+Recommendation: Require authoritative license text plus applicable third-party notices and version-matched provenance before promotion.
+
+Rationale: No license file was discovered in bounded ancestry, and the tree includes a vendored browser bundle.
+
+Files: ["QUESTIONS.md"]
+
+## Q-mixture-agents-invocation
+
+Candidate: library/harness-claude-skills/mixture-of-agents/b6883206a8b5 (contract-valid)
+
+Question: Should a high-stakes task implicitly activate a multi-provider run?
+
+Recommendation: No; require explicit invocation and retain the second pre-dispatch roster/time/quota confirmation.
+
+Rationale: The workflow consumes shared provider quota and can run for 12-25 minutes or longer.
+
+Files: ["EVIDENCE.md"]
+
+## Q-mixture-agents-claims
+
+Candidate: library/harness-claude-skills/mixture-of-agents/b6883206a8b5 (contract-valid)
+
+Question: Should the cited paper support measured-sounding claims about this repo-planning implementation?
+
+Recommendation: No; preserve the citation as provenance and label extrapolated quality or wall-clock claims as unmeasured hypotheses.
+
+Rationale: The paper evaluates a different chat-answer setting and this review ran no comparative live evaluation.
+
+Files: ["EVIDENCE.md"]
+
+## Q-mixture-agents-webui
+
+Candidate: library/harness-claude-skills/mixture-of-agents/b6883206a8b5 (contract-valid)
+
+Question: Should the Flask control room ship in the same optional skill candidate?
+
+Recommendation: Not yet; split or disable it until localhost enforcement, real non-loopback access control, origin defenses, narrower workspace roots, and explicit dispatch authorization exist.
+
+Rationale: A self-issued profile isolates browser data but does not authenticate a machine user, while jobs inherit provider credentials and may inspect the default home-directory workspace root.
+
+Files: ["EVIDENCE.md"]
 
 Contract errors for library/harness-config-opencode-skills/impeccable/82d09480e480: ["REVIEW.md must be a regular file", "review.json must be a regular file"]
 
@@ -40,9 +190,11 @@ Rationale: Apply may trigger hooks and deploy unrelated pending changes.
 
 Files: ["SKILL.md"]
 
+Contract errors for library/local-tracked/frontier-sweep/df026dc35123: ["Original bytes unavailable for binary preservation check: SKILL.md"]
+
 ## Q-frontier-sweep-dispatch
 
-Candidate: library/local-tracked/frontier-sweep/df026dc35123 (contract-valid)
+Candidate: library/local-tracked/frontier-sweep/df026dc35123 (invalid)
 
 Question: Should one dispatcher own all claims and tracker updates?
 
@@ -54,7 +206,7 @@ Files: ["SKILL.md"]
 
 ## Q-frontier-sweep-herdr
 
-Candidate: library/local-tracked/frontier-sweep/df026dc35123 (contract-valid)
+Candidate: library/local-tracked/frontier-sweep/df026dc35123 (invalid)
 
 Question: Does a sweep request alone authorize new Herdr topology?
 

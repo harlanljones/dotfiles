@@ -1,0 +1,31 @@
+{
+  "status": "reviewed",
+  "disposition": "retain with diff-coverage correction; candidate only",
+  "pack": "code-review agent pack",
+  "invocation": "explicit delegated invocation only",
+  "execution": {
+    "recommended": "dedicated read-only review agent with local repository context",
+    "alternatives": "in-session review when no dedicated agent is available; no further delegation needed"
+  },
+  "reviewedFiles": [
+    "SKILL.md",
+    "agents/openai.yaml"
+  ],
+  "changes": [
+    {
+      "files": ["REVIEW.md", "review.json"],
+      "summary": "Add a bounded review identifying missing untracked-file coverage while preserving the narrow read-only design."
+    }
+  ],
+  "questions": [],
+  "validation": [
+    "Read both retained files in full and statically walked through each comparison mode and the finding output contract.",
+    "Checked the review instructions against the rubric requirement to cover staged, unstaged, and untracked implementation changes.",
+    "Ran repository review-schema and baseline-preservation checks only."
+  ],
+  "limitations": [
+    "The candidate review agent was not invoked and runtime finding quality was not measured.",
+    "No license file was discovered; distribution permission is unresolved.",
+    "Promotion and pack membership remain human decisions."
+  ]
+}
