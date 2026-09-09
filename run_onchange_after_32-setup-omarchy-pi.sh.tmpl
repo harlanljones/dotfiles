@@ -1,0 +1,48 @@
+{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+#!/bin/bash
+# Registers the pi harness (local Ollama agent) with the Omarchy Agents
+# leaderboard plugin. Managed by chezmoi.
+
+set -euo pipefail
+
+PLUGIN_DIR="$HOME/.config/omarchy/plugins/harlan.agent-leaderboard"
+if [[ ! -d "$PLUGIN_DIR" ]]; then
+  exit 0
+fi
+
+# Collection needs no plugin-side helper: omarchy-agent-usage-update (the
+# user wrapper in ~/.local/bin) auto-discovers omarchy-agent-usage-pi, and
+# the leaderboard rescans the usage directory after every update run.
+# Only the mark and accent need patching into Panel.qml.
+#
+# This hook is numbered after 25-sync-omarchy-agents-workspace on purpose.
+# That script redeploys the plugin from ~/dev/omarchy-agents and would wipe
+# any earlier patch, so running afterwards makes the registration reapply
+# itself on every sync instead of silently disappearing.
+
+# 1. Deploy SVG assets
+mkdir -p "$PLUGIN_DIR/assets"
+cat << 'SVG_EOF' > "$PLUGIN_DIR/assets/pi.svg"
+<svg fill="#38BDF8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <title>Pi</title>
+  <path d="M4 5.5h16V8H4z M7.5 8h2.5v11H7.5z M14 8h2.5v11H14z"/>
+</svg>
+SVG_EOF
+
+cat << 'SVG_EOF' > "$PLUGIN_DIR/assets/pi-light.svg"
+<svg fill="#0284C5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+  <title>Pi</title>
+  <path d="M4 5.5h16V8H4z M7.5 8h2.5v11H7.5z M14 8h2.5v11H14z"/>
+</svg>
+SVG_EOF
+
+# 2. Patch Panel.qml if pi isn't registered
+if ! grep -q "^ *pi: true," "$PLUGIN_DIR/Panel.qml"; then
+  sed -i 's/readonly property var shippedMarks: ({/&\n    pi: true,/' "$PLUGIN_DIR/Panel.qml"
+  sed -i 's/function agentAccent(id) {/&\n    if (id === "pi") return "#38BDF8"/' "$PLUGIN_DIR/Panel.qml"
+  sed -i 's/|| id === "opencode") \&\& colorLuminance/|| id === "opencode" || id === "pi") \&\& colorLuminance/' "$PLUGIN_DIR/Panel.qml"
+fi
+
+# 3. Run initial usage collection
+omarchy-agent-usage-update || true
+{{- end -}}

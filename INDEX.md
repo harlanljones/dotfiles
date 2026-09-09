@@ -10,6 +10,7 @@ Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
 **4545 tracked entries** across 15 categories.
+**4547 tracked entries** across 15 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -26,6 +27,9 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Custom executables](#custom-executables) | 30 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 15 |
+| [Custom executables](#custom-executables) | 31 |
+| [Credentials & SSH](#credentials--ssh) | 2 |
+| [Apply hooks (`run_*`)](#apply-hooks-run) | 16 |
 | [Chezmoi control files](#chezmoi-control-files) | 7 |
 | [Repository material (not applied)](#repository-material-not-applied) | 4335 |
 
@@ -253,6 +257,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.local/bin/omarchy-agent-usage-codex` | `dot_local/bin/executable_omarchy-agent-usage-codex.tmpl` | custom executables | executable, template |
 | `~/.local/bin/omarchy-agent-usage-cursor` | `dot_local/bin/executable_omarchy-agent-usage-cursor.tmpl` | custom executables | executable, template |
 | `~/.local/bin/omarchy-agent-usage-opencode` | `dot_local/bin/executable_omarchy-agent-usage-opencode.tmpl` | custom executables | executable, template |
+| `~/.local/bin/omarchy-agent-usage-pi` | `dot_local/bin/executable_omarchy-agent-usage-pi.tmpl` | custom executables | executable, template |
 | `~/.local/bin/omarchy-agent-usage-update` | `dot_local/bin/executable_omarchy-agent-usage-update.tmpl` | custom executables | executable, template |
 | `~/.local/bin/omarchy-agent` | `dot_local/bin/executable_omarchy-agent.tmpl` | custom executables | executable, template |
 | `~/.local/bin/omarchy-cline-usage-login` | `dot_local/bin/executable_omarchy-cline-usage-login.tmpl` | custom executables | executable, template |
@@ -298,6 +303,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | 29 | `run_onchange_after_29-setup-omarchy-drift-capture.sh.tmpl` | runs when this script's contents change | after |
 | 30 | `run_onchange_after_30-macos-defaults.sh.tmpl` | runs when this script's contents change | after |
 | 31 | `run_onchange_after_31-mouse-dpi.sh.tmpl` | runs when this script's contents change | after |
+| 32 | `run_onchange_after_32-setup-omarchy-pi.sh.tmpl` | runs when this script's contents change | after |
 
 ## Chezmoi control files
 

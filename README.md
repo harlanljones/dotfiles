@@ -209,6 +209,8 @@ Declarative tracking for system-level packages that mise does not manage:
   - `omarchy-agent-usage-codex`: Collects Codex CLI session logs and app-server RPC metrics.
   - `~/.claude/settings.json`: Configures Claude Code tool execution permissions, git safety hooks, and session hooks for `herdr` agent state and codebase memory reminders.
   - **Shared CLI statusline** (`~/.local/bin/statusline`): Single cross-harness statusline renderer used by Claude Code (`statusLine.command` in `~/.claude/settings.json`) and Cursor (via `omarchy-cursor-statusline`). Reads the Claude-aligned JSON payload and renders model, cwd, git branch, context meter, line diff, session cost, and output style; drops the extras when absent. Codex uses native `[tui] status_line` widgets (no external-script support); opencode has no statusline slot today.
+- **Pi Harness Integration** (local agents):
+  - `omarchy-agent-usage-pi`: Parses `~/.pi/agent/sessions/**/*.jsonl` transcripts for per-model, per-day token metrics, so local Ollama runs (`qwen3.8:pi`) rank alongside the metered API agents. Local inference has no quota or spend, so `limits` is empty and any cost shown is an estimate at hosted `qwen` API rates — override it in `~/.config/omarchy-agents/pricing.json`.
 - **Grok CLI Integration**:
   - `grok` launcher via mise (`npm:@xai-official/grok`).
   - Session start hooks (`~/.grok/hooks/herdr.json` and `executable_herdr-agent-state.sh`) reporting agent lifecycle to the Herdr terminal multiplexer.
@@ -229,7 +231,7 @@ Declarative tracking for system-level packages that mise does not manage:
   - `omarchy-agent`: Launch default coding agent with support for Antigravity (`agy`) and Cursor.
   - `omarchy-default-agent`: Quick switcher to configure default coding agent (`omarchy default agent agy`, `omarchy default agent cursor`).
   - `omarchy-agent-usage-update`: Master aggregator running all active collectors (`omarchy-agent-usage-*`) to write standard JSON records into `~/.local/state/omarchy/agents/usage/`.
-  - `omarchy-agent-usage-antigravity`, `omarchy-agent-usage-cline`, `omarchy-agent-usage-codex`, `omarchy-agent-usage-cursor`, `omarchy-agent-usage-opencode`: Standalone usage collectors.
+  - `omarchy-agent-usage-antigravity`, `omarchy-agent-usage-cline`, `omarchy-agent-usage-codex`, `omarchy-agent-usage-cursor`, `omarchy-agent-usage-opencode`, `omarchy-agent-usage-pi`: Standalone usage collectors.
   - `omarchy-cursor-statusline`: Cursor CLI `statusLine` hook; logs real per-call token usage and delegates display to the shared `statusline` renderer.
   - `statusline`: Shared cross-harness CLI statusline renderer for Claude Code and Cursor.
   - `omarchy-cursor-usage-scrape`, `omarchy-cursor-usage-override`: Cursor limit scraping and override tools.
@@ -490,6 +492,7 @@ Declarative tracking for system-level packages that mise does not manage:
 │   │   ├── executable_omarchy-agent-usage-codex.tmpl
 │   │   ├── executable_omarchy-agent-usage-cursor.tmpl
 │   │   ├── executable_omarchy-agent-usage-opencode.tmpl
+│   │   ├── executable_omarchy-agent-usage-pi.tmpl
 │   │   ├── executable_omarchy-agent-usage-update.tmpl
 │   │   ├── executable_omarchy-agent.tmpl
 │   │   ├── executable_omarchy-cline-usage-login.tmpl
@@ -534,6 +537,7 @@ Declarative tracking for system-level packages that mise does not manage:
 ├── run_onchange_after_29-setup-omarchy-drift-capture.sh.tmpl
 ├── run_onchange_after_30-macos-defaults.sh.tmpl
 ├── run_onchange_after_31-mouse-dpi.sh.tmpl
+├── run_onchange_after_32-setup-omarchy-pi.sh.tmpl
 └── run_onchange_before_09-install-agent-skills.sh.tmpl
 ```
 <!-- END REPO TREE -->

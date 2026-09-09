@@ -65,6 +65,8 @@ ordering guarantee — treat each trigger class separately.
 | 28 | `run_onchange_after_28-sync-claude-settings.sh.tmpl` | onchange | Sync Claude Code permissions/hooks |
 | 29 | `run_onchange_after_29-setup-omarchy-drift-capture.sh.tmpl` | onchange | Set up Omarchy shell drift capture |
 | 30 | `run_onchange_after_30-macos-defaults.sh.tmpl` | onchange (darwin) | Declarative `defaults write` preferences |
+| 31 | `run_onchange_after_31-mouse-dpi.sh.tmpl` | onchange | Pin Logitech mice to 400 DPI |
+| 32 | `run_onchange_after_32-setup-omarchy-pi.sh.tmpl` | onchange | Pi (local Ollama) usage collector setup |
 
 ## 4. Contents map
 

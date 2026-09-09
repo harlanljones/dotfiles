@@ -4,6 +4,7 @@
   "generator": "docs/generate_index.py",
   "summary": {
     "total": 4545,
+    "total": 4547,
     "by_category": {
       "shell": 13,
       "prompt": 1,
@@ -18,6 +19,9 @@
       "scripts": 30,
       "security": 2,
       "hooks": 15,
+      "scripts": 31,
+      "security": 2,
+      "hooks": 16,
       "chezmoi": 7,
       "repo": 4335
     }
@@ -1525,6 +1529,17 @@
       "subsystem": "custom executables"
     },
     {
+      "source": "dot_local/bin/executable_omarchy-agent-usage-pi.tmpl",
+      "target": "~/.local/bin/omarchy-agent-usage-pi",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable",
+        "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
       "source": "dot_local/bin/executable_omarchy-agent-usage-update.tmpl",
       "target": "~/.local/bin/omarchy-agent-usage-update",
       "kind": "dotfile",
@@ -1914,6 +1929,19 @@
         "phase": "after",
         "order": 31,
         "name": "mouse-dpi",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_after_32-setup-omarchy-pi.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 32,
+        "name": "setup-omarchy-pi",
         "template": true
       }
     },

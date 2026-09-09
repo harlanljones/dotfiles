@@ -1,0 +1,293 @@
+{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+#!/usr/bin/python3
+# omarchy:summary=Print pi harness usage record as JSON
+# omarchy:args=[--force] [--limits-only]
+# omarchy:hidden=true
+"""Collect pi harness usage and print a usage record as JSON.
+
+Scans the pi agent's session transcripts under ~/.pi/agent/sessions/ and
+compiles per-model and per-day token usage, matching the record contract
+shared by the claude, codex and cline collectors.
+
+pi writes one JSONL file per session, named after the session's start
+time and id, inside a directory named for the sanitized cwd. Every line
+is a self-describing entry; the ones that matter here are:
+
+  {"type": "session",  "version": 3, "id": ..., "timestamp": <ISO>, "cwd": ...}
+  {"type": "message",  "timestamp": <ISO>, "message": {"role": ..., ...}}
+
+Assistant messages carry "model", "provider" and a per-request "usage"
+block of {input, output, cacheRead, cacheWrite, totalTokens}. Model
+attribution is read off each message, so switching models mid-session is
+handled correctly.
+
+Because pi runs against a local Ollama server there is no account, no
+quota and no API spend, so "limits" is always empty. The leaderboard
+still prices the tokens: model ids like "qwen3.8:pi" prefix-match the
+built-in "qwen" rate table, which turns the record into an estimate of
+what the same work would have cost on a hosted API. That is the point —
+it makes local inference comparable to the metered agents — but it is a
+notional figure, not money spent, and usageStatusText says so. To zero it
+out instead, add an override to ~/.config/omarchy-agents/pricing.json:
+
+  {"qwen3.8:pi": {"inputPerMtok": 0, "outputPerMtok": 0}}
+"""
+
+from __future__ import annotations
+
+import argparse
+import json
+import os
+import sys
+import tempfile
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+from typing import Any, Iterator
+
+
+def pi_dir() -> Path:
+  return Path(os.environ.get("PI_CONFIG_DIR", Path.home() / ".pi"))
+
+
+def sessions_root() -> Path:
+  return pi_dir() / "agent" / "sessions"
+
+
+def usage_dir() -> Path:
+  root = Path(os.environ.get("XDG_STATE_HOME", Path.home() / ".local" / "state"))
+  folder = root / "omarchy" / "agents" / "usage"
+  folder.mkdir(parents=True, exist_ok=True)
+  return folder
+
+
+def write_json(path: Path, payload: dict) -> None:
+  handle_fd, tmp_name = tempfile.mkstemp(dir=path.parent, prefix=path.name + ".", suffix=".tmp")
+  tmp = Path(tmp_name)
+  try:
+    with os.fdopen(handle_fd, "w", encoding="utf-8") as handle:
+      handle.write(json.dumps(payload, indent=2) + "\n")
+    tmp.chmod(0o644)
+    tmp.replace(path)
+  except BaseException:
+    tmp.unlink(missing_ok=True)
+    raise
+
+
+def iter_entries(path: Path) -> Iterator[dict]:
+  """Yield the parsed entries of one session file, skipping bad lines.
+
+  A truncated final line is normal while pi is mid-write, so a parse
+  failure never aborts the scan."""
+  try:
+    with open(path, encoding="utf-8") as handle:
+      for line in handle:
+        line = line.strip()
+        if not line:
+          continue
+        try:
+          entry = json.loads(line)
+        except ValueError:
+          continue
+        if isinstance(entry, dict):
+          yield entry
+  except OSError:
+    return
+
+
+def iso_day(timestamp: Any) -> str | None:
+  """Local YYYY-MM-DD for an ISO-8601 timestamp."""
+  if not isinstance(timestamp, str) or not timestamp:
+    return None
+  try:
+    parsed = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+  except ValueError:
+    return None
+  if parsed.tzinfo is None:
+    parsed = parsed.replace(tzinfo=timezone.utc)
+  return parsed.astimezone().date().isoformat()
+
+
+def epoch_day(epoch_ms: Any) -> str | None:
+  """Local YYYY-MM-DD for a millisecond epoch timestamp."""
+  try:
+    return datetime.fromtimestamp(float(epoch_ms) / 1000).date().isoformat()
+  except (TypeError, ValueError, OSError, OverflowError):
+    return None
+
+
+def new_bucket() -> dict[str, int]:
+  return {
+    "inputTokens": 0,
+    "outputTokens": 0,
+    "cacheReadInputTokens": 0,
+    "cacheCreationInputTokens": 0,
+  }
+
+
+def add_usage(bucket: dict[str, int], usage: dict) -> int:
+  """Add one message's usage to a bucket; return the message's total."""
+  fields = (
+    ("input", "inputTokens"),
+    ("output", "outputTokens"),
+    ("cacheRead", "cacheReadInputTokens"),
+    ("cacheWrite", "cacheCreationInputTokens"),
+  )
+  total = 0
+  for src, dst in fields:
+    try:
+      value = int(usage.get(src) or 0)
+    except (TypeError, ValueError):
+      value = 0
+    bucket[dst] += value
+    total += value
+  return total
+
+
+def model_key(message: dict) -> str:
+  model = message.get("model")
+  if isinstance(model, str) and model.strip():
+    return model.strip()
+  provider = message.get("provider")
+  if isinstance(provider, str) and provider.strip():
+    return provider.strip()
+  return "unknown"
+
+
+def is_prompt(message: dict) -> bool:
+  """A user message only counts as a prompt when it carries real text.
+
+  pi keeps tool output under its own "toolResult" role, so this mostly
+  filters out empty or attachment-only turns."""
+  if message.get("role") != "user":
+    return False
+  content = message.get("content")
+  if isinstance(content, str):
+    return content.strip() != ""
+  if isinstance(content, list):
+    return any(isinstance(block, dict) and block.get("type") == "text" for block in content)
+  return False
+
+
+def empty_record(ready: bool) -> dict[str, Any]:
+  return {
+    "id": "pi",
+    "name": "Pi",
+    "schemaVersion": 1,
+    "ready": ready,
+    "hasLocalStats": ready,
+    "hasPromptStats": ready,
+    "todayPrompts": 0,
+    "todaySessions": 0,
+    "todayTotalTokens": 0,
+    "todayTokensByModel": {},
+    "recentDays": [],
+    "totalPrompts": 0,
+    "totalSessions": 0,
+    "activeDays": 0,
+    "activeDates": [],
+    "modelUsage": {},
+    "limits": [],
+    "tierLabel": "Ollama (local)",
+    "usageStatusText": (
+      "Local Ollama inference — no quota and no API spend. Any cost shown is "
+      "an estimate of the same tokens at hosted API rates."
+    ) if ready else "",
+    "authHelpText": "" if ready else "Run the pi harness at least once to track usage.",
+    "updatedAt": datetime.now(timezone.utc).isoformat(),
+  }
+
+
+def collect_metrics() -> dict[str, Any]:
+  root = sessions_root()
+  transcripts = sorted(root.glob("*/*.jsonl")) if root.is_dir() else []
+  record = empty_record(bool(transcripts))
+  if not transcripts:
+    return record
+
+  today = datetime.now().date()
+  week_start = today - timedelta(days=6)
+  model_usage: dict[str, dict[str, int]] = {}
+  today_by_model: dict[str, dict[str, int]] = {}
+  day_tokens: dict[str, int] = {}
+
+  for transcript in transcripts:
+    session_day: str | None = None
+    counted_session = False
+
+    for entry in iter_entries(transcript):
+      kind = entry.get("type")
+
+      if kind == "session":
+        if counted_session:
+          continue
+        counted_session = True
+        session_day = iso_day(entry.get("timestamp"))
+        record["totalSessions"] += 1
+        if session_day == today.isoformat():
+          record["todaySessions"] += 1
+        continue
+
+      if kind != "message":
+        continue
+      message = entry.get("message")
+      if not isinstance(message, dict):
+        continue
+
+      day = iso_day(entry.get("timestamp")) or epoch_day(message.get("timestamp")) or session_day
+
+      if is_prompt(message):
+        record["totalPrompts"] += 1
+        if day == today.isoformat():
+          record["todayPrompts"] += 1
+        continue
+
+      if message.get("role") != "assistant":
+        continue
+      usage = message.get("usage")
+      if not isinstance(usage, dict):
+        continue
+
+      model = model_key(message)
+      total = add_usage(model_usage.setdefault(model, new_bucket()), usage)
+      if total <= 0 or day is None:
+        continue
+      day_tokens[day] = day_tokens.get(day, 0) + total
+      if day == today.isoformat():
+        record["todayTotalTokens"] += total
+        add_usage(today_by_model.setdefault(model, new_bucket()), usage)
+
+  # A model the harness only ever failed against contributes an all-zero
+  # bucket; keeping it just adds an empty row to the leaderboard.
+  record["modelUsage"] = {
+    model: bucket for model, bucket in model_usage.items() if sum(bucket.values()) > 0
+  }
+  record["todayTokensByModel"] = today_by_model
+  record["recentDays"] = [
+    {"date": (week_start + timedelta(days=offset)).isoformat(),
+     "messageCount": day_tokens.get((week_start + timedelta(days=offset)).isoformat(), 0)}
+    for offset in range(7)
+  ]
+  record["activeDates"] = sorted(day for day, tokens in day_tokens.items() if tokens > 0)
+  record["activeDays"] = len(record["activeDates"])
+  return record
+
+
+def main() -> int:
+  parser = argparse.ArgumentParser(description="Collect pi harness usage")
+  parser.add_argument("--force", action="store_true", help="accepted for interface parity")
+  parser.add_argument("--limits-only", action="store_true", help="accepted for interface parity")
+  parser.add_argument("--cache-seconds", type=float, default=10.0, help="accepted for interface parity")
+  parser.add_argument("--print", action="store_true", help="print JSON output")
+  args, _ = parser.parse_known_args()
+
+  record = collect_metrics()
+  write_json(usage_dir() / "pi.json", record)
+
+  if not sys.stdout.isatty() or args.print:
+    print(json.dumps(record, indent=2))
+  return 0
+
+
+if __name__ == "__main__":
+  sys.exit(main())
+{{- end -}}
