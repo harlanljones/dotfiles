@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**4543 tracked entries** across 15 categories.
+**4545 tracked entries** across 15 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -23,9 +23,9 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Toolchain & packages](#toolchain--packages) | 4 |
 | [AI agent harnesses](#ai-agent-harnesses) | 41 |
 | [Background services](#background-services) | 16 |
-| [Custom executables](#custom-executables) | 29 |
+| [Custom executables](#custom-executables) | 30 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Apply hooks (`run_*`)](#apply-hooks-run) | 14 |
+| [Apply hooks (`run_*`)](#apply-hooks-run) | 15 |
 | [Chezmoi control files](#chezmoi-control-files) | 7 |
 | [Repository material (not applied)](#repository-material-not-applied) | 4335 |
 
@@ -245,7 +245,6 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.local/bin/cursor` | `dot_local/bin/executable_cursor` | custom executables | executable |
 | `~/.local/bin/dots` | `dot_local/bin/executable_dots` | custom executables | executable |
 | `~/.local/bin/dots-push` | `dot_local/bin/executable_dots-push` | custom executables | executable |
-| `~/.local/bin/grok` | `dot_local/bin/executable_grok` | custom executables | executable |
 | `~/.local/bin/herdr-agent-lifecycle` | `dot_local/bin/executable_herdr-agent-lifecycle` | custom executables | executable |
 | `~/.local/bin/lazygit-ollama-commit.sh` | `dot_local/bin/executable_lazygit-ollama-commit.sh` | custom executables | executable |
 | `~/.local/bin/ollama-commit-msg.sh` | `dot_local/bin/executable_ollama-commit-msg.sh` | custom executables | executable |
@@ -268,6 +267,8 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.local/bin/omarchy-opencode-go-usage-login` | `dot_local/bin/executable_omarchy-opencode-go-usage-login.tmpl` | custom executables | executable, template |
 | `~/.local/bin/omarchy-opencode-go-usage-override` | `dot_local/bin/executable_omarchy-opencode-go-usage-override.tmpl` | custom executables | executable, template |
 | `~/.local/bin/omarchy-opencode-go-usage-scrape` | `dot_local/bin/executable_omarchy-opencode-go-usage-scrape.tmpl` | custom executables | executable, template |
+| `~/.local/bin/piper` | `dot_local/bin/executable_piper` | custom executables | executable |
+| `~/.local/bin/ratbagctl` | `dot_local/bin/executable_ratbagctl` | custom executables | executable |
 | `~/.local/bin/statusline` | `dot_local/bin/executable_statusline.tmpl` | custom executables | executable, template |
 | `~/.local/bin/evot` | `dot_local/bin/symlink_evot` | custom executables | symlink |
 
@@ -296,6 +297,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | 28 | `run_onchange_after_28-sync-claude-settings.sh.tmpl` | runs when this script's contents change | after |
 | 29 | `run_onchange_after_29-setup-omarchy-drift-capture.sh.tmpl` | runs when this script's contents change | after |
 | 30 | `run_onchange_after_30-macos-defaults.sh.tmpl` | runs when this script's contents change | after |
+| 31 | `run_onchange_after_31-mouse-dpi.sh.tmpl` | runs when this script's contents change | after |
 
 ## Chezmoi control files
 

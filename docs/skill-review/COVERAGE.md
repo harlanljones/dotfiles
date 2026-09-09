@@ -6,11 +6,11 @@ Contract validation is not proof of semantic full-tree reading, executed validat
 
 - totalVariants: 482
 - selectedVariants: 482
-- contractValid: 6
-- unreviewed: 476
+- contractValid: 14
+- unreviewed: 468
 - missingCandidates: 0
-- missingReviews: 476
-- invalidReviews: 0
+- missingReviews: 467
+- invalidReviews: 1
 - inventoryGaps: 16
 - allSelectedContractsValid: False
 
@@ -43,19 +43,11 @@ Contract validation is not proof of semantic full-tree reading, executed validat
 
 ## Outstanding Candidates
 
-- library/builtin-codex/imagegen/6e733e799e52: unreviewed; ["REVIEW.md must be a regular file", "review.json must be a regular file"]
-- library/builtin-codex/openai-docs/1de75a2e0091: unreviewed; ["REVIEW.md must be a regular file", "review.json must be a regular file"]
-- library/builtin-codex/plugin-creator/ede23896a590: unreviewed; ["REVIEW.md must be a regular file", "review.json must be a regular file"]
-- library/builtin-codex/review-agent/91ab275699ee: unreviewed; ["REVIEW.md must be a regular file", "review.json must be a regular file"]
-- library/builtin-codex/skill-creator/5be1693bd421: unreviewed; ["REVIEW.md must be a regular file", "review.json must be a regular file"]
-- library/builtin-codex/skill-installer/bd391a97dbae: unreviewed; ["REVIEW.md must be a regular file", "review.json must be a regular file"]
-- library/harness-claude-skills/codebase-memory/c4002c91abe2: unreviewed; ["REVIEW.md must be a regular file", "review.json must be a regular file"]
-- library/harness-claude-skills/impeccable/6c5d5e55dd40: unreviewed; ["REVIEW.md must be a regular file", "review.json must be a regular file"]
-- library/harness-claude-skills/mixture-of-agents/b6883206a8b5: unreviewed; ["REVIEW.md must be a regular file", "review.json must be a regular file"]
 - library/harness-config-opencode-skills/impeccable/82d09480e480: unreviewed; ["REVIEW.md must be a regular file", "review.json must be a regular file"]
 - library/harness-gemini-config-skills/impeccable/dda62b499a21: unreviewed; ["REVIEW.md must be a regular file", "review.json must be a regular file"]
 - library/harness-gemini-skills/impeccable/ea77c0b5c398: unreviewed; ["REVIEW.md must be a regular file", "review.json must be a regular file"]
 - library/harness-pi-agent-skills/impeccable/fa8118279b98: unreviewed; ["REVIEW.md must be a regular file", "review.json must be a regular file"]
+- library/local-tracked/frontier-sweep/df026dc35123: invalid; ["Original bytes unavailable for binary preservation check: SKILL.md"]
 - library/pack-agent-reach/agent-reach/6cfca4cc59cc: unreviewed; ["REVIEW.md must be a regular file", "review.json must be a regular file"]
 - library/pack-cloudflare/agents-sdk/acf6c1c443fe: unreviewed; ["REVIEW.md must be a regular file", "review.json must be a regular file"]
 - library/pack-cloudflare/cloudflare-email-service/ce36c6dbab94: unreviewed; ["REVIEW.md must be a regular file", "review.json must be a regular file"]

@@ -1,0 +1,46 @@
+{
+  "status": "reviewed",
+  "disposition": "retain with fallback freshness correction; candidate only",
+  "pack": "OpenAI and Codex documentation pack",
+  "invocation": "task-triggered for OpenAI product, API, model, migration, or Codex documentation questions",
+  "execution": {
+    "recommended": "in-session read-only official documentation retrieval",
+    "alternatives": "bounded parallel retrieval only for genuinely broad synthesis"
+  },
+  "reviewedFiles": [
+    "LICENSE.txt",
+    "SKILL.md",
+    "agents/openai.yaml",
+    "assets/openai-small.svg",
+    "assets/openai.png",
+    "references/codex-self-knowledge.md",
+    "references/latest-model.md",
+    "references/mcp-diagnostics.md",
+    "references/model-migration.md",
+    "references/model-selection.md",
+    "references/official-docs.md",
+    "references/prompting-guide.md",
+    "references/upgrade-guide.md",
+    "references/upgrading-to-gpt-5p6-sol.md",
+    "scripts/fetch-codex-manual.mjs",
+    "scripts/resolve-latest-model-info",
+    "scripts/resolve-latest-model-info.cjs"
+  ],
+  "changes": [
+    {
+      "files": ["REVIEW.md", "review.json"],
+      "summary": "Add a bounded review preserving the official-source-first design while identifying the stale bundled latest-model fallback."
+    }
+  ],
+  "questions": [],
+  "validation": [
+    "Read every retained instruction, reference, script, metadata file, asset, and license; visually inspected PNG assets and read SVG source.",
+    "Compared the latest-model fallback and named-model claims with current official OpenAI documentation.",
+    "Byte-compared the retained SKILL.md with the installed source and ran repository review-schema and baseline-preservation checks only."
+  ],
+  "limitations": [
+    "Candidate network fetchers and model resolvers were not executed.",
+    "Availability, aliases, and model guidance remain time-sensitive and require live official verification.",
+    "Promotion and pack membership remain human decisions."
+  ]
+}

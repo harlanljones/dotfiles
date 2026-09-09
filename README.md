@@ -482,7 +482,6 @@ Declarative tracking for system-level packages that mise does not manage:
 │   │   ├── executable_cursor
 │   │   ├── executable_dots
 │   │   ├── executable_dots-push
-│   │   ├── executable_grok
 │   │   ├── executable_herdr-agent-lifecycle
 │   │   ├── executable_lazygit-ollama-commit.sh
 │   │   ├── executable_ollama-commit-msg.sh
@@ -505,6 +504,8 @@ Declarative tracking for system-level packages that mise does not manage:
 │   │   ├── executable_omarchy-opencode-go-usage-login.tmpl
 │   │   ├── executable_omarchy-opencode-go-usage-override.tmpl
 │   │   ├── executable_omarchy-opencode-go-usage-scrape.tmpl
+│   │   ├── executable_piper
+│   │   ├── executable_ratbagctl
 │   │   ├── executable_statusline.tmpl
 │   │   └── symlink_evot
 │   └── share
@@ -532,6 +533,7 @@ Declarative tracking for system-level packages that mise does not manage:
 ├── run_onchange_after_28-sync-claude-settings.sh.tmpl
 ├── run_onchange_after_29-setup-omarchy-drift-capture.sh.tmpl
 ├── run_onchange_after_30-macos-defaults.sh.tmpl
+├── run_onchange_after_31-mouse-dpi.sh.tmpl
 └── run_onchange_before_09-install-agent-skills.sh.tmpl
 ```
 <!-- END REPO TREE -->
