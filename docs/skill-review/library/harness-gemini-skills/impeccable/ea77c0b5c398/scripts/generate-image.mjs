@@ -19,6 +19,10 @@
 import fs from 'node:fs';
 import zlib from 'node:zlib';
 
+// Q-impeccable-image-cost: the OpenAI fallback spends the user's own API
+// credit per image. Should the first call in a session require an explicit
+// cost confirmation before any network request?
+
 function arg(name, fallback = null) {
   const i = process.argv.indexOf(`--${name}`);
   if (i === -1) return fallback;

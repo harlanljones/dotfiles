@@ -1,0 +1,71 @@
+{
+  "status": "reviewed",
+  "disposition": "retain with authority corrections as an optional research-acquisition pack; not universal core",
+  "pack": "internet-research-acquisition (optional; provider-specific)",
+  "invocation": {
+    "when": "User requests internet research/search/look-up, shares a URL, or names a listed platform.",
+    "boundary": "Use only the requested platform and user-approved access scope; a dedicated platform skill takes precedence.",
+    "not_for": "Report writing, analysis, translation, posting, commenting, or liking."
+  },
+  "execution": {
+    "recommended": "Task-triggered, read-only routing: health-check only explicitly requested login-backed platforms, select the reported backend, read the matching reference, follow its retry chain, and require non-empty content.",
+    "alternatives": "Use a public web-reader/search route, a dedicated platform skill, or an already configured user-directed provider; report unavailable backends instead of installing or logging in.",
+    "authority": "Configuration, login, installation, browser sessions, cookie/key import, and possible-cost provider fallback require explicit user authorization."
+  },
+  "reviewedFiles": [
+    "SKILL.md",
+    "SKILL_en.md",
+    "references/career.md",
+    "references/dev.md",
+    "references/finance.md",
+    "references/search.md",
+    "references/social.md",
+    "references/video.md",
+    "references/web.md"
+  ],
+  "changes": [
+    {
+      "files": ["SKILL.md", "SKILL_en.md"],
+      "summary": "Make invocation need- and consent-scoped, keep broad research need-driven, make update checks opt-in, and establish explicit authority boundaries with stable question markers."
+    },
+    {
+      "files": ["references/career.md", "references/dev.md", "references/finance.md", "references/social.md", "references/video.md"],
+      "summary": "Clarify that login, credential or browser-session use, dependency installation, system configuration, and GitHub write commands are not authorized by a read-only research skill."
+    },
+    {
+      "files": ["REVIEW.md", "review.json"],
+      "summary": "Add the complete source-grounded review, provenance, per-skill execution recommendation, human questions, validation record, and limitations."
+    }
+  ],
+  "questions": [
+    {
+      "id": "Q-agent-reach-core",
+      "question": "Should Agent Reach remain an optional internet-research-acquisition pack, or be promoted to universal core?",
+      "recommendation": "Retain it as optional until provider support, maintenance ownership, licensing permission, and the desired breadth of automatic activation are accepted by a human.",
+      "rationale": "The tree spans public and login-backed platforms, browser sessions, many external CLIs/MCPs, and provider-specific fallbacks. Installation footprint and upstream collection size do not establish universal need or reliable availability.",
+      "files": ["SKILL.md", "SKILL_en.md"]
+    },
+    {
+      "id": "Q-agent-reach-authority",
+      "question": "Should configuration, login, installation, cookie/key import, and browser-session actions require explicit per-action user consent?",
+      "recommendation": "Yes. Explain credential scope, storage location, data sharing, and possible cost before each such action, and otherwise report the backend as unavailable.",
+      "rationale": "The original entrypoints said the agent would complete setup after the user supplied cookies or one extension click, while references include package installs, system installs, logins, credential writes, and remote GitHub writes.",
+      "files": ["SKILL.md", "SKILL_en.md"]
+    }
+  ],
+  "validation": [
+    "Read all 9 frozen regular files, including both entrypoints and all 7 references; no scripts, standalone examples, metadata, assets, or licenses were present in the candidate tree.",
+    "Verified the frozen tree SHA-256 and all 9 baseline source-mirror hashes before the authorized rewrite; no license or opaque asset bytes were changed.",
+    "Static walkthroughs covered public versus login-backed routing, doctor-null and missing-backend behavior, credential isolation, read-only versus write-capable GitHub commands, retry chains, provider fallback cost, and install/configure authority; no candidate workflow was executed.",
+    "Scoped review.py contract check and repository fixture suites were run; exact results and exit codes are recorded in PR_DESCRIPTION.md."
+  ],
+  "limitations": [
+    "Installed revision and release are unknown; provenance is a declared upstream repository, not a pinned version.",
+    "No license file was found within bounded source ancestry, so redistribution permission is unknown.",
+    "Provider availability, authentication, rate limits, current platform policy, result quality, and semantic behavior were not live-tested.",
+    "External dependencies include multiple CLIs/MCPs, a user-controlled Chrome session, ffmpeg, and Groq/OpenAI providers; they are not bundled or lock-pinned by this tree.",
+    "The tree contains two language entrypoints but no loader metadata proving which one a harness selects.",
+    "The broader 148-file checkpointed variants and the remaining library candidates were not read or reviewed by this ticket.",
+    "Review readiness is not human approval, installation, deployment permission, or evidence that the candidate should enter universal core."
+  ]
+}

@@ -18,7 +18,7 @@ mcporter call linkedin.get_company_profile company_name="openai" sections="posts
 mcporter call linkedin.search_jobs keywords="software engineer" location="Remote" max_pages=2
 ```
 
-> **需要登录**: 首次使用前运行 `uvx mcp-server-linkedin@latest --login`，保存有效登录态。
+> **需要登录**: 首次使用前运行 `uvx mcp-server-linkedin@latest --login`，保存有效登录态；这是外部下载、登录和本地状态写入，必须先获用户明确授权，不得自动登录或把登录态写入日志。
 
 ### Fallback 方案
 

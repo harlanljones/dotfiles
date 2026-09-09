@@ -734,3 +734,4 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   }
   process.exit(process.exitCode ?? 0);
 }
+// Q-impeccable-telemetry: concept-seed contacts https://impeccable.style/api (roll plus one choice ping per round); confirm the network/telemetry default and opt-out posture before promotion.

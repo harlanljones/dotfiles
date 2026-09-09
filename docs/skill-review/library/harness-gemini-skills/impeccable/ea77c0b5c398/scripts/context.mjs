@@ -75,6 +75,9 @@ const VISUAL_SCAN_DEPTH_LIMIT = 4;
 // block context output or print an error.
 
 const UPDATE_HOST = (process.env.IMPECCABLE_UPDATE_HOST || 'https://impeccable.style').replace(/\/$/, '');
+// Q-impeccable-update-check: the boot performs a daily-throttled network
+// version check, silent on failure. Should the default stay on with an
+// documented opt-out, or require opt-in?
 const UPDATE_CACHE_PATH =
   process.env.IMPECCABLE_UPDATE_CACHE || path.join(os.homedir(), '.impeccable', 'update-check.json');
 const CHECK_INTERVAL_MS = 24 * 60 * 60 * 1000; // throttle the network poll to once a day

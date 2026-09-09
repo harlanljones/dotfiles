@@ -1667,3 +1667,4 @@ httpServer.listen(state.port, '127.0.0.1', () => {
 
 process.on('SIGINT', shutdown);
 process.on('SIGTERM', shutdown);
+// Review HJ-738 Q-impeccable-live: loopback-only token-gated server plus project writes; trust boundary is a human decision.

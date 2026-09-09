@@ -763,6 +763,8 @@ function createRequestHandler({ detectScript, liveScriptParts }) {
     }
 
     // --- Vendored modern-screenshot (UMD build) ---
+    // Q-impeccable-vendored-screenshot: this minified bundle ships with no
+    // recorded upstream version or license. Should the tree pin both?
     // Lazy-loaded by live.js when the user clicks Go; exposes
     // window.modernScreenshot.domToBlob(...) for capture.
     if (p === '/modern-screenshot.js') {

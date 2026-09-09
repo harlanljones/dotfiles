@@ -321,3 +321,5 @@ Stops the helper and runs `live-inject.mjs --remove` to strip the injected scrip
 ## First-time setup
 
 Only when `live.mjs` reports `config_missing` / `config_invalid`, or `configDrift` needs explaining, or the config lacks `cspChecked`: read [live-setup.md](live-setup.md). It owns the config schema, the per-framework `files` table, injection adapters, drift healing, and the CSP detection and consent flow.
+
+<!-- Q-impeccable-live-authority: live mode binds a localhost helper, injects scripts into user pages, patches CSP sources, and writes user source files; confirm the external-write and local-server authority boundary before promotion. -->

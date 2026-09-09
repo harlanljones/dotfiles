@@ -22,8 +22,9 @@ metadata:
 
 # Agent Reach — internet capability router
 
-15 platforms, multiple backends each. **When this skill exists, use it for
-these platforms — do not invent your own approach.**
+15 platforms, multiple backends each. **When the task needs one of these
+platforms and the user agrees to the access scope, use this skill to route it;
+do not invent your own approach.** <!-- Q-agent-reach-core -->
 
 ## Standing rules (apply for the whole session)
 
@@ -36,10 +37,13 @@ these platforms — do not invent your own approach.**
    before starting.
 3. **On failure, follow the retry chains in references/** — never guess
    commands.
-4. **For broad research tasks**: combine platforms (Exa for web search +
-   Twitter/Reddit for discussions + XiaoHongShu/Bilibili for Chinese
-   perspectives), collect in parallel, then synthesize.
-5. **Watch versions for the user**: after finishing a substantial
+4. **For broad research tasks** (with the user's agreement to those sources):
+   combine platforms as needed (Exa for web search + Twitter/Reddit for
+   discussions + XiaoHongShu/Bilibili for Chinese perspectives), collect in
+   parallel, then synthesize; do not access login-backed platforms merely
+   because this rule exists.
+5. **Watch versions for the user**: when the user permits an extra network
+   check and after finishing a substantial
    multi-platform task, run `agent-reach check-update` (fast, one API call).
    If a new version exists, append one line to your wrap-up: "Agent Reach
    vX.Y.Z is available — paste this to me to update: 帮我更新 Agent Reach：
@@ -149,4 +153,7 @@ chains — note: reference docs are written in Chinese, commands are universal):
 If a channel needs setup, fetch the install guide:
 https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/install.md
 
-The user only provides cookies / one extension click; the agent does the rest.
+Configuration, login, installation, and browser-session actions require the
+user's explicit authorization. Explain which credentials will be stored, where,
+and whether cost may result before acting. Use supplied cookies/keys only for
+authorized platform requests; never record, commit, or echo them. <!-- Q-agent-reach-authority -->

@@ -25,7 +25,7 @@ metadata:
 
 # Agent Reach — 互联网能力路由器
 
-15 平台、多后端。**本 skill 存在时必须用它访问这些平台，不要自己发明方案。**
+15 平台、多后端。**当用户任务需要这些平台且同意相应访问范围时，用本 skill 路由；不要自己发明方案。** <!-- Q-agent-reach-core -->
 
 ## 常驻规则（全程适用）
 
@@ -35,8 +35,8 @@ metadata:
    只有用户任务明确需要该平台时，才按对应 reference 的只读命令手动验证。
 2. **声明你在用什么**：开始干活前说一句「使用 agent-reach 的 X 平台 / Y 后端」。
 3. **失败按 references 里的重试链处理**，不要瞎猜命令。
-4. **全网调研类任务**：组合多平台（Exa 搜索 + Twitter/Reddit 看讨论 + 小红书/B站看中文场景），并行收集再汇总。
-5. **替用户盯版本**：完成一次较大的调研/多平台任务后，顺手跑
+4. **全网调研类任务**（且用户同意这些来源）：按任务需要组合多平台（Exa 搜索 + Twitter/Reddit 看讨论 + 小红书/B站看中文场景），并行收集再汇总；不要因本规则擅自访问登录态平台。
+5. **替用户盯版本**：用户允许额外网络检查且完成一次较大的调研/多平台任务后，顺手跑
    `agent-reach check-update`（很快，一个 API 调用）。有新版就在收尾汇报里附一句：
    「Agent Reach 有新版 vX.Y.Z，复制这句话给我即可更新：帮我更新 Agent Reach：
    https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/update.md」。
@@ -139,4 +139,4 @@ agent-reach doctor --json
 如果某个 channel 需要配置，获取安装指南：
 https://raw.githubusercontent.com/Panniantong/agent-reach/main/docs/install.md
 
-用户只需提供 cookies，其他配置由 agent 完成。
+配置、登录、安装和浏览器会话操作都必须先获得用户明确授权；先说明将保存哪些凭据、写入何处、是否可能产生费用。用户提供的 cookies/keys 只用于已授权的平台请求，不得记录、提交或回显。 <!-- Q-agent-reach-authority -->

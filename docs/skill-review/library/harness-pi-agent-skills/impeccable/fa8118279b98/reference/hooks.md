@@ -109,3 +109,5 @@ node .pi/skills/impeccable/scripts/hook-admin.mjs ignore-file "src/legacy/Card.t
 
 - If `.impeccable/config.json` or `.impeccable/config.local.json` is unreadable or malformed, the hook ignores that file and uses the remaining valid config/defaults. `hook-admin.mjs status` will show malformed files as ignored.
 - If the user asks to "disable the hook" globally, lead with `/impeccable hooks off` (persistent for this project; writes `hook.enabled: false` to config). The legacy `IMPECCABLE_HOOK_DISABLED=1` env var also works as a one-shot override that follows the shell.
+
+<!-- Q-impeccable-hooks: the hook auto-runs the detector after edits and (on Cursor) can block writes; confirm the auto-execution and write-gate consent boundary before promotion. -->

@@ -2,6 +2,10 @@
 
 小红书、Twitter/X、B站、V2EX、Reddit、Facebook、Instagram。
 
+本 reference 默认只做只读访问。`configure`、`login`、Cookie 导入、安装依赖或
+复用浏览器登录态都需要用户明确授权；先说明凭据范围、保存位置、可能的费用和
+平台风控影响，不得自动登录、回显或提交凭据。
+
 ## 小红书 / XiaoHongShu（多后端）
 
 小红书有三个后端，**先跑 `agent-reach doctor --json` 看 xiaohongshu 的 `active_backend` 是哪个**，再用对应命令组。

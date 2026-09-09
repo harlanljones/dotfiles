@@ -557,6 +557,8 @@ export function chooseCopyEditAgent({
   if (mode === 'codex') return commandExists('codex') ? 'codex' : null;
   if (mode === 'claude') return commandExists('claude') ? 'claude' : null;
   if (mode !== 'auto') return null;
+  // Q-impeccable-copy-agent: auto mode only wakes codex/claude CLIs. On a
+  // Gemini-CLI-only machine Apply degrades. Should a gemini CLI path exist?
   if (authCheck('codex')) return 'codex';
   if (authCheck('claude')) return 'claude';
   if (chatAvailable()) return 'chat';

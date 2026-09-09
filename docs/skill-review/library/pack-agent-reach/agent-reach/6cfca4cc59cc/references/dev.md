@@ -6,6 +6,11 @@ GitHub CLI
 
 GitHub 官方命令行工具，用于仓库、Issue、PR、Actions、Release 以及 API 访问。
 
+本 skill 默认只做读取。`gh auth login`、`gh repo clone/create/fork/sync`、
+`gh issue create`、`gh pr create`、`gh release create` 等会登录、写远端或
+写本地状态的命令，只有用户逐项明确授权后才能运行；否则仅使用查看、搜索、
+检查和只读 API 命令，并把缺少权限报告为限制。
+
 ```bash
 # 认证
 gh auth login

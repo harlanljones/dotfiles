@@ -275,3 +275,4 @@ try {
   fs.writeFileSync(`${out}.json`, JSON.stringify({ prompt, createdAt: new Date().toISOString(), tool: 'generate-image.mjs', model: 'gpt-image-2', ...(refs.length ? { refs } : {}) }, null, 2));
 } catch { /* embedding is best-effort */ }
 console.log(`IMAGE: ${out} (${size}, ${quality}, gpt-image-2, billed to your OpenAI key); prompt embedded + sidecar at ${out}.json`);
+// Q-impeccable-image-cost: the API fallback spends the user's OpenAI credit (gpt-image-2, ~$0.05-0.25/image); confirm cost-consent wording and key handling before promotion.

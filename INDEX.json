@@ -3,8 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 4545,
-    "total": 4547,
+    "total": 4591,
     "by_category": {
       "shell": 13,
       "prompt": 1,
@@ -16,14 +15,12 @@
       "toolchain": 4,
       "agents": 41,
       "services": 16,
-      "scripts": 30,
-      "security": 2,
-      "hooks": 15,
       "scripts": 31,
       "security": 2,
+      "other": 1,
       "hooks": 16,
       "chezmoi": 7,
-      "repo": 4335
+      "repo": 4378
     }
   },
   "categories": [
@@ -74,6 +71,10 @@
     {
       "id": "security",
       "title": "Credentials & SSH"
+    },
+    {
+      "id": "other",
+      "title": "Other configuration"
     },
     {
       "id": "hooks",
@@ -1751,6 +1752,13 @@
       "subsystem": "ssh"
     },
     {
+      "source": "PR_DESCRIPTION.md",
+      "target": "~/PR_DESCRIPTION.md",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
       "source": "run_after_23-sync-agent-skills.sh.tmpl",
       "kind": "hook",
       "category": "hooks",
@@ -2199,6 +2207,66 @@
       "role": "Recovery guide and repository maintenance scripts"
     },
     {
+      "source": "docs/skill-review/evaluations/02-builtin-codex-batch-1.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/evaluations/02-builtin-codex-batch-2.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/evaluations/HJ-735-codebase-memory.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/evaluations/HJ-736-impeccable.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/evaluations/HJ-737.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/evaluations/HJ-738.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/evaluations/HJ-739.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/evaluations/HJ-740.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/evaluations/HJ-741.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/evaluations/HJ-742.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
       "source": "docs/skill-review/evaluations/test_local.py",
       "kind": "repo",
       "category": "repo",
@@ -2218,6 +2286,12 @@
     },
     {
       "source": "docs/skill-review/library/builtin-codex/imagegen/6e733e799e52/LICENSE.txt",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/builtin-codex/imagegen/6e733e799e52/REVIEW.md",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
@@ -2277,6 +2351,12 @@
       "role": "Recovery guide and repository maintenance scripts"
     },
     {
+      "source": "docs/skill-review/library/builtin-codex/imagegen/6e733e799e52/review.json",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
       "source": "docs/skill-review/library/builtin-codex/imagegen/6e733e799e52/scripts/image_gen.py",
       "kind": "repo",
       "category": "repo",
@@ -2290,6 +2370,12 @@
     },
     {
       "source": "docs/skill-review/library/builtin-codex/openai-docs/1de75a2e0091/LICENSE.txt",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/builtin-codex/openai-docs/1de75a2e0091/REVIEW.md",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
@@ -2373,6 +2459,12 @@
       "role": "Recovery guide and repository maintenance scripts"
     },
     {
+      "source": "docs/skill-review/library/builtin-codex/openai-docs/1de75a2e0091/review.json",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
       "source": "docs/skill-review/library/builtin-codex/openai-docs/1de75a2e0091/scripts/fetch-codex-manual.mjs",
       "kind": "repo",
       "category": "repo",
@@ -2386,6 +2478,12 @@
     },
     {
       "source": "docs/skill-review/library/builtin-codex/openai-docs/1de75a2e0091/scripts/resolve-latest-model-info.cjs",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/builtin-codex/plugin-creator/ede23896a590/REVIEW.md",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
@@ -2427,6 +2525,12 @@
       "role": "Recovery guide and repository maintenance scripts"
     },
     {
+      "source": "docs/skill-review/library/builtin-codex/plugin-creator/ede23896a590/review.json",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
       "source": "docs/skill-review/library/builtin-codex/plugin-creator/ede23896a590/scripts/create_basic_plugin.py",
       "kind": "repo",
       "category": "repo",
@@ -2457,6 +2561,12 @@
       "role": "Recovery guide and repository maintenance scripts"
     },
     {
+      "source": "docs/skill-review/library/builtin-codex/review-agent/91ab275699ee/REVIEW.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
       "source": "docs/skill-review/library/builtin-codex/review-agent/91ab275699ee/SKILL.md",
       "kind": "repo",
       "category": "repo",
@@ -2464,6 +2574,18 @@
     },
     {
       "source": "docs/skill-review/library/builtin-codex/review-agent/91ab275699ee/agents/openai.yaml",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/builtin-codex/review-agent/91ab275699ee/review.json",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/builtin-codex/skill-creator/5be1693bd421/REVIEW.md",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
@@ -2505,6 +2627,18 @@
       "role": "Recovery guide and repository maintenance scripts"
     },
     {
+      "source": "docs/skill-review/library/builtin-codex/skill-creator/5be1693bd421/review-notes.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/builtin-codex/skill-creator/5be1693bd421/review.json",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
       "source": "docs/skill-review/library/builtin-codex/skill-creator/5be1693bd421/scripts/generate_openai_yaml.py",
       "kind": "repo",
       "category": "repo",
@@ -2524,6 +2658,12 @@
     },
     {
       "source": "docs/skill-review/library/builtin-codex/skill-installer/bd391a97dbae/LICENSE.txt",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/builtin-codex/skill-installer/bd391a97dbae/REVIEW.md",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
@@ -2553,6 +2693,18 @@
       "role": "Recovery guide and repository maintenance scripts"
     },
     {
+      "source": "docs/skill-review/library/builtin-codex/skill-installer/bd391a97dbae/review-notes.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/builtin-codex/skill-installer/bd391a97dbae/review.json",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
       "source": "docs/skill-review/library/builtin-codex/skill-installer/bd391a97dbae/scripts/github_utils.py",
       "kind": "repo",
       "category": "repo",
@@ -2571,7 +2723,37 @@
       "role": "Recovery guide and repository maintenance scripts"
     },
     {
+      "source": "docs/skill-review/library/harness-claude-skills/codebase-memory/c4002c91abe2/QUESTIONS.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/harness-claude-skills/codebase-memory/c4002c91abe2/REVIEW.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
       "source": "docs/skill-review/library/harness-claude-skills/codebase-memory/c4002c91abe2/SKILL.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/harness-claude-skills/codebase-memory/c4002c91abe2/review.json",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/harness-claude-skills/impeccable/6c5d5e55dd40/QUESTIONS.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/harness-claude-skills/impeccable/6c5d5e55dd40/REVIEW.md",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
@@ -2812,6 +2994,12 @@
     },
     {
       "source": "docs/skill-review/library/harness-claude-skills/impeccable/6c5d5e55dd40/reference/visualize.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/harness-claude-skills/impeccable/6c5d5e55dd40/review.json",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
@@ -3465,7 +3653,19 @@
       "role": "Recovery guide and repository maintenance scripts"
     },
     {
+      "source": "docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/EVIDENCE.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
       "source": "docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/README.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/REVIEW.md",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
@@ -3544,6 +3744,12 @@
     },
     {
       "source": "docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/report/template.html",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/review.json",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
@@ -4023,6 +4229,12 @@
       "role": "Recovery guide and repository maintenance scripts"
     },
     {
+      "source": "docs/skill-review/library/harness-config-opencode-skills/impeccable/82d09480e480/REVIEW.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
       "source": "docs/skill-review/library/harness-config-opencode-skills/impeccable/82d09480e480/SKILL.md",
       "kind": "repo",
       "category": "repo",
@@ -4258,6 +4470,12 @@
     },
     {
       "source": "docs/skill-review/library/harness-config-opencode-skills/impeccable/82d09480e480/reference/visualize.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/harness-config-opencode-skills/impeccable/82d09480e480/review.json",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
@@ -4911,6 +5129,12 @@
       "role": "Recovery guide and repository maintenance scripts"
     },
     {
+      "source": "docs/skill-review/library/harness-gemini-config-skills/impeccable/dda62b499a21/REVIEW.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
       "source": "docs/skill-review/library/harness-gemini-config-skills/impeccable/dda62b499a21/SKILL.md",
       "kind": "repo",
       "category": "repo",
@@ -5146,6 +5370,12 @@
     },
     {
       "source": "docs/skill-review/library/harness-gemini-config-skills/impeccable/dda62b499a21/reference/visualize.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/harness-gemini-config-skills/impeccable/dda62b499a21/review.json",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
@@ -5799,6 +6029,12 @@
       "role": "Recovery guide and repository maintenance scripts"
     },
     {
+      "source": "docs/skill-review/library/harness-gemini-skills/impeccable/ea77c0b5c398/REVIEW.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
       "source": "docs/skill-review/library/harness-gemini-skills/impeccable/ea77c0b5c398/SKILL.md",
       "kind": "repo",
       "category": "repo",
@@ -6034,6 +6270,12 @@
     },
     {
       "source": "docs/skill-review/library/harness-gemini-skills/impeccable/ea77c0b5c398/reference/visualize.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/harness-gemini-skills/impeccable/ea77c0b5c398/review.json",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
@@ -6687,6 +6929,12 @@
       "role": "Recovery guide and repository maintenance scripts"
     },
     {
+      "source": "docs/skill-review/library/harness-pi-agent-skills/impeccable/fa8118279b98/REVIEW.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
       "source": "docs/skill-review/library/harness-pi-agent-skills/impeccable/fa8118279b98/SKILL.md",
       "kind": "repo",
       "category": "repo",
@@ -6922,6 +7170,12 @@
     },
     {
       "source": "docs/skill-review/library/harness-pi-agent-skills/impeccable/fa8118279b98/reference/visualize.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/harness-pi-agent-skills/impeccable/fa8118279b98/review.json",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
@@ -7713,6 +7967,12 @@
       "role": "Recovery guide and repository maintenance scripts"
     },
     {
+      "source": "docs/skill-review/library/pack-agent-reach/agent-reach/6cfca4cc59cc/REVIEW.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
       "source": "docs/skill-review/library/pack-agent-reach/agent-reach/6cfca4cc59cc/SKILL.md",
       "kind": "repo",
       "category": "repo",
@@ -7762,6 +8022,12 @@
     },
     {
       "source": "docs/skill-review/library/pack-agent-reach/agent-reach/6cfca4cc59cc/references/web.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/skill-review/library/pack-agent-reach/agent-reach/6cfca4cc59cc/review.json",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"

@@ -55,6 +55,10 @@ const STATUS_MESSAGE = 'Checking UI changes';
 const STOP_TIMEOUT_SECONDS = 30;
 const STOP_STATUS_MESSAGE = 'Design deep pass';
 
+// Q-impeccable-hooks-gemini: manifest targets cover .claude/.agents/.cursor/
+// .github only, so a Gemini-CLI-only project gets no hook installed. Should
+// `on` say that explicitly instead of reporting no folders found?
+
 function stopManifestEntry(command) {
   return {
     hooks: [

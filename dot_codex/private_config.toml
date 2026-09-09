@@ -1,5 +1,5 @@
-model = "gpt-6-astra"
-model_reasoning_effort = "low"
+model = "gpt-5.6-luna"
+model_reasoning_effort = "high"
 approvals_reviewer = "auto_review"
 plan_mode_reasoning_effort = "max"
 service_tier = "default"
@@ -113,6 +113,12 @@ trust_level = "trusted"
 [projects."/home/harlan/dev/bootstrap"]
 trust_level = "trusted"
 
+[projects."/home/harlan/dev/xbsr"]
+trust_level = "trusted"
+
+[projects."/home/harlan/dev/the-tango"]
+trust_level = "trusted"
+
 [hooks.state]
 
 [hooks.state."/home/harlan/.codex/hooks.json:session_start:0:0"]
@@ -184,6 +190,15 @@ trusted_hash = "sha256:dea7ceb50560faff4ddec1e9c66ed7ebf45bea61687bbbc368c41a657
 
 [hooks.state."/home/harlan/.codex/hooks.json:stop:0:0"]
 trusted_hash = "sha256:b360e1e8e241d92d8e02665b026c7ef2fe9d89da7c347ae09ae3522f345c0a39"
+
+[hooks.state."security-guidance@claude-plugins-official:hooks/hooks.json:post_tool_use:1:5"]
+trusted_hash = "sha256:ff051adf363232a355758bbc96941b87ab8b38bd47e6c5940b1232827a68b6d6"
+
+[hooks.state."security-guidance@claude-plugins-official:hooks/hooks.json:post_tool_use:1:6"]
+trusted_hash = "sha256:ff051adf363232a355758bbc96941b87ab8b38bd47e6c5940b1232827a68b6d6"
+
+[hooks.state."security-guidance@claude-plugins-official:hooks/hooks.json:subagent_stop:0:0"]
+trusted_hash = "sha256:259af6de997af555cb363624a6db1b8e9a9ec644864293ec97b5abe3ad30eb55"
 
 [tui]
 status_line = ["model-with-reasoning", "current-dir", "git-branch", "branch-changes", "run-state", "context-used", "five-hour-limit", "weekly-limit", "used-tokens", "task-progress"]

@@ -2341,3 +2341,4 @@ export function payload(text, eventName = 'PostToolUse', harness = 'claude') {
     hookSpecificOutput: { hookEventName: eventName, additionalContext: text },
   });
 }
+// Review HJ-738 Q-impeccable-hook: post-edit auto-run surfaces findings; default scope is a human decision.

@@ -54,3 +54,5 @@ When the harness runs subagents, spawn the shipped asset producer every time, ev
 Convert images with a converter context.mjs reported at boot (the IMAGE_TOOLS line); probe only when it reported none, at most once per session, never per image.
 
 Return to [new-work.md](new-work.md) for the direction contract, implementation, and the finishing pass.
+
+<!-- Review HJ-738: Q-impeccable-cost asks whether comp/image spend needs explicit per-session consent. -->

@@ -109,7 +109,7 @@ curl -s -b /tmp/bili_ck.txt -A "$UA" -e "https://www.bilibili.com/" \
   "https://api.bilibili.com/x/web-interface/search/all/v2?keyword=QUERY&page=1"
 ```
 
-> **安装 bili-cli**: `pipx install bilibili-cli`（上游 2026-03 起停更但实测健康；只读场景无需登录，`bili login` 扫码可解锁动态/收藏等个人功能）。
+> **安装 bili-cli**: `pipx install bilibili-cli`（上游 2026-03 起停更但实测健康；只读场景无需登录，`bili login` 扫码可解锁动态/收藏等个人功能）。安装和扫码登录会改变本机状态或建立登录态，必须先获用户明确授权。
 
 ## 小宇宙播客 / Xiaoyuzhou Podcast
 
@@ -126,8 +126,8 @@ curl -s -b /tmp/bili_ck.txt -A "$UA" -e "https://www.bilibili.com/" \
 
 1. **ffmpeg**: `brew install ffmpeg`
 2. **Groq API Key** (免费): https://console.groq.com/keys
-3. **配置 Key**: `agent-reach configure groq-key`（隐藏输入）
-4. **首次运行**: `agent-reach install --env=auto --system --channels=xiaoyuzhou`（需用户明确授权）
+3. **配置 Key**: `agent-reach configure groq-key`（隐藏输入；保存凭据前需用户明确授权）
+4. **首次运行**: `agent-reach install --env=auto --system --channels=xiaoyuzhou`（系统安装和服务配置需用户明确授权）
 
 ### 检查状态
 

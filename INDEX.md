@@ -9,8 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**4545 tracked entries** across 15 categories.
-**4547 tracked entries** across 15 categories.
+**4591 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -24,14 +23,12 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Toolchain & packages](#toolchain--packages) | 4 |
 | [AI agent harnesses](#ai-agent-harnesses) | 41 |
 | [Background services](#background-services) | 16 |
-| [Custom executables](#custom-executables) | 30 |
-| [Credentials & SSH](#credentials--ssh) | 2 |
-| [Apply hooks (`run_*`)](#apply-hooks-run) | 15 |
 | [Custom executables](#custom-executables) | 31 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
+| [Other configuration](#other-configuration) | 1 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 16 |
 | [Chezmoi control files](#chezmoi-control-files) | 7 |
-| [Repository material (not applied)](#repository-material-not-applied) | 4335 |
+| [Repository material (not applied)](#repository-material-not-applied) | 4378 |
 
 ---
 
@@ -284,6 +281,12 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/1password/ssh/agent.toml` | `dot_config/1password/ssh/agent.toml` | 1password | — |
 | `~/.ssh/config` | `private_dot_ssh/config` | ssh | private |
 
+## Other configuration
+
+| Target | Source | Subsystem | Attributes |
+| --- | --- | --- | --- |
+| `~/PR_DESCRIPTION.md` | `PR_DESCRIPTION.md` | — | — |
+
 ## Apply hooks (`run_*`)
 
 | Order | Source | Trigger | Phase |
@@ -354,10 +357,21 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/batches/03-planning.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/batches/04-authoring.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/evaluations/01-local.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/evaluations/02-builtin-codex-batch-1.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/evaluations/02-builtin-codex-batch-2.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/evaluations/HJ-735-codebase-memory.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/evaluations/HJ-736-impeccable.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/evaluations/HJ-737.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/evaluations/HJ-738.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/evaluations/HJ-739.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/evaluations/HJ-740.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/evaluations/HJ-741.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/evaluations/HJ-742.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/evaluations/test_local.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/inventory.json` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/inventory.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/imagegen/6e733e799e52/LICENSE.txt` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/builtin-codex/imagegen/6e733e799e52/REVIEW.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/imagegen/6e733e799e52/SKILL.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/imagegen/6e733e799e52/agents/openai.yaml` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/imagegen/6e733e799e52/assets/imagegen-small.svg` | Recovery guide and repository maintenance scripts |
@@ -367,9 +381,11 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/library/builtin-codex/imagegen/6e733e799e52/references/image-api.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/imagegen/6e733e799e52/references/prompting.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/imagegen/6e733e799e52/references/sample-prompts.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/builtin-codex/imagegen/6e733e799e52/review.json` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/imagegen/6e733e799e52/scripts/image_gen.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/imagegen/6e733e799e52/scripts/remove_chroma_key.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/openai-docs/1de75a2e0091/LICENSE.txt` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/builtin-codex/openai-docs/1de75a2e0091/REVIEW.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/openai-docs/1de75a2e0091/SKILL.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/openai-docs/1de75a2e0091/agents/openai.yaml` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/openai-docs/1de75a2e0091/assets/openai-small.svg` | Recovery guide and repository maintenance scripts |
@@ -383,40 +399,56 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/library/builtin-codex/openai-docs/1de75a2e0091/references/prompting-guide.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/openai-docs/1de75a2e0091/references/upgrade-guide.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/openai-docs/1de75a2e0091/references/upgrading-to-gpt-5p6-sol.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/builtin-codex/openai-docs/1de75a2e0091/review.json` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/openai-docs/1de75a2e0091/scripts/fetch-codex-manual.mjs` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/openai-docs/1de75a2e0091/scripts/resolve-latest-model-info` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/openai-docs/1de75a2e0091/scripts/resolve-latest-model-info.cjs` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/builtin-codex/plugin-creator/ede23896a590/REVIEW.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/plugin-creator/ede23896a590/SKILL.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/plugin-creator/ede23896a590/agents/openai.yaml` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/plugin-creator/ede23896a590/assets/plugin-creator-small.svg` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/plugin-creator/ede23896a590/assets/plugin-creator.png` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/plugin-creator/ede23896a590/references/installing-and-updating.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/plugin-creator/ede23896a590/references/plugin-json-spec.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/builtin-codex/plugin-creator/ede23896a590/review.json` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/plugin-creator/ede23896a590/scripts/create_basic_plugin.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/plugin-creator/ede23896a590/scripts/identifier_validation.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/plugin-creator/ede23896a590/scripts/read_marketplace_name.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/plugin-creator/ede23896a590/scripts/update_plugin_cachebuster.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/plugin-creator/ede23896a590/scripts/validate_plugin.py` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/builtin-codex/review-agent/91ab275699ee/REVIEW.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/review-agent/91ab275699ee/SKILL.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/review-agent/91ab275699ee/agents/openai.yaml` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/builtin-codex/review-agent/91ab275699ee/review.json` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/builtin-codex/skill-creator/5be1693bd421/REVIEW.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/skill-creator/5be1693bd421/SKILL.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/skill-creator/5be1693bd421/agents/openai.yaml` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/skill-creator/5be1693bd421/assets/skill-creator-small.svg` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/skill-creator/5be1693bd421/assets/skill-creator.png` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/skill-creator/5be1693bd421/license.txt` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/skill-creator/5be1693bd421/references/openai_yaml.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/builtin-codex/skill-creator/5be1693bd421/review-notes.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/builtin-codex/skill-creator/5be1693bd421/review.json` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/skill-creator/5be1693bd421/scripts/generate_openai_yaml.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/skill-creator/5be1693bd421/scripts/init_skill.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/skill-creator/5be1693bd421/scripts/quick_validate.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/skill-installer/bd391a97dbae/LICENSE.txt` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/builtin-codex/skill-installer/bd391a97dbae/REVIEW.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/skill-installer/bd391a97dbae/SKILL.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/skill-installer/bd391a97dbae/agents/openai.yaml` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/skill-installer/bd391a97dbae/assets/skill-installer-small.svg` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/skill-installer/bd391a97dbae/assets/skill-installer.png` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/builtin-codex/skill-installer/bd391a97dbae/review-notes.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/builtin-codex/skill-installer/bd391a97dbae/review.json` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/skill-installer/bd391a97dbae/scripts/github_utils.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/skill-installer/bd391a97dbae/scripts/install-skill-from-github.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/builtin-codex/skill-installer/bd391a97dbae/scripts/list-skills.py` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/harness-claude-skills/codebase-memory/c4002c91abe2/QUESTIONS.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/harness-claude-skills/codebase-memory/c4002c91abe2/REVIEW.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/codebase-memory/c4002c91abe2/SKILL.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/harness-claude-skills/codebase-memory/c4002c91abe2/review.json` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/harness-claude-skills/impeccable/6c5d5e55dd40/QUESTIONS.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/harness-claude-skills/impeccable/6c5d5e55dd40/REVIEW.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/impeccable/6c5d5e55dd40/SKILL.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/impeccable/6c5d5e55dd40/reference/adapt.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/impeccable/6c5d5e55dd40/reference/adapt.native.md` | Recovery guide and repository maintenance scripts |
@@ -457,6 +489,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/library/harness-claude-skills/impeccable/6c5d5e55dd40/reference/shape.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/impeccable/6c5d5e55dd40/reference/typeset.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/impeccable/6c5d5e55dd40/reference/visualize.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/harness-claude-skills/impeccable/6c5d5e55dd40/review.json` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/impeccable/6c5d5e55dd40/scripts/command-metadata.json` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/impeccable/6c5d5e55dd40/scripts/concept-seed.mjs` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/impeccable/6c5d5e55dd40/scripts/context-signals.mjs` | Recovery guide and repository maintenance scripts |
@@ -565,7 +598,9 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/library/harness-claude-skills/impeccable/6c5d5e55dd40/scripts/pin.mjs` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/impeccable/6c5d5e55dd40/scripts/serve-question.mjs` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/impeccable/6c5d5e55dd40/scripts/surface-brief.mjs` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/EVIDENCE.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/README.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/REVIEW.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/SKILL.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/config.example.yaml` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/prompts/aggregator.md` | Recovery guide and repository maintenance scripts |
@@ -579,6 +614,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/report/assets/report-scout.webp` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/report/assets/report-synthesis.webp` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/report/template.html` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/review.json` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/scripts/adapters/__init__.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/scripts/adapters/agy.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/scripts/adapters/claude.py` | Recovery guide and repository maintenance scripts |
@@ -658,6 +694,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/webui/tests/test_effort_controls_browser.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/webui/tests/test_webui.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-claude-skills/mixture-of-agents/b6883206a8b5/webui/worker.py` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/harness-config-opencode-skills/impeccable/82d09480e480/REVIEW.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-config-opencode-skills/impeccable/82d09480e480/SKILL.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-config-opencode-skills/impeccable/82d09480e480/reference/adapt.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-config-opencode-skills/impeccable/82d09480e480/reference/adapt.native.md` | Recovery guide and repository maintenance scripts |
@@ -698,6 +735,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/library/harness-config-opencode-skills/impeccable/82d09480e480/reference/shape.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-config-opencode-skills/impeccable/82d09480e480/reference/typeset.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-config-opencode-skills/impeccable/82d09480e480/reference/visualize.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/harness-config-opencode-skills/impeccable/82d09480e480/review.json` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-config-opencode-skills/impeccable/82d09480e480/scripts/command-metadata.json` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-config-opencode-skills/impeccable/82d09480e480/scripts/concept-seed.mjs` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-config-opencode-skills/impeccable/82d09480e480/scripts/context-signals.mjs` | Recovery guide and repository maintenance scripts |
@@ -806,6 +844,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/library/harness-config-opencode-skills/impeccable/82d09480e480/scripts/pin.mjs` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-config-opencode-skills/impeccable/82d09480e480/scripts/serve-question.mjs` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-config-opencode-skills/impeccable/82d09480e480/scripts/surface-brief.mjs` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/harness-gemini-config-skills/impeccable/dda62b499a21/REVIEW.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-config-skills/impeccable/dda62b499a21/SKILL.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-config-skills/impeccable/dda62b499a21/reference/adapt.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-config-skills/impeccable/dda62b499a21/reference/adapt.native.md` | Recovery guide and repository maintenance scripts |
@@ -846,6 +885,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/library/harness-gemini-config-skills/impeccable/dda62b499a21/reference/shape.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-config-skills/impeccable/dda62b499a21/reference/typeset.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-config-skills/impeccable/dda62b499a21/reference/visualize.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/harness-gemini-config-skills/impeccable/dda62b499a21/review.json` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-config-skills/impeccable/dda62b499a21/scripts/command-metadata.json` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-config-skills/impeccable/dda62b499a21/scripts/concept-seed.mjs` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-config-skills/impeccable/dda62b499a21/scripts/context-signals.mjs` | Recovery guide and repository maintenance scripts |
@@ -954,6 +994,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/library/harness-gemini-config-skills/impeccable/dda62b499a21/scripts/pin.mjs` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-config-skills/impeccable/dda62b499a21/scripts/serve-question.mjs` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-config-skills/impeccable/dda62b499a21/scripts/surface-brief.mjs` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/harness-gemini-skills/impeccable/ea77c0b5c398/REVIEW.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-skills/impeccable/ea77c0b5c398/SKILL.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-skills/impeccable/ea77c0b5c398/reference/adapt.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-skills/impeccable/ea77c0b5c398/reference/adapt.native.md` | Recovery guide and repository maintenance scripts |
@@ -994,6 +1035,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/library/harness-gemini-skills/impeccable/ea77c0b5c398/reference/shape.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-skills/impeccable/ea77c0b5c398/reference/typeset.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-skills/impeccable/ea77c0b5c398/reference/visualize.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/harness-gemini-skills/impeccable/ea77c0b5c398/review.json` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-skills/impeccable/ea77c0b5c398/scripts/command-metadata.json` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-skills/impeccable/ea77c0b5c398/scripts/concept-seed.mjs` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-skills/impeccable/ea77c0b5c398/scripts/context-signals.mjs` | Recovery guide and repository maintenance scripts |
@@ -1102,6 +1144,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/library/harness-gemini-skills/impeccable/ea77c0b5c398/scripts/pin.mjs` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-skills/impeccable/ea77c0b5c398/scripts/serve-question.mjs` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-gemini-skills/impeccable/ea77c0b5c398/scripts/surface-brief.mjs` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/harness-pi-agent-skills/impeccable/fa8118279b98/REVIEW.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-pi-agent-skills/impeccable/fa8118279b98/SKILL.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-pi-agent-skills/impeccable/fa8118279b98/reference/adapt.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-pi-agent-skills/impeccable/fa8118279b98/reference/adapt.native.md` | Recovery guide and repository maintenance scripts |
@@ -1142,6 +1185,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/library/harness-pi-agent-skills/impeccable/fa8118279b98/reference/shape.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-pi-agent-skills/impeccable/fa8118279b98/reference/typeset.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-pi-agent-skills/impeccable/fa8118279b98/reference/visualize.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/harness-pi-agent-skills/impeccable/fa8118279b98/review.json` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-pi-agent-skills/impeccable/fa8118279b98/scripts/command-metadata.json` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-pi-agent-skills/impeccable/fa8118279b98/scripts/concept-seed.mjs` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/harness-pi-agent-skills/impeccable/fa8118279b98/scripts/context-signals.mjs` | Recovery guide and repository maintenance scripts |
@@ -1273,6 +1317,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/library/local-tracked/project-doc-planner/e047c3792d6a/SKILL.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/local-tracked/project-doc-planner/e047c3792d6a/agents/openai.yaml` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/local-tracked/project-doc-planner/e047c3792d6a/review.json` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/pack-agent-reach/agent-reach/6cfca4cc59cc/REVIEW.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/pack-agent-reach/agent-reach/6cfca4cc59cc/SKILL.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/pack-agent-reach/agent-reach/6cfca4cc59cc/SKILL_en.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/pack-agent-reach/agent-reach/6cfca4cc59cc/references/career.md` | Recovery guide and repository maintenance scripts |
@@ -1282,6 +1327,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/library/pack-agent-reach/agent-reach/6cfca4cc59cc/references/social.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/pack-agent-reach/agent-reach/6cfca4cc59cc/references/video.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/pack-agent-reach/agent-reach/6cfca4cc59cc/references/web.md` | Recovery guide and repository maintenance scripts |
+| `docs/skill-review/library/pack-agent-reach/agent-reach/6cfca4cc59cc/review.json` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/pack-cloudflare/agents-sdk/acf6c1c443fe/SKILL.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/pack-cloudflare/agents-sdk/acf6c1c443fe/references/browse-the-web.md` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/library/pack-cloudflare/agents-sdk/acf6c1c443fe/references/callable.md` | Recovery guide and repository maintenance scripts |

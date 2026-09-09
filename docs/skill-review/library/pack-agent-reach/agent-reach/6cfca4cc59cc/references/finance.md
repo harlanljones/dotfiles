@@ -37,7 +37,8 @@ OpenCLI 只复用用户已经存在且明确控制的浏览器会话。不要自
 agent-reach configure --from-browser chrome --platform xueqiu
 ```
 
-该配置只读取并保存 `xq_a_token`，不会顺带采集其他平台 Cookie。
+该配置只读取并保存 `xq_a_token`，不会顺带采集其他平台 Cookie；读取浏览器会话
+并写入凭据仍需用户明确授权，必须先说明保存位置和范围。
 
 ## 验收与失败处理
 

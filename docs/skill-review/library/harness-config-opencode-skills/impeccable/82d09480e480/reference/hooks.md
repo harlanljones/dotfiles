@@ -109,3 +109,5 @@ node .opencode/skills/impeccable/scripts/hook-admin.mjs ignore-file "src/legacy/
 
 - If `.impeccable/config.json` or `.impeccable/config.local.json` is unreadable or malformed, the hook ignores that file and uses the remaining valid config/defaults. `hook-admin.mjs status` will show malformed files as ignored.
 - If the user asks to "disable the hook" globally, lead with `/impeccable hooks off` (persistent for this project; writes `hook.enabled: false` to config). The legacy `IMPECCABLE_HOOK_DISABLED=1` env var also works as a one-shot override that follows the shell.
+
+<!-- Review HJ-738: Q-impeccable-hook asks whether auto-run after edits stays opt-in per project. -->
