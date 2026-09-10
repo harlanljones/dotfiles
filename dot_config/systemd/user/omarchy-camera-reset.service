@@ -1,0 +1,18 @@
+[Unit]
+Description=Omarchy camera reset — restore UVC camera controls to driver defaults
+Documentation=file:%h/.local/bin/omarchy-camera-reset
+ConditionPathExistsGlob=/dev/video*
+
+[Service]
+Type=oneshot
+# The node appears in /dev slightly before the USB device answers control I/O.
+ExecStartPre=/usr/bin/sleep 1
+ExecStart=%h/.local/bin/omarchy-camera-reset
+# Oneshot units that do not remain after exit are eligible to be started again
+# the moment they finish; holding "active" keeps anything wanting this unit
+# from retriggering it in a loop.
+RemainAfterExit=yes
+NoNewPrivileges=yes
+
+[Install]
+WantedBy=default.target

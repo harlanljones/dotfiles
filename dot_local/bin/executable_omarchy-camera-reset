@@ -1,0 +1,145 @@
+#!/usr/bin/env bash
+# Reset UVC camera controls to their driver-reported defaults.
+#
+# Written after a Razer Kiyo Pro drifted into manual exposure (600) with gain
+# 100 and dynamic framerate on — a grainy, smeary, low-FPS picture that no app
+# would fix on its own, because nothing on the system persisted those values.
+#
+# Rather than hardcode a table of "good" values, this reads each control's
+# default straight out of the driver and writes it back. That keeps the script
+# correct for any UVC device, not just the one that misbehaved.
+
+set -uo pipefail
+
+MATCH=""
+DRY_RUN=0
+VERBOSE=0
+
+usage() {
+  cat <<'USAGE'
+Usage: omarchy-camera-reset [options]
+
+  -m, --match NAME   Only reset cameras whose card name contains NAME
+                     (e.g. --match "Kiyo"). Default: every capture device.
+  -d, --device PATH  Reset exactly this node (e.g. /dev/video0).
+  -n, --dry-run      Print what would change, change nothing.
+  -v, --verbose      List every control, not just the ones that differ.
+  -h, --help         Show this help.
+USAGE
+}
+
+DEVICE=""
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -m|--match)   MATCH="${2:-}"; shift 2 ;;
+    -d|--device)  DEVICE="${2:-}"; shift 2 ;;
+    -n|--dry-run) DRY_RUN=1; shift ;;
+    -v|--verbose) VERBOSE=1; shift ;;
+    -h|--help)    usage; exit 0 ;;
+    *) echo "omarchy-camera-reset: unknown option: $1" >&2; usage >&2; exit 2 ;;
+  esac
+done
+
+command -v v4l2-ctl >/dev/null 2>&1 || {
+  echo "omarchy-camera-reset: v4l2-ctl not found (install v4l-utils)" >&2
+  exit 1
+}
+
+# A UVC camera exposes several /dev/video* nodes; only some accept controls.
+# The metadata node answers --list-ctrls with nothing, so that is the filter.
+usable() {
+  v4l2-ctl -d "$1" --list-ctrls 2>/dev/null | grep -q '0x00[0-9a-f]\{6\}'
+}
+
+card_name() {
+  v4l2-ctl -d "$1" --info 2>/dev/null \
+    | sed -n 's/^[[:space:]]*Card type[[:space:]]*:[[:space:]]*//p' | head -1
+}
+
+# Controls that gate other controls. Writing these flips auto modes on, which
+# makes the controls they gate read-only, so they must be written LAST --
+# otherwise restoring auto_exposure locks exposure_time_absolute at its bad
+# value before we get a chance to fix it.
+is_auto_toggle() {
+  case "$1" in
+    auto_exposure|white_balance_automatic|focus_automatic_continuous) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+CHANGED=0
+
+apply_ctrl() {
+  local dev="$1" name="$2" cur="$3" def="$4"
+  printf '    %-32s %s -> %s\n' "$name" "$cur" "$def"
+  (( DRY_RUN )) && { CHANGED=$((CHANGED + 1)); return; }
+  if v4l2-ctl -d "$dev" --set-ctrl="$name=$def" >/dev/null 2>&1; then
+    CHANGED=$((CHANGED + 1))
+  else
+    printf '    %-32s could not be set\n' "$name"
+  fi
+}
+
+# Set every writable, currently-active control to its default, gated controls
+# before the auto toggles that would freeze them.
+reset_pass() {
+  local dev="$1" deferred=() line name flags def cur
+  while IFS= read -r line; do
+    name=$(awk '{print $1}' <<<"$line")
+    flags=""
+    [[ "$line" == *flags=* ]] && flags=${line#*flags=}
+    # inactive controls are gated behind an auto mode; read-only and volatile
+    # ones cannot or should not be written.
+    [[ "$flags" == *inactive* || "$flags" == *read-only* || "$flags" == *volatile* ]] && continue
+    def=$(grep -o 'default=[-0-9]*' <<<"$line" | head -1 | cut -d= -f2)
+    cur=$(grep -o 'value=[-0-9]*'   <<<"$line" | head -1 | cut -d= -f2)
+    [[ -n "$def" && -n "$cur" ]] || continue
+    if [[ "$def" == "$cur" ]]; then
+      (( VERBOSE )) && printf '    %-32s %s (already default)\n' "$name" "$cur"
+      continue
+    fi
+    if is_auto_toggle "$name"; then
+      deferred+=("$name|$cur|$def")
+    else
+      apply_ctrl "$dev" "$name" "$cur" "$def"
+    fi
+  done < <(v4l2-ctl -d "$dev" --list-ctrls 2>/dev/null | grep '0x00[0-9a-f]\{6\}')
+
+  local d
+  for d in ${deferred+"${deferred[@]}"}; do
+    IFS='|' read -r name cur def <<<"$d"
+    apply_ctrl "$dev" "$name" "$cur" "$def"
+  done
+}
+
+if [[ -n "$DEVICE" ]]; then
+  devices=("$DEVICE")
+else
+  mapfile -t devices < <(ls -1 /dev/video* 2>/dev/null)
+fi
+
+(( ${#devices[@]} )) || { echo "omarchy-camera-reset: no /dev/video* devices present"; exit 0; }
+
+for dev in "${devices[@]}"; do
+  [[ -e "$dev" ]] || continue
+  usable "$dev" || continue
+  name=$(card_name "$dev")
+  if [[ -n "$MATCH" && "$name" != *"$MATCH"* ]]; then continue; fi
+
+  echo "${name:-unknown} ($dev)"
+  # Two passes: restoring an auto-mode toggle can un-gate controls that were
+  # inactive during the first sweep (exposure time, white balance temperature).
+  before=$CHANGED
+  reset_pass "$dev"
+  # A toggle restored to OFF can un-gate a control that was inactive on the
+  # first sweep. Nothing changed during a dry run, so there is nothing to
+  # re-examine -- and re-running it would double-count.
+  (( DRY_RUN )) || reset_pass "$dev"
+  (( CHANGED > before )) || echo "    all controls already at defaults"
+done
+
+if (( DRY_RUN )); then
+  echo "dry run: $CHANGED control(s) would change"
+else
+  echo "reset $CHANGED control(s) to defaults"
+fi

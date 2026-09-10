@@ -31,4 +31,7 @@ o.bind("SUPER + ALT + N", "Clear notifications", "omarchy-shell notifications di
 -- o.bind("SUPER + H", nil, "voxtype record toggle")
 -- o.bind("SUPER + PERIOD", nil, "omarchy-shell shell toggle omarchy.emojis")
 
+-- X Native Client toggle override
+o.bind("SUPER + SHIFT + X", "X Native", "qml-runtime " .. (os.getenv("HOME") or "") .. "/.config/omarchy/plugins/community.omarchy-x-native-bundle/native-app/main.qml --toggle")
+
 require("default.hypr.require_optional").module("hypr.omachord") -- Oma Chord managed loader
