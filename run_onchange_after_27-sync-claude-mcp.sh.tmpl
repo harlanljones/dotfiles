@@ -6,6 +6,11 @@ set -euo pipefail
 
 CLAUDE_JSON="${HOME}/.claude.json"
 MCP='{{ .claude.mcpServers | toJson }}'
+# .chezmoidata files are data, not templates, so the manifest stores the
+# command as __HOME__/... and it is expanded here instead. Doing it at
+# runtime rather than at render time keeps this script byte-identical on
+# every machine, so the run_onchange hash does not churn per host.
+MCP="${MCP//__HOME__/$HOME}"
 
 if [[ ! -f "$CLAUDE_JSON" ]]; then
   printf '{}\n' > "$CLAUDE_JSON"
