@@ -3,9 +3,9 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 4591,
+    "total": 4594,
     "by_category": {
-      "shell": 13,
+      "shell": 14,
       "prompt": 1,
       "terminal": 4,
       "editor": 12,
@@ -14,8 +14,8 @@
       "navigation": 3,
       "toolchain": 4,
       "agents": 41,
-      "services": 16,
-      "scripts": 31,
+      "services": 17,
+      "scripts": 32,
       "security": 2,
       "other": 1,
       "hooks": 16,
@@ -141,6 +141,14 @@
     {
       "source": "dot_config/shell/40-aliases.sh",
       "target": "~/.config/shell/40-aliases.sh",
+      "kind": "dotfile",
+      "category": "shell",
+      "attributes": [],
+      "subsystem": "shared shell modules"
+    },
+    {
+      "source": "dot_config/shell/45-omarchy-parity.sh",
+      "target": "~/.config/shell/45-omarchy-parity.sh",
       "kind": "dotfile",
       "category": "shell",
       "attributes": [],
@@ -1341,6 +1349,14 @@
       "subsystem": "user systemd units"
     },
     {
+      "source": "dot_config/systemd/user/omarchy-camera-reset.service",
+      "target": "~/.config/systemd/user/omarchy-camera-reset.service",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "user systemd units"
+    },
+    {
       "source": "dot_config/systemd/user/omarchy-cline-usage-scrape.service",
       "target": "~/.config/systemd/user/omarchy-cline-usage-scrape.service",
       "kind": "dotfile",
@@ -1559,6 +1575,16 @@
       "attributes": [
         "executable",
         "template"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_omarchy-camera-reset",
+      "target": "~/.local/bin/omarchy-camera-reset",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
       ],
       "subsystem": "custom executables"
     },

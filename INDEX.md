@@ -9,11 +9,11 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**4591 tracked entries** across 16 categories.
+**4594 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
-| [Shell](#shell) | 13 |
+| [Shell](#shell) | 14 |
 | [Prompt](#prompt) | 1 |
 | [Terminal & multiplexer](#terminal--multiplexer) | 4 |
 | [Editors](#editors) | 12 |
@@ -22,8 +22,8 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Navigation & search](#navigation--search) | 3 |
 | [Toolchain & packages](#toolchain--packages) | 4 |
 | [AI agent harnesses](#ai-agent-harnesses) | 41 |
-| [Background services](#background-services) | 16 |
-| [Custom executables](#custom-executables) | 31 |
+| [Background services](#background-services) | 17 |
+| [Custom executables](#custom-executables) | 32 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
 | [Other configuration](#other-configuration) | 1 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 16 |
@@ -43,6 +43,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/shell/20-integrations.sh` | `dot_config/shell/20-integrations.sh` | shared shell modules | — |
 | `~/.config/shell/30-navigation.sh` | `dot_config/shell/30-navigation.sh` | shared shell modules | — |
 | `~/.config/shell/40-aliases.sh` | `dot_config/shell/40-aliases.sh` | shared shell modules | — |
+| `~/.config/shell/45-omarchy-parity.sh` | `dot_config/shell/45-omarchy-parity.sh` | shared shell modules | — |
 | `~/.config/shell/50-agents.sh` | `dot_config/shell/50-agents.sh` | shared shell modules | — |
 | `~/.config/shell/55-apps.sh` | `dot_config/shell/55-apps.sh` | shared shell modules | — |
 | `~/.config/shell/60-prompt.sh` | `dot_config/shell/60-prompt.sh` | shared shell modules | — |
@@ -229,6 +230,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/systemd/user/omarchy-agents-analysis.timer` | `dot_config/systemd/user/omarchy-agents-analysis.timer` | user systemd units | — |
 | `~/.config/systemd/user/omarchy-agents-dashboard.service` | `dot_config/systemd/user/omarchy-agents-dashboard.service` | user systemd units | — |
 | `~/.config/systemd/user/omarchy-agents-tunnel.service` | `dot_config/systemd/user/omarchy-agents-tunnel.service` | user systemd units | — |
+| `~/.config/systemd/user/omarchy-camera-reset.service` | `dot_config/systemd/user/omarchy-camera-reset.service` | user systemd units | — |
 | `~/.config/systemd/user/omarchy-cline-usage-scrape.service` | `dot_config/systemd/user/omarchy-cline-usage-scrape.service` | user systemd units | — |
 | `~/.config/systemd/user/omarchy-cline-usage-scrape.timer` | `dot_config/systemd/user/omarchy-cline-usage-scrape.timer` | user systemd units | — |
 | `~/.config/systemd/user/omarchy-cursor-usage-scrape.service` | `dot_config/systemd/user/omarchy-cursor-usage-scrape.service` | user systemd units | — |
@@ -257,6 +259,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.local/bin/omarchy-agent-usage-pi` | `dot_local/bin/executable_omarchy-agent-usage-pi.tmpl` | custom executables | executable, template |
 | `~/.local/bin/omarchy-agent-usage-update` | `dot_local/bin/executable_omarchy-agent-usage-update.tmpl` | custom executables | executable, template |
 | `~/.local/bin/omarchy-agent` | `dot_local/bin/executable_omarchy-agent.tmpl` | custom executables | executable, template |
+| `~/.local/bin/omarchy-camera-reset` | `dot_local/bin/executable_omarchy-camera-reset` | custom executables | executable |
 | `~/.local/bin/omarchy-cline-usage-login` | `dot_local/bin/executable_omarchy-cline-usage-login.tmpl` | custom executables | executable, template |
 | `~/.local/bin/omarchy-cline-usage-override` | `dot_local/bin/executable_omarchy-cline-usage-override.tmpl` | custom executables | executable, template |
 | `~/.local/bin/omarchy-cline-usage-scrape` | `dot_local/bin/executable_omarchy-cline-usage-scrape.tmpl` | custom executables | executable, template |
