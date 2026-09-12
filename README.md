@@ -435,6 +435,7 @@ Declarative tracking for system-level packages that mise does not manage:
 │   │   ├── 20-integrations.sh
 │   │   ├── 30-navigation.sh
 │   │   ├── 40-aliases.sh
+│   │   ├── 45-omarchy-parity.sh
 │   │   ├── 50-agents.sh
 │   │   ├── 55-apps.sh
 │   │   ├── 60-prompt.sh
@@ -449,6 +450,7 @@ Declarative tracking for system-level packages that mise does not manage:
 │   │       ├── omarchy-agents-analysis.timer
 │   │       ├── omarchy-agents-dashboard.service
 │   │       ├── omarchy-agents-tunnel.service
+│   │       ├── omarchy-camera-reset.service
 │   │       ├── omarchy-cline-usage-scrape.service
 │   │       ├── omarchy-cline-usage-scrape.timer
 │   │       ├── omarchy-cursor-usage-scrape.service
@@ -496,6 +498,7 @@ Declarative tracking for system-level packages that mise does not manage:
 │   │   ├── executable_omarchy-agent-usage-pi.tmpl
 │   │   ├── executable_omarchy-agent-usage-update.tmpl
 │   │   ├── executable_omarchy-agent.tmpl
+│   │   ├── executable_omarchy-camera-reset
 │   │   ├── executable_omarchy-cline-usage-login.tmpl
 │   │   ├── executable_omarchy-cline-usage-override.tmpl
 │   │   ├── executable_omarchy-cline-usage-scrape.tmpl
