@@ -31,13 +31,26 @@ fi
 # Provider-generated builds (impeccable) are restored when missing.
 missing_impeccable_providers=()
 {{- range .agentSkills.impeccableProviders }}
-{{- if or (ne .name "antigravity") (ne $.machine "vespasian") }}
 if [[ ! -f "$skill_home/{{ .skillPath }}" ]]; then
   missing_impeccable_providers+=({{ .name | quote }})
 fi
 {{- end }}
-{{- end }}
 if [[ ${#missing_impeccable_providers[@]} -gt 0 ]]; then
   provider_csv=$(IFS=,; printf '%s' "${missing_impeccable_providers[*]}")
-  npx -y impeccable install --providers="$provider_csv" --scope=global -y --no-hooks
+  if ! impeccable_output=$(npx -y impeccable install --providers="$provider_csv" --scope=global -y --no-hooks 2>&1); then
+    if [[ "$impeccable_output" == *"Unknown provider(s):"* ]]; then
+      # Older impeccable releases may not know every provider in the shared
+      # manifest. Retry only after identifying that compatibility failure;
+      # unrelated install errors remain fatal.
+      compatible_csv=$(printf '%s' "$provider_csv" | sed 's/,\?antigravity\,\?/,/g; s/^,//; s/,$//')
+      if [[ -n "$compatible_csv" ]]; then
+        npx -y impeccable install --providers="$compatible_csv" --scope=global -y --no-hooks
+      else
+        printf '%s\n' "$impeccable_output" >&2
+      fi
+    else
+      printf '%s\n' "$impeccable_output" >&2
+      exit 1
+    fi
+  fi
 fi
