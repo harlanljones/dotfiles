@@ -1,4 +1,4 @@
-{{- $statusCmd := ternary (joinPath .chezmoi.homeDir ".local/bin/omarchy-cursor-statusline") "~/.local/bin/statusline" (and (hasKey . "machine") (eq .machine "augustus")) -}}
+{{- $statusCmd := ternary (joinPath .chezmoi.homeDir ".local/bin/omarchy-cursor-statusline") (joinPath .chezmoi.homeDir ".local/bin/statusline") (and (hasKey . "machine") (eq .machine "augustus")) -}}
 #!/bin/bash
 # Configures Cursor CLI integration and shared statusline across all machines.
 # statusline command: {{ $statusCmd }}

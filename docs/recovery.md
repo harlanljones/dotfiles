@@ -71,6 +71,11 @@ mkdir -p ~/.config/chezmoi
 # copy key.txt from your backup into ~/.config/chezmoi/key.txt
 
 # 2. Initialize and apply
+# Option A (Recommended): Interactive setup wizard (checks system info, clarifies profile, installs tools)
+git clone https://github.com/harlanljones/dotfiles.git ~/.local/share/chezmoi
+~/.local/share/chezmoi/setup.sh
+
+# Option B: Direct chezmoi initialization
 chezmoi init --apply https://github.com/harlanljones/dotfiles.git
 ```
 
@@ -78,8 +83,8 @@ Applying without the key first is safe and often the faster path on a new
 machine: the encrypted entries are skipped, everything else lands, and you can
 restore `key.txt` and re-apply whenever the backup is to hand.
 
-The first script that runs (`run_once_before_00-verify-deps.sh`) checks for
-`git` and `age` and fails early with install hints if they are missing.
+The dependency check script (`run_once_before_00-verify-deps.sh`) inspects system
+dependencies and, when run interactively, prompts to install missing packages automatically.
 
 Then install system packages:
 

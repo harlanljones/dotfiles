@@ -2,6 +2,7 @@ README.md
 AGENTS.md
 INDEX.md
 INDEX.json
+setup.sh
 .gitignore
 .gitleaksignore
 .gitleaks.toml
@@ -46,12 +47,19 @@ gitleaks-report.*
 .env.*
 settings.local.json
 
-{{- if not (stat (joinPath .chezmoi.homeDir ".config" "chezmoi" "key.txt")) }}
-# No age identity on this machine, so the encrypted entries cannot be
+{{- $keyPath := joinPath .chezmoi.homeDir ".config" "chezmoi" "key.txt" }}
+{{- $hasMatchingKey := false }}
+{{- if stat $keyPath }}
+  {{- if contains "age1hf4200nhdqg0l3xs68v4gef6mn0nuvmh72573m3nfj8kqpcs7pnsmfkuw6" (include $keyPath) }}
+    {{- $hasMatchingKey = true }}
+  {{- end }}
+{{- end }}
+{{- if not $hasMatchingKey }}
+# No matching age identity on this machine, so the encrypted entries cannot be
 # decrypted. Hide them rather than letting `chezmoi apply` abort partway
 # through -- that failure is what left Hadrian half-adopted. Restore
-# ~/.config/chezmoi/key.txt (docs/recovery.md) and they come back on the next
-# apply; .chezmoiignore is re-evaluated every run.
+# ~/.config/chezmoi/key.txt (docs/recovery.md) matching the recipient key and
+# they come back on the next apply; .chezmoiignore is re-evaluated every run.
 .config/opencode/opencode.json
 {{- end }}
 .gemini/antigravity-cli

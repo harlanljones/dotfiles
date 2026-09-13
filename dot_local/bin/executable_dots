@@ -100,6 +100,7 @@ ${BOLD}COMMANDS:${NC}
   ${CYAN}push, pp${NC}          Capture templates, commit & push with Ollama-generated message
   ${CYAN}doctor${NC}            Run diagnostics on tools, age keys, agent links, template drift
   ${CYAN}theme${NC}             List, show, or switch this machine's color theme
+  ${CYAN}setup${NC}             Run interactive system onboarding & setup wizard
   ${CYAN}help${NC}              Show this help message
 
 ${BOLD}OPTIONS FOR SYNC:${NC}
@@ -672,6 +673,19 @@ cmd_doctor() {
   echo -e "${GREEN}Diagnostics complete.${NC}"
 }
 
+cmd_setup() {
+  local src
+  src="$(get_source_dir)"
+  if [[ -x "$src/setup.sh" ]]; then
+    exec "$src/setup.sh" "$@"
+  elif [[ -f "$src/setup.sh" ]]; then
+    exec bash "$src/setup.sh" "$@"
+  else
+    echo -e "${RED}error:${NC} setup.sh not found in $src" >&2
+    exit 1
+  fi
+}
+
 # Subcommand dispatch
 main() {
   local cmd="${1:-help}"
@@ -689,6 +703,7 @@ main() {
     push|pp)        cmd_push "$@" ;;
     doctor)         cmd_doctor "$@" ;;
     theme)          cmd_theme "$@" ;;
+    setup)          cmd_setup "$@" ;;
     help|-h|--help) usage ;;
     *)
       echo -e "${RED}error:${NC} Unknown command '$cmd'." >&2

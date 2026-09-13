@@ -9,14 +9,24 @@ It keeps tools, editors, and shells aligned across multiple workstations.
 
 ### New Machine Setup
 
-Install chezmoi and apply the configurations in one command:
+Run the interactive setup wizard to inspect system information, clarify machine profiles, and configure all tools and dotfiles:
+
+```bash
+# Clone and run the interactive setup wizard:
+git clone https://github.com/harlanljones/dotfiles.git ~/.local/share/chezmoi
+~/.local/share/chezmoi/setup.sh
+
+# Or on an existing setup, re-run onboarding anytime:
+dots setup
+```
+
+Alternatively, initialize directly with chezmoi:
 
 ```bash
 chezmoi init --apply https://github.com/harlanljones/dotfiles.git
 ```
 
-The bootstrap script checks for required tools automatically.
-It verifies that git and age are installed before applying changes.
+The setup scripts check system info automatically, prompt for any missing dependencies or machine choices interactively, and verify age encryption keys.
 For full recovery instructions, see [docs/recovery.md](docs/recovery.md).
 
 ### Daily Workflow
@@ -55,6 +65,7 @@ It wraps common chezmoi commands to simplify daily tasks.
 | `dots push` | Adds modified files, generates a commit message, and pushes to git. |
 | `dots theme` | Lists available color themes or switches the active theme. |
 | `dots doctor` | Runs health checks on tools, encryption keys, and agent skills. |
+| `dots setup` | Runs the interactive system onboarding and setup wizard. |
 | `dots cd` | Opens a shell inside the chezmoi source directory. |
 
 The `dots push` command uses a local Ollama model to write conventional commit messages.

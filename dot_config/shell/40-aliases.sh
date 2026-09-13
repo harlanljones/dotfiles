@@ -8,6 +8,13 @@ if command -v eza >/dev/null 2>&1; then
   alias lsa='ls -a'
   alias lt='eza --tree --level=2 --long --icons --git'
   alias lta='lt -a'
+  alias ll='ls -a'
+  alias la='ls -a'
+  alias l='ls'
+else
+  alias ll='ls -alF'
+  alias la='ls -A'
+  alias l='ls -CF'
 fi
 
 alias ..='cd ..'
@@ -19,7 +26,7 @@ alias codex="codex --approve-for-me"
 alias cx="codex"
 alias cr="codex -m gpt-reserve"
 alias oc="opencode"
-alias cursor="agent"
+command -v agent >/dev/null 2>&1 && alias cursor="agent"
 
 # Git and dotfile workflows.
 alias gs='git status -sb'

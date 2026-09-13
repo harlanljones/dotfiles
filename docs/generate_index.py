@@ -66,6 +66,7 @@ REPO_MATERIAL = (
     ("INDEX.md", "Generated human-readable index (this artifact)"),
     ("README.md", "Human-facing repository overview"),
     ("AGENTS.md", "Authoritative contract for agents working in this repo"),
+    ("setup.sh", "Interactive new machine onboarding & setup wizard"),
     ("docs/", "Recovery guide and repository maintenance scripts"),
     ("Documents/", "Non-config content (Cline workflow docs)"),
     (".github/", "CI workflows"),

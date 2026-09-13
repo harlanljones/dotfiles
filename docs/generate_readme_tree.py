@@ -31,6 +31,7 @@ SKIP = (
     "AGENTS.md",
     "INDEX.md",
     "INDEX.json",
+    "setup.sh",
     "package.json",
     "bun.lock",
     ".github/",

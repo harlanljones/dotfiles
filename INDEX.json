@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 4593,
+    "total": 4594,
     "by_category": {
       "shell": 16,
       "prompt": 1,
@@ -20,7 +20,7 @@
       "other": 36,
       "hooks": 19,
       "chezmoi": 9,
-      "repo": 4377
+      "repo": 4378
     }
   },
   "categories": [
@@ -28283,6 +28283,12 @@
       "kind": "repo",
       "category": "repo",
       "role": "Runtime CLI deps installed outside mise"
+    },
+    {
+      "source": "setup.sh",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Interactive new machine onboarding & setup wizard"
     }
   ]
 }

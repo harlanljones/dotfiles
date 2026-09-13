@@ -39,21 +39,67 @@ for cmd in $optional; do
     fi
 done
 
+{{- if eq .chezmoi.os "darwin" }}
+install_hard_cmd="brew install$missing_hard"
+{{- else if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "ubuntu") }}
+install_hard_cmd="sudo apt-get update && sudo apt-get install -y$missing_hard"
+{{- else }}
+install_hard_cmd="sudo pacman -S --needed$missing_hard"
+{{- end }}
+
+if [ -n "$missing_hard" ]; then
+    if [ -t 0 ] && [ -t 1 ]; then
+        printf "Required dependency missing:%s\n" "$missing_hard"
+        printf "Would you like to install required packages now? [Y/n]: "
+        read -r reply || reply=""
+        case "${reply:-Y}" in
+            [yY]|[yY][eE][sS])
+                if eval "$install_hard_cmd"; then
+                    missing_hard=""
+                    for cmd in git age; do
+                        if ! have "$cmd"; then
+                            missing_hard="$missing_hard $cmd"
+                        fi
+                    done
+                fi
+                ;;
+        esac
+    fi
+fi
+
 if [ -n "$missing_hard" ]; then
     echo "ERROR: required tools not found:$missing_hard" >&2
-    {{- if eq .chezmoi.os "darwin" }}
-    echo "Install with: brew install$missing_hard" >&2
-    {{- else if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "ubuntu") }}
-    echo "Install with: sudo apt-get install -y$missing_hard" >&2
-    {{- else }}
-    echo "Install with: sudo pacman -S --needed$missing_hard" >&2
-    {{- end }}
+    echo "Install with: $install_hard_cmd" >&2
     exit 1
 fi
 
 if [ -n "$missing_opt" ]; then
     echo "NOTE: optional tools not found:$missing_opt"
-    echo "      Some features will be unavailable until installed ($opt_hint)."
+    if [ -t 0 ] && [ -t 1 ]; then
+        printf "Would you like to install optional system packages now? [y/N]: "
+        read -r reply || reply=""
+        case "${reply:-N}" in
+            [yY]|[yY][eE][sS])
+                {{- if eq .chezmoi.os "darwin" }}
+                brew bundle --file=~/.Brewfile || true
+                {{- else if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "ubuntu") }}
+                if [ -r ~/.config/apt/pkglist.txt ]; then
+                    xargs -a ~/.config/apt/pkglist.txt sudo apt-get install -y || true
+                fi
+                {{- else }}
+                if [ -r ~/.config/pacman/pkglist.txt ]; then
+                    sudo pacman -S --needed - < ~/.config/pacman/pkglist.txt || true
+                fi
+                {{- end }}
+                ;;
+            *)
+                echo "      Some features will be unavailable until installed ($opt_hint)."
+                ;;
+        esac
+    else
+        echo "      Some features will be unavailable until installed ($opt_hint)."
+    fi
 fi
 
 echo "verify-deps: OK"
+

@@ -58,4 +58,15 @@ if ! command -v zd >/dev/null 2>&1; then
   command -v tmux     >/dev/null 2>&1 && alias t='tmux attach || tmux new -s Work'
   command -v opencode >/dev/null 2>&1 && alias c='opencode --auto'
   command -v mise     >/dev/null 2>&1 && alias mup='MISE_MINIMUM_RELEASE_AGE=0 mise up'
+  command -v docker   >/dev/null 2>&1 && alias d='docker'
+
+  if ! command -v open >/dev/null 2>&1; then
+    if command -v wslview >/dev/null 2>&1; then
+      alias open='wslview'
+    elif command -v explorer.exe >/dev/null 2>&1; then
+      open() { explorer.exe "${1:-.}"; }
+    elif command -v xdg-open >/dev/null 2>&1; then
+      alias open='xdg-open'
+    fi
+  fi
 fi
