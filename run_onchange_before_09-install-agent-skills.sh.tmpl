@@ -31,9 +31,11 @@ fi
 # Provider-generated builds (impeccable) are restored when missing.
 missing_impeccable_providers=()
 {{- range .agentSkills.impeccableProviders }}
+{{- if or (ne .name "antigravity") (ne $.machine "vespasian") }}
 if [[ ! -f "$skill_home/{{ .skillPath }}" ]]; then
   missing_impeccable_providers+=({{ .name | quote }})
 fi
+{{- end }}
 {{- end }}
 if [[ ${#missing_impeccable_providers[@]} -gt 0 ]]; then
   provider_csv=$(IFS=,; printf '%s' "${missing_impeccable_providers[*]}")
