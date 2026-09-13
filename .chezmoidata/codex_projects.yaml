@@ -1,0 +1,54 @@
+# Codex project trust, rendered into ~/.codex/config.toml by
+# dot_codex/private_config.toml.tmpl. `common` applies to every machine;
+# a leading "~" expands to that machine's home directory.
+#
+# Codex appends [projects."…"] entries to config.toml itself when you trust a
+# new directory. Because that file is a template, `chezmoi re-add` cannot
+# absorb them -- add the path here instead, then `dots sync`.
+codexProjects:
+  common:
+    - "~"
+    - "~/.local/share/chezmoi"
+  augustus:
+    - /home/harlan/dev/arbitrage-rs
+    - /home/harlan/dev/clify
+    - /home/harlan/dev/harlanljones
+    - /home/harlan/dev/herdr-outpost
+    - /home/harlan/dev/concerto-labs
+    - /home/harlan/dev/sabermetrics-in-rust
+    - /home/harlan/dev/saberkit
+    - /home/harlan/dev/baseball-dashboard
+    - /home/harlan/dev/omarchy-agents
+    - /home/harlan/dev/bayes-horizon
+    - /home/harlan/dev/urban-signal
+    - /home/harlan/dev/arbkit
+    - /home/harlan/dev/film-lab
+    - /home/harlan/dev/ferrite-db
+    - /home/harlan/.local/share/chezmoi/dotfiles-showcase
+    - /home/harlan/dev/dotfiles-showcase
+    - /home/harlan/dev/zero-loss
+    - /home/harlan/dev/watchtower
+    - /home/harlan/dev/last-call
+    - /home/harlan/dev/cadence
+    - /home/harlan/dev/harlan-web
+    - /home/harlan/dev/regime-risk
+    - /home/harlan/dev/skipper
+    - /home/harlan/dev/dead-internet
+    - /home/harlan/dev/booking-mesh
+    - /home/harlan/dev/agent-trace
+    - /home/harlan/dev/minddump
+    - /home/harlan/dev/admin-rs
+    - /home/harlan/dev/monad
+    - /home/harlan/dev/second-brain
+    - /home/harlan/dev/herdr-corral
+    - /home/harlan/dev
+    - /home/harlan/dev/bootstrap
+    - /home/harlan/dev/xbsr
+    - /home/harlan/dev/the-tango
+  hadrian: []
+  vespasian:
+    - /home/harlan/the-well
+    - /home/harlan/cadence
+    - /home/harlan/skipper
+    - /home/harlan/second-brain
+    - /mnt/c/Users/harlan/GitHub/last-call

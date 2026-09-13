@@ -1,0 +1,19 @@
+# Vespasian (Ubuntu under WSL) only -- ignored on every other machine.
+#
+# On Augustus pacman owns these CLIs and on Hadrian the Brewfile does. Ubuntu's
+# archive is too old for two of them (neovim 0.9 predates LazyVim's minimum;
+# fzf 0.44 lacks `fzf --bash`, which 20-integrations.sh calls), so mise owns
+# the whole set here rather than splitting it across apt and mise.
+[tools]
+atuin = "latest"
+bat = "latest"
+delta = "latest"
+direnv = "latest"
+eza = "latest"
+fd = "latest"
+fzf = "latest"
+lazygit = "latest"
+neovim = "latest"
+ripgrep = "latest"
+starship = "latest"
+zoxide = "latest"

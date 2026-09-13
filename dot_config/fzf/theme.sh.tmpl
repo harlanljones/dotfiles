@@ -1,0 +1,13 @@
+{{- $name := (index .machines .machine).theme.name -}}
+#!/usr/bin/env bash
+# fzf colors for the {{ (index .themes $name).label }} theme, selected with `dots theme`.
+# Sourced by ~/.config/shell/65-theme.sh. Only the color and line-highlight
+# options are taken from .chezmoitemplates/themes/{{ $name }}/fzf.sh; layout,
+# border and info style stay as 10-tools.sh sets them.
+export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
+{{ range splitList "\n" (include (printf ".chezmoitemplates/themes/%s/fzf.sh" $name)) -}}
+{{ if regexMatch "^\\s*--(color=|highlight-line)" . -}}
+{{ . }}
+{{ end -}}
+{{ end -}}
+"

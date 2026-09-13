@@ -10,13 +10,20 @@ this file and surface the conflict rather than silently overriding it.
 
 A [chezmoi](https://www.chezmoi.io/) source tree that manages the user's shell,
 editor, prompt, terminal, window manager, git config, and AI-agent harness config
-across **two machines** (macOS `hadrian`, Linux/Omarchy `augustus`). Sensitive
-values are stored as [age](https://github.com/FiloSottile/age) encrypted files.
+across **three machines** (macOS `hadrian`, Linux/Omarchy `augustus`, Ubuntu-on-WSL2
+`vespasian`). Sensitive values are stored as [age](https://github.com/FiloSottile/age)
+encrypted files.
 
 - **Source repo:** `~/.local/share/chezmoi` (this directory). Target home dir is `~`.
 - **Apply:** `chezmoi apply` (or the `dots` CLI wrapper). Dry-run: `chezmoi apply --dry-run`.
-- **Machine resolution:** `.chezmoi.toml.tmpl` → `[data] machine` ⟶ `augustus` (hostname
-  `omarchy` or any Linux) / `hadrian` (darwin) / `unknown`.
+- **Machine resolution:** `.chezmoi.toml.tmpl` → `[data] machine`, first match wins:
+  hostname `omarchy` → `augustus`, `MacBookPro` → `hadrian`, `DESKTOP-UTOJEVB` →
+  `vespasian`; then a WSL kernel → `vespasian`, any other Linux → `augustus`,
+  darwin → `hadrian`, else `unknown`.
+- **Vespasian is not Augustus-lite.** It has no `/usr/share/omarchy`, no desktop
+  session and no systemd agent units. Gate Omarchy-only files on
+  `eq .machine "augustus"` (or `osRelease.id == "omarchy"`), never on
+  `eq .chezmoi.os "linux"`.
 
 ## 2. Source-name conventions
 
@@ -58,7 +65,7 @@ ordering guarantee — treat each trigger class separately.
 | 21 | `run_onchange_after_21-setup-omarchy-cline.sh.tmpl` | onchange | Cline usage collector setup |
 | 22 | `run_onchange_after_22-setup-omarchy-cline-usage-scrape.sh.tmpl` | onchange | Cline rate-limit headless scraper |
 | 23 | `run_after_23-sync-agent-skills.sh.tmpl` | every apply | Reconcile shared `~/.agents/skills` into harnesses |
-| 24 | `run_once_after_24-setup-omarchy-agents.sh.tmpl` | once | Local state dirs + user systemd daemon |
+| 24 | `run_once_after_24-setup-omarchy-agents.sh.tmpl` | once (augustus) | Local state dirs + user systemd daemon |
 | 25 | `run_onchange_after_25-sync-omarchy-agents-workspace.sh.tmpl` | onchange | Validate/deploy `omarchy-agents` plugin builds |
 | 26 | `run_onchange_after_26-setup-omarchy-cursor.sh.tmpl` | onchange | Cursor usage collector setup |
 | 27 | `run_onchange_after_27-sync-claude-mcp.sh.tmpl` | onchange | Sync Claude Code MCP config |
@@ -67,6 +74,9 @@ ordering guarantee — treat each trigger class separately.
 | 30 | `run_onchange_after_30-macos-defaults.sh.tmpl` | onchange (darwin) | Declarative `defaults write` preferences |
 | 31 | `run_onchange_after_31-mouse-dpi.sh.tmpl` | onchange | Pin Logitech mice to 400 DPI |
 | 32 | `run_onchange_after_32-setup-omarchy-pi.sh.tmpl` | onchange | Pi (local Ollama) usage collector setup |
+| 40 | `run_onchange_after_40-vespasian-windows-terminal.sh.tmpl` | onchange (vespasian) | Write the Tokyo Night Windows Terminal fragment (scheme + Ubuntu profile update) |
+| 41 | `run_onchange_after_41-vespasian-nerd-font.sh.tmpl` | onchange (vespasian) | Per-user install of the pinned JetBrainsMono Nerd Font on Windows |
+| 42 | `run_onchange_after_42-vespasian-theme-state.sh.tmpl` | onchange (vespasian) | Rebuild bat's theme cache; set Claude Code theme to `dark-ansi`/`light-ansi` per the selected theme |
 
 ## 4. Contents map
 
@@ -89,7 +99,8 @@ The table below is the orienting summary; the index is the detail.
 | `dot_local/bin/executable_statusline.tmpl` | Shared cross-harness CLI statusline renderer (Claude Code + Cursor) → `~/.local/bin/statusline` |
 | `dot_agents/`, `dot_claude/`, `dot_cline/`, `dot_codex/`, `dot_gemini/`, `dot_grok/`, `dot_pi/` | Per-harness config, skills, rules, MCP, hooks |
 | `dot_evotai/` | EVOT LLM provider environment config (`~/.evotai/evot.env`) |
-| `.chezmoidata/` | YAML data sources read by `.tmpl`s (`machines`, `agent_skills`, `omarchy_plugins`, `claude_mcp`, `claude_settings`) |
+| `.chezmoidata/` | YAML data sources read by `.tmpl`s (`machines`, `agent_skills`, `omarchy_plugins`, `claude_mcp`, `claude_settings`, `codex_projects`, `themes`) |
+| `.chezmoitemplates/themes/<name>/` | Verbatim upstream per-tool theme ports (Windows Terminal, lazygit, delta, fzf, eza, bat, Gemini) included by the themed templates; never applied. Select with `dots theme set <name>` (edits `machines.<machine>.theme.name`), never by editing rendered targets |
 | `docs/` | Recovery guide, reorganization proposal, and generator scripts (chezmoi-ignored, git-tracked) |
 | `docs/agents/`, `docs/skill-review/` | Cross-agent tracking guide and candidate-only skill review evidence; never deploy or execute copied workflows as repo automation |
 | `INDEX.json` / `INDEX.md` | **Generated** file index (see above); never hand-edit |
@@ -113,7 +124,9 @@ Each CLI/runtime is owned by exactly one manager. Do not spread a tool across tw
 | mise | `dot_config/mise/config.toml` | bun, chezmoi, claude, codex, copilot, gemini, gh, `github:can1357/oh-my-pi`, go, node, `npm:@xai-official/grok`, `npm:playwright`, opencode, pi, pnpm, python, ruby, terraform, tflint, uv |
 | node/bun (npm) | root `package.json` + `bun.lock` | @magnitudedev/cli, @nanonets/graft, @schpet/linear-cli, cline, freebuff, supabase, wrangler |
 | Homebrew (macOS) | `dot_Brewfile` | brews + casks (Ghostty, JetBrainsMono Nerd Font, …) |
-| pacman / paru (Linux) | `dot_config/pacman/pkglist.txt` + `aurlist.txt` | native + AUR packages |
+| pacman / paru (Augustus) | `dot_config/pacman/pkglist.txt` + `aurlist.txt` | native + AUR packages |
+| mise conf.d (Vespasian) | `dot_config/mise/conf.d/vespasian.toml` | atuin, bat, delta, direnv, eza, fd, fzf, lazygit, neovim, ripgrep, starship, zoxide (pacman/brew own these elsewhere) |
+| apt (Vespasian) | `dot_config/apt/pkglist.txt` | age, build-essential, curl, erlang-nox, jq, postgresql, sqlite3, tailscale, unzip |
 | standalone / scripts | `dot_local/bin/`, `~/.fly/bin` | flyctl (Fly.io CLI installer), evot (outpost integration symlink) |
 
 ## 6. Hard rules for agents
@@ -142,6 +155,14 @@ Each CLI/runtime is owned by exactly one manager. Do not spread a tool across tw
   machine, run `chezmoi re-add ~/.config/nvim/lazy-lock.json` on the box whose
   plugin set is authoritative (Augustus), so an apply cannot roll plugins back
   to those pins. After that first re-add this is an ordinary managed file.
+- **Never manage an agent harness's config as a whole file.** Codex, Gemini
+  and Claude Code rewrite their own settings (model, effort, trust, counters).
+  `~/.codex/config.toml` and `~/.gemini/settings.json` are `modify_` templates
+  that merge a baseline from `.chezmoitemplates/` into the live file;
+  `~/.claude/settings.json` is merged by `run_onchange_after_28` from
+  `claudeSettings` (enforced) and `claudeSettingsDefaults` (seed-only). Put a
+  key the tool changes interactively in the live-owned/defaults layer, never in
+  the enforced baseline, or every `dots push` will commit the last choice.
 - **Shell configuration goes in `dot_config/shell/`, not in the rc files.**
   `dot_bashrc` and `dot_zshrc` are loaders and must stay that way. Each module
   is a `*.sh` file with a shebang so CI shellchecks it, guards on the binary it

@@ -3,123 +3,24 @@ model_reasoning_effort = "high"
 approvals_reviewer = "auto_review"
 plan_mode_reasoning_effort = "max"
 service_tier = "default"
+{{- /* Mac-only: the Codex desktop app's computer-use client. */}}
+{{- if eq .chezmoi.os "darwin" }}
 notify = ["/Users/harlan/.codex/computer-use/Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient", "turn-ended"]
+{{- end }}
 
 [features]
 hooks = true
 prevent_idle_sleep = true
 js_repl = false
 
-[projects."/home/harlan"]
-trust_level = "trusted"
+{{- /* Project trust lives in .chezmoidata/codex_projects.yaml, per machine.
+       Codex appends entries here on its own; move them into that file. */}}
+{{- $projects := concat .codexProjects.common (index .codexProjects .machine | default list) }}
+{{- range $projects }}
 
-[projects."/home/harlan/dev/arbitrage-rs"]
+[projects."{{ if hasPrefix "~" . }}{{ $.chezmoi.homeDir }}{{ trimPrefix "~" . }}{{ else }}{{ . }}{{ end }}"]
 trust_level = "trusted"
-
-[projects."/home/harlan/dev/clify"]
-trust_level = "trusted"
-
-[projects."/home/harlan/.local/share/chezmoi"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/harlanljones"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/herdr-outpost"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/concerto-labs"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/sabermetrics-in-rust"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/saberkit"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/baseball-dashboard"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/omarchy-agents"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/bayes-horizon"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/urban-signal"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/arbkit"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/film-lab"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/ferrite-db"]
-trust_level = "trusted"
-
-[projects."/home/harlan/.local/share/chezmoi/dotfiles-showcase"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/dotfiles-showcase"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/zero-loss"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/watchtower"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/last-call"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/cadence"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/harlan-web"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/regime-risk"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/skipper"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/dead-internet"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/booking-mesh"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/agent-trace"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/minddump"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/admin-rs"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/monad"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/second-brain"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/herdr-corral"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/bootstrap"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/xbsr"]
-trust_level = "trusted"
-
-[projects."/home/harlan/dev/the-tango"]
-trust_level = "trusted"
+{{- end }}
 
 [hooks.state]
 
@@ -216,6 +117,9 @@ command = "/home/harlan/.local/bin/codebase-memory-mcp"
 command = "npx"
 args = ["-y", "chrome-devtools-mcp@latest"]
 
+{{- /* Mac-only: MCP servers bundled inside ChatGPT.app. */}}
+{{- if eq .chezmoi.os "darwin" }}
+
 [mcp_servers.node_repl]
 args = []
 command = "/Applications/ChatGPT.app/Contents/Resources/cua_node/bin/node_repl"
@@ -237,9 +141,11 @@ BROWSER_USE_CODEX_APP_VERSION = "26.825.51511"
 NODE_REPL_TRUSTED_SERVICES = '{"browser":"/Users/harlan/.codex/plugins/cache/openai-bundled/browser/26.825.51511/scripts/browser-service.mjs","sky":"@oai/sky/service"}'
 SKY_CUA_SERVICE_PATH = "/Users/harlan/.codex/computer-use/Codex Computer Use.app"
 CODEX_CLI_PATH = "/Applications/ChatGPT.app/Contents/Resources/codex"
+{{- end }}
 
 [mcp_servers.openaiDeveloperDocs]
 url = "https://developers.openai.com/mcp"
+{{- if eq .chezmoi.os "darwin" }}
 
 [mcp_servers.computer-use]
 command = "./Codex Computer Use.app/Contents/SharedSupport/SkyComputerUseClient.app/Contents/MacOS/SkyComputerUseClient"
@@ -254,6 +160,7 @@ enabled = false
 [marketplaces.openai-bundled]
 source_type = "local"
 source = "/Users/harlan/.codex/.tmp/bundled-marketplaces/openai-bundled"
+{{- end }}
 
 [marketplaces.claude-plugins-official]
 source_type = "git"
@@ -267,6 +174,8 @@ source = "https://github.com/pbakaus/impeccable.git"
 source_type = "local"
 source = "/home/harlan/.cache/codex-runtimes/codex-primary-runtime/plugins/openai-primary-runtime"
 
+{{- if eq .chezmoi.os "darwin" }}
+
 [plugins."codex-app-tools@openai-bundled"]
 enabled = true
 
@@ -278,6 +187,7 @@ enabled = true
 
 [plugins."visualize@openai-bundled"]
 enabled = true
+{{- end }}
 
 [plugins."chrome-devtools-mcp@claude-plugins-official"]
 enabled = true
@@ -321,11 +231,14 @@ enabled = true
 [plugins."template-creator@openai-primary-runtime"]
 enabled = true
 
+{{- if eq .chezmoi.os "darwin" }}
+
 [plugins."chrome@openai-bundled"]
 enabled = true
 
 [plugins."computer-use@openai-bundled"]
 enabled = true
+{{- end }}
 
 [desktop]
 external-agent-import-sync-enabled = true

@@ -86,6 +86,17 @@ Then install system packages:
 - **macOS**: `brew bundle --file=~/.Brewfile`
 - **Linux**: `pacman -S --needed - < ~/.config/pacman/pkglist.txt` then AUR
   entries via paru/yay: `paru -S --needed - < ~/.config/pacman/aurlist.txt`
+- **Ubuntu on WSL (Vespasian)**: `age` must exist *before* the first apply
+  (the dependency gate stops otherwise), so the order is:
+  1. `sudo apt-get install -y age`, and install chezmoi (`mise use -g chezmoi`)
+  2. `chezmoi init --apply https://github.com/harlanljones/dotfiles.git`
+  3. `xargs -a ~/.config/apt/pkglist.txt sudo apt-get install -y` (tailscale
+     needs its apt repository configured first), then `mise install`
+  4. `chezmoi apply` again, so templates guarded on `lookPath` (delta) and the
+     bat theme cache see the newly installed tools
+  5. Restart Windows Terminal to load the Tokyo Night fragment and Nerd Font.
+     Move installer-appended lines from `~/.bashrc` into
+     `~/.config/shell/99-local.sh`.
 
 Finally review what the apply produced:
 

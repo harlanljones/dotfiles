@@ -3,23 +3,23 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 4594,
+    "total": 4643,
     "by_category": {
-      "shell": 14,
+      "shell": 16,
       "prompt": 1,
       "terminal": 4,
-      "editor": 12,
+      "editor": 17,
       "desktop": 58,
       "vcs": 4,
       "navigation": 3,
-      "toolchain": 4,
+      "toolchain": 5,
       "agents": 41,
       "services": 17,
       "scripts": 32,
       "security": 2,
-      "other": 1,
-      "hooks": 16,
-      "chezmoi": 7,
+      "other": 37,
+      "hooks": 19,
+      "chezmoi": 9,
       "repo": 4378
     }
   },
@@ -123,6 +123,14 @@
       "subsystem": "shared shell modules"
     },
     {
+      "source": "dot_config/shell/15-base-bash.sh",
+      "target": "~/.config/shell/15-base-bash.sh",
+      "kind": "dotfile",
+      "category": "shell",
+      "attributes": [],
+      "subsystem": "shared shell modules"
+    },
+    {
       "source": "dot_config/shell/20-integrations.sh",
       "target": "~/.config/shell/20-integrations.sh",
       "kind": "dotfile",
@@ -173,6 +181,14 @@
     {
       "source": "dot_config/shell/60-prompt.sh",
       "target": "~/.config/shell/60-prompt.sh",
+      "kind": "dotfile",
+      "category": "shell",
+      "attributes": [],
+      "subsystem": "shared shell modules"
+    },
+    {
+      "source": "dot_config/shell/65-theme.sh",
+      "target": "~/.config/shell/65-theme.sh",
       "kind": "dotfile",
       "category": "shell",
       "attributes": [],
@@ -251,6 +267,14 @@
       "subsystem": "herdr multiplexer"
     },
     {
+      "source": "dot_config/nvim/init.lua",
+      "target": "~/.config/nvim/init.lua",
+      "kind": "dotfile",
+      "category": "editor",
+      "attributes": [],
+      "subsystem": "neovim / LazyVim"
+    },
+    {
       "source": "dot_config/nvim/lazy-lock.json",
       "target": "~/.config/nvim/lazy-lock.json",
       "kind": "dotfile",
@@ -267,8 +291,32 @@
       "subsystem": "neovim / LazyVim"
     },
     {
+      "source": "dot_config/nvim/lua/config/autocmds.lua",
+      "target": "~/.config/nvim/lua/config/autocmds.lua",
+      "kind": "dotfile",
+      "category": "editor",
+      "attributes": [],
+      "subsystem": "neovim / LazyVim"
+    },
+    {
       "source": "dot_config/nvim/lua/config/keymaps.lua",
       "target": "~/.config/nvim/lua/config/keymaps.lua",
+      "kind": "dotfile",
+      "category": "editor",
+      "attributes": [],
+      "subsystem": "neovim / LazyVim"
+    },
+    {
+      "source": "dot_config/nvim/lua/config/lazy.lua",
+      "target": "~/.config/nvim/lua/config/lazy.lua",
+      "kind": "dotfile",
+      "category": "editor",
+      "attributes": [],
+      "subsystem": "neovim / LazyVim"
+    },
+    {
+      "source": "dot_config/nvim/lua/config/options.lua",
+      "target": "~/.config/nvim/lua/config/options.lua",
       "kind": "dotfile",
       "category": "editor",
       "attributes": [],
@@ -330,6 +378,16 @@
       "kind": "dotfile",
       "category": "editor",
       "attributes": [],
+      "subsystem": "neovim / LazyVim"
+    },
+    {
+      "source": "dot_config/nvim/lua/plugins/theme.lua.tmpl",
+      "target": "~/.config/nvim/lua/plugins/theme.lua",
+      "kind": "dotfile",
+      "category": "editor",
+      "attributes": [
+        "template"
+      ],
       "subsystem": "neovim / LazyVim"
     },
     {
@@ -889,6 +947,14 @@
       "subsystem": "homebrew"
     },
     {
+      "source": "dot_config/mise/conf.d/vespasian.toml",
+      "target": "~/.config/mise/conf.d/vespasian.toml",
+      "kind": "dotfile",
+      "category": "toolchain",
+      "attributes": [],
+      "subsystem": "mise"
+    },
+    {
       "source": "dot_config/mise/config.toml",
       "target": "~/.config/mise/config.toml",
       "kind": "dotfile",
@@ -959,18 +1025,19 @@
       "subsystem": "codex"
     },
     {
-      "source": "dot_codex/private_AGENTS.md",
-      "target": "~/.codex/AGENTS.md",
+      "source": "dot_codex/modify_private_config.toml",
+      "target": "~/.codex/config.toml",
       "kind": "dotfile",
       "category": "agents",
       "attributes": [
+        "modify",
         "private"
       ],
       "subsystem": "codex"
     },
     {
-      "source": "dot_codex/private_config.toml",
-      "target": "~/.codex/config.toml",
+      "source": "dot_codex/private_AGENTS.md",
+      "target": "~/.codex/AGENTS.md",
       "kind": "dotfile",
       "category": "agents",
       "attributes": [
@@ -1197,11 +1264,13 @@
       "subsystem": "gemini"
     },
     {
-      "source": "dot_gemini/config/mcp_config.json",
+      "source": "dot_gemini/config/empty_mcp_config.json",
       "target": "~/.gemini/config/mcp_config.json",
       "kind": "dotfile",
       "category": "agents",
-      "attributes": [],
+      "attributes": [
+        "empty"
+      ],
       "subsystem": "gemini"
     },
     {
@@ -1215,18 +1284,19 @@
       "subsystem": "gemini"
     },
     {
-      "source": "dot_gemini/private_GEMINI.md",
-      "target": "~/.gemini/GEMINI.md",
+      "source": "dot_gemini/modify_private_settings.json",
+      "target": "~/.gemini/settings.json",
       "kind": "dotfile",
       "category": "agents",
       "attributes": [
+        "modify",
         "private"
       ],
       "subsystem": "gemini"
     },
     {
-      "source": "dot_gemini/private_settings.json",
-      "target": "~/.gemini/settings.json",
+      "source": "dot_gemini/private_GEMINI.md",
+      "target": "~/.gemini/GEMINI.md",
       "kind": "dotfile",
       "category": "agents",
       "attributes": [
@@ -1778,11 +1848,271 @@
       "subsystem": "ssh"
     },
     {
+      "source": ".chezmoitemplates/codex-config.toml",
+      "target": "~/.chezmoitemplates/codex-config.toml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/gemini-settings.json",
+      "target": "~/.chezmoitemplates/gemini-settings.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-day/bat.tmTheme",
+      "target": "~/.chezmoitemplates/themes/tokyonight-day/bat.tmTheme",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-day/delta.gitconfig",
+      "target": "~/.chezmoitemplates/themes/tokyonight-day/delta.gitconfig",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-day/eza.yml",
+      "target": "~/.chezmoitemplates/themes/tokyonight-day/eza.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-day/fzf.sh",
+      "target": "~/.chezmoitemplates/themes/tokyonight-day/fzf.sh",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-day/gemini.json",
+      "target": "~/.chezmoitemplates/themes/tokyonight-day/gemini.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-day/lazygit.yml",
+      "target": "~/.chezmoitemplates/themes/tokyonight-day/lazygit.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-day/windows_terminal.json",
+      "target": "~/.chezmoitemplates/themes/tokyonight-day/windows_terminal.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-moon/bat.tmTheme",
+      "target": "~/.chezmoitemplates/themes/tokyonight-moon/bat.tmTheme",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-moon/delta.gitconfig",
+      "target": "~/.chezmoitemplates/themes/tokyonight-moon/delta.gitconfig",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-moon/eza.yml",
+      "target": "~/.chezmoitemplates/themes/tokyonight-moon/eza.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-moon/fzf.sh",
+      "target": "~/.chezmoitemplates/themes/tokyonight-moon/fzf.sh",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-moon/gemini.json",
+      "target": "~/.chezmoitemplates/themes/tokyonight-moon/gemini.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-moon/lazygit.yml",
+      "target": "~/.chezmoitemplates/themes/tokyonight-moon/lazygit.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-moon/windows_terminal.json",
+      "target": "~/.chezmoitemplates/themes/tokyonight-moon/windows_terminal.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-night/bat.tmTheme",
+      "target": "~/.chezmoitemplates/themes/tokyonight-night/bat.tmTheme",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-night/delta.gitconfig",
+      "target": "~/.chezmoitemplates/themes/tokyonight-night/delta.gitconfig",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-night/eza.yml",
+      "target": "~/.chezmoitemplates/themes/tokyonight-night/eza.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-night/fzf.sh",
+      "target": "~/.chezmoitemplates/themes/tokyonight-night/fzf.sh",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-night/gemini.json",
+      "target": "~/.chezmoitemplates/themes/tokyonight-night/gemini.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-night/lazygit.yml",
+      "target": "~/.chezmoitemplates/themes/tokyonight-night/lazygit.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-night/windows_terminal.json",
+      "target": "~/.chezmoitemplates/themes/tokyonight-night/windows_terminal.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-storm/bat.tmTheme",
+      "target": "~/.chezmoitemplates/themes/tokyonight-storm/bat.tmTheme",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-storm/delta.gitconfig",
+      "target": "~/.chezmoitemplates/themes/tokyonight-storm/delta.gitconfig",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-storm/eza.yml",
+      "target": "~/.chezmoitemplates/themes/tokyonight-storm/eza.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-storm/fzf.sh",
+      "target": "~/.chezmoitemplates/themes/tokyonight-storm/fzf.sh",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-storm/gemini.json",
+      "target": "~/.chezmoitemplates/themes/tokyonight-storm/gemini.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-storm/lazygit.yml",
+      "target": "~/.chezmoitemplates/themes/tokyonight-storm/lazygit.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/tokyonight-storm/windows_terminal.json",
+      "target": "~/.chezmoitemplates/themes/tokyonight-storm/windows_terminal.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
       "source": "PR_DESCRIPTION.md",
       "target": "~/PR_DESCRIPTION.md",
       "kind": "dotfile",
       "category": "other",
       "attributes": []
+    },
+    {
+      "source": "dot_config/apt/pkglist.txt",
+      "target": "~/.config/apt/pkglist.txt",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "dot_config/bat/config",
+      "target": "~/.config/bat/config",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "dot_config/bat/themes/dots.tmTheme.tmpl",
+      "target": "~/.config/bat/themes/dots.tmTheme",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": [
+        "template"
+      ]
+    },
+    {
+      "source": "dot_config/delta/theme.gitconfig.tmpl",
+      "target": "~/.config/delta/theme.gitconfig",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": [
+        "template"
+      ]
+    },
+    {
+      "source": "dot_config/eza/theme.yml.tmpl",
+      "target": "~/.config/eza/theme.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": [
+        "template"
+      ]
+    },
+    {
+      "source": "dot_config/fzf/theme.sh.tmpl",
+      "target": "~/.config/fzf/theme.sh",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": [
+        "template"
+      ]
     },
     {
       "source": "run_after_23-sync-agent-skills.sh.tmpl",
@@ -1980,6 +2310,45 @@
       }
     },
     {
+      "source": "run_onchange_after_40-vespasian-windows-terminal.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 40,
+        "name": "vespasian-windows-terminal",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_after_41-vespasian-nerd-font.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 41,
+        "name": "vespasian-nerd-font",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_after_42-vespasian-theme-state.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 42,
+        "name": "vespasian-theme-state",
+        "template": true
+      }
+    },
+    {
       "source": "run_onchange_before_09-install-agent-skills.sh.tmpl",
       "kind": "hook",
       "category": "hooks",
@@ -2017,6 +2386,12 @@
       "role": "Controls how chezmoi renders and applies this tree"
     },
     {
+      "source": ".chezmoidata/codex_projects.yaml",
+      "kind": "chezmoi",
+      "category": "chezmoi",
+      "role": "Controls how chezmoi renders and applies this tree"
+    },
+    {
       "source": ".chezmoidata/machines.yaml",
       "kind": "chezmoi",
       "category": "chezmoi",
@@ -2024,6 +2399,12 @@
     },
     {
       "source": ".chezmoidata/omarchy_plugins.yaml",
+      "kind": "chezmoi",
+      "category": "chezmoi",
+      "role": "Controls how chezmoi renders and applies this tree"
+    },
+    {
+      "source": ".chezmoidata/themes.yaml",
       "kind": "chezmoi",
       "category": "chezmoi",
       "role": "Controls how chezmoi renders and applies this tree"

@@ -3,17 +3,24 @@
 # while preserving runtime/dynamic fields (autoMode, push notifications, etc.).
 # Idempotent: exits early when managed keys are already in sync.
 #
+# Two layers from .chezmoidata/claude_settings.yaml:
+#   claudeSettings          enforced -- overrides the live value on every sync
+#   claudeSettingsDefaults  seeds -- only fills keys the live file lacks, so a
+#                           /model or /effort change made in Claude Code sticks
+#
 # chezmoi data hash: {{ .claudeSettings | toJson | sha256sum }}
+# chezmoi defaults hash: {{ .claudeSettingsDefaults | toJson | sha256sum }}
 
 set -euo pipefail
 
 SETTINGS_FILE="${HOME}/.claude/settings.json"
 BASELINE='{{ .claudeSettings | toJson }}'
+DEFAULTS='{{ .claudeSettingsDefaults | toJson }}'
 
 mkdir -p "$(dirname "$SETTINGS_FILE")"
 
 if [[ ! -f "$SETTINGS_FILE" ]]; then
-  printf '%s\n' "$BASELINE" | jq . > "$SETTINGS_FILE"
+  jq -s '.[0] * .[1]' <(printf '%s' "$DEFAULTS") <(printf '%s' "$BASELINE") > "$SETTINGS_FILE"
   chmod 600 "$SETTINGS_FILE"
   echo "created $SETTINGS_FILE from baseline"
   exit 0
@@ -24,9 +31,9 @@ if ! jq -e . "$SETTINGS_FILE" >/dev/null 2>&1; then
   exit 1
 fi
 
-# Merge live settings with baseline; baseline keys override baseline fields,
-# while dynamic fields (autoMode, agentPushNotifEnabled, etc.) are preserved.
-merged=$(jq -s '.[0] * .[1]' "$SETTINGS_FILE" <(printf '%s' "$BASELINE"))
+# defaults < live < baseline: seeds lose to anything already set, enforced keys
+# win, and dynamic fields (autoMode, agentPushNotifEnabled, etc.) are preserved.
+merged=$(jq -s '.[0] * .[1] * .[2]' <(printf '%s' "$DEFAULTS") "$SETTINGS_FILE" <(printf '%s' "$BASELINE"))
 
 # Check if merged result is already what's on disk
 if [[ "$(jq -S . "$SETTINGS_FILE")" == "$(printf '%s' "$merged" | jq -S .)" ]]; then

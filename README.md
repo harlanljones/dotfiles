@@ -25,12 +25,20 @@ verified example exceptions live in `.gitleaks.toml` and are regression-tested;
 
 ## 🖥️ Machines
 
-This repository identifies each workstation by a canonical **machine name** resolved at apply time (see `.chezmoi.toml.tmpl` → `[data] machine`). Detection is hostname-first with an OS fallback, so a box is identified deterministically without renaming the system. Both machines are now pinned by hostname; the OS fallback only catches an unregistered box:
+This repository identifies each workstation by a canonical **machine name** resolved at apply time (see `.chezmoi.toml.tmpl` → `[data] machine`). Detection is hostname-first with an OS fallback, so a box is identified deterministically without renaming the system. All three machines are pinned by hostname; a WSL kernel (`microsoft` in the kernel release) falls back to Vespasian, and the OS fallback only catches an unregistered box:
 
 | Machine | OS | System hostname |
 | --- | --- | --- |
 | **Augustus** | Linux (Omarchy / Arch) | `omarchy` |
 | **Hadrian** | macOS (M1 Pro) | `MacBookPro` |
+| **Vespasian** | Ubuntu 24.04 on WSL2 (Windows gaming/dev PC) | `DESKTOP-UTOJEVB` |
+
+**Vespasian** has no Omarchy base layer and no Linux desktop, so it differs from Augustus in a few deliberate ways:
+
+- **Shell:** `.bashrc` sources Omarchy's base rc only when it exists; `~/.config/shell/15-base-bash.sh` supplies history, completion, `mise activate bash` and `starship init bash` instead. Every other shell module (aliases, agents, prompt, navigation) is shared unchanged.
+- **Tools:** the CLIs pacman/brew own elsewhere come from mise via `~/.config/mise/conf.d/vespasian.toml`; system packages are listed in `~/.config/apt/pkglist.txt`.
+- **Theme:** Tokyo Night (night) everywhere, taken from `folke/tokyonight.nvim` extras. Windows Terminal gets a color scheme and Ubuntu-profile update through an additive fragment (`run_onchange_after_40-vespasian-windows-terminal.sh.tmpl`; `settings.json` is never edited), JetBrainsMono Nerd Font is installed per-user (`41`), and Neovim, lazygit, delta, bat, eza, fzf, Gemini CLI and Claude Code (`dark-ansi`, `42`) are themed to match. Starship, opencode and Codex draw with terminal colors, so they follow the scheme. Switch with `dots theme set <name>` (`dots theme` lists Tokyo Night night/storm/moon/day); themes are registered in `.chezmoidata/themes.yaml` with their per-tool ports under `.chezmoitemplates/themes/`.
+- **Gated off:** Hyprland, Ghostty, Omarchy systemd units, 1Password agent config, mouse DPI and the Omarchy agent daemons (`.chezmoiignore.tmpl`).
 
 The registry (display name, role, backstory, per-machine theme) lives in `.chezmoidata/machines.yaml` and is referenced from templates via `{{ index .machines .machine ... }}`. The resolved name is surfaced in the Starship prompt (SSH sessions) and exported as `MACHINE_NAME` via `environment.d` on Linux.
 
@@ -253,9 +261,47 @@ Declarative tracking for system-level packages that mise does not manage:
 │   ├── agent_skills.yaml
 │   ├── claude_mcp.yaml
 │   ├── claude_settings.yaml
+│   ├── codex_projects.yaml
 │   ├── machines.yaml
-│   └── omarchy_plugins.yaml
+│   ├── omarchy_plugins.yaml
+│   └── themes.yaml
 ├── .chezmoiignore.tmpl
+├── .chezmoitemplates
+│   ├── codex-config.toml
+│   ├── gemini-settings.json
+│   └── themes
+│       ├── tokyonight-day
+│       │   ├── bat.tmTheme
+│       │   ├── delta.gitconfig
+│       │   ├── eza.yml
+│       │   ├── fzf.sh
+│       │   ├── gemini.json
+│       │   ├── lazygit.yml
+│       │   └── windows_terminal.json
+│       ├── tokyonight-moon
+│       │   ├── bat.tmTheme
+│       │   ├── delta.gitconfig
+│       │   ├── eza.yml
+│       │   ├── fzf.sh
+│       │   ├── gemini.json
+│       │   ├── lazygit.yml
+│       │   └── windows_terminal.json
+│       ├── tokyonight-night
+│       │   ├── bat.tmTheme
+│       │   ├── delta.gitconfig
+│       │   ├── eza.yml
+│       │   ├── fzf.sh
+│       │   ├── gemini.json
+│       │   ├── lazygit.yml
+│       │   └── windows_terminal.json
+│       └── tokyonight-storm
+│           ├── bat.tmTheme
+│           ├── delta.gitconfig
+│           ├── eza.yml
+│           ├── fzf.sh
+│           ├── gemini.json
+│           ├── lazygit.yml
+│           └── windows_terminal.json
 ├── PR_DESCRIPTION.md
 ├── dot_Brewfile
 ├── dot_agents
@@ -274,8 +320,8 @@ Declarative tracking for system-level packages that mise does not manage:
 │       └── symlink_project-doc-planner
 ├── dot_codex
 │   ├── hooks.json
+│   ├── modify_private_config.toml
 │   ├── private_AGENTS.md
-│   ├── private_config.toml
 │   ├── rules
 │   │   └── default.rules
 │   └── skills
@@ -302,14 +348,26 @@ Declarative tracking for system-level packages that mise does not manage:
 │   ├── 1password
 │   │   └── ssh
 │   │       └── agent.toml
+│   ├── apt
+│   │   └── pkglist.txt
 │   ├── atuin
 │   │   └── config.toml
+│   ├── bat
+│   │   ├── config
+│   │   └── themes
+│   │       └── dots.tmTheme.tmpl
 │   ├── btop
 │   │   └── btop.conf
 │   ├── chrome-flags.conf
+│   ├── delta
+│   │   └── theme.gitconfig.tmpl
 │   ├── environment.d
 │   │   ├── 10-defaults.conf
 │   │   └── 10-machine.conf.tmpl
+│   ├── eza
+│   │   └── theme.yml.tmpl
+│   ├── fzf
+│   │   └── theme.sh.tmpl
 │   ├── gh
 │   │   └── config.yml
 │   ├── ghostty
@@ -330,13 +388,19 @@ Declarative tracking for system-level packages that mise does not manage:
 │   ├── lazygit
 │   │   └── config.yml.tmpl
 │   ├── mise
+│   │   ├── conf.d
+│   │   │   └── vespasian.toml
 │   │   └── config.toml
 │   ├── nvim
+│   │   ├── init.lua
 │   │   ├── lazy-lock.json
 │   │   ├── lazyvim.json
 │   │   └── lua
 │   │       ├── config
-│   │       │   └── keymaps.lua
+│   │       │   ├── autocmds.lua
+│   │       │   ├── keymaps.lua
+│   │       │   ├── lazy.lua
+│   │       │   └── options.lua
 │   │       └── plugins
 │   │           ├── blink-cmp.lua
 │   │           ├── copilot-lualine.lua
@@ -345,6 +409,7 @@ Declarative tracking for system-level packages that mise does not manage:
 │   │           ├── example.lua
 │   │           ├── faster-smear-cursor.lua
 │   │           ├── mini-animate-disable-cursor.lua
+│   │           ├── theme.lua.tmpl
 │   │           └── vim-be-good.lua
 │   ├── omarchy
 │   │   ├── create_private_shell.json.tmpl
@@ -432,6 +497,7 @@ Declarative tracking for system-level packages that mise does not manage:
 │   ├── shell
 │   │   ├── 00-env.sh
 │   │   ├── 10-tools.sh
+│   │   ├── 15-base-bash.sh
 │   │   ├── 20-integrations.sh
 │   │   ├── 30-navigation.sh
 │   │   ├── 40-aliases.sh
@@ -439,6 +505,7 @@ Declarative tracking for system-level packages that mise does not manage:
 │   │   ├── 50-agents.sh
 │   │   ├── 55-apps.sh
 │   │   ├── 60-prompt.sh
+│   │   ├── 65-theme.sh
 │   │   ├── 70-cloud.sh
 │   │   └── README.md
 │   ├── starship.toml.tmpl
@@ -469,11 +536,11 @@ Declarative tracking for system-level packages that mise does not manage:
 │   │   ├── private_codebase-memory-scout.md
 │   │   └── private_codebase-memory.md
 │   ├── config
-│   │   ├── mcp_config.json
+│   │   ├── empty_mcp_config.json
 │   │   └── skills
 │   │       └── symlink_project-doc-planner
+│   ├── modify_private_settings.json
 │   ├── private_GEMINI.md
-│   ├── private_settings.json
 │   └── skills
 │       └── symlink_project-doc-planner
 ├── dot_grok
@@ -542,6 +609,9 @@ Declarative tracking for system-level packages that mise does not manage:
 ├── run_onchange_after_30-macos-defaults.sh.tmpl
 ├── run_onchange_after_31-mouse-dpi.sh.tmpl
 ├── run_onchange_after_32-setup-omarchy-pi.sh.tmpl
+├── run_onchange_after_40-vespasian-windows-terminal.sh.tmpl
+├── run_onchange_after_41-vespasian-nerd-font.sh.tmpl
+├── run_onchange_after_42-vespasian-theme-state.sh.tmpl
 └── run_onchange_before_09-install-agent-skills.sh.tmpl
 ```
 <!-- END REPO TREE -->
@@ -604,6 +674,7 @@ dots push         # Stage, commit with Ollama-generated message, push
 Templates use `.chezmoiignore.tmpl` to ensure only platform-relevant configurations are applied:
 - **macOS (`darwin`)**: Installs `.zshrc`, Starship, Mise, Neovim, Lazygit configs, git config, Ghostty, SSH config, 1Password SSH agent config, GitHub CLI config, macOS defaults script, and the Homebrew `Brewfile`.
 - **Linux (`omarchy`)**: Installs `.bashrc`, Hyprland, Herdr, Omarchy agent integrations, systemd user services/timers + environment.d, pacman package manifests, btop, and usage collectors/scrapers.
+- **Ubuntu on WSL2 (`vespasian`)**: Installs `.bashrc` (with the `15-base-bash.sh` base layer in place of Omarchy's rc), the shared shell modules, Starship, git, lazygit, Neovim (plus a LazyVim bootstrap), agent harness configs, environment.d, the apt manifest and mise `conf.d` tools, and the Tokyo Night theme set (Windows Terminal fragment, Nerd Font, bat/eza/delta/fzf). No Hyprland, Ghostty, systemd agent units, or pacman manifests.
 
 ---
 

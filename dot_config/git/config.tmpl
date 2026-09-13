@@ -4,6 +4,15 @@
 {{- else -}}
 {{-   $gh = "/usr/bin/gh" -}}
 {{- end -}}
+{{- /* Fall back to PATH only when the package-manager location is absent
+       (Vespasian: gh comes from mise or ~/.local/bin), so the rendered file
+       stays unchanged on Augustus and Hadrian. */ -}}
+{{- if not (stat $gh) -}}
+{{-   $found := lookPath "gh" -}}
+{{-   if $found -}}
+{{-     $gh = $found -}}
+{{-   end -}}
+{{- end -}}
 # See https://git-scm.com/docs/git-config
 
 [alias]
@@ -64,5 +73,9 @@
 	navigate = true
 [merge]
 	conflictstyle = zdiff3
+{{- if eq .machine "vespasian" }}
+[include]
+	path = ~/.config/delta/theme.gitconfig
+{{- end }}
 {{- end }}
 

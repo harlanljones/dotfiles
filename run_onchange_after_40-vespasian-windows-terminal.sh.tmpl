@@ -1,0 +1,49 @@
+{{- /* hasKey: CI's shellcheck job renders scripts without a chezmoi config. */ -}}
+{{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
+{{- $wt := (index .machines "vespasian").windowsTerminal -}}
+{{- $name := (index .machines "vespasian").theme.name -}}
+{{- /* Upstream WT ports start with `#` comment lines; strip them before parsing. */ -}}
+{{- $scheme := regexReplaceAll "(?m)^#.*$" (include (printf ".chezmoitemplates/themes/%s/windows_terminal.json" $name)) "" | fromJson -}}
+#!/usr/bin/env bash
+# Theme the Ubuntu profile in Windows Terminal with the `dots theme` selection
+# ({{ (index .themes $name).label }}).
+#
+# Writes one additive JSON fragment under %LOCALAPPDATA%\Microsoft\Windows
+# Terminal\Fragments\dots. Fragments can add color schemes and update existing
+# profiles by guid, so the user's settings.json is never touched. Delete the
+# fragment and restart Windows Terminal to undo. Scheme values come from
+# .chezmoitemplates/themes/{{ $name }}/windows_terminal.json.
+
+set -euo pipefail
+
+if ! command -v cmd.exe >/dev/null 2>&1 || ! command -v wslpath >/dev/null 2>&1; then
+  echo "windows-terminal: not running under WSL, skipping"
+  exit 0
+fi
+
+# cmd.exe warns about UNC working directories; start it from a Windows path.
+win_localappdata="$(cd /mnt/c && cmd.exe /d /c 'echo %LOCALAPPDATA%' 2>/dev/null | tr -d '\r')"
+fragment_dir="$(wslpath "$win_localappdata")/Microsoft/Windows Terminal/Fragments/dots"
+mkdir -p "$fragment_dir"
+
+cat >"$fragment_dir/vespasian.json" <<'EOF'
+{
+  "$help": "Managed by chezmoi (harlanljones/dotfiles, machine vespasian). Edits here are overwritten.",
+  "schemes": [ {{ $scheme | toJson }} ],
+  "profiles": [
+    {
+      "updates": "{{ $wt.profileGuid }}",
+      "colorScheme": {{ $scheme.name | toJson }},
+      "font": { "face": "{{ $wt.fontFace }}", "size": {{ $wt.fontSize }} },
+      "padding": "12, 8",
+      "cursorShape": "bar",
+      "opacity": 96,
+      "useAcrylic": true,
+      "intenseTextStyle": "bright"
+    }
+  ]
+}
+EOF
+
+echo "windows-terminal: wrote $fragment_dir/vespasian.json (restart Windows Terminal to load it)"
+{{- end -}}

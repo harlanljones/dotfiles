@@ -12,7 +12,12 @@ if [[ -f /etc/omarchy.conf ]]; then
 else
   export OMARCHY_PATH=/usr/share/omarchy
 fi
-source "$OMARCHY_PATH/default/bash/rc"
+# Guarded so Linux boxes without Omarchy (Vespasian, WSL) still get a working
+# shell; ~/.config/shell/15-base-bash.sh supplies the base layer there.
+if [[ -r "$OMARCHY_PATH/default/bash/rc" ]]; then
+  source "$OMARCHY_PATH/default/bash/rc"
+  OMARCHY_BASE_LOADED=1
+fi
 
 # Everything personal lives in ~/.config/shell/*.sh, shared with zsh and
 # sourced in numeric order. See that directory's README for what goes where.

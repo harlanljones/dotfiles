@@ -12,6 +12,9 @@ identity = "~/.config/chezmoi/key.txt"
 recipient = "age1hf4200nhdqg0l3xs68v4gef6mn0nuvmh72573m3nfj8kqpcs7pnsmfkuw6"
 
 {{/* Machine identity. Hostname-first so a box is pinned deterministically,
-     with an OS fallback for a machine that has not been registered yet. */ -}}
+     with an OS fallback for a machine that has not been registered yet.
+     WSL is checked before the generic Linux fallback: a WSL kernel reports
+     "microsoft" in its osrelease, and treating it as Augustus would source
+     Omarchy's missing base rc and land Hyprland/systemd config on Windows. */ -}}
 [data]
-machine = '{{ if eq .chezmoi.hostname "omarchy" }}augustus{{ else if eq .chezmoi.hostname "MacBookPro" }}hadrian{{ else if eq .chezmoi.os "linux" }}augustus{{ else if eq .chezmoi.os "darwin" }}hadrian{{ else }}unknown{{ end }}'
+machine = '{{ if eq .chezmoi.hostname "omarchy" }}augustus{{ else if eq .chezmoi.hostname "MacBookPro" }}hadrian{{ else if eq .chezmoi.hostname "DESKTOP-UTOJEVB" }}vespasian{{ else if and (eq .chezmoi.os "linux") (contains "microsoft" (lower .chezmoi.kernel.osrelease)) }}vespasian{{ else if eq .chezmoi.os "linux" }}augustus{{ else if eq .chezmoi.os "darwin" }}hadrian{{ else }}unknown{{ end }}'
