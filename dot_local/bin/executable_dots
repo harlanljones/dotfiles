@@ -623,6 +623,41 @@ cmd_doctor() {
     fi
   fi
 
+  # 3b. SSH Agent & Git Commit Signing
+  local ssh_sock="${SSH_AUTH_SOCK:-${HOME}/.1password/agent.sock}"
+  if [[ ! -S "$ssh_sock" ]] || ! SSH_AUTH_SOCK="$ssh_sock" ssh-add -l >/dev/null 2>&1; then
+    if ! pgrep -x wsl-ssh-bridge >/dev/null 2>&1 && command -v wsl-ssh-bridge >/dev/null 2>&1; then
+      rm -f "$ssh_sock"
+      (wsl-ssh-bridge >/dev/null 2>&1 &)
+      sleep 0.5
+    fi
+  fi
+
+  if [[ -S "$ssh_sock" ]]; then
+    local key_count
+    key_count=$(SSH_AUTH_SOCK="$ssh_sock" ssh-add -l 2>/dev/null | grep -E -c '^[0-9]+' || true)
+    key_count="${key_count:-0}"
+    if [[ "$key_count" -gt 0 ]]; then
+      echo -e " ${GREEN}✓${NC} ${BOLD}ssh agent:${NC} active at $ssh_sock ($key_count key(s) loaded)"
+    elif SSH_AUTH_SOCK="$ssh_sock" ssh-add -l 2>&1 | grep -qi 'no identities'; then
+      echo -e " ${YELLOW}!${NC} ${BOLD}ssh agent:${NC} connected but no keys loaded (enable SSH agent in 1Password)"
+    else
+      echo -e " ${YELLOW}!${NC} ${BOLD}ssh agent:${NC} socket present but not responding"
+    fi
+  else
+    echo -e " ${DIM}–${NC} ${BOLD}ssh agent:${NC} socket not active ($ssh_sock)"
+  fi
+
+  local git_signing
+  git_signing=$(git config --get commit.gpgsign 2>/dev/null || echo "false")
+  if [[ "$git_signing" == "true" ]]; then
+    local sign_key
+    sign_key=$(git config --get user.signingkey 2>/dev/null || echo "unset")
+    echo -e " ${GREEN}✓${NC} ${BOLD}git signing:${NC} enabled (key: ${sign_key:0:24}...)"
+  else
+    echo -e " ${DIM}–${NC} ${BOLD}git signing:${NC} not enabled"
+  fi
+
   # 4. Runtime managers (Mise / Bun)
   if command -v mise >/dev/null 2>&1; then
     local mise_ver

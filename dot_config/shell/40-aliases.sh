@@ -46,6 +46,29 @@ alias lg="lazygit"
 # 1Password CLI (WSL desktop integration)
 command -v op.exe >/dev/null 2>&1 && alias op="op.exe"
 
+# In-memory secret injection: runs commands with secrets from 1Password without disk files
+opr() {
+  local op_bin
+  if command -v op.exe >/dev/null 2>&1; then
+    op_bin="op.exe"
+  elif command -v op >/dev/null 2>&1; then
+    op_bin="op"
+  else
+    echo "error: 1Password CLI not found in PATH" >&2
+    return 1
+  fi
+
+  if [ -f .env.op ]; then
+    "$op_bin" run --env-file=.env.op -- "$@"
+  elif [ -f .env.template ]; then
+    "$op_bin" run --env-file=.env.template -- "$@"
+  elif [ -f .env ]; then
+    "$op_bin" run --env-file=.env -- "$@"
+  else
+    "$op_bin" run -- "$@"
+  fi
+}
+
 # Aliases managed by the Omarchy Alias Manager plugin (leoom.aliases)
 [ -r "$HOME/.config/omarchy/aliases" ] && source "$HOME/.config/omarchy/aliases"
 

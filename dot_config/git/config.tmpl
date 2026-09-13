@@ -44,6 +44,20 @@
 [user]
 	name = Harlan Jones
 	email = harlanljones@gmail.com
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJJ6caZOCH+I3WuG/qfa7fItOrlm1lF95dIqSAxG4kFs
+[gpg]
+	format = ssh
+[gpg "ssh"]
+{{- if eq .chezmoi.os "darwin" }}
+	program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+{{- else if and (eq .chezmoi.os "linux") (contains "microsoft" (lower .chezmoi.kernel.osrelease)) }}
+	program = "op-ssh-sign"
+{{- else }}
+	program = "/opt/1Password/op-ssh-sign"
+{{- end }}
+[commit]
+	gpgsign = true
+
 [credential "https://github.com"]
 	helper = 
 	helper = !{{ $gh }} auth git-credential

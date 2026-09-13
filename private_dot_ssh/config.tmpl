@@ -9,7 +9,11 @@ Host *
     # 1Password SSH agent first (keys stay in the vault, served via
     # ~/.config/1password/ssh/agent.toml); falls back to on-disk keys in
     # ~/.ssh when the socket is absent or has no matching key.
+{{- if eq .chezmoi.os "darwin" }}
+    IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+{{- else }}
     IdentityAgent ~/.1password/agent.sock
+{{- end }}
 
 # Per-host entries: copy the template below.
 #

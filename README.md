@@ -425,7 +425,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 ├── private_dot_grokbot
 │   └── settings.json
 ├── private_dot_ssh
-│   └── config
+│   └── config.tmpl
 ├── run_after_23-sync-agent-skills.sh.tmpl
 ├── run_once_after_24-setup-omarchy-agents.sh.tmpl
 ├── run_once_before_00-verify-deps.sh.tmpl

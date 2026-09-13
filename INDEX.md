@@ -242,7 +242,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | Target | Source | Subsystem | Attributes |
 | --- | --- | --- | --- |
 | `~/.config/1password/ssh/agent.toml` | `dot_config/1password/ssh/agent.toml` | 1password | — |
-| `~/.ssh/config` | `private_dot_ssh/config` | ssh | private |
+| `~/.ssh/config` | `private_dot_ssh/config.tmpl` | ssh | private, template |
 
 ## Other configuration
 

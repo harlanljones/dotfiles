@@ -1452,12 +1452,13 @@
       "subsystem": "1password"
     },
     {
-      "source": "private_dot_ssh/config",
+      "source": "private_dot_ssh/config.tmpl",
       "target": "~/.ssh/config",
       "kind": "dotfile",
       "category": "security",
       "attributes": [
-        "private"
+        "private",
+        "template"
       ],
       "subsystem": "ssh"
     },

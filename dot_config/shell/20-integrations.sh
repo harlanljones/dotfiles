@@ -25,3 +25,27 @@ fi
 if [ "$SHELL_KIND" = zsh ] && command -v mise >/dev/null 2>&1; then
   eval "$(mise activate zsh)"
 fi
+
+# 1Password CLI shell completion
+if command -v op >/dev/null 2>&1; then
+  eval "$(op completion "$SHELL_KIND")"
+elif command -v op.exe >/dev/null 2>&1; then
+  eval "$(op.exe completion "$SHELL_KIND")"
+fi
+
+# 1Password SSH Agent integration
+if [ -n "${WSL_DISTRO_NAME:-}" ] || grep -qi microsoft /proc/version 2>/dev/null; then
+  export SSH_AUTH_SOCK="$HOME/.1password/agent.sock"
+  mkdir -p "$HOME/.1password"
+  if [ -e "$SSH_AUTH_SOCK" ] && ! pgrep -x wsl-ssh-bridge >/dev/null 2>&1; then
+    rm -f "$SSH_AUTH_SOCK"
+  fi
+  if ! pgrep -x wsl-ssh-bridge >/dev/null 2>&1 && command -v wsl-ssh-bridge >/dev/null 2>&1; then
+    (wsl-ssh-bridge >/dev/null 2>&1 &)
+  fi
+elif [ "$(uname -s 2>/dev/null || echo '')" = "Darwin" ]; then
+  export SSH_AUTH_SOCK="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+elif [ -e "$HOME/.1password/agent.sock" ]; then
+  export SSH_AUTH_SOCK="$HOME/.1password/agent.sock"
+fi
+
