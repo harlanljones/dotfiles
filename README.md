@@ -415,8 +415,10 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   ├── executable_statusline.tmpl
 │   │   └── symlink_evot
 │   └── share
-│       └── applications
-│           └── cursor-desktop.desktop
+│       ├── applications
+│       │   └── cursor-desktop.desktop
+│       └── wsl-ssh-bridge
+│           └── main.go
 ├── dot_pi
 │   └── agent
 │       └── skills
@@ -444,6 +446,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 ├── run_onchange_after_40-vespasian-windows-terminal.sh.tmpl
 ├── run_onchange_after_41-vespasian-nerd-font.sh.tmpl
 ├── run_onchange_after_42-vespasian-theme-state.sh.tmpl
+├── run_onchange_after_43-vespasian-1password-ssh-bridge.sh.tmpl
 └── run_onchange_before_09-install-agent-skills.sh.tmpl
 ```
 <!-- END REPO TREE -->
