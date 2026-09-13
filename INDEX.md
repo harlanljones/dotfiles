@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**4595 tracked entries** across 16 categories.
+**4593 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -25,10 +25,10 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Background services](#background-services) | 17 |
 | [Custom executables](#custom-executables) | 32 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Other configuration](#other-configuration) | 37 |
+| [Other configuration](#other-configuration) | 36 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 19 |
 | [Chezmoi control files](#chezmoi-control-files) | 9 |
-| [Repository material (not applied)](#repository-material-not-applied) | 4378 |
+| [Repository material (not applied)](#repository-material-not-applied) | 4377 |
 
 ---
 
@@ -278,7 +278,6 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.chezmoitemplates/themes/tokyonight-storm/gemini.json` | `.chezmoitemplates/themes/tokyonight-storm/gemini.json` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-storm/lazygit.yml` | `.chezmoitemplates/themes/tokyonight-storm/lazygit.yml` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-storm/windows_terminal.json` | `.chezmoitemplates/themes/tokyonight-storm/windows_terminal.json` | — | — |
-| `~/PR_DESCRIPTION.md` | `PR_DESCRIPTION.md` | — | — |
 | `~/.config/apt/pkglist.txt` | `dot_config/apt/pkglist.txt` | — | — |
 | `~/.config/bat/config` | `dot_config/bat/config` | — | — |
 | `~/.config/bat/themes/dots.tmTheme` | `dot_config/bat/themes/dots.tmTheme.tmpl` | — | template |
@@ -4705,4 +4704,3 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/test_gitleaks.py` | Recovery guide and repository maintenance scripts |
 | `dotfiles-showcase` | Submodule — the showcase web app; never applied |
 | `package.json` | Runtime CLI deps installed outside mise |
-| `to-questionnaire-dotfiles-sync-cli.md` | Scratch planning documents |

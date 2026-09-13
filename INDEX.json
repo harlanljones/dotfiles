@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 4595,
+    "total": 4593,
     "by_category": {
       "shell": 16,
       "prompt": 1,
@@ -17,10 +17,10 @@
       "services": 17,
       "scripts": 32,
       "security": 2,
-      "other": 37,
+      "other": 36,
       "hooks": 19,
       "chezmoi": 9,
-      "repo": 4378
+      "repo": 4377
     }
   },
   "categories": [
@@ -1667,13 +1667,6 @@
     {
       "source": ".chezmoitemplates/themes/tokyonight-storm/windows_terminal.json",
       "target": "~/.chezmoitemplates/themes/tokyonight-storm/windows_terminal.json",
-      "kind": "dotfile",
-      "category": "other",
-      "attributes": []
-    },
-    {
-      "source": "PR_DESCRIPTION.md",
-      "target": "~/PR_DESCRIPTION.md",
       "kind": "dotfile",
       "category": "other",
       "attributes": []
@@ -28290,12 +28283,6 @@
       "kind": "repo",
       "category": "repo",
       "role": "Runtime CLI deps installed outside mise"
-    },
-    {
-      "source": "to-questionnaire-dotfiles-sync-cli.md",
-      "kind": "repo",
-      "category": "repo",
-      "role": "Scratch planning documents"
     }
   ]
 }

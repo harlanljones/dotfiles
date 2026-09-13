@@ -98,9 +98,9 @@ It uses `blink.cmp` for auto-completion.
 ### AI Coding Agents
 
 The repository provides shared configuration for multiple AI coding tools.
-Supported agents include Claude Code, Codex, Google Antigravity, Cline, and OpenCode.
+Supported agents include Claude Code, Codex, Cursor, Google Antigravity, Cline, and OpenCode.
 Shared agent skills live in `~/.agents/skills/`.
-A unified status line displays active models and token costs.
+A unified status line displays active models and token costs across Claude Code, Cursor, and Codex.
 Safety rules prevent automated agents from pushing or committing to git directly.
 
 ### Tool Management
@@ -109,12 +109,14 @@ Tool versions are managed declaratively with [mise](https://mise.jdx.dev/).
 Configuration lives in `~/.config/mise/config.toml`.
 Mise manages runtimes for Node.js, Bun, Python, Go, and Terraform.
 System package manifests live in `dot_config/pacman/`, `dot_config/apt/`, and `dot_Brewfile`.
+Health checks verify that required mise tools are installed on the local system.
 
 ### Unified Theming
 
 The entire environment shares a consistent color palette.
 The default theme is Tokyo Night.
 Theme settings synchronize across Windows Terminal, Neovim, lazygit, delta, bat, eza, and fzf.
+On Windows WSL2 systems, Windows Terminal updates immediately and launches into Ubuntu by default.
 You can switch themes across all tools by running `dots theme set <theme-name>`.
 
 ## Documentation and Index
@@ -179,7 +181,6 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │           ├── gemini.json
 │           ├── lazygit.yml
 │           └── windows_terminal.json
-├── PR_DESCRIPTION.md
 ├── dot_Brewfile
 ├── dot_agents
 │   └── skills
