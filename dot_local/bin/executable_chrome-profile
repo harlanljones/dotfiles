@@ -1,0 +1,233 @@
+#!/usr/bin/env bash
+# chrome-profile -- launch Google Chrome with a specific profile.
+#
+# Discovers installed profiles from Chrome's Local State JSON file, presents an
+# interactive fzf picker (or accepts a name/filter argument), and opens Chrome
+# in the chosen profile. Works on Linux, macOS, and WSL2.
+#
+# Usage:
+#   chrome-profile                     # interactive fzf picker
+#   chrome-profile work                # fuzzy-match "work" (case-insensitive)
+#   chrome-profile personal https://…  # open URL in the matched profile
+#   chrome-profile --list              # print discovered profiles
+#   chrome-profile -h | --help         # show this help
+set -euo pipefail
+
+# ---------------------------------------------------------------------------
+# Platform detection
+# ---------------------------------------------------------------------------
+detect_platform() {
+  if [[ "$(uname -s)" == "Darwin" ]]; then
+    echo "macos"
+  elif grep -qi microsoft /proc/version 2>/dev/null; then
+    echo "wsl"
+  else
+    echo "linux"
+  fi
+}
+
+PLATFORM="$(detect_platform)"
+
+# ---------------------------------------------------------------------------
+# Resolve Chrome binary and user-data directory per platform
+# ---------------------------------------------------------------------------
+resolve_chrome() {
+  case "$PLATFORM" in
+    macos)
+      CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+      CHROME_DATA="$HOME/Library/Application Support/Google/Chrome"
+      ;;
+    wsl)
+      CHROME_BIN="/mnt/c/Program Files/Google/Chrome/Application/chrome.exe"
+      local win_appdata
+      win_appdata="$(cmd.exe /c "echo %LOCALAPPDATA%" 2>/dev/null | tr -d '\r')"
+      CHROME_DATA="$(wslpath "$win_appdata/Google/Chrome/User Data")"
+      ;;
+    linux)
+      CHROME_BIN=""
+      for candidate in google-chrome-stable google-chrome chromium; do
+        if command -v "$candidate" >/dev/null 2>&1; then
+          CHROME_BIN="$(command -v "$candidate")"
+          break
+        fi
+      done
+      if [[ -z "$CHROME_BIN" ]]; then
+        # Fallback to known paths
+        for path in /opt/google/chrome/chrome /usr/bin/google-chrome-stable; do
+          if [[ -x "$path" ]]; then
+            CHROME_BIN="$path"
+            break
+          fi
+        done
+      fi
+      CHROME_DATA="$HOME/.config/google-chrome"
+      ;;
+  esac
+
+  if [[ -z "${CHROME_BIN:-}" ]] || { [[ "$PLATFORM" != "wsl" ]] && [[ ! -x "$CHROME_BIN" ]]; }; then
+    echo "error: Google Chrome not found" >&2
+    return 1
+  fi
+
+  LOCAL_STATE="$CHROME_DATA/Local State"
+  if [[ ! -f "$LOCAL_STATE" ]]; then
+    echo "error: Chrome Local State not found at: $LOCAL_STATE" >&2
+    return 1
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# Parse profiles from Local State using jq
+# ---------------------------------------------------------------------------
+list_profiles() {
+  jq -r '
+    .profile.info_cache | to_entries[] |
+    "\(.key)\t\(.value.name)\t\(.value.user_name // "")"
+  ' "$LOCAL_STATE"
+}
+
+# Format profiles for display: "Name (email) [dir]"
+format_profiles() {
+  while IFS=$'\t' read -r dir name email; do
+    if [[ -n "$email" ]]; then
+      printf '%s (%s) [%s]\n' "$name" "$email" "$dir"
+    else
+      printf '%s [%s]\n' "$name" "$dir"
+    fi
+  done < <(list_profiles)
+}
+
+# ---------------------------------------------------------------------------
+# Profile selection
+# ---------------------------------------------------------------------------
+pick_profile() {
+  local filter="${1:-}"
+  local formatted
+  formatted="$(format_profiles)"
+
+  if [[ -z "$formatted" ]]; then
+    echo "error: no Chrome profiles found" >&2
+    return 1
+  fi
+
+  local selected
+  if [[ -n "$filter" ]]; then
+    # Fuzzy: case-insensitive match across name, email, and directory
+    selected="$(echo "$formatted" | grep -i "$filter" | head -1)"
+    if [[ -z "$selected" ]]; then
+      # Fall back to fzf --filter for even fuzzier matching
+      if command -v fzf >/dev/null 2>&1; then
+        selected="$(echo "$formatted" | fzf --filter="$filter" | head -1)"
+      fi
+    fi
+    if [[ -z "$selected" ]]; then
+      echo "error: no profile matching '$filter'" >&2
+      echo "" >&2
+      echo "Available profiles:" >&2
+      echo "$formatted" >&2
+      return 1
+    fi
+  else
+    if ! command -v fzf >/dev/null 2>&1; then
+      echo "error: fzf is required for interactive selection" >&2
+      echo "  Install fzf or pass a profile name as an argument." >&2
+      return 1
+    fi
+    selected="$(echo "$formatted" | fzf \
+      --height=40% --layout=reverse --border \
+      --prompt='Chrome Profile❯ ' \
+      --header='Select a Chrome profile')" || return 1
+  fi
+
+  # Extract the directory name from "[Dir Name]" at the end
+  echo "$selected" | sed 's/.*\[\(.*\)\]$/\1/'
+}
+
+# ---------------------------------------------------------------------------
+# Launch Chrome
+# ---------------------------------------------------------------------------
+launch_chrome() {
+  local profile_dir="$1"
+  shift
+  local urls=("$@")
+
+  case "$PLATFORM" in
+    wsl)
+      # On WSL, run the Windows binary detached
+      "$CHROME_BIN" --profile-directory="$profile_dir" "${urls[@]}" >/dev/null 2>&1 &
+      ;;
+    macos)
+      # Direct binary invocation avoids LaunchServices quirks
+      "$CHROME_BIN" --profile-directory="$profile_dir" "${urls[@]}" >/dev/null 2>&1 &
+      ;;
+    linux)
+      "$CHROME_BIN" --profile-directory="$profile_dir" "${urls[@]}" >/dev/null 2>&1 &
+      ;;
+  esac
+
+  disown 2>/dev/null
+}
+
+# ---------------------------------------------------------------------------
+# Usage
+# ---------------------------------------------------------------------------
+usage() {
+  cat <<'USAGE'
+chrome-profile -- launch Google Chrome with a specific profile
+
+USAGE:
+  chrome-profile                     Interactive fzf picker
+  chrome-profile <filter>            Fuzzy-match a profile by name/email
+  chrome-profile <filter> [URLs...]  Open URLs in the matched profile
+  chrome-profile --list              List discovered profiles
+  chrome-profile -h, --help          Show this help
+
+EXAMPLES:
+  chrome-profile work
+  chrome-profile personal https://github.com
+  chrome-profile --list
+USAGE
+}
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+main() {
+  case "${1:-}" in
+    -h|--help)
+      usage
+      return 0
+      ;;
+    --list|-l)
+      resolve_chrome
+      command -v jq >/dev/null 2>&1 || { echo "error: jq is required" >&2; return 1; }
+      echo "Chrome profiles ($(basename "$CHROME_DATA")):"
+      echo ""
+      format_profiles
+      return 0
+      ;;
+  esac
+
+  resolve_chrome
+  command -v jq >/dev/null 2>&1 || { echo "error: jq is required" >&2; return 1; }
+
+  local filter=""
+  local urls=()
+
+  # First non-URL argument is the profile filter; rest are URLs
+  for arg in "$@"; do
+    if [[ -z "$filter" && "$arg" != http://* && "$arg" != https://* ]]; then
+      filter="$arg"
+    else
+      urls+=("$arg")
+    fi
+  done
+
+  local profile_dir
+  profile_dir="$(pick_profile "$filter")"
+
+  echo "Opening Chrome with profile: $profile_dir"
+  launch_chrome "$profile_dir" "${urls[@]}"
+}
+
+main "$@"

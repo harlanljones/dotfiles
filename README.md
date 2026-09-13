@@ -447,6 +447,8 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 ├── run_onchange_after_41-vespasian-nerd-font.sh.tmpl
 ├── run_onchange_after_42-vespasian-theme-state.sh.tmpl
 ├── run_onchange_after_43-vespasian-1password-ssh-bridge.sh.tmpl
+├── run_onchange_after_44-vespasian-windows-debloat.sh.tmpl
+├── run_onchange_after_45-vespasian-desktop-tools.sh.tmpl
 └── run_onchange_before_09-install-agent-skills.sh.tmpl
 ```
 <!-- END REPO TREE -->

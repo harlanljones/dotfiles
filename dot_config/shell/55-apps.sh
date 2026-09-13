@@ -34,3 +34,10 @@ if [ "$(uname -s)" = "Linux" ]; then
     printf 'freetoken-desktop detached (log: %s)\n' "$log"
   }
 fi
+
+# Chrome profile launcher -- select which Chrome profile to open windows in.
+if command -v chrome-profile >/dev/null 2>&1; then
+  alias chrome='chrome-profile'
+  alias chrome-work='chrome-profile primeiq'
+  alias chrome-personal='chrome-profile personal'
+fi

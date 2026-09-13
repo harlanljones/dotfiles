@@ -97,6 +97,7 @@ The table below is the orienting summary; the index is the detail.
 | `dot_local/bin/` | Custom scripts, usage collectors, scrapers, agent hooks (installed to `~/.local/bin`) |
 | `dot_local/bin/cline-safety/` | `git` interceptor that refuses `commit`/`push` under Cline |
 | `dot_local/bin/executable_statusline.tmpl` | Shared cross-harness CLI statusline renderer (Claude Code + Cursor) → `~/.local/bin/statusline` |
+| `dot_local/bin/executable_chrome-profile` | **Chrome profile selector** → `~/.local/bin/chrome-profile`. Discovers profiles from Chrome's `Local State` JSON and launches Chrome in the chosen one (interactive `fzf` picker or fuzzy name/email filter). Cross-platform: Linux (`google-chrome-stable`), macOS (direct `.app` binary), WSL2 (Windows `chrome.exe` via `wslpath`). Shell aliases in `55-apps.sh`: `chrome` (picker), `chrome-work` (primeiq.ai), `chrome-personal` (Personal). Requires `jq`; `fzf` for interactive mode. Usage: `chrome-profile [filter] [URLs...]`, `chrome-profile --list` |
 | `dot_agents/`, `dot_claude/`, `dot_cline/`, `dot_codex/`, `dot_gemini/`, `dot_grok/`, `dot_pi/` | Per-harness config, skills, rules, MCP, hooks |
 | `dot_evotai/` | EVOT LLM provider environment config (`~/.evotai/evot.env`) |
 | `.chezmoidata/` | YAML data sources read by `.tmpl`s (`machines`, `agent_skills`, `omarchy_plugins`, `claude_mcp`, `claude_settings`, `codex_projects`, `themes`) |
@@ -127,7 +128,7 @@ Each CLI/runtime is owned by exactly one manager. Do not spread a tool across tw
 | pacman / paru (Augustus) | `dot_config/pacman/pkglist.txt` + `aurlist.txt` | native + AUR packages |
 | mise conf.d (Vespasian) | `dot_config/mise/conf.d/vespasian.toml` | atuin, bat, delta, direnv, eza, fd, fzf, lazygit, neovim, ripgrep, starship, zoxide (pacman/brew own these elsewhere) |
 | apt (Vespasian) | `dot_config/apt/pkglist.txt` | age, build-essential, curl, erlang-nox, jq, postgresql, sqlite3, tailscale, unzip |
-| standalone / scripts | `dot_local/bin/`, `~/.fly/bin` | flyctl (Fly.io CLI installer), evot (outpost integration symlink) |
+| standalone / scripts | `dot_local/bin/`, `~/.fly/bin` | flyctl (Fly.io CLI installer), evot (outpost integration symlink), chrome-profile (Chrome profile selector) |
 
 ## 6. Hard rules for agents
 

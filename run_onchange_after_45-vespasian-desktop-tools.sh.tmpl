@@ -232,7 +232,7 @@ keybindings:
     bindings: ['lwin+r', 'alt+r']
 
   # Gaming & emergency pause toggle
-  - commands: ['wm-toggle-pause']
+  - commands: ['wm-toggle-pause', 'shell-exec powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%LOCALAPPDATA%\Programs\glazewm\notify-mode.ps1"']
     bindings: ['lwin+shift+p', 'alt+shift+p']
 
   # Layout controls
@@ -300,7 +300,404 @@ keybindings:
     bindings: ['lwin+shift+9', 'alt+shift+9']
 EOF_CONFIG
 
-# 7. Setup user startup shortcuts so tools auto-start on Windows login
+# 7. Deploy Zebar Tokyo Night status bar with mode indicator
+zebar_conf_dir="$wsl_userprofile/.glzr/zebar"
+mkdir -p "$zebar_conf_dir/tokyonight"
+
+# settings.json — point Zebar at our custom pack
+cat <<'ZEBAR_SETTINGS' > "$zebar_conf_dir/settings.json"
+{
+  "$schema": "https://github.com/glzr-io/zebar/raw/v3.3.1/resources/settings-schema.json",
+  "startupConfigs": [
+    {
+      "pack": "tokyonight",
+      "widget": "bar",
+      "preset": "default"
+    }
+  ]
+}
+ZEBAR_SETTINGS
+
+# zpack.json — widget pack manifest
+cat <<'ZBAR_PACK' > "$zebar_conf_dir/tokyonight/zpack.json"
+{
+  "$schema": "https://github.com/glzr-io/zebar/raw/v3.0.0/resources/zpack-schema.json",
+  "name": "tokyonight",
+  "version": "1.0.0",
+  "description": "Tokyo Night status bar for GlazeWM with Gaming vs Dev mode indicator",
+  "widgets": [
+    {
+      "name": "bar",
+      "htmlPath": "./index.html",
+      "zOrder": "normal",
+      "shownInTaskbar": false,
+      "focused": false,
+      "resizable": true,
+      "transparent": true,
+      "includeFiles": ["*.html", "*.css"],
+      "presets": [
+        {
+          "name": "default",
+          "anchor": "top_left",
+          "offsetX": "0px",
+          "offsetY": "0px",
+          "width": "100%",
+          "height": "38px",
+          "monitorSelection": { "type": "all" },
+          "dockToEdge": { "enabled": false, "edge": null, "windowMargin": "0px" }
+        }
+      ]
+    }
+  ]
+}
+ZBAR_PACK
+
+# styles.css — Tokyo Night bar theme (templated from active palette)
+cat > "$zebar_conf_dir/tokyonight/styles.css" <<'ZBAR_CSS'
+@import 'https://www.nerdfonts.com/assets/css/webfont.css';
+
+:root {
+  --bg-primary: rgba(36, 40, 59, 0.90);
+  --bg-secondary: rgba(29, 32, 47, 0.70);
+  --text-main: {{ $scheme.foreground }};
+  --text-muted: {{ $scheme.blue }};
+  --accent-blue: {{ $scheme.blue }};
+  --accent-cyan: {{ $scheme.cyan }};
+  --accent-green: {{ $scheme.green }};
+  --accent-purple: {{ $scheme.purple }};
+  --accent-red: {{ $scheme.red }};
+  --accent-yellow: {{ $scheme.yellow }};
+  --border-color: rgba(65, 72, 104, 0.6);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'JetBrainsMono Nerd Font', 'JetBrains Mono', ui-monospace, monospace;
+  user-select: none;
+}
+
+html, body, #root {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: transparent;
+  color: var(--text-main);
+  font-size: 12px;
+}
+
+.bar-container {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  height: 100%;
+  padding: 0 16px;
+  background: var(--bg-primary);
+  border-bottom: 1px solid var(--border-color);
+  backdrop-filter: blur(12px);
+}
+
+.left, .center, .right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.center {
+  justify-content: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.right {
+  justify-content: flex-end;
+}
+
+/* Mode pill styling */
+.mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.mode-badge.dev {
+  background: rgba(122, 162, 247, 0.18);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
+.mode-badge.dev:hover {
+  background: rgba(122, 162, 247, 0.35);
+}
+
+.mode-badge.gaming {
+  background: rgba(247, 118, 142, 0.25);
+  border-color: var(--accent-red);
+  color: var(--accent-red);
+  animation: pulse-glow 2s infinite;
+}
+
+.mode-badge.gaming:hover {
+  background: rgba(247, 118, 142, 0.40);
+}
+
+.mode-badge.resize {
+  background: rgba(187, 154, 247, 0.25);
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
+}
+
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 0 0 rgba(247, 118, 142, 0.4); }
+  70% { box-shadow: 0 0 0 6px rgba(247, 118, 142, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(247, 118, 142, 0); }
+}
+
+/* Workspaces */
+.workspaces {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 6px;
+}
+
+.ws-btn {
+  background: var(--bg-secondary);
+  color: var(--text-main);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  padding: 3px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.ws-btn:hover {
+  background: rgba(122, 162, 247, 0.25);
+  border-color: var(--accent-blue);
+}
+
+.ws-btn.focused {
+  background: var(--accent-blue);
+  color: #1a1b26;
+  font-weight: 700;
+  border-color: var(--accent-blue);
+}
+
+.ws-btn.displayed:not(.focused) {
+  background: rgba(122, 162, 247, 0.15);
+  border-color: rgba(122, 162, 247, 0.4);
+}
+
+/* Window title */
+.window-title {
+  color: {{ $scheme.white }};
+  font-size: 11px;
+  font-weight: 500;
+  max-width: 450px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Right stats */
+.stat-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 8px;
+  background: var(--bg-secondary);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 11px;
+}
+
+.stat-item i { color: var(--accent-cyan); }
+.stat-item.clock i { color: var(--accent-purple); }
+.stat-item.memory i { color: var(--accent-green); }
+.stat-item.cpu i { color: var(--accent-yellow); }
+ZBAR_CSS
+
+# index.html — React widget with live Gaming/Dev mode indicator
+cat <<'ZBAR_HTML' > "$zebar_conf_dir/tokyonight/index.html"
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="./styles.css" />
+    <script
+      src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"
+      crossorigin="anonymous"
+    ></script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <script type="text/babel" data-type="module">
+      import React, { useState, useEffect } from 'https://esm.sh/react@18?dev';
+      import { createRoot } from 'https://esm.sh/react-dom@18/client?dev';
+      import * as zebar from 'https://esm.sh/zebar@3.0';
+
+      const providers = zebar.createProviderGroup({
+        glazewm: { type: 'glazewm' },
+        cpu: { type: 'cpu' },
+        memory: { type: 'memory' },
+        date: { type: 'date', formatting: 'EEE MMM d  HH:mm' },
+      });
+
+      createRoot(document.getElementById('root')).render(<App />);
+
+      function App() {
+        const [output, setOutput] = useState(providers.outputMap);
+
+        useEffect(() => {
+          providers.onOutput(() => setOutput(providers.outputMap));
+        }, []);
+
+        const g = output.glazewm;
+        const isPaused = g?.isPaused ?? false;
+        const bindingModes = g?.bindingModes ?? [];
+        const workspaces = g?.currentWorkspaces ?? [];
+        const focusedContainer = g?.focusedContainer;
+        const windowTitle = focusedContainer?.title || '';
+        const cursor_pointer = {cursor: 'pointer'};
+
+        return (
+          <div className="bar-container">
+            <div className="left">
+              {/* Mode indicator: Gaming vs Dev/Tiling */}
+              {isPaused ? (
+                <button
+                  className="mode-badge gaming"
+                  onClick={() => g?.runCommand('wm-toggle-pause')}
+                  title="Gaming Mode Active: Window management paused. Click or press Super+Shift+P to resume dev/tiling."
+                >
+                  🎮 GAMING
+                </button>
+              ) : (
+                <button
+                  className="mode-badge dev"
+                  onClick={() => g?.runCommand('wm-toggle-pause')}
+                  title="Dev / Tiling Mode Active. Click or press Super+Shift+P to pause for gaming."
+                >
+                  ⚡ DEV
+                </button>
+              )}
+
+              {/* Binding modes (e.g. resize) */}
+              {bindingModes.map(mode => (
+                <button
+                  className="mode-badge resize"
+                  key={mode.name}
+                  onClick={() => g?.runCommand(`wm-disable-binding-mode --name ${mode.name}`)}
+                  title="Press Escape or Enter to exit resize mode"
+                >
+                  󰩨 {mode.displayName ?? mode.name.toUpperCase()}
+                </button>
+              ))}
+
+              {/* Workspaces */}
+              <div className="workspaces">
+                {workspaces.map(ws => (
+                  <button
+                    key={ws.name}
+                    className={`ws-btn ${ws.hasFocus ? 'focused' : ''} ${ws.isDisplayed ? 'displayed' : ''}`}
+                    onClick={() => g?.runCommand(`focus --workspace ${ws.name}`)}
+                  >
+                    {ws.displayName ?? ws.name}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="center">
+              {windowTitle && (
+                <span className="window-title" title={windowTitle}>
+                  {windowTitle}
+                </span>
+              )}
+            </div>
+
+            <div className="right">
+              {g && (
+                <span
+                  className="stat-item"
+                  style={cursor_pointer}
+                  onClick={() => g.runCommand('toggle-tiling-direction')}
+                  title="Click to toggle tiling direction (horizontal / vertical)"
+                >
+                  {g.tilingDirection === 'horizontal' ? '󰤝 SPLIT-H' : '󰤼 SPLIT-V'}
+                </span>
+              )}
+
+              {output.cpu && (
+                <span className="stat-item cpu">
+                  <i className="nf nf-oct-cpu"></i>
+                  {Math.round(output.cpu.usage)}%
+                </span>
+              )}
+
+              {output.memory && (
+                <span className="stat-item memory">
+                  <i className="nf nf-fae-chip"></i>
+                  {Math.round(output.memory.usage)}%
+                </span>
+              )}
+
+              {output.date && (
+                <span className="stat-item clock">
+                  <i className="nf nf-fa-clock_o"></i>
+                  {output.date.formatted}
+                </span>
+              )}
+            </div>
+          </div>
+        );
+      }
+    </script>
+  </body>
+</html>
+ZBAR_HTML
+
+# 7b. Deploy mode-switch notification script for GlazeWM
+cat > "$glazewm_dir/notify-mode.ps1" <<'PS_NOTIFY'
+Add-Type -AssemblyName System.Windows.Forms
+Add-Type -AssemblyName System.Drawing
+
+$cli = "$env:LOCALAPPDATA\Programs\glazewm\cli\glazewm.exe"
+if (Test-Path $cli) {
+    $out = & $cli query paused | ConvertFrom-Json
+    $isPaused = $out.data
+
+    $title = if ($isPaused) { "Gaming Mode" } else { "Dev / Tiling Mode" }
+    $msg = if ($isPaused) { "Tiling paused & hotkeys released. Press Super+Shift+P to resume." } else { "Dynamic tiling active. Super+Enter for WSL terminal." }
+
+    $notification = New-Object System.Windows.Forms.NotifyIcon
+    $notification.Icon = [System.Drawing.SystemIcons]::Information
+    $notification.BalloonTipTitle = $title
+    $notification.BalloonTipText = $msg
+    $notification.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Info
+    $notification.Visible = $true
+    $notification.ShowBalloonTip(1500)
+    Start-Sleep -Milliseconds 1600
+    $notification.Dispose()
+}
+PS_NOTIFY
+
+# 8. Setup user startup shortcuts so tools auto-start on Windows login
 startup_dir="$wsl_userprofile/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup"
 mkdir -p "$startup_dir"
 
@@ -327,7 +724,7 @@ for name, target in targets.items():
     subprocess.run(["powershell.exe", "-NoProfile", "-Command", ps], check=True)
 PY_EOF
 
-# 8. Trigger live GlazeWM reload if running
+# 9. Trigger live GlazeWM reload if running
 if [[ -f "$glazewm_dir/cli/glazewm.exe" ]]; then
   "$glazewm_dir/cli/glazewm.exe" command wm-reload-config </dev/null 2>&1 || true
 fi

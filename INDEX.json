@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 4596,
+    "total": 4598,
     "by_category": {
       "shell": 16,
       "prompt": 1,
@@ -18,7 +18,7 @@
       "scripts": 32,
       "security": 2,
       "other": 37,
-      "hooks": 20,
+      "hooks": 22,
       "chezmoi": 9,
       "repo": 4378
     }
@@ -1973,6 +1973,32 @@
         "phase": "after",
         "order": 43,
         "name": "vespasian-1password-ssh-bridge",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_after_44-vespasian-windows-debloat.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 44,
+        "name": "vespasian-windows-debloat",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_after_45-vespasian-desktop-tools.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 45,
+        "name": "vespasian-desktop-tools",
         "template": true
       }
     },

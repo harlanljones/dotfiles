@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**4596 tracked entries** across 16 categories.
+**4598 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -26,7 +26,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Custom executables](#custom-executables) | 32 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
 | [Other configuration](#other-configuration) | 37 |
-| [Apply hooks (`run_*`)](#apply-hooks-run) | 20 |
+| [Apply hooks (`run_*`)](#apply-hooks-run) | 22 |
 | [Chezmoi control files](#chezmoi-control-files) | 9 |
 | [Repository material (not applied)](#repository-material-not-applied) | 4378 |
 
@@ -310,6 +310,8 @@ agents and the showcase app should read. This page is the same data for humans.
 | 41 | `run_onchange_after_41-vespasian-nerd-font.sh.tmpl` | runs when this script's contents change | after |
 | 42 | `run_onchange_after_42-vespasian-theme-state.sh.tmpl` | runs when this script's contents change | after |
 | 43 | `run_onchange_after_43-vespasian-1password-ssh-bridge.sh.tmpl` | runs when this script's contents change | after |
+| 44 | `run_onchange_after_44-vespasian-windows-debloat.sh.tmpl` | runs when this script's contents change | after |
+| 45 | `run_onchange_after_45-vespasian-desktop-tools.sh.tmpl` | runs when this script's contents change | after |
 
 ## Chezmoi control files
 
