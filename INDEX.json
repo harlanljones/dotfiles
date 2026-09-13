@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 4643,
+    "total": 4644,
     "by_category": {
       "shell": 16,
       "prompt": 1,
@@ -13,7 +13,7 @@
       "vcs": 4,
       "navigation": 3,
       "toolchain": 5,
-      "agents": 41,
+      "agents": 42,
       "services": 17,
       "scripts": 32,
       "security": 2,
@@ -1271,6 +1271,14 @@
       "attributes": [
         "empty"
       ],
+      "subsystem": "gemini"
+    },
+    {
+      "source": "dot_gemini/config/mcp_config.json",
+      "target": "~/.gemini/config/mcp_config.json",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
       "subsystem": "gemini"
     },
     {

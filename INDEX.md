@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**4643 tracked entries** across 16 categories.
+**4644 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -21,7 +21,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Version control](#version-control) | 4 |
 | [Navigation & search](#navigation--search) | 3 |
 | [Toolchain & packages](#toolchain--packages) | 5 |
-| [AI agent harnesses](#ai-agent-harnesses) | 41 |
+| [AI agent harnesses](#ai-agent-harnesses) | 42 |
 | [Background services](#background-services) | 17 |
 | [Custom executables](#custom-executables) | 32 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
@@ -217,6 +217,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.gemini/agents/codebase-memory-scout.md` | `dot_gemini/agents/private_codebase-memory-scout.md` | gemini | private |
 | `~/.gemini/agents/codebase-memory.md` | `dot_gemini/agents/private_codebase-memory.md` | gemini | private |
 | `~/.gemini/config/mcp_config.json` | `dot_gemini/config/empty_mcp_config.json` | gemini | empty |
+| `~/.gemini/config/mcp_config.json` | `dot_gemini/config/mcp_config.json` | gemini | — |
 | `~/.gemini/config/skills/project-doc-planner` | `dot_gemini/config/skills/symlink_project-doc-planner` | gemini | symlink |
 | `~/.gemini/settings.json` | `dot_gemini/modify_private_settings.json` | gemini | modify, private |
 | `~/.gemini/GEMINI.md` | `dot_gemini/private_GEMINI.md` | gemini | private |
