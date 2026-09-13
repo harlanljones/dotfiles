@@ -59,7 +59,7 @@ ordering guarantee — treat each trigger class separately.
 | Order | Script | Trigger | Purpose |
 | --- | --- | --- | --- |
 | 00 | `run_once_before_00-verify-deps.sh.tmpl` | once | Fail early if `git`/`age` missing; warn on optional tools |
-| 09 | `run_onchange_before_09-install-agent-skills.sh.tmpl` | onchange | Install missing cross-harness agent skills |
+| 09 | `run_onchange_before_09-install-agent-skills.sh.tmpl` | onchange | Install missing cross-harness agent skills (retries without incompatible providers, non-fatal on download error) |
 | 10 | `run_onchange_after_10-install-omarchy-plugins.sh.tmpl` | onchange | Install/update Omarchy desktop plugins |
 | 20 | `run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl` | onchange | Antigravity token/usage collector setup |
 | 21 | `run_onchange_after_21-setup-omarchy-cline.sh.tmpl` | onchange | Cline usage collector setup |

@@ -28,6 +28,7 @@ here is shellchecked.
 | `50-agents.sh` | `cline` safety wrapper |
 | `55-apps.sh` | `ft` (FreeToken desktop), WebKit workaround |
 | `60-prompt.sh` | Starship init and the failure recolor |
+| `65-theme.sh` | Terminal palette export for fzf (`~/.config/fzf/theme.sh` on Vespasian) |
 | `70-cloud.sh` | flyctl, Google Cloud SDK |
 | `99-local.sh` | **Untracked.** Machine-local additions; sourced last |
 
