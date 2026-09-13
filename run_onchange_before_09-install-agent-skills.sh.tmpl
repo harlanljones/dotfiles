@@ -44,13 +44,15 @@ if [[ ${#missing_impeccable_providers[@]} -gt 0 ]]; then
       # unrelated install errors remain fatal.
       compatible_csv=$(printf '%s' "$provider_csv" | sed 's/,\?antigravity\,\?/,/g; s/^,//; s/,$//')
       if [[ -n "$compatible_csv" ]]; then
-        npx -y impeccable install --providers="$compatible_csv" --scope=global -y --no-hooks
+        if ! npx -y impeccable install --providers="$compatible_csv" --scope=global -y --no-hooks; then
+          printf 'agent-skill-install: provider download failed; continuing without generated skills\n' >&2
+        fi
       else
         printf '%s\n' "$impeccable_output" >&2
       fi
     else
       printf '%s\n' "$impeccable_output" >&2
-      exit 1
+      printf 'agent-skill-install: provider download failed; continuing without generated skills\n' >&2
     fi
   fi
 fi
