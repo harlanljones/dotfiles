@@ -626,7 +626,7 @@ Declarative tracking for system-level packages that mise does not manage:
 
 ## 🧪 Repo Hygiene & Recovery
 
-- **CI** (`.github/workflows/ci.yml`): On every push/PR, `chezmoi apply --dry-run --exclude encrypted` validates all templates and ignore rules on both Linux and macOS runners (encrypted entries are skipped since CI has no age key; the Linux job installs `age` so the gate script can run for real), plus a lint job (shellcheck over every rendered managed script + actionlint on workflows).
+- **CI** (`.github/workflows/ci.yml`): On pushes (`main`, `feat/**`, `fix/**`, `chore/**`), PRs to `main`, or manual dispatch (`workflow_dispatch`), `chezmoi apply --dry-run --exclude encrypted` validates all templates and ignore rules across Linux (both standard Arch/Augustus fallback and pinned Vespasian/WSL) and macOS runners (encrypted entries are skipped since CI has no age key; the Linux job installs `age` so the dependency gate runs for real), runs a full-history `gitleaks` secret scan with regression tests, and executes a comprehensive lint job (`shellcheck` with generated chezmoi configuration over all rendered scripts, `actionlint`, index and README structure tree drift checks, and review tooling fixtures).
 - **Recovery guide** (`docs/recovery.md`): Age key backup procedure, key rotation, new-machine bootstrap order, and the `chezmoi doctor` checklist.
 
 ---

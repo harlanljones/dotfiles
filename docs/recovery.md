@@ -122,7 +122,7 @@ chezmoi apply
 ```
 
 If a push is rejected because the remote branch advanced, preserve both sides
-with `git pull --rebase origin feat/vespasian-wsl` and then push again. If the
+with `git pull --rebase origin <branch>` (e.g. `main`) and then push again. If the
 rebase conflicts only in `INDEX.json` or `INDEX.md`, regenerate the indexes
 and README tree, stage them, and continue the rebase:
 
@@ -131,7 +131,7 @@ python3 docs/generate_index.py
 python3 docs/generate_readme_tree.py
 git add INDEX.json INDEX.md README.md
 GIT_EDITOR=true git rebase --continue
-git push origin feat/vespasian-wsl
+git push origin <branch>
 ```
 
 Chezmoi source names beginning with `empty_` map to the same target as the

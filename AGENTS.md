@@ -105,7 +105,7 @@ The table below is the orienting summary; the index is the detail.
 | `docs/agents/`, `docs/skill-review/` | Cross-agent tracking guide and candidate-only skill review evidence; never deploy or execute copied workflows as repo automation |
 | `INDEX.json` / `INDEX.md` | **Generated** file index (see above); never hand-edit |
 | `Documents/` | Non-config content (Cline workflow docs) |
-| `.github/workflows/ci.yml` | CI: dry-run apply on Linux + macOS, shellcheck, actionlint |
+| `.github/workflows/ci.yml` | CI: dry-run apply on Linux (Augustus + Vespasian) and macOS, gitleaks, shellcheck with chezmoi config, actionlint |
 | `dot_config/opencode/encrypted_opencode.json.age` | Age-encrypted OpenCode auth & configuration |
 | `dotfiles-showcase/` | **Submodule** — interactive web app; never apply, never edit here |
 | `package.json` / `bun.lock` | Runtime CLI deps installed outside mise (see §5) |
@@ -188,7 +188,6 @@ Each CLI/runtime is owned by exactly one manager. Do not spread a tool across tw
   `docs/generate_readme_tree.py` and gated by CI
   (`python3 docs/generate_readme_tree.py --check`). Regenerate it after adding or
   moving dotfiles (`python3 docs/generate_readme_tree.py`).
-- CI (`.github/workflows/ci.yml`) validates templates on Linux + macOS, and runs
-  `shellcheck` over every rendered managed script.
+- CI (`.github/workflows/ci.yml`) validates templates on Linux (Augustus fallback and pinned Vespasian/WSL) and macOS, runs gitleaks secret scanning across full history, executes shellcheck over rendered managed scripts with generated chezmoi configuration, and verifies index/README trees.
 - For changes to tools not self-verified here, run the relevant tool's own tests
   (e.g. the submodule's `bun test`).
