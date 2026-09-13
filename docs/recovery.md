@@ -105,6 +105,38 @@ chezmoi doctor          # health check (see checklist below)
 systemctl --user status omarchy-agents-dashboard.service   # Linux only
 ```
 
+### WSL command recovery notes
+
+Use `mise use -g chezmoi` to install or select chezmoi globally. `mise use`
+without `-g` writes a repo-local `mise.toml`; it also treats later words as
+tool names, so `mise use chezmoi apply --dry-run -v` attempts to install a tool
+named `apply`. Once mise is activated, run chezmoi directly:
+
+```bash
+eval "$(~/.local/bin/mise activate bash)"
+hash -r
+chezmoi apply --dry-run -v
+chezmoi apply
+```
+
+If a push is rejected because the remote branch advanced, preserve both sides
+with `git pull --rebase origin feat/vespasian-wsl` and then push again. If the
+rebase conflicts only in `INDEX.json` or `INDEX.md`, regenerate the indexes
+and README tree, stage them, and continue the rebase:
+
+```bash
+python3 docs/generate_index.py
+python3 docs/generate_readme_tree.py
+git add INDEX.json INDEX.md README.md
+GIT_EDITOR=true git rebase --continue
+git push origin feat/vespasian-wsl
+```
+
+Chezmoi source names beginning with `empty_` map to the same target as the
+name without that prefix. Do not keep both `dot_gemini/config/empty_mcp_config.json`
+and `dot_gemini/config/mcp_config.json`; they produce an inconsistent-state
+error for `~/.gemini/config/mcp_config.json`.
+
 ---
 
 ## 3. `chezmoi doctor` checklist
