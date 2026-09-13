@@ -18,3 +18,15 @@
 # all-clear, and it should be deleted along with the commit if history is ever
 # rewritten to purge it.
 812c7da919116c5bdce32ad78eb1e97131a4d321:dot_config/opencode/opencode.json:generic-api-key:66
+
+# Age recipient (public key) printed in setup.sh onboarding help text. The
+# generic-api-key rule matched because the line said "key: age1…"; it is the
+# same public recipient already documented in docs/recovery.md and
+# .chezmoi.toml.tmpl, not a credential. Current tree reworded to avoid the
+# false positive; these entries silence the historical commits only.
+# STATUS: false positive (public age recipient). No rotation needed.
+78b659b7089cf9a71494e1c721e0ce6acd8b1bc5:setup.sh:generic-api-key:284
+3052b8dc06039b9b5a05f7e171ce933e52a21882:setup.sh:generic-api-key:305
+9c785b46139760ed447a32e8db3c9be1514e095e:setup.sh:generic-api-key:316
+13bca142c1071da95d19c5589ad02212433f2ea2:setup.sh:generic-api-key:319
+71a09c2e5de4c04a19a9360f5a01d85463c8cb26:setup.sh:generic-api-key:319

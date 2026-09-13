@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 4594,
+    "total": 4596,
     "by_category": {
       "shell": 16,
       "prompt": 1,
@@ -17,8 +17,8 @@
       "services": 17,
       "scripts": 32,
       "security": 2,
-      "other": 36,
-      "hooks": 19,
+      "other": 37,
+      "hooks": 20,
       "chezmoi": 9,
       "repo": 4378
     }
@@ -1723,6 +1723,13 @@
       ]
     },
     {
+      "source": "dot_local/share/wsl-ssh-bridge/main.go",
+      "target": "~/.local/share/wsl-ssh-bridge/main.go",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
       "source": "run_after_23-sync-agent-skills.sh.tmpl",
       "kind": "hook",
       "category": "hooks",
@@ -1953,6 +1960,19 @@
         "phase": "after",
         "order": 42,
         "name": "vespasian-theme-state",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_after_43-vespasian-1password-ssh-bridge.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 43,
+        "name": "vespasian-1password-ssh-bridge",
         "template": true
       }
     },

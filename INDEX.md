@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**4594 tracked entries** across 16 categories.
+**4596 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -25,8 +25,8 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Background services](#background-services) | 17 |
 | [Custom executables](#custom-executables) | 32 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Other configuration](#other-configuration) | 36 |
-| [Apply hooks (`run_*`)](#apply-hooks-run) | 19 |
+| [Other configuration](#other-configuration) | 37 |
+| [Apply hooks (`run_*`)](#apply-hooks-run) | 20 |
 | [Chezmoi control files](#chezmoi-control-files) | 9 |
 | [Repository material (not applied)](#repository-material-not-applied) | 4378 |
 
@@ -284,6 +284,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/delta/theme.gitconfig` | `dot_config/delta/theme.gitconfig.tmpl` | — | template |
 | `~/.config/eza/theme.yml` | `dot_config/eza/theme.yml.tmpl` | — | template |
 | `~/.config/fzf/theme.sh` | `dot_config/fzf/theme.sh.tmpl` | — | template |
+| `~/.local/share/wsl-ssh-bridge/main.go` | `dot_local/share/wsl-ssh-bridge/main.go` | — | — |
 
 ## Apply hooks (`run_*`)
 
@@ -308,6 +309,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | 40 | `run_onchange_after_40-vespasian-windows-terminal.sh.tmpl` | runs when this script's contents change | after |
 | 41 | `run_onchange_after_41-vespasian-nerd-font.sh.tmpl` | runs when this script's contents change | after |
 | 42 | `run_onchange_after_42-vespasian-theme-state.sh.tmpl` | runs when this script's contents change | after |
+| 43 | `run_onchange_after_43-vespasian-1password-ssh-bridge.sh.tmpl` | runs when this script's contents change | after |
 
 ## Chezmoi control files
 

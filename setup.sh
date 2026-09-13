@@ -316,7 +316,7 @@ if [[ -f "$KEY_FILE" ]]; then
 else
   warn "No age private key found at $KEY_FILE"
   info "Encrypted files (e.g. opencode.json.age) cannot be decrypted without this key."
-  info "Target recipient public key: age1hf4200nhdqg0l3xs68v4gef6mn0nuvmh72573m3nfj8kqpcs7pnsmfkuw6"
+  info "Target age recipient (public): age1hf4200nhdqg0l3xs68v4gef6mn0nuvmh72573m3nfj8kqpcs7pnsmfkuw6"
 
   KEY_SOURCE="$(ask_choice "How would you like to provide the age key?" "1password" \
     "1password (Retrieve existing key from 1Password vault using 'op read')" \
