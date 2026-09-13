@@ -2,8 +2,14 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - 'feat/**'
+      - 'fix/**'
+      - 'chore/**'
   pull_request:
+    branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -109,6 +115,7 @@ jobs:
       - name: Shellcheck all managed scripts
         run: |
           export PATH="$HOME/.local/bin:$PATH"
+          chezmoi execute-template --source "$PWD" -f .chezmoi.toml.tmpl > /tmp/chezmoi.toml
           status=0
           while IFS= read -r -d '' file; do
             # Review copies under docs/ are evidence, not managed scripts.
@@ -121,7 +128,7 @@ jobs:
             esac
             if [[ "$file" == *.tmpl ]]; then
               out="/tmp/sc_$(echo "$file" | tr '/' '_')"
-              chezmoi execute-template --source "$PWD" --override-data '{"chezmoi":{"osRelease":{"id":"omarchy"}}}' < "$file" > "$out"
+              chezmoi execute-template --config /tmp/chezmoi.toml --source "$PWD" --override-data '{"chezmoi":{"osRelease":{"id":"omarchy"}}}' < "$file" > "$out"
               target="$out"
             else
               target="$file"

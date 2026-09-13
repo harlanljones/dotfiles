@@ -88,7 +88,9 @@ Then install system packages:
   entries via paru/yay: `paru -S --needed - < ~/.config/pacman/aurlist.txt`
 - **Ubuntu on WSL (Vespasian)**: `age` must exist *before* the first apply
   (the dependency gate stops otherwise), so the order is:
-  1. `sudo apt-get install -y age`, and install chezmoi (`mise use -g chezmoi`)
+  1. `sudo apt-get install -y age`, install mise (`curl https://mise.run | sh`),
+     activate mise (`eval "$(~/.local/bin/mise activate bash)"`), and install
+     chezmoi (`mise use -g chezmoi`)
   2. `chezmoi init --apply https://github.com/harlanljones/dotfiles.git`
   3. `xargs -a ~/.config/apt/pkglist.txt sudo apt-get install -y` (tailscale
      needs its apt repository configured first), then `mise install`
@@ -136,6 +138,17 @@ Chezmoi source names beginning with `empty_` map to the same target as the
 name without that prefix. Do not keep both `dot_gemini/config/empty_mcp_config.json`
 and `dot_gemini/config/mcp_config.json`; they produce an inconsistent-state
 error for `~/.gemini/config/mcp_config.json`.
+
+Agent skill installation (`run_onchange_before_09-install-agent-skills.sh`)
+automatically retries without incompatible providers (such as `antigravity`
+on older impeccable releases) and treats download failures as non-fatal warnings
+so `chezmoi apply` completes. Once network connectivity or provider support is
+ready, re-run `dots sync` to install any remaining skills.
+
+Theme switching on Vespasian uses `dots theme set <name>` (e.g. `dots theme set tokyonight-storm`).
+This re-renders the Windows Terminal fragment (`vespasian.json`), updates the JetBrainsMono
+Nerd Font if the pinned release changed, rebuilds the `bat` cache, and updates `~/.claude.json`.
+Restart Windows Terminal and Neovim to load the new theme.
 
 ---
 
