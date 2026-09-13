@@ -4,6 +4,14 @@
 
 set -euo pipefail
 
+for _p in "$HOME/.local/share/mise/shims" "$HOME/.local/bin" "$HOME/.cache/.bun/bin"; do
+  case ":${PATH}:" in
+    *":$_p:"*) ;;
+    *) PATH="$_p:$PATH" ;;
+  esac
+done
+export PATH
+
 # ANSI color styling
 BOLD=$'\033[1m'
 DIM=$'\033[2m'
@@ -100,6 +108,7 @@ ${BOLD}COMMANDS:${NC}
   ${CYAN}push, pp${NC}          Capture templates, commit & push with Ollama-generated message
   ${CYAN}doctor${NC}            Run diagnostics on tools, age keys, agent links, template drift
   ${CYAN}theme${NC}             List, show, or switch this machine's color theme
+  ${CYAN}age, key${NC}          Manage age encryption key & 1Password backup/restore
   ${CYAN}setup${NC}             Run interactive system onboarding & setup wizard
   ${CYAN}help${NC}              Show this help message
 
@@ -147,6 +156,10 @@ ${BOLD}OPTIONS FOR THEME:${NC}
   current            Print the current theme key
   set <name>         Switch theme and run dots sync
     --no-sync        Only edit the source repo; apply later with dots sync
+${BOLD}OPTIONS FOR AGE / KEY:${NC}
+  status             Show key file path, derived public key, and 1Password status
+  backup [vault]     Save age private key to 1Password vault (default: Personal)
+  restore [uri]      Restore age private key from 1Password URI
 
 ${BOLD}EXAMPLES:${NC}
   dots sync                # Fast apply managed dotfiles
@@ -589,7 +602,7 @@ cmd_doctor() {
     echo -e " ${RED}✗${NC} ${BOLD}source repo:${NC} $src is not a git repository"
   fi
 
-  # 3. Age encryption key
+  # 3. Age encryption key & 1Password
   local age_key="${HOME}/.config/chezmoi/key.txt"
   if [[ -f "$age_key" ]]; then
     echo -e " ${GREEN}✓${NC} ${BOLD}age key:${NC} found at $age_key"
@@ -597,6 +610,15 @@ cmd_doctor() {
     echo -e " ${DIM}–${NC} ${BOLD}age:${NC} installed (custom key path or unencrypted config)"
   else
     echo -e " ${YELLOW}!${NC} ${BOLD}age:${NC} age binary not found in PATH"
+  fi
+  if command -v op >/dev/null 2>&1; then
+    local op_ver
+    op_ver=$(op --version 2>/dev/null || echo "installed")
+    if op whoami >/dev/null 2>&1; then
+      echo -e " ${GREEN}✓${NC} ${BOLD}1password:${NC} v$op_ver (authenticated)"
+    else
+      echo -e " ${DIM}–${NC} ${BOLD}1password:${NC} v$op_ver (installed; run 'eval \$(op signin)' to authenticate)"
+    fi
   fi
 
   # 4. Runtime managers (Mise / Bun)
@@ -673,6 +695,94 @@ cmd_doctor() {
   echo -e "${GREEN}Diagnostics complete.${NC}"
 }
 
+cmd_age() {
+  local subcmd="${1:-status}"
+  shift || true
+  local key_file="${HOME}/.config/chezmoi/key.txt"
+
+  case "$subcmd" in
+    status)
+      echo -e "${BOLD}=== Age Encryption & 1Password Status ===${NC}"
+      if [[ -f "$key_file" ]]; then
+        local perm
+        perm=$(stat -c '%a' "$key_file" 2>/dev/null || stat -f '%Lp' "$key_file" 2>/dev/null || echo "ok")
+        echo -e " ${GREEN}✓${NC} ${BOLD}age key file:${NC} $key_file (permissions: $perm)"
+        if command -v age-keygen >/dev/null 2>&1; then
+          local pub
+          pub=$(age-keygen -y "$key_file" 2>/dev/null || echo "unable to derive")
+          echo -e "   ${CYAN}Public recipient:${NC} $pub"
+        fi
+      else
+        echo -e " ${YELLOW}!${NC} ${BOLD}age key file:${NC} not found at $key_file"
+      fi
+
+      if command -v op >/dev/null 2>&1; then
+        local op_ver
+        op_ver=$(op --version 2>/dev/null || echo "installed")
+        echo -e " ${GREEN}✓${NC} ${BOLD}1Password CLI:${NC} v$op_ver"
+        if op whoami >/dev/null 2>&1; then
+          echo -e "   ${GREEN}✓${NC} 1Password session active"
+        else
+          echo -e "   ${YELLOW}!${NC} 1Password session not authenticated (run: eval \$(op signin))"
+        fi
+      else
+        echo -e " ${YELLOW}!${NC} ${BOLD}1Password CLI:${NC} op binary not found in PATH"
+      fi
+      ;;
+    backup)
+      if [[ ! -f "$key_file" ]]; then
+        echo -e "${RED}error:${NC} No age key found at $key_file to backup." >&2
+        return 1
+      fi
+      if ! command -v op >/dev/null 2>&1; then
+        echo -e "${RED}error:${NC} 1Password CLI (op) not found in PATH." >&2
+        return 1
+      fi
+      local vault="${1:-Personal}"
+      echo -e "${CYAN}Backing up $key_file to 1Password vault '$vault'...${NC}"
+      if op item get "chezmoi-age-key" --vault="$vault" >/dev/null 2>&1; then
+        if op item edit "chezmoi-age-key" notesPlain="$(cat "$key_file")" --vault="$vault"; then
+          echo -e "${GREEN}✓ Updated existing 'chezmoi-age-key' item in vault '$vault'.${NC}"
+        else
+          echo -e "${RED}error:${NC} Failed to update 1Password item. Run 'eval \$(op signin)'." >&2
+          return 1
+        fi
+      else
+        if op item create --category="Secure Note" --title="chezmoi-age-key" notesPlain="$(cat "$key_file")" --vault="$vault"; then
+          echo -e "${GREEN}✓ Created 'chezmoi-age-key' secure note in vault '$vault'.${NC}"
+        else
+          echo -e "${RED}error:${NC} Failed to create 1Password item. Run 'eval \$(op signin)'." >&2
+          return 1
+        fi
+      fi
+      ;;
+    restore)
+      local uri="${1:-op://Personal/chezmoi-age-key/notesPlain}"
+      if ! command -v op >/dev/null 2>&1; then
+        echo -e "${RED}error:${NC} 1Password CLI (op) not found in PATH." >&2
+        return 1
+      fi
+      mkdir -p "$(dirname "$key_file")"
+      echo -e "${CYAN}Restoring age key from 1Password ($uri)...${NC}"
+      local tmp
+      tmp="$(mktemp)"
+      if op read "$uri" > "$tmp" 2>/dev/null && [[ -s "$tmp" ]]; then
+        mv "$tmp" "$key_file"
+        chmod 600 "$key_file"
+        echo -e "${GREEN}✓ Age key restored to $key_file (0600).${NC}"
+      else
+        rm -f "$tmp"
+        echo -e "${RED}error:${NC} Failed to read secret from '$uri'. Ensure 'eval \$(op signin)' is complete." >&2
+        return 1
+      fi
+      ;;
+    *)
+      echo "Usage: dots age [status|backup <vault>|restore <uri>]"
+      return 1
+      ;;
+  esac
+}
+
 cmd_setup() {
   local src
   src="$(get_source_dir)"
@@ -703,6 +813,7 @@ main() {
     push|pp)        cmd_push "$@" ;;
     doctor)         cmd_doctor "$@" ;;
     theme)          cmd_theme "$@" ;;
+    age|key)        cmd_age "$@" ;;
     setup)          cmd_setup "$@" ;;
     help|-h|--help) usage ;;
     *)

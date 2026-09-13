@@ -32,14 +32,37 @@ applying. Note also that `encryption = "age"` must appear *above* the first
 table header in that template — below `[data]`, TOML nests it inside that table
 and chezmoi warns `'encryption' not set` and proceeds unencrypted.
 
-### Back it up now
+### Back it up now (1Password & Offline)
 
-1. Copy `key.txt` to at least one offline location:
-   - Encrypted USB drive, or
-   - A password manager secure note (it is a short text file), or
-   - An encrypted cloud vault.
-2. Verify the copy: `diff ~/.config/chezmoi/key.txt /path/to/backup/key.txt`
-3. Record where the backup lives somewhere other than this machine.
+The primary and recommended backup store for the age key is **1Password**:
+
+```bash
+# Automated via dots CLI (updates existing or creates new):
+dots age backup Personal
+
+# Or directly with 1Password CLI:
+op item create --category="Secure Note" \
+  --title="chezmoi-age-key" \
+  notesPlain="$(cat ~/.config/chezmoi/key.txt)" \
+  --vault="Personal"
+```
+
+To restore the age key onto a fresh machine from 1Password:
+
+```bash
+# Automated via dots CLI:
+dots age restore op://Personal/chezmoi-age-key/notesPlain
+
+# Or directly with 1Password CLI:
+mkdir -p ~/.config/chezmoi
+op read "op://Personal/chezmoi-age-key/notesPlain" > ~/.config/chezmoi/key.txt
+chmod 600 ~/.config/chezmoi/key.txt
+```
+
+You can also copy `key.txt` to an offline location:
+- Encrypted USB drive, or
+- Additional offline encrypted backup.
+Verify the copy: `diff ~/.config/chezmoi/key.txt /path/to/backup/key.txt`
 
 ### If the key is lost
 

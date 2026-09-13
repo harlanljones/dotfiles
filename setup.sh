@@ -5,6 +5,14 @@
 
 set -euo pipefail
 
+for _p in "$HOME/.local/share/mise/shims" "$HOME/.local/bin" "$HOME/.cache/.bun/bin"; do
+  case ":${PATH}:" in
+    *":$_p:"*) ;;
+    *) PATH="$_p:$PATH" ;;
+  esac
+done
+export PATH
+
 # ──────────────────────────────────────────────────────────────────────────
 # Styling & UI Helpers
 # ──────────────────────────────────────────────────────────────────────────
@@ -219,7 +227,9 @@ if [[ "$SYS_OS" == "Darwin" ]]; then
   fi
   if [[ -f dot_Brewfile ]]; then
     if confirm "Run 'brew bundle' to install packages from dot_Brewfile?" "Y"; then
-      [[ "$DRY_RUN" == "false" ]] && brew bundle --file=dot_Brewfile || warn "Some brew packages failed to install."
+      if [[ "$DRY_RUN" == "false" ]]; then
+        brew bundle --file=dot_Brewfile || warn "Some brew packages failed to install."
+      fi
     fi
   fi
 elif [[ "$DISTRO_ID" == "ubuntu" || "$DISTRO_ID" == "debian" ]]; then
@@ -249,7 +259,10 @@ elif [[ "$DISTRO_ID" == "arch" ]]; then
   PACMAN_PKG_FILE="$SCRIPT_DIR/dot_config/pacman/pkglist.txt"
   if [[ -f "$PACMAN_PKG_FILE" ]]; then
     if confirm "Synchronize pacman packages from pkglist.txt?" "Y"; then
-      [[ "$DRY_RUN" == "false" ]] && sudo pacman -S --needed - < "$PACMAN_PKG_FILE" || warn "Pacman sync incomplete."
+      if [[ "$DRY_RUN" == "false" ]]; then
+        # shellcheck disable=SC2024
+        sudo pacman -S --needed - < "$PACMAN_PKG_FILE" || warn "Pacman sync incomplete."
+      fi
     fi
   fi
 fi
@@ -270,10 +283,18 @@ if [[ -f "$KEY_FILE" ]]; then
       read -r OP_VAULT || OP_VAULT=""
       OP_VAULT="${OP_VAULT:-Personal}"
       if [[ "$DRY_RUN" == "false" ]]; then
-        if op item create --category="Secure Note" --title="chezmoi-age-key" notesPlain="$(cat "$KEY_FILE")" --vault="$OP_VAULT" 2>/dev/null; then
-          success "Age key successfully backed up to 1Password vault '$OP_VAULT'."
+        if op item get "chezmoi-age-key" --vault="$OP_VAULT" >/dev/null 2>&1; then
+          if op item edit "chezmoi-age-key" notesPlain="$(cat "$KEY_FILE")" --vault="$OP_VAULT" 2>/dev/null; then
+            success "Age key successfully updated in 1Password vault '$OP_VAULT'."
+          else
+            warn "Could not update 1Password item. Ensure you are signed in via 'eval \$(op signin)'."
+          fi
         else
-          warn "Could not create 1Password item. Ensure you are signed in via 'op signin'."
+          if op item create --category="Secure Note" --title="chezmoi-age-key" notesPlain="$(cat "$KEY_FILE")" --vault="$OP_VAULT" 2>/dev/null; then
+            success "Age key successfully backed up to 1Password vault '$OP_VAULT'."
+          else
+            warn "Could not create 1Password item. Ensure you are signed in via 'eval \$(op signin)'."
+          fi
         fi
       fi
     fi
@@ -419,12 +440,15 @@ mkdir -p "$(dirname "$CHEZMOI_CONFIG")"
 
 if [[ "$DRY_RUN" == "false" ]]; then
   # Write or update local machine definition
-  cat <<EOF > "$CHEZMOI_CONFIG"
+cat <<EOF > "$CHEZMOI_CONFIG"
 encryption = "age"
 
 [age]
 identity = "~/.config/chezmoi/key.txt"
 recipient = "age1hf4200nhdqg0l3xs68v4gef6mn0nuvmh72573m3nfj8kqpcs7pnsmfkuw6"
+
+[onepassword]
+prompt = true
 
 [data]
 machine = '$SELECTED_MACHINE'
