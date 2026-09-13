@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**4643 tracked entries** across 16 categories.
+**4595 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -17,7 +17,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Prompt](#prompt) | 1 |
 | [Terminal & multiplexer](#terminal--multiplexer) | 4 |
 | [Editors](#editors) | 17 |
-| [Desktop & window manager](#desktop--window-manager) | 58 |
+| [Desktop & window manager](#desktop--window-manager) | 10 |
 | [Version control](#version-control) | 4 |
 | [Navigation & search](#navigation--search) | 3 |
 | [Toolchain & packages](#toolchain--packages) | 5 |
@@ -103,54 +103,6 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/hypr/monitors.lua` | `dot_config/hypr/monitors.lua` | hyprland | — |
 | `~/.config/omarchy/shell.json` | `dot_config/omarchy/create_private_shell.json.tmpl` | omarchy | create, private, template |
 | `~/.config/omarchy/defaults/agent` | `dot_config/omarchy/defaults/agent.tmpl` | omarchy | template |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/aether.zed.json` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/aether.zed.json` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/alacritty.toml` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/alacritty.toml` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/backgrounds/5d0e5451240b8b7f.jpg` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/backgrounds/5d0e5451240b8b7f.jpg` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/btop.theme` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/btop.theme` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/chromium.theme` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/chromium.theme` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/colors.toml` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/colors.toml` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/foot.ini` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/foot.ini` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/ghostty.conf` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/ghostty.conf` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/hyprland.conf` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/hyprland.conf` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/hyprlock.conf` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/hyprlock.conf` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/icons.theme` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/icons.theme` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/kitty.conf` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/kitty.conf` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/mako.ini` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/mako.ini` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/neovim.lua` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/neovim.lua` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/swayosd.css` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/swayosd.css` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/vencord.theme.css` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/vencord.theme.css` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/vscode-extension/package.json` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/vscode-extension/package.json` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/vscode-extension/themes/aether-color-theme.json` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/vscode-extension/themes/aether-color-theme.json` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/vscode.json` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/vscode.json` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/walker.css` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/walker.css` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/warp.yaml` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/warp.yaml` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/waybar.css` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/waybar.css` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/wofi.css` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/wofi.css` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/zellij.kdl` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-aether/zellij.kdl` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/aether.zed.json` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/aether.zed.json` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/alacritty.toml` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/alacritty.toml` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/backgrounds/5d0e5451240b8b7f.jpg` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/backgrounds/5d0e5451240b8b7f.jpg` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/btop.theme` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/btop.theme` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/chromium.theme` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/chromium.theme` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/colors.toml` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/colors.toml` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/foot.ini` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/foot.ini` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/ghostty.conf` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/ghostty.conf` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/hyprland.conf` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/hyprland.conf` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/hyprlock.conf` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/hyprlock.conf` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/icons.theme` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/icons.theme` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/kitty.conf` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/kitty.conf` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/mako.ini` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/mako.ini` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/neovim.lua` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/neovim.lua` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/swayosd.css` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/swayosd.css` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/vencord.theme.css` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/vencord.theme.css` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/vscode-extension/package.json` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/vscode-extension/package.json` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/vscode-extension/themes/aether-color-theme.json` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/vscode-extension/themes/aether-color-theme.json` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/vscode.json` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/vscode.json` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/walker.css` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/walker.css` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/warp.yaml` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/warp.yaml` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/waybar.css` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/waybar.css` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/wofi.css` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/wofi.css` | omarchy | — |
-| `~/.config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/zellij.kdl` | `dot_config/omarchy/themes/red-mountain-peaks-at-dusk-01-red-palette/zellij.kdl` | omarchy | — |
 | `~/.local/share/applications/cursor-desktop.desktop` | `dot_local/share/applications/cursor-desktop.desktop` | desktop entries | — |
 
 ## Version control

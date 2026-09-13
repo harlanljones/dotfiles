@@ -8,11 +8,9 @@
 # Theme the Ubuntu profile in Windows Terminal with the `dots theme` selection
 # ({{ (index .themes $name).label }}).
 #
-# Writes one additive JSON fragment under %LOCALAPPDATA%\Microsoft\Windows
-# Terminal\Fragments\dots. Fragments can add color schemes and update existing
-# profiles by guid, so the user's settings.json is never touched. Delete the
-# fragment and restart Windows Terminal to undo. Scheme values come from
-# .chezmoitemplates/themes/{{ $name }}/windows_terminal.json.
+# Writes additive JSON fragments and updates Windows Terminal settings.json so
+# the theme applies reliably in real time to packaged and unpackaged instances.
+# Scheme values come from .chezmoitemplates/themes/{{ $name }}/windows_terminal.json.
 
 set -euo pipefail
 
@@ -23,10 +21,15 @@ fi
 
 # cmd.exe warns about UNC working directories; start it from a Windows path.
 win_localappdata="$(cd /mnt/c && cmd.exe /d /c 'echo %LOCALAPPDATA%' 2>/dev/null | tr -d '\r')"
-fragment_dir="$(wslpath "$win_localappdata")/Microsoft/Windows Terminal/Fragments/dots"
-mkdir -p "$fragment_dir"
+wsl_localappdata="$(wslpath "$win_localappdata")"
 
-cat >"$fragment_dir/vespasian.json" <<'EOF'
+# 1. Write fragments to standard unpackaged and packaged locations
+fragment_dirs=(
+  "$wsl_localappdata/Microsoft/Windows Terminal/Fragments/dots"
+  "$wsl_localappdata/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/Fragments/dots"
+)
+
+fragment_json=$(cat <<'EOF'
 {
   "$help": "Managed by chezmoi (harlanljones/dotfiles, machine vespasian). Edits here are overwritten.",
   "schemes": [ {{ $scheme | toJson }} ],
@@ -44,6 +47,77 @@ cat >"$fragment_dir/vespasian.json" <<'EOF'
   ]
 }
 EOF
+)
 
-echo "windows-terminal: wrote $fragment_dir/vespasian.json (restart Windows Terminal to load it)"
+for dir in "${fragment_dirs[@]}"; do
+  parent="$(dirname "$dir")"
+  if [[ -d "$(dirname "$parent")" ]]; then
+    mkdir -p "$dir"
+    printf '%s\n' "$fragment_json" > "$dir/vespasian.json"
+  fi
+done
+
+# 2. Directly update settings.json in Windows Terminal to ensure live reload
+# and overcome dynamic WSL profile fragment priority limitations
+python3 - "$wsl_localappdata" <<'PY_EOF'
+import json
+import os
+import sys
+
+wsl_appdata = sys.argv[1]
+scheme = json.loads(r'''{{ $scheme | toJson }}''')
+profile_guid = "{{ $wt.profileGuid }}"
+font_face = "{{ $wt.fontFace }}"
+font_size = int("{{ $wt.fontSize }}")
+
+settings_candidates = [
+    os.path.join(wsl_appdata, "Packages", "Microsoft.WindowsTerminal_8wekyb3d8bbwe", "LocalState", "settings.json"),
+    os.path.join(wsl_appdata, "Microsoft", "Windows Terminal", "settings.json"),
+]
+
+for path in settings_candidates:
+    if not os.path.isfile(path):
+        continue
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception:
+        continue
+
+    # Update schemes
+    schemes = data.get("schemes", [])
+    schemes = [s for s in schemes if s.get("name") != scheme.get("name")]
+    schemes.append(scheme)
+    data["schemes"] = schemes
+
+    # Update profile
+    profiles = data.setdefault("profiles", {})
+    plist = profiles.get("list", [])
+    matched = False
+    for p in plist:
+        if p.get("guid") == profile_guid or "Ubuntu" in p.get("name", ""):
+            p["colorScheme"] = scheme.get("name")
+            p["font"] = {"face": font_face, "size": font_size}
+            p["padding"] = "12, 8"
+            p["cursorShape"] = "bar"
+            p["opacity"] = 96
+            p["useAcrylic"] = True
+            p["intenseTextStyle"] = "bright"
+            matched = True
+
+    # Set as default profile if Ubuntu exists
+    data["defaultProfile"] = profile_guid
+
+    # Also set color scheme on defaults so any new or existing terminal tab inherits it
+    defaults = profiles.setdefault("defaults", {})
+    defaults["colorScheme"] = scheme.get("name")
+    defaults["font"] = {"face": font_face, "size": font_size}
+
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(data, f, indent=4)
+        f.write("\n")
+    print(f"windows-terminal: updated {path}")
+PY_EOF
+
+echo "windows-terminal: applied {{ $scheme.name }} ({{ (index .themes $name).label }}) to Windows Terminal"
 {{- end -}}

@@ -1,60 +1,57 @@
-{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+{{- $statusCmd := ternary (joinPath .chezmoi.homeDir ".local/bin/omarchy-cursor-statusline") "~/.local/bin/statusline" (and (hasKey . "machine") (eq .machine "augustus")) -}}
 #!/bin/bash
-# Configures Cursor CLI integration for the Omarchy Agents leaderboard plugin.
-# Managed by chezmoi. Cursor CLI itself is installed separately
-# (curl https://cursor.com/install -fsS | bash) — this only wires up the
-# leaderboard once it's present.
+# Configures Cursor CLI integration and shared statusline across all machines.
+# statusline command: {{ $statusCmd }}
 
 set -euo pipefail
 
-PLUGIN_DIR="$HOME/.config/omarchy/plugins/harlan.agent-leaderboard"
-if [[ ! -d "$PLUGIN_DIR" ]]; then
-  exit 0
-fi
+# 1. Register the statusLine hook in Cursor's cli-config.json
+for conf_dir in "$HOME/.cursor" "$HOME/.config/cursor"; do
+  mkdir -p "$conf_dir"
+  CLI_CONFIG="$conf_dir/cli-config.json"
+  python3 - "$CLI_CONFIG" "{{ $statusCmd }}" << 'PY_EOF' || true
+import json
+import os
+import sys
 
-# 1. Deploy SVG asset. Cursor's brand orange (#F54E00) reads fine on both
-# light and dark surfaces, so — like Claude and Fireworks — it ships a
-# single mark with no separate -light variant.
-mkdir -p "$PLUGIN_DIR/assets"
-cat << 'SVG_EOF' > "$PLUGIN_DIR/assets/cursor.svg"
+config_path, command = sys.argv[1], sys.argv[2]
+data = {}
+if os.path.isfile(config_path):
+    try:
+        with open(config_path, encoding="utf-8") as handle:
+            data = json.load(handle)
+    except Exception:
+        data = {}
+
+data["statusLine"] = {"type": "command", "command": command, "padding": 0}
+tmp_path = config_path + ".tmp"
+with open(tmp_path, "w", encoding="utf-8") as handle:
+    json.dump(data, handle, indent=2)
+    handle.write("\n")
+os.replace(tmp_path, config_path)
+PY_EOF
+done
+
+{{ if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+PLUGIN_DIR="$HOME/.config/omarchy/plugins/harlan.agent-leaderboard"
+if [[ -d "$PLUGIN_DIR" ]]; then
+  # 2. Deploy SVG asset.
+  mkdir -p "$PLUGIN_DIR/assets"
+  cat << 'SVG_EOF' > "$PLUGIN_DIR/assets/cursor.svg"
 <svg fill="#F54E00" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
   <title>Cursor</title>
   <path d="M4 2.5 19.5 11 12.6 12.9 10.8 20.5 4 2.5Z"/>
 </svg>
 SVG_EOF
 
-# 2. Patch Panel.qml if cursor isn't registered
-if ! grep -q "cursor: true" "$PLUGIN_DIR/Panel.qml"; then
-  sed -i 's/readonly property var shippedMarks: ({/readonly property var shippedMarks: ({\n    cursor: true,/' "$PLUGIN_DIR/Panel.qml"
-  sed -i 's/function agentAccent(id, index) {/function agentAccent(id, index) {\n    if (id === "cursor") return "#F54E00"/' "$PLUGIN_DIR/Panel.qml"
-  sed -i 's/function agentAccent(id) {/function agentAccent(id) {\n    if (id === "cursor") return "#F54E00"/' "$PLUGIN_DIR/Panel.qml"
+  # 3. Patch Panel.qml if cursor isn't registered
+  if ! grep -q "cursor: true" "$PLUGIN_DIR/Panel.qml"; then
+    sed -i 's/readonly property var shippedMarks: ({/readonly property var shippedMarks: ({\n    cursor: true,/' "$PLUGIN_DIR/Panel.qml"
+    sed -i 's/function agentAccent(id, index) {/function agentAccent(id, index) {\n    if (id === "cursor") return "#F54E00"/' "$PLUGIN_DIR/Panel.qml"
+    sed -i 's/function agentAccent(id) {/function agentAccent(id) {\n    if (id === "cursor") return "#F54E00"/' "$PLUGIN_DIR/Panel.qml"
+  fi
+
+  # 4. Run initial usage collection
+  omarchy-agent-usage-update || true
 fi
-
-# 3. Register the token-usage statusLine hook, without touching any other
-# key a user (or Cursor itself) has already set in cli-config.json. Skipped
-# entirely if the file doesn't exist yet (Cursor creates it on first run) or
-# if a statusLine is already configured — never override a customization.
-CLI_CONFIG="$HOME/.config/cursor/cli-config.json"
-if [[ -f "$CLI_CONFIG" ]]; then
-  python3 - "$CLI_CONFIG" "$HOME/.local/bin/omarchy-cursor-statusline" << 'PY_EOF' || true
-import json
-import sys
-
-config_path, command = sys.argv[1], sys.argv[2]
-with open(config_path, encoding="utf-8") as handle:
-  data = json.load(handle)
-
-if "statusLine" not in data:
-  data["statusLine"] = {"type": "command", "command": command, "padding": 0}
-  tmp_path = config_path + ".tmp"
-  with open(tmp_path, "w", encoding="utf-8") as handle:
-    json.dump(data, handle, indent=2)
-    handle.write("\n")
-  import os
-  os.replace(tmp_path, config_path)
-PY_EOF
-fi
-
-# 4. Run initial usage collection
-omarchy-agent-usage-update || true
-{{- end -}}
+{{- end }}

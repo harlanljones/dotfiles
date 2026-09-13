@@ -290,65 +290,8 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │           └── vim-be-good.lua
 │   ├── omarchy
 │   │   ├── create_private_shell.json.tmpl
-│   │   ├── defaults
-│   │   │   └── agent.tmpl
-│   │   └── themes
-│   │       ├── red-mountain-peaks-at-dusk-01-red-aether
-│   │       │   ├── aether.zed.json
-│   │       │   ├── alacritty.toml
-│   │       │   ├── backgrounds
-│   │       │   │   └── 5d0e5451240b8b7f.jpg
-│   │       │   ├── btop.theme
-│   │       │   ├── chromium.theme
-│   │       │   ├── colors.toml
-│   │       │   ├── foot.ini
-│   │       │   ├── ghostty.conf
-│   │       │   ├── hyprland.conf
-│   │       │   ├── hyprlock.conf
-│   │       │   ├── icons.theme
-│   │       │   ├── kitty.conf
-│   │       │   ├── mako.ini
-│   │       │   ├── neovim.lua
-│   │       │   ├── swayosd.css
-│   │       │   ├── vencord.theme.css
-│   │       │   ├── vscode-extension
-│   │       │   │   ├── package.json
-│   │       │   │   └── themes
-│   │       │   │       └── aether-color-theme.json
-│   │       │   ├── vscode.json
-│   │       │   ├── walker.css
-│   │       │   ├── warp.yaml
-│   │       │   ├── waybar.css
-│   │       │   ├── wofi.css
-│   │       │   └── zellij.kdl
-│   │       └── red-mountain-peaks-at-dusk-01-red-palette
-│   │           ├── aether.zed.json
-│   │           ├── alacritty.toml
-│   │           ├── backgrounds
-│   │           │   └── 5d0e5451240b8b7f.jpg
-│   │           ├── btop.theme
-│   │           ├── chromium.theme
-│   │           ├── colors.toml
-│   │           ├── foot.ini
-│   │           ├── ghostty.conf
-│   │           ├── hyprland.conf
-│   │           ├── hyprlock.conf
-│   │           ├── icons.theme
-│   │           ├── kitty.conf
-│   │           ├── mako.ini
-│   │           ├── neovim.lua
-│   │           ├── swayosd.css
-│   │           ├── vencord.theme.css
-│   │           ├── vscode-extension
-│   │           │   ├── package.json
-│   │           │   └── themes
-│   │           │       └── aether-color-theme.json
-│   │           ├── vscode.json
-│   │           ├── walker.css
-│   │           ├── warp.yaml
-│   │           ├── waybar.css
-│   │           ├── wofi.css
-│   │           └── zellij.kdl
+│   │   └── defaults
+│   │       └── agent.tmpl
 │   ├── opencode
 │   │   ├── agents
 │   │   │   ├── private_codebase-memory-auditor.md

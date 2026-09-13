@@ -603,6 +603,11 @@ cmd_doctor() {
     local mise_ver
     mise_ver=$(mise --version 2>/dev/null | head -n 1)
     echo -e " ${GREEN}✓${NC} ${BOLD}mise:${NC} $mise_ver"
+    local missing_tools
+    missing_tools=$(mise ls --missing 2>/dev/null | wc -l || echo 0)
+    if [[ "$missing_tools" -gt 0 ]]; then
+      echo -e "   ${YELLOW}!${NC} ${DIM}$missing_tools requested mise tool(s) missing; run: mise install${NC}"
+    fi
   fi
   if command -v bun >/dev/null 2>&1; then
     local bun_ver
