@@ -536,7 +536,6 @@ Declarative tracking for system-level packages that mise does not manage:
 │   │   ├── private_codebase-memory-scout.md
 │   │   └── private_codebase-memory.md
 │   ├── config
-│   │   ├── empty_mcp_config.json
 │   │   ├── mcp_config.json
 │   │   └── skills
 │   │       └── symlink_project-doc-planner

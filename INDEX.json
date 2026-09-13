@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 4644,
+    "total": 4642,
     "by_category": {
       "shell": 16,
       "prompt": 1,
@@ -13,14 +13,14 @@
       "vcs": 4,
       "navigation": 3,
       "toolchain": 5,
-      "agents": 42,
+      "agents": 41,
       "services": 17,
       "scripts": 32,
       "security": 2,
       "other": 37,
       "hooks": 19,
       "chezmoi": 9,
-      "repo": 4378
+      "repo": 4377
     }
   },
   "categories": [
@@ -1260,16 +1260,6 @@
       "category": "agents",
       "attributes": [
         "private"
-      ],
-      "subsystem": "gemini"
-    },
-    {
-      "source": "dot_gemini/config/empty_mcp_config.json",
-      "target": "~/.gemini/config/mcp_config.json",
-      "kind": "dotfile",
-      "category": "agents",
-      "attributes": [
-        "empty"
       ],
       "subsystem": "gemini"
     },
@@ -28672,12 +28662,6 @@
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
-    },
-    {
-      "source": "dotfiles-showcase",
-      "kind": "repo",
-      "category": "repo",
-      "role": "Submodule \u2014 the showcase web app; never applied"
     },
     {
       "source": "package.json",

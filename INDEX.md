@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**4644 tracked entries** across 16 categories.
+**4642 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -21,14 +21,14 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Version control](#version-control) | 4 |
 | [Navigation & search](#navigation--search) | 3 |
 | [Toolchain & packages](#toolchain--packages) | 5 |
-| [AI agent harnesses](#ai-agent-harnesses) | 42 |
+| [AI agent harnesses](#ai-agent-harnesses) | 41 |
 | [Background services](#background-services) | 17 |
 | [Custom executables](#custom-executables) | 32 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
 | [Other configuration](#other-configuration) | 37 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 19 |
 | [Chezmoi control files](#chezmoi-control-files) | 9 |
-| [Repository material (not applied)](#repository-material-not-applied) | 4378 |
+| [Repository material (not applied)](#repository-material-not-applied) | 4377 |
 
 ---
 
@@ -216,7 +216,6 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.gemini/agents/codebase-memory-auditor.md` | `dot_gemini/agents/private_codebase-memory-auditor.md` | gemini | private |
 | `~/.gemini/agents/codebase-memory-scout.md` | `dot_gemini/agents/private_codebase-memory-scout.md` | gemini | private |
 | `~/.gemini/agents/codebase-memory.md` | `dot_gemini/agents/private_codebase-memory.md` | gemini | private |
-| `~/.gemini/config/mcp_config.json` | `dot_gemini/config/empty_mcp_config.json` | gemini | empty |
 | `~/.gemini/config/mcp_config.json` | `dot_gemini/config/mcp_config.json` | gemini | — |
 | `~/.gemini/config/skills/project-doc-planner` | `dot_gemini/config/skills/symlink_project-doc-planner` | gemini | symlink |
 | `~/.gemini/settings.json` | `dot_gemini/modify_private_settings.json` | gemini | modify, private |
@@ -4752,6 +4751,5 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/test_inventory.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/test_review.py` | Recovery guide and repository maintenance scripts |
 | `docs/test_gitleaks.py` | Recovery guide and repository maintenance scripts |
-| `dotfiles-showcase` | Submodule — the showcase web app; never applied |
 | `package.json` | Runtime CLI deps installed outside mise |
 | `to-questionnaire-dotfiles-sync-cli.md` | Scratch planning documents |
