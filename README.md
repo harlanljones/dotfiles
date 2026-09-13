@@ -1,261 +1,132 @@
 # Dotfiles
 
-Personal dotfiles managed across macOS and Linux (Omarchy / Arch Linux) using [chezmoi](https://www.chezmoi.io/) and [age](https://github.com/FiloSottile/age) encryption.
+This repository manages personal dotfiles across Linux and macOS.
+It uses [chezmoi](https://www.chezmoi.io/) for configuration management.
+It uses [age](https://github.com/FiloSottile/age) for secret encryption.
+It keeps tools, editors, and shells aligned across multiple workstations.
 
----
+## Quick Start
 
-## 🗺️ Finding things
+### New Machine Setup
 
-[`INDEX.md`](INDEX.md) is a categorized map of every tracked file — its
-home-directory target, chezmoi attributes, and subsystem — with
-[`INDEX.json`](INDEX.json) as the machine-readable equivalent that the showcase
-app and development agents read. Both are **generated** by
-`docs/generate_index.py` and verified by CI; edit the script, never the
-artifacts.
+Install chezmoi and apply the configurations in one command:
 
-Agent work is coordinated through [the tracker guide](docs/agents/issue-tracker.md).
-The [Skills Review library](docs/skill-review/README.md) contains tracked candidate
-copies and evidence, not active skills. `docs/` is excluded from chezmoi apply;
-local `.unlazy/` coordination state is excluded from both Git and apply.
-Secret scanning retains all default rules and full-history coverage. Narrow,
-verified example exceptions live in `.gitleaks.toml` and are regression-tested;
-`.gitleaksignore` separately records the historical compromised credential.
+```bash
+chezmoi init --apply https://github.com/harlanljones/dotfiles.git
+```
 
----
+The bootstrap script checks for required tools automatically.
+It verifies that git and age are installed before applying changes.
+For full recovery instructions, see [docs/recovery.md](docs/recovery.md).
 
-## 🖥️ Machines
+### Daily Workflow
 
-This repository identifies each workstation by a canonical **machine name** resolved at apply time (see `.chezmoi.toml.tmpl` → `[data] machine`). Detection is hostname-first with an OS fallback, so a box is identified deterministically without renaming the system. All three machines are pinned by hostname; a WSL kernel (`microsoft` in the kernel release) falls back to Vespasian, and the OS fallback only catches an unregistered box:
+You can manage your configuration using the `dots` wrapper:
 
-| Machine | OS | System hostname |
-| --- | --- | --- |
-| **Augustus** | Linux (Omarchy / Arch) | `omarchy` |
-| **Hadrian** | macOS (M1 Pro) | `MacBookPro` |
-| **Vespasian** | Ubuntu 24.04 on WSL2 (Windows gaming/dev PC) | `DESKTOP-UTOJEVB` |
+```bash
+dots status       # Check for local file changes
+dots diff         # Review pending changes
+dots sync         # Apply repository changes to your home directory
+dots push         # Commit with an AI-generated message and push to git
+```
 
-**Vespasian** has no Omarchy base layer and no Linux desktop, so it differs from Augustus in a few deliberate ways:
+You can also run standard chezmoi commands directly:
 
-- **Shell:** `.bashrc` sources Omarchy's base rc only when it exists; `~/.config/shell/15-base-bash.sh` supplies history, completion, `mise activate bash` and `starship init bash` instead. Every other shell module (aliases, agents, prompt, navigation, theme) is shared unchanged.
-- **Tools:** the CLIs pacman/brew own elsewhere come from mise via `~/.config/mise/conf.d/vespasian.toml`; system packages are listed in `~/.config/apt/pkglist.txt`.
-- **Theme:** Tokyo Night (`tokyonight-night` default) everywhere, taken from `folke/tokyonight.nvim` extras. Windows Terminal gets a color scheme and Ubuntu-profile update through an additive fragment (`run_onchange_after_40-vespasian-windows-terminal.sh.tmpl`; `settings.json` is never edited), JetBrainsMono Nerd Font is installed per-user (`41`), and Neovim, lazygit, delta, bat, eza, fzf, Gemini CLI and Claude Code (`dark-ansi`, `42`) are themed to match. Starship, opencode and Codex draw with terminal colors, so they follow the scheme. Switch with `dots theme set <name>` (`dots theme` lists Tokyo Night night/storm/moon/day); themes are registered in `.chezmoidata/themes.yaml` with their per-tool ports under `.chezmoitemplates/themes/`.
-- **Harness configs & Skills:** Codex (`~/.codex/config.toml`) and Gemini (`~/.gemini/settings.json`) use `modify_` templates merging baselines without clobbering interactive model/effort picks, Codex project trust (`.chezmoidata/codex_projects.yaml` pre-trusts `~/dev`, `~/.local/share/chezmoi`, `~/dev/herdr-corral`), or UI preferences. Skills installation (`run_onchange_before_09-install-agent-skills.sh.tmpl`) retries without incompatible providers (e.g. Antigravity under older impeccable releases) and treats download failures as non-fatal warnings so WSL apply never aborts.
-- **Gated off:** Hyprland, Ghostty, Omarchy systemd units, 1Password agent config, mouse DPI, pacman manifests, and the Omarchy agent daemons (`.chezmoiignore.tmpl`).
+```bash
+chezmoi status    # Show modified files
+chezmoi diff      # Show file diffs
+chezmoi apply     # Apply changes to home
+chezmoi update    # Pull remote changes and apply
+```
 
-The registry (display name, role, backstory, per-machine theme) lives in `.chezmoidata/machines.yaml` and is referenced from templates via `{{ index .machines .machine ... }}`. The resolved name is surfaced in the Starship prompt (SSH sessions) and exported as `MACHINE_NAME` via `environment.d` on Linux.
+## The `dots` CLI
 
-**Overriding the machine:** edit the `machine` mapping in `.chezmoi.toml.tmpl` (e.g. to pin a box regardless of OS, or to register a new machine). `.chezmoiignore.tmpl` already gates Augustus-only files behind `{{ if eq .machine "augustus" }}`, which is the pattern for per-machine branching.
+The repository provides an ergonomic command-line helper named `dots`.
+It wraps common chezmoi commands to simplify daily tasks.
 
----
+| Command | Description |
+| :--- | :--- |
+| `dots sync` | Applies managed files to your home directory. |
+| `dots diff` | Displays pending changes between the repo and your home directory. |
+| `dots status` | Displays the status of modified, added, or untracked files. |
+| `dots absorb <file>` | Captures modified local files back into the chezmoi repository. |
+| `dots edit <file>` | Opens the source template for a managed file in your editor. |
+| `dots update` | Pulls the latest changes from git and applies them. |
+| `dots push` | Adds modified files, generates a commit message, and pushes to git. |
+| `dots theme` | Lists available color themes or switches the active theme. |
+| `dots doctor` | Runs health checks on tools, encryption keys, and agent skills. |
+| `dots cd` | Opens a shell inside the chezmoi source directory. |
 
-## 🛠️ Components & Configurations
+The `dots push` command uses a local Ollama model to write conventional commit messages.
+If Ollama is unavailable, it falls back to a clean default message.
 
-### 🌐 Dotfiles Showcase
+## Target Machines
 
-An interactive, local-first web app that visualizes these dotfiles — headlined by a **Starship Playground** that drives the real `starship` binary to reproduce your exact prompt (including the failure-recolor), plus a broad explorer of the tools below. Built with React + Vite + Tailwind and a Bun/Hono API; reads your live `~/.config/*` at runtime.
+The repository detects your machine automatically by hostname or operating system.
+Templates adjust settings to match each system.
 
-- Repo: [harlanljones/dotfiles-showcase](https://github.com/harlanljones/dotfiles-showcase) (tracked here as a git submodule at `dotfiles-showcase/`).
-- Run locally: `bun install && bun run dev` (needs the `starship` binary on PATH). See `AGENTS.md` / `ROADMAP.md` in the showcase repo for architecture, milestones, and the Linear project.
+| Machine | Environment | Primary Role |
+| :--- | :--- | :--- |
+| **Augustus** | Arch Linux (Omarchy) | Main Linux desktop with Hyprland. |
+| **Hadrian** | macOS (Apple Silicon) | MacBook Pro portable workstation. |
+| **Vespasian** | Ubuntu 24.04 on WSL2 | Windows workstation development environment. |
 
-### 🐚 Shell & Prompt
-- **Shell modules** (`~/.config/shell/*.sh`): The real shell configuration, shared by bash and zsh and sourced in numeric order — `00-env` (PATH, editor), `10-tools` (ripgrep/fzf/pager exports), `15-base-bash` (bash baseline when Omarchy rc is absent — Vespasian/WSL), `20-integrations` (zsh completion system + `globdots`, then guarded zoxide/fzf/atuin/direnv hooks, mise on zsh), `30-navigation` (`zj`/`zp` jumps and bindings), `40-aliases` (`eza` shortcuts, traversal, agent launchers, `n`), `50-agents` (`cline`), `55-apps` (`ft`), `60-prompt` (Starship + failure recolor), `65-theme` (terminal theme palette exports), `70-cloud` (flyctl, Google Cloud SDK). `99-local.sh` is untracked and sourced last for machine-local additions. See [`dot_config/shell/README.md`](dot_config/shell/README.md).
-- **Zsh** (`.zshrc` on macOS) and **Bash** (`.bashrc` on Linux): Loaders. On Omarchy, `.bashrc` establishes the Omarchy base layer first; on Vespasian (WSL), `15-base-bash.sh` supplies the baseline. Both then source the module directory above and declare nothing themselves. Modules branch on `SHELL_KIND` where the shells genuinely differ, so nothing is written twice.
-- **[Starship](https://starship.rs/)** (`~/.config/starship.toml`): Fast, cyan-accented prompt displaying `user@host` (SSH sessions only), directory path with smart repo-root formatting, git branch with a compact dirty-repo dot indicator, in-progress rebase/merge state, detached-HEAD commit hash, and long command duration (`>=3s`).
-- **Prompt failure recoloring** (`~/.config/shell/60-prompt.sh`): Both shells hook Starship so every prompt segment renders red after a non-zero exit status and returns to cyan on success — zsh via a `starship_status_prompt` PROMPT wrapper, bash via a `starship_precmd` override. The two implementations differ deliberately (bash recolors every foreground color, zsh recolors cyan only) and the showcase demonstrates that divergence.
-- **Herdr** (`~/.config/herdr/config.toml` & `~/.config/herdr/plugins.json`): Modern terminal multiplexer configured with tmux-parity keybindings (`Ctrl+Space` prefix), follow-CWD panes/splits, and terminal-native palette, layered with agent-orchestration settings: agent-pane navigation (`Ctrl+Alt+Shift+1..9`), a priority-sorted agent sidebar, desktop notifications when an agent finishes or needs input, and persistent pane history. Templated per machine (`config.toml.tmpl` and `plugins.json.tmpl`) with enabled plugins:
-  - **Corral** (`harlan.corral`): Linear issue panel (`prefix+l` on Augustus) and agent event binding (`~/dev/herdr-corral`).
-  - **Equalize Panes** (`ponko2.equalize-panes`): Automatic pane equalization across layout changes (`prefix+=`).
-  - **Ferry** (`shadowfax.ferry`): Move live panes/tabs or merge workspaces from a native popup (macOS).
-  - Pairs with [`herdr-outpost`](https://github.com/harlanljones/herdr-outpost) and `herdr-outpost-relay.service` for remote dashboard/relay access.
-- **[Ghostty](https://ghostty.org/)** (`~/.config/ghostty/config`, from `config.tmpl`): Terminal emulator config, templated per machine. `font-size` comes from `ghostty.fontSize` in `.chezmoidata/machines.yaml` — **9 on Augustus** (a 4K panel at 1.6x scale, where 9pt JetBrainsMono is already large) and **14 on Hadrian** (a 14" Retina laptop). The Omarchy theme `config-file`, `gtk-toolbar-style`, and `async-backend = epoll` are Linux-only and rendered only on Augustus; Hadrian instead gets `macos-option-as-alt = true`, without which the `Alt-Z`/`Alt-X` zoxide bindings from `30-navigation.sh` never reach the shell. Shared across both: JetBrainsMono Nerd Font, copy/paste keybindings, and split-resize bindings.
-- **[btop](https://github.com/aristocratos/btop)** (`~/.config/btop/btop.conf`, Linux): Adopted monitor settings (vim keys, truecolor, omarchy-managed theme) so upgrades stop clobbering them.
-- **Modern shell QoL** (both `.zshrc` and `.bashrc`, each guarded so missing tools never break the shell):
-  - **[zoxide](https://github.com/ajeetdsouza/zoxide)**: Smarter `cd` with directory jumping, configured via `~/.config/zoxide/config.toml` with symlink resolution, pwd tracking hooks, and directory ignore rules (`.git`, `node_modules`, `.venv`, `target`, `/tmp`, `/Volumes`, `/mnt`).
-  - **[fzf](https://github.com/junegunn/fzf)**: Fuzzy keybindings and completion (`Ctrl-R` history, `Ctrl-T` files), with fd-backed default commands (`FZF_DEFAULT_COMMAND`, preview layout opts).
-  - **[atuin](https://github.com/atuinsh/atuin)**: Searchable shell history synced across machines (`~/.config/atuin/config.toml`).
-  - **[direnv](https://direnv.net/)**: Per-directory environment loading.
-  - **[flyctl](https://fly.io/docs/flyctl/)**: Fly.io CLI integration in `.bashrc` (`~/.fly/bin`).
-- **Chrome / Chromium flags** (`~/.config/chrome-flags.conf`, Linux): Ozone platform and display flags (`--ozone-platform=x11`).
-- **[ripgrep](https://github.com/BurntSushi/ripgrep) config** (`~/.config/ripgrep/rc`): Smart-case, column caps, hidden/followed files via `RIPGREP_CONFIG_PATH`.
-- **Man pages through [bat](https://github.com/sharkdp/bat)**: `MANPAGER` shim when bat is installed.
-- **[GitHub CLI](https://cli.github.com/)** (`~/.config/gh/config.yml`): Adopted config (editor/prompt settings, aliases); `hosts.yml` auth state deliberately unmanaged.
+Machine definitions live in `.chezmoidata/machines.yaml`.
+Platform ignore rules live in `.chezmoiignore.tmpl`.
+Templates render only the files needed for the current operating system.
 
-### 🧰 Version & Tool Management
-- **[mise](https://mise.jdx.dev/)** (`~/.config/mise/config.toml`): Manages CLI tools and runtime versions:
-  - `bun`
-  - `chezmoi`
-  - `claude`
-  - `codex`
-  - `copilot`
-  - `gemini`
-  - `gh`
-  - `github:can1357/oh-my-pi`
-  - `go`
-  - `node`
-  - `npm:@xai-official/grok`
-  - `npm:playwright`
-  - `opencode`
-  - `pi`
-  - `pnpm`
-  - `python`
-  - `ruby`
-  - `terraform`
-  - `tflint`
-  - `uv`
+## Core Subsystems
 
-### 🗂️ Dotfiles CLI (`dots`)
-An ergonomic wrapper around chezmoi (`~/.local/bin/dots`, managed by this repo) that speeds up the daily dotfiles workflow and noise-reduces diff output.
+### Shell and Terminal
 
-| Command | Aliases | Description |
-| --- | --- | --- |
-| `dots sync` | `apply` | Apply managed dotfiles to your home directory (`-n/--dry-run`, `-v/--verbose`, `-f/--force`) |
-| `dots diff` | | Clean diff of pending changes (generated script contents hidden by default; `-a/--all` to include) |
-| `dots status` | `st` | Show state of managed files (modified, added, deleted, untracked) |
-| `dots absorb` | `add` | Capture live modified files back into the chezmoi repo (`dots absorb <file>`; with no argument it delegates to `omarchy-dotfiles-sync`) |
-| `dots edit` | `ed` | Edit the source template for a target managed file |
-| `dots cd` | | Open a shell in the chezmoi source directory (`--print` to output the path) |
-| `dots update` | `pull` | Pull latest changes from the git remote (`--rebase`) and re-apply |
-| `dots push` | `pp` | Stage all changes, generate a conventional commit message with local Ollama, commit, and push to origin |
-| `dots theme` | | List themes (`list`), show current (`current`), or switch theme (`set <name>`) across Windows Terminal, Neovim, lazygit, delta, bat, eza, fzf, Gemini, Claude |
-| `dots doctor` | | Diagnostics: chezmoi version, source repo git state, age key, mise/bun, agent skills catalog |
-| `dots help` | | Show help |
+The shell environment works identically across bash and zsh.
+Modular shell scripts live in `~/.config/shell/`.
+They load environment variables, navigation helpers, aliases, and tool hooks.
+The prompt uses [Starship](https://starship.rs/).
+The prompt turns red when a command fails.
+The terminal multiplexer is [Herdr](https://github.com/harlanljones/herdr-outpost).
+Herdr provides tmux-compatible keybindings and workspace navigation.
 
-**Push (`dots-push`)**: `dots push` delegates to `~/.local/bin/dots-push`, which re-adds locally modified targets (`chezmoi re-add`), stages everything, and asks a local Ollama model to write a one-line Conventional Commit message from the diff (first 400 lines), with a dated `chore:` fallback when Ollama is unavailable. Then it commits and pushes. Environment overrides:
+### Editor
 
-- `OLLAMA_COMMIT_MODEL`: message-generation model (default `qwen2.5-coder:7b`).
-- `CHEZMOI_DIR`: chezmoi source directory (default `~/.local/share/chezmoi`).
-- `MAX_DIFF_LINES`: how many diff lines are sent to Ollama (default `400`).
+The primary editor is [Neovim](https://neovim.io/).
+It runs a [LazyVim](https://www.lazyvim.org/) distribution.
+Configurations live in `~/.config/nvim/`.
+Neovim includes language support for TypeScript, Python, Tailwind, Markdown, and Lua.
+It uses `blink.cmp` for auto-completion.
 
-### 📦 System Package Manifests
-Declarative tracking for system-level packages that mise does not manage:
-- **macOS** (`~/.Brewfile`): Homebrew Bundle manifest (`brews` + `casks`, including Ghostty and JetBrainsMono Nerd Font). Beyond the pacman-parity tools it pins `fd`, `bat`, `ripgrep`, and `jq`, which the shell modules depend on rather than merely prefer — `fd` backs `FZF_DEFAULT_COMMAND`, `bat` backs the `MANPAGER` shim, `ripgrep` reads `RIPGREP_CONFIG_PATH`, and `jq` drives the Claude settings/MCP sync scripts.
-  - Restore: `brew bundle --file=~/.Brewfile`
-- **Linux / Arch** (`~/.config/pacman/pkglist.txt` + `aurlist.txt`): Explicit native packages and foreign (AUR) packages.
-  - Restore: `pacman -S --needed - < pkglist.txt`, then `paru -S --needed - < aurlist.txt`
-  - Regenerate: `pacman -Qqen > ~/.config/pacman/pkglist.txt && pacman -Qqem > ~/.config/pacman/aurlist.txt`
-- **Ubuntu on WSL / Vespasian** (`~/.config/apt/pkglist.txt` + `~/.config/mise/conf.d/vespasian.toml`): Explicit apt packages (`age`, `build-essential`, `curl`, `erlang-nox`, `jq`, `postgresql`, `sqlite3`, `tailscale`, `unzip`) and CLI tools tracked via mise's machine configuration (`~/.config/mise/conf.d/vespasian.toml`) for utilities that pacman or Homebrew manage on other systems (`atuin`, `bat`, `delta`, `direnv`, `eza`, `fd`, `fzf`, `lazygit`, `neovim`, `ripgrep`, `starship`, `zoxide`) because Ubuntu 24.04 archive packages are too old for LazyVim and shell integrations.
-  - Restore: `xargs -a ~/.config/apt/pkglist.txt sudo apt-get install -y`, then `mise install`
-  - Regenerate apt list: `apt-mark showmanual > ~/.config/apt/pkglist.txt` (filtered to explicit dependencies)
-- **Dependency gate**: `run_once_before_00-verify-deps.sh.tmpl` fails the first `chezmoi apply` early with per-OS install hints when `git`/`age` are missing, and warns about optional tools.
+### AI Coding Agents
 
-### 💻 Editor
-- **[Neovim](https://neovim.io/) / [LazyVim](https://www.lazyvim.org/)** (`~/.config/nvim/`):
-  - **LazyVim Bootstrap (Vespasian)**: On Vespasian, Neovim is bootstrapped via `init.lua`, `lua/config/lazy.lua`, `autocmds.lua`, and `options.lua`, loading Tokyo Night through `lua/plugins/theme.lua.tmpl` (on Augustus, Omarchy manages this bootstrap).
-  - **LazyVim Extras**: Configured via `lazyvim.json` for TypeScript, Python, Tailwind, Astro, JSON, Markdown, TOML, Neo-tree, inc-rename, dial, and chezmoi/dotfile utilities.
-  - **[blink.cmp](https://github.com/Saghen/blink.cmp)**: Super-tab completion configuration.
-  - **vim-be-good**: Vim practice plugin.
+The repository provides shared configuration for multiple AI coding tools.
+Supported agents include Claude Code, Codex, Google Antigravity, Cline, and OpenCode.
+Shared agent skills live in `~/.agents/skills/`.
+A unified status line displays active models and token costs.
+Safety rules prevent automated agents from pushing or committing to git directly.
 
-### 🐙 Git, Lazygit & Safety Guardrails
-- **Git Configuration** (`~/.config/git/config` + `~/.config/git/ignore`):
-  - Identity, aliases, rebase-on-pull, histogram diffs, rerere, and `gh`-based credential helpers (gh path templated per-OS).
-  - Global ignore for `.claude/settings.local.json` and macOS cruft.
-  - **[delta](https://github.com/dandavison/delta) integration** (`core.pager`, `interactive.diffFilter`, `zdiff3` merges) — rendered only when the delta binary is on PATH (`lookPath` guard), same for lazygit's pager.
-- **[Lazygit](https://github.com/jesseduffield/lazygit)** (`~/.config/lazygit/config.yml`):
-  - Custom keybinding `<Ctrl-g>` to generate conventional git commit messages from staged diffs using local LLMs via Ollama.
-- **Ollama Commit Generator** (`~/.local/bin/ollama-commit-msg.sh`):
-  - Prints a Conventional Commit message for the staged diff using `qwen2.5-coder:7b` (configurable via `OLLAMA_COMMIT_MODEL`), with sanitizing and fallback handling. Consumed by:
-    - `~/.local/bin/lazygit-ollama-commit.sh` — lazygit's `<Ctrl-g>`, adds an `$EDITOR` review step, then pushes (`LAZYGIT_OLLAMA_NO_PUSH=1` to commit only).
-    - Neovim `<leader>P` — pre-fills the commit prompt before write-all/commit/push/quit.
-- **Agent Git Safety Policies**:
-  - Enforced denial of automated `git commit` and `git push` operations across all coding agent harnesses:
-    - **Cline**: `~/.local/bin/cline-safety/git` wrapper intercepting automated commits/pushes.
-    - **Codex**: `~/.codex/rules/default.rules` rule definitions blocking direct commits and pushes.
-    - **Claude Code**: `~/.claude/settings.json` deny permissions on `Bash(git push *)` and `Bash(git commit *)`.
-    - **OpenCode**: `~/.config/opencode/opencode.json` bash permission rules denying `git commit*` and `git push*`.
+### Tool Management
 
-### 🔐 Secret Management & Issue Tracking
-- **[age Encryption](https://github.com/FiloSottile/age)** (`.chezmoi.toml.tmpl`): Chezmoi encrypts sensitive credentials and configurations at rest using age with identity key located at `~/.config/chezmoi/key.txt` (e.g. `dot_config/opencode/encrypted_opencode.json.age`). `encryption` must sit **above** the first table header in `.chezmoi.toml.tmpl` — placed after `[data]`, TOML nests it inside that table and chezmoi silently falls back to no encryption.
-  - **Missing-key gate**: when `~/.config/chezmoi/key.txt` is absent, `.chezmoiignore.tmpl` hides the encrypted targets instead of letting `chezmoi apply` abort partway through the run. Restoring the key is enough to bring them back — `.chezmoiignore` is re-evaluated on every apply, while `.chezmoi.toml.tmpl` is only re-rendered by `chezmoi init`.
-- **SSH Config** (`~/.ssh/config`): Managed defaults with the **1Password SSH agent** first (`IdentityAgent ~/.1password/agent.sock`, keys served from `~/.config/1password/ssh/agent.toml`) and on-disk `~/.ssh` keys as fallback; private keys are deliberately NOT managed (see `docs/recovery.md`).
-- **Systemd user environment** (`~/.config/environment.d/10-defaults.conf`, Linux): `EDITOR`/`VISUAL`/`PAGER`/`LESS` for all user systemd services (dashboard, tunnel, analytics) which never inherit shell rc files.
-- **macOS Defaults** (`run_onchange_after_30-macos-defaults.sh.tmpl`, darwin only): Declarative `defaults write` preferences — screenshot location, Finder path bar/extensions, Dock autohide, key repeat.
-- **[Linear](https://linear.app/) Integration & CLI**:
-  - Encrypted configuration and tools for `@schpet/linear-cli`.
-  - **Linear Agent Tracking Skill** (`dot_codex/skills/linear-agent-tracking/`): Enables coding agents to read/query issues, claim tasks, create Wayfinder decision maps, track dependencies, and update ticket statuses.
-  - **Linear Frontier Sweep Skill** (`dot_codex/skills/frontier-sweep/`): Orchestrates parallel autonomous coding agents across unblocked, unclaimed dependency frontier tickets into dedicated git worktrees without auto-committing.
-  - **Herdr Corral Plugin**: Live Linear panel (`prefix+l` on Augustus) and agent event tracking in Herdr terminal multiplexer.
+Tool versions are managed declaratively with [mise](https://mise.jdx.dev/).
+Configuration lives in `~/.config/mise/config.toml`.
+Mise manages runtimes for Node.js, Bun, Python, Go, and Terraform.
+System package manifests live in `dot_config/pacman/`, `dot_config/apt/`, and `dot_Brewfile`.
 
-### 🖥️ Window Management & Hardware (Linux / Omarchy)
-- **[Hyprland](https://hyprland.org/)** (`~/.config/hypr/`):
-  - **Monitors** (`monitors.lua`, `hyprland.lua`): Dual-monitor setup with DP-1 (32" 4K 60Hz on left, 1.6x scale) and DP-2 (27" 2K 240Hz on right, 1.25x scale), with a guarded loader for `hyprmoncfg-monitors.lua`.
-  - **Bindings** (`bindings.lua`): Hyprland keybindings including the optional Oma Chord loader (`hypr.omachord`).
-  - **Input** (`input.lua`): Pointer sensitivity and custom input overrides.
+### Unified Theming
 
-### 🤖 Omarchy & AI Coding Agent Integration
-- **Cross-Harness Agent Skills** (`.chezmoidata/agent_skills.yaml`, `run_onchange_before_09-install-agent-skills.sh.tmpl`, and `run_after_23-sync-agent-skills.sh.tmpl`):
-  - Restores missing third-party skills and safely reconciles the complete shared `~/.agents/skills` catalog into Claude, Cline, Antigravity, Gemini, and Pi without replacing provider-owned variants. Codex and OpenCode consume the shared catalog directly.
-  - Keeps custom skills such as `grilling`, `project-doc-planner`, `dots`, `frontier-sweep`, and `linear-agent-tracking` in chezmoi while preserving harness-specific `impeccable` builds.
-- **Plugin Management** (`.chezmoidata/omarchy_plugins.yaml` & `run_onchange_after_10-install-omarchy-plugins.sh.tmpl`):
-  - Declarative tracking and automatic installation/updating of Omarchy desktop plugins:
-    - `omarchy-resume`
-    - `omarchy-simple-notifications`
-    - `omarchy-hw-tooltip`
-    - `dockmarchy`
-    - `omarchy-shmall.lock-plugin`
-    - `omarchy-sportsbar`
-- **Omarchy Agents Workspace** ([`harlanljones/omarchy-agents`](https://github.com/harlanljones/omarchy-agents), checked out at `~/dev/omarchy-agents/`):
-  - Turborepo source of truth for the web dashboard and both Omarchy plugin forks. Chezmoi retains only machine configuration and invokes the workspace's deployment task after apply.
-  - Kept outside `.chezmoidata/omarchy_plugins.yaml` because the repository contains multiple apps; `run_onchange_after_25-sync-omarchy-agents-workspace.sh.tmpl` validates and deploys both plugin builds.
-  - `run_once_after_24-setup-omarchy-agents.sh.tmpl` configures local state directories and user systemd daemon.
-- **Agent Leaderboard Plugin** (`~/dev/omarchy-agents/apps/omarchy-agent-leaderboard/`, deployed to `~/.config/omarchy/plugins/harlan.agent-leaderboard/`):
-  - Custom bar widget (`harlan.agent-leaderboard`) ranking token usage across all coding agents (Antigravity, Claude, Cline, Codex, Cursor, Fireworks, OpenCode, Grok, Hermes) across daily, 7-day, and all-time windows.
-  - Bundles embedded collectors for Antigravity (`collect-antigravity.py`) and Fireworks (`collect-fireworks.py`).
-- **Agents Plugin** (`~/dev/omarchy-agents/apps/omarchy-agent-usage/`, deployed to `~/.config/omarchy/plugins/harlan.agents/`):
-  - Custom multi-agent status widget (`harlan.agents`) providing live rate-limit meters, pace, 7-day usage trends, and model breakdown across Claude Code, Cline, Codex, Cursor, Fireworks, and OpenCode.
-- **Antigravity CLI Integration** (`run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl`):
-  - Sets up `collect-antigravity.py` collector to parse Antigravity CLI sessions, model attribution, and context-weighted token usage.
-- **Cline CLI Integration & Automated Scraping** (`run_onchange_after_21-setup-omarchy-cline.sh.tmpl` & `run_onchange_after_22-setup-omarchy-cline-usage-scrape.sh.tmpl`):
-  - Registers Cline in the Agent Leaderboard and Agents widgets; parses `~/.cline/data/sessions` transcripts for per-model, per-day token metrics (`omarchy-agent-usage-cline`).
-  - **Automated Rate Limit Scraper**: Headless Google Chrome scraping via Playwright (`omarchy-cline-usage-scrape` and `omarchy-cline-usage-login`) running on a systemd timer (`omarchy-cline-usage-scrape.timer`) to keep real ClinePass limits up to date without manual dashboard visits.
-  - **Cline Pass estimated limits & manual override**: When scraping is inactive, estimates windows using reference rates, or accepts manual overrides via `omarchy-cline-usage-override` / `/usage` workflow.
-- **Cursor CLI Integration & Automated Scraping** (`run_onchange_after_26-setup-omarchy-cursor.sh.tmpl`):
-  - Registers Cursor in the Agent Leaderboard; `omarchy-agent-usage-cursor` parses `~/.config/cursor/chats/*/*/store.db` chat stores for prompt/session/model counts, and combines them with real per-API-call token usage logged by `omarchy-cursor-statusline`.
-  - **Token tracking via statusLine hook**: Cursor CLI `statusLine` hook registers `omarchy-cursor-statusline` in `~/.cursor/cli-config.json` to log deduplicated per-call token counts to `~/.local/state/omarchy/agents/cursor/`; display is delegated to the shared `~/.local/bin/statusline` renderer.
-  - **Automated Usage Scraper**: Headless scraping via Playwright (`omarchy-cursor-usage-scrape`) running periodically on a systemd timer (`omarchy-cursor-usage-scrape.timer`) to capture dashboard usage.
-  - **Manual override fallback**: `omarchy-cursor-usage-override` allows setting manually-read percentage metrics.
-  - `omarchy default agent cursor` / `omarchy agent` launches `cursor-agent --yolo`.
-  - **Cursor Settings & Desktop**: `~/.config/Cursor/User/settings.json` configuring auto color scheme detection, message steering, and composer density/usage summary settings; desktop entry (`cursor-desktop.desktop`) and `cursor` launcher script (`~/.local/bin/cursor`).
-- **OpenCode & OpenCode Go Integration**:
-  - `omarchy-agent-usage-opencode`: SQLite collector parsing prompt history, session stats, token usage, and provider rate limits from `~/.local/share/opencode/opencode.db`.
-  - **Automated OpenCode Go Scraper**: Headless browser scraper (`omarchy-opencode-go-usage-scrape`) running on a systemd timer (`omarchy-opencode-go-usage-scrape.timer`), interactive login helper (`omarchy-opencode-go-usage-login`), and manual override (`omarchy-opencode-go-usage-override`).
-  - **OpenCode Go Skill** (`~/.config/opencode/skills/opencode-go-usage/SKILL.md`): Skill for reading and recording OpenCode Go rolling/weekly/monthly quota figures.
-  - **Custom Subagents & MCP**: Defines specialized `codebase-memory`, `codebase-memory-scout`, and `codebase-memory-auditor` personas (`~/.config/opencode/agents/`) configured with `codebase-memory-mcp`.
-- **Codex & Claude Code Configuration**:
-  - `omarchy-agent-usage-codex`: Collects Codex CLI session logs and app-server RPC metrics.
-  - `~/.claude/settings.json`: Configures Claude Code tool execution permissions, git safety hooks, and session hooks for `herdr` agent state and codebase memory reminders.
-  - **Shared CLI statusline** (`~/.local/bin/statusline`): Single cross-harness statusline renderer used by Claude Code (`statusLine.command` in `~/.claude/settings.json`) and Cursor (via `omarchy-cursor-statusline`). Reads the Claude-aligned JSON payload and renders model, cwd, git branch, context meter, line diff, session cost, and output style; drops the extras when absent. Codex uses native `[tui] status_line` widgets (no external-script support); opencode has no statusline slot today.
-- **Pi Harness Integration** (local agents):
-  - `omarchy-agent-usage-pi`: Parses `~/.pi/agent/sessions/**/*.jsonl` transcripts for per-model, per-day token metrics, so local Ollama runs (`qwen3.8:pi`) rank alongside the metered API agents. Local inference has no quota or spend, so `limits` is empty and any cost shown is an estimate at hosted `qwen` API rates — override it in `~/.config/omarchy-agents/pricing.json`.
-- **Grok CLI Integration**:
-  - `grok` launcher via mise (`npm:@xai-official/grok`).
-  - Session start hooks (`~/.grok/hooks/herdr.json` and `executable_herdr-agent-state.sh`) reporting agent lifecycle to the Herdr terminal multiplexer.
-- **Gemini CLI & Persona Integration**:
-  - MCP configuration (`~/.gemini/config/mcp_config.json`) and agent personas (`~/.gemini/agents/`) configured with `codebase-memory-mcp` (`codebase-memory`, `codebase-memory-scout`, `codebase-memory-auditor`).
-- **EVOT AI Integration**:
-  - Provider environment configuration (`~/.evotai/evot.env`) and symlink `~/.local/bin/evot` pointing to `herdr-outpost` integrations.
-- **Background Systemd User Services & Timers** (`~/.config/systemd/user/`):
-  - `herdr-outpost-relay.service`: herdr-outpost relay daemon connecting herdr multiplexer to remote dashboard.
-  - `omarchy-agents-dashboard.service`: Web dashboard server for agent monitoring.
-  - `omarchy-agents-tunnel.service`: Cloudflare tunnel service exposing the local dashboard securely.
-  - `omarchy-agents-analysis.service` & `omarchy-agents-analysis.timer`: Background agent analytics powered by local LLMs via Ollama.
-  - `ollama-omarchy-agents.service`: Dedicated local Ollama service for agent analysis tasks.
-  - `omarchy-cline-usage-scrape.timer`: Periodic automated scraping of ClinePass rate limits.
-  - `omarchy-cursor-usage-scrape.timer`: Periodic automated scraping of Cursor dashboard usage.
-  - `omarchy-opencode-go-usage-scrape.timer`: Periodic automated scraping of OpenCode Go usage limits.
-- **Omarchy Agent Wrappers & Utilities** (`~/.local/bin/`):
-  - `omarchy-agent`: Launch default coding agent with support for Antigravity (`agy`) and Cursor.
-  - `omarchy-default-agent`: Quick switcher to configure default coding agent (`omarchy default agent agy`, `omarchy default agent cursor`).
-  - `omarchy-agent-usage-update`: Master aggregator running all active collectors (`omarchy-agent-usage-*`) to write standard JSON records into `~/.local/state/omarchy/agents/usage/`.
-  - `omarchy-agent-usage-antigravity`, `omarchy-agent-usage-cline`, `omarchy-agent-usage-codex`, `omarchy-agent-usage-cursor`, `omarchy-agent-usage-opencode`, `omarchy-agent-usage-pi`: Standalone usage collectors.
-  - `omarchy-cursor-statusline`: Cursor CLI `statusLine` hook; logs real per-call token usage and delegates display to the shared `statusline` renderer.
-  - `statusline`: Shared cross-harness CLI statusline renderer for Claude Code and Cursor.
-  - `omarchy-cursor-usage-scrape`, `omarchy-cursor-usage-override`: Cursor limit scraping and override tools.
-  - `omarchy-cline-usage-login`, `omarchy-cline-usage-scrape`, `omarchy-cline-usage-override`: ClinePass limit scraper and override utilities.
-  - `omarchy-opencode-go-usage-login`, `omarchy-opencode-go-usage-scrape`, `omarchy-opencode-go-usage-override`: OpenCode Go limit scraper and override utilities.
-  - `cursor`: Launcher for Cursor IDE or fallback to Cursor agent.
-  - `grok`: Launcher running `@xai-official/grok` in the mise environment.
-  - `evot`: Symlink to `~/dev/herdr-outpost/integrations/evot`.
+The entire environment shares a consistent color palette.
+The default theme is Tokyo Night.
+Theme settings synchronize across Windows Terminal, Neovim, lazygit, delta, bat, eza, and fzf.
+You can switch themes across all tools by running `dots theme set <theme-name>`.
 
----
+## Documentation and Index
+
+The repository includes several guides for maintenance and recovery:
+
+- [`INDEX.md`](INDEX.md): A complete categorized directory of all tracked dotfiles.
+- [`docs/recovery.md`](docs/recovery.md): Step-by-step disaster recovery and age key management.
+- [`dot_config/shell/README.md`](dot_config/shell/README.md): Detailed guide to the modular shell setup.
+- [`docs/agents/issue-tracker.md`](docs/agents/issue-tracker.md): Guide for coding agent coordination.
+
+The index file `INDEX.md` is generated automatically by `docs/generate_index.py`.
 
 ## 📂 Repository Structure
 
@@ -621,102 +492,3 @@ Declarative tracking for system-level packages that mise does not manage:
 └── run_onchange_before_09-install-agent-skills.sh.tmpl
 ```
 <!-- END REPO TREE -->
-
----
-
-## 🧪 Repo Hygiene & Recovery
-
-- **CI** (`.github/workflows/ci.yml`): On pushes (`main`, `feat/**`, `fix/**`, `chore/**`), PRs to `main`, or manual dispatch (`workflow_dispatch`), `chezmoi apply --dry-run --exclude encrypted` validates all templates and ignore rules across Linux (both standard Arch/Augustus fallback and pinned Vespasian/WSL) and macOS runners (encrypted entries are skipped since CI has no age key; the Linux job installs `age` so the dependency gate runs for real), runs a full-history `gitleaks` secret scan with regression tests, and executes a comprehensive lint job (`shellcheck` with generated chezmoi configuration over all rendered scripts, `actionlint`, index and README structure tree drift checks, and review tooling fixtures).
-- **Recovery guide** (`docs/recovery.md`): Age key backup procedure, key rotation, new-machine bootstrap order, and the `chezmoi doctor` checklist.
-
----
-
-## 🚀 Quick Start
-
-### Initialize and Apply
-
-```bash
-# Clone and apply in one step
-chezmoi init --apply https://github.com/harlanljones/dotfiles.git
-
-# Or if already initialized
-chezmoi apply
-```
-
-The first run executes the dependency gate (`run_once_before_00-verify-deps.sh`), which
-fails early with install hints if `git`/`age` are missing and warns about optional tools
-(delta, atuin, direnv, ...). Full bootstrap order (age key restore, package manifests,
-`chezmoi doctor` checklist) lives in [`docs/recovery.md`](docs/recovery.md).
-
-### Daily Workflow
-
-```bash
-# Check differences between repo and target
-chezmoi diff
-
-# Edit a file managed by chezmoi
-chezmoi edit ~/.config/starship.toml
-
-# Pull remote changes and apply
-chezmoi update
-
-# Check status of managed files
-chezmoi status
-```
-
-Or with the `dots` CLI wrapper (see [Dotfiles CLI](#️-dotfiles-cli-dots)):
-
-```bash
-dots status       # Check state of managed files
-dots diff         # Clean diff of pending changes
-dots update       # Pull remote changes and apply
-dots push         # Stage, commit with Ollama-generated message, push
-```
-
----
-
-## 💻 OS Support
-
-Templates use `.chezmoiignore.tmpl` to ensure only platform-relevant configurations are applied:
-- **macOS (`darwin`)**: Installs `.zshrc`, Starship, Mise, Neovim, Lazygit configs, git config, Ghostty, SSH config, 1Password SSH agent config, GitHub CLI config, macOS defaults script, and the Homebrew `Brewfile`.
-- **Linux (`omarchy`)**: Installs `.bashrc`, Hyprland, Herdr, Omarchy agent integrations, systemd user services/timers + environment.d, pacman package manifests, btop, and usage collectors/scrapers.
-- **Ubuntu on WSL2 (`vespasian`)**: Installs `.bashrc` (with the `15-base-bash.sh` base layer in place of Omarchy's rc), the shared shell modules, Starship, git, lazygit, Neovim (plus a LazyVim bootstrap), agent harness configs, environment.d, the apt manifest and mise `conf.d` tools, and the Tokyo Night theme set (Windows Terminal fragment, Nerd Font, bat/eza/delta/fzf). No Hyprland, Ghostty, systemd agent units, or pacman manifests.
-
----
-
-## 🔗 Related & Parent Projects
-
-### 🏛️ Parent & Sister Projects
-- **[Omarchy Desktop](https://github.com/omarchy/omarchy)**: The core Linux desktop environment providing window management defaults, bar shell placement, plugin hooks, and system-level agent skills.
-- **[`harlanljones/omarchy-agents`](https://github.com/harlanljones/omarchy-agents)**: Turborepo monorepo housing the multi-agent web dashboard, background Ollama analytics service, and both custom desktop bar plugins (`harlan.agent-leaderboard` and `harlan.agents`).
-- **[`harlanljones/herdr-outpost`](https://github.com/harlanljones/herdr-outpost)**: A lightweight, secure remote dashboard and relay gateway for Herdr.
-
-### 🤖 Coding Agent Harnesses & Knowledge Infrastructure
-- **[Google Antigravity & Gemini CLI](https://github.com/google-deepmind)**: Advanced multi-turn agentic coding tool with MCP support and project knowledge graphs.
-- **[Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview)** ([`anthropics/claude-code`](https://github.com/anthropics/claude-code)): Terminal-based AI agent harness by Anthropic.
-- **[Cline](https://github.com/cline/cline)**: Autonomous coding assistant supporting custom tools, workflows, and browser automation.
-- **[OpenCode](https://github.com/opencode-ai/opencode)**: Terminal AI coding agent featuring subagent personas and MCP integration.
-- **[Cursor](https://cursor.com/)**: AI-first code editor and CLI agent (`cursor-agent`).
-- **[OpenAI Codex CLI](https://github.com/openai/codex)**: OpenAI coding agent harness.
-- **[codebase-memory-mcp](https://github.com/codebase-memory/codebase-memory-mcp)**: MCP server maintaining knowledge graphs for structural codebase queries and architecture analysis.
-- **[Cloudflare Agent Skills](https://github.com/cloudflare/skills)**: Official Cloudflare skills catalog for building Cloudflare Workers, Durable Objects, and agentic workflows.
-- **[Linear CLI](https://github.com/schpet/linear-cli)** (`@schpet/linear-cli`): Command-line interface for Linear issue tracking, dependencies, and autonomous ticket management.
-
-### 🛠️ Upstream Tools & Dotfile Foundations
-- **[chezmoi](https://www.chezmoi.io/)** ([`twpayne/chezmoi`](https://github.com/twpayne/chezmoi)): Multi-machine dotfile manager.
-- **[age](https://github.com/FiloSottile/age)**: Modern file encryption tool used for securing chezmoi secrets.
-- **[mise](https://mise.jdx.dev/)** ([`jdx/mise`](https://github.com/jdx/mise)): Polyglot runtime and tool version manager.
-- **[Starship](https://starship.rs/)** ([`starship/starship`](https://github.com/starship/starship)): Cross-shell customizable prompt.
-- **[LazyVim](https://www.lazyvim.org/)** ([`LazyVim/LazyVim`](https://github.com/LazyVim/LazyVim)) & **[Neovim](https://neovim.io/)**: Modal text editor ecosystem.
-- **[Lazygit](https://github.com/jesseduffield/lazygit)** ([`jesseduffield/lazygit`](https://github.com/jesseduffield/lazygit)): Terminal UI for Git commands.
-- **[Hyprland](https://hyprland.org/)** ([`hyprwm/Hyprland`](https://github.com/hyprwm/Hyprland)): Dynamic tiling Wayland compositor.
-- **[Playwright](https://playwright.dev/)** ([`microsoft/playwright`](https://github.com/microsoft/playwright)): Browser automation framework powering headless usage scrapers.
-- **[Ollama](https://ollama.com/)** ([`ollama/ollama`](https://github.com/ollama/ollama)): Local LLM runtime used for automated commit generation and offline agent analytics.
-
-### 🧩 Omarchy Desktop Community Plugins
-- **[`anagrius/omarchy-resume`](https://github.com/anagrius/omarchy-resume)**: Desktop resume and session restorer.
-- **[`gigor/omarchy-simple-notifications`](https://github.com/gigor/omarchy-simple-notifications)**: Lightweight notification widget.
-- **[`IM0001GT/omarchy-hw-tooltip`](https://github.com/IM0001GT/omarchy-hw-tooltip)**: Hardware status and tooltip monitor.
-- **[`This-Is-NPC/dockmarchy`](https://github.com/This-Is-NPC/dockmarchy)**: Dock and launcher integration.
-- **[`shmall03/omarchy-shmall.lock-plugin`](https://github.com/shmall03/omarchy-shmall.lock-plugin)**: Screen lock and authentication plugin.
-- **[`cgmccarron/omarchy-sportsbar`](https://github.com/cgmccarron/omarchy-sportsbar)**: Live sports scores and status widget.
