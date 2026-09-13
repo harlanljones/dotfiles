@@ -1,3 +1,5 @@
+{{- /* hasKey: CI's shellcheck job renders scripts without a chezmoi config. */ -}}
+{{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
 {{- $name := (index .machines .machine).theme.name -}}
 #!/usr/bin/env bash
 # fzf colors for the {{ (index .themes $name).label }} theme, selected with `dots theme`.
@@ -11,3 +13,4 @@ export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS \
 {{ end -}}
 {{ end -}}
 "
+{{- end -}}
