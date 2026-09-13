@@ -752,18 +752,24 @@ cmd_age() {
         echo -e "${RED}error:${NC} 1Password CLI (op / op.exe) not found in PATH." >&2
         return 1
       fi
-      local vault="${1:-Personal}"
-      echo -e "${CYAN}Backing up $key_file to 1Password vault '$vault' via $op_bin...${NC}"
-      if "$op_bin" item get "chezmoi-age-key" --vault="$vault" >/dev/null 2>&1; then
-        if "$op_bin" item edit "chezmoi-age-key" notesPlain="$(cat "$key_file")" --vault="$vault"; then
-          echo -e "${GREEN}✓ Updated existing 'chezmoi-age-key' item in vault '$vault'.${NC}"
+      local vault="${1:-}"
+      local vault_args=()
+      local vault_display="default vault"
+      if [[ -n "$vault" ]]; then
+        vault_args=("--vault=$vault")
+        vault_display="vault '$vault'"
+      fi
+      echo -e "${CYAN}Backing up $key_file to 1Password $vault_display via $op_bin...${NC}"
+      if "$op_bin" item get "chezmoi-age-key" ${vault_args[@]+"${vault_args[@]}"} >/dev/null 2>&1; then
+        if "$op_bin" item edit "chezmoi-age-key" notesPlain="$(cat "$key_file")" ${vault_args[@]+"${vault_args[@]}"}; then
+          echo -e "${GREEN}✓ Updated existing 'chezmoi-age-key' item in $vault_display.${NC}"
         else
           echo -e "${RED}error:${NC} Failed to update 1Password item. Ensure 1Password is unlocked." >&2
           return 1
         fi
       else
-        if "$op_bin" item create --category="Secure Note" --title="chezmoi-age-key" notesPlain="$(cat "$key_file")" --vault="$vault"; then
-          echo -e "${GREEN}✓ Created 'chezmoi-age-key' secure note in vault '$vault'.${NC}"
+        if "$op_bin" item create --category="Secure Note" --title="chezmoi-age-key" notesPlain="$(cat "$key_file")" ${vault_args[@]+"${vault_args[@]}"}; then
+          echo -e "${GREEN}✓ Created 'chezmoi-age-key' secure note in $vault_display.${NC}"
         else
           echo -e "${RED}error:${NC} Failed to create 1Password item. Ensure 1Password is unlocked." >&2
           return 1
@@ -771,24 +777,34 @@ cmd_age() {
       fi
       ;;
     restore)
-      local uri="${1:-op://Personal/chezmoi-age-key/notesPlain}"
+      local uri="${1:-}"
       if [[ -z "$op_bin" ]]; then
         echo -e "${RED}error:${NC} 1Password CLI (op / op.exe) not found in PATH." >&2
         return 1
       fi
       mkdir -p "$(dirname "$key_file")"
-      echo -e "${CYAN}Restoring age key from 1Password ($uri) via $op_bin...${NC}"
       local tmp
       tmp="$(mktemp)"
-      if "$op_bin" read "$uri" > "$tmp" 2>/dev/null && [[ -s "$tmp" ]]; then
-        mv "$tmp" "$key_file"
-        chmod 600 "$key_file"
-        echo -e "${GREEN}✓ Age key restored to $key_file (0600).${NC}"
+      if [[ -n "$uri" ]]; then
+        echo -e "${CYAN}Restoring age key from 1Password ($uri) via $op_bin...${NC}"
+        if "$op_bin" read "$uri" > "$tmp" 2>/dev/null && [[ -s "$tmp" ]]; then
+          mv "$tmp" "$key_file"
+          chmod 600 "$key_file"
+          echo -e "${GREEN}✓ Age key restored to $key_file (0600).${NC}"
+          return 0
+        fi
       else
-        rm -f "$tmp"
-        echo -e "${RED}error:${NC} Failed to read secret from '$uri'. Ensure 1Password is unlocked." >&2
-        return 1
+        echo -e "${CYAN}Retrieving 'chezmoi-age-key' from 1Password via $op_bin...${NC}"
+        if "$op_bin" item get "chezmoi-age-key" --fields notesPlain > "$tmp" 2>/dev/null && [[ -s "$tmp" ]]; then
+          mv "$tmp" "$key_file"
+          chmod 600 "$key_file"
+          echo -e "${GREEN}✓ Age key restored to $key_file (0600).${NC}"
+          return 0
+        fi
       fi
+      rm -f "$tmp"
+      echo -e "${RED}error:${NC} Failed to read secret from 1Password. Ensure 1Password is unlocked and item exists." >&2
+      return 1
       ;;
     *)
       echo "Usage: dots age [status|backup <vault>|restore <uri>]"

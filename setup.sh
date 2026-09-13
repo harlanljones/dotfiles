@@ -290,19 +290,22 @@ if [[ -f "$KEY_FILE" ]]; then
   success "Age private key found at $KEY_FILE"
   if [[ -n "$OP_BIN" ]]; then
     if confirm "Back up this age private key to 1Password?" "N"; then
-      printf '  Enter 1Password vault name (default: Personal): '
+      printf '  Enter 1Password vault name (leave blank for default vault): '
       read -r OP_VAULT || OP_VAULT=""
-      OP_VAULT="${OP_VAULT:-Personal}"
+      vault_args=()
+      if [[ -n "$OP_VAULT" ]]; then
+        vault_args=("--vault=$OP_VAULT")
+      fi
       if [[ "$DRY_RUN" == "false" ]]; then
-        if "$OP_BIN" item get "chezmoi-age-key" --vault="$OP_VAULT" >/dev/null 2>&1; then
-          if "$OP_BIN" item edit "chezmoi-age-key" notesPlain="$(cat "$KEY_FILE")" --vault="$OP_VAULT" 2>/dev/null; then
-            success "Age key successfully updated in 1Password vault '$OP_VAULT'."
+        if "$OP_BIN" item get "chezmoi-age-key" ${vault_args[@]+"${vault_args[@]}"} >/dev/null 2>&1; then
+          if "$OP_BIN" item edit "chezmoi-age-key" notesPlain="$(cat "$KEY_FILE")" ${vault_args[@]+"${vault_args[@]}"} 2>/dev/null; then
+            success "Age key successfully updated in 1Password."
           else
             warn "Could not update 1Password item. Ensure 1Password is unlocked."
           fi
         else
-          if "$OP_BIN" item create --category="Secure Note" --title="chezmoi-age-key" notesPlain="$(cat "$KEY_FILE")" --vault="$OP_VAULT" 2>/dev/null; then
-            success "Age key successfully backed up to 1Password vault '$OP_VAULT'."
+          if "$OP_BIN" item create --category="Secure Note" --title="chezmoi-age-key" notesPlain="$(cat "$KEY_FILE")" ${vault_args[@]+"${vault_args[@]}"} 2>/dev/null; then
+            success "Age key successfully backed up to 1Password."
           else
             warn "Could not create 1Password item. Ensure 1Password is unlocked."
           fi
@@ -331,11 +334,16 @@ else
           OP_BIN="$(get_op_cmd)"
         fi
       fi
-      printf '  Enter 1Password secret URI [op://Personal/chezmoi-age-key/notesPlain]: '
+      printf '  Enter 1Password item name or URI [chezmoi-age-key]: '
       read -r OP_URI || OP_URI=""
-      OP_URI="${OP_URI:-op://Personal/chezmoi-age-key/notesPlain}"
+      OP_URI="${OP_URI:-chezmoi-age-key}"
       if [[ "$DRY_RUN" == "false" && -n "$OP_BIN" ]]; then
-        if "$OP_BIN" read "$OP_URI" > "$KEY_FILE" 2>/dev/null && [[ -s "$KEY_FILE" ]]; then
+        if [[ "$OP_URI" == op://* ]]; then
+          "$OP_BIN" read "$OP_URI" > "$KEY_FILE" 2>/dev/null || true
+        else
+          "$OP_BIN" item get "$OP_URI" --fields notesPlain > "$KEY_FILE" 2>/dev/null || true
+        fi
+        if [[ -s "$KEY_FILE" ]]; then
           chmod 600 "$KEY_FILE"
           success "Age key retrieved from 1Password and saved to $KEY_FILE (0600)"
         else
