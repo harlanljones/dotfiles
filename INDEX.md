@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**4642 tracked entries** across 16 categories.
+**4643 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -28,7 +28,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Other configuration](#other-configuration) | 37 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 19 |
 | [Chezmoi control files](#chezmoi-control-files) | 9 |
-| [Repository material (not applied)](#repository-material-not-applied) | 4377 |
+| [Repository material (not applied)](#repository-material-not-applied) | 4378 |
 
 ---
 
@@ -4751,5 +4751,6 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/test_inventory.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/test_review.py` | Recovery guide and repository maintenance scripts |
 | `docs/test_gitleaks.py` | Recovery guide and repository maintenance scripts |
+| `dotfiles-showcase` | Submodule — the showcase web app; never applied |
 | `package.json` | Runtime CLI deps installed outside mise |
 | `to-questionnaire-dotfiles-sync-cli.md` | Scratch planning documents |

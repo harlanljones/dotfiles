@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 4642,
+    "total": 4643,
     "by_category": {
       "shell": 16,
       "prompt": 1,
@@ -20,7 +20,7 @@
       "other": 37,
       "hooks": 19,
       "chezmoi": 9,
-      "repo": 4377
+      "repo": 4378
     }
   },
   "categories": [
@@ -28662,6 +28662,12 @@
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "dotfiles-showcase",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Submodule \u2014 the showcase web app; never applied"
     },
     {
       "source": "package.json",
