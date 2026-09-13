@@ -1,4 +1,5 @@
-{{- if eq .chezmoi.os "linux" -}}
+{{- /* hasKey: CI's shellcheck job renders scripts without a chezmoi config. */ -}}
+{{- if and (hasKey . "machine") (eq .machine "augustus") -}}
 #!/bin/bash
 set -eu
 

@@ -64,6 +64,52 @@ settings.local.json
 .config/btop
 .config/btop/**
 {{- end }}
+{{- if ne .machine "vespasian" }}
+# Vespasian-only package ownership (apt manifest + mise tools that pacman or
+# brew own on the other machines).
+.config/apt
+.config/apt/**
+.config/mise/conf.d/vespasian.toml
+# Vespasian's Tokyo Night theme and LazyVim bootstrap. On Augustus, Omarchy
+# owns nvim's init.lua/lazy.lua and links its own plugins/theme.lua.
+.config/nvim/init.lua
+.config/nvim/lua/config/lazy.lua
+.config/nvim/lua/config/options.lua
+.config/nvim/lua/config/autocmds.lua
+.config/nvim/lua/plugins/theme.lua
+.config/fzf
+.config/fzf/**
+.config/bat
+.config/bat/**
+.config/eza
+.config/eza/**
+.config/delta
+.config/delta/**
+{{- end }}
+{{- if eq .machine "vespasian" }}
+# WSL Ubuntu: no Linux desktop session (Windows Terminal is the terminal), no
+# Omarchy agent daemons, and the mice are configured from Windows.
+.config/hypr
+.config/hypr/**
+.config/ghostty
+.config/ghostty/**
+.config/systemd
+.config/systemd/**
+.config/1password
+.config/1password/**
+.config/chrome-flags.conf
+.local/share/applications
+.local/share/applications/**
+.local/bin/omarchy-*
+.local/bin/piper
+.local/bin/ratbagctl
+.local/bin/cursor
+# The Omarchy Alias Manager file is plain aliases that 40-aliases.sh sources,
+# so it is portable: once absorbed on Augustus it syncs here too.
+!.config/omarchy/aliases
+24-setup-omarchy-agents.sh
+31-mouse-dpi.sh
+{{- end }}
 {{- if eq .chezmoi.os "darwin" }}
 .bashrc
 .bash_profile

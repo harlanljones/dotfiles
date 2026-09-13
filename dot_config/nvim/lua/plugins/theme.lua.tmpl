@@ -1,0 +1,16 @@
+{{- $name := (index .machines .machine).theme.name -}}
+{{- $theme := index .themes $name -}}
+-- Vespasian only (ignored on other machines, where Omarchy links its own
+-- theme.lua here). {{ $theme.label }}, selected with `dots theme set`, matching
+-- Windows Terminal, lazygit, delta, bat, eza and fzf on this box.
+return {
+  {
+    "folke/tokyonight.nvim",
+    priority = 1000,
+    opts = { style = "{{ $theme.nvimStyle }}" },
+  },
+  {
+    "LazyVim/LazyVim",
+    opts = { colorscheme = "{{ $theme.nvimColorscheme }}" },
+  },
+}

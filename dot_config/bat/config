@@ -1,0 +1,4 @@
+# Vespasian only. "dots" is whichever theme `dots theme set` selected, rendered
+# into ~/.config/bat/themes/dots.tmTheme and compiled by
+# run_onchange_after_42-vespasian-theme-state.sh (bat cache --build).
+--theme="dots"

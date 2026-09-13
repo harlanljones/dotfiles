@@ -1,0 +1,9 @@
+age
+build-essential
+curl
+erlang-nox
+jq
+postgresql
+sqlite3
+tailscale
+unzip

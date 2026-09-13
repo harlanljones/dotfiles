@@ -1,0 +1,46 @@
+chezmoi:modify-template
+{{- /* The marker line above makes chezmoi render this file as a template with
+       the live target on .chezmoi.stdin instead of executing it as a script.
+       chezmoi deletes that whole line before rendering, so it must stay on a
+       line of its own.
+
+       ~/.codex/config.toml is shared between chezmoi and Codex itself.
+
+       Codex rewrites the model, reasoning effort, nux/notice counters and hook
+       trust hashes on its own, and appends a [projects."…"] entry whenever a
+       folder is trusted. Owning the whole file made every `dots push` commit
+       whatever model was last picked, and every apply revoke new trust. So
+       chezmoi merges the repo baseline (.chezmoitemplates/codex-config.toml)
+       into the live file on each apply instead:
+
+       - repo-owned: everything the baseline defines (features, MCP servers,
+         marketplaces, plugins, status line, skills). Note that a baseline
+         `false` cannot override a live `true` -- the merge skips zero values.
+       - live-owned: $liveOwned below. The baseline value is only a default for
+         a machine whose live file does not have the key yet.
+       - projects: union of baseline (.chezmoidata/codex_projects.yaml) and
+         live, so trusting a folder in Codex is never reverted. */ -}}
+{{- $live := dict -}}
+{{- /* stdin is absent when rendered outside apply/diff (e.g. execute-template). */ -}}
+{{- if and (hasKey .chezmoi "stdin") .chezmoi.stdin -}}
+{{-   $live = fromToml .chezmoi.stdin -}}
+{{- end -}}
+{{- $base := includeTemplate "codex-config.toml" . | fromToml -}}
+{{- $liveOwned := list "model" "model_reasoning_effort" "plan_mode_reasoning_effort" "service_tier" "notice" "hooks" -}}
+
+{{- $out := mustMergeOverwrite (dict) (deepCopy $live) (deepCopy $base) -}}
+{{- range $liveOwned -}}
+{{-   if hasKey $live . -}}
+{{-     $_ := set $out . (get $live .) -}}
+{{-   end -}}
+{{- end -}}
+
+{{- /* tui: the status line is repo-owned; nux counters and the rest are Codex's. */ -}}
+{{- if hasKey $live "tui" -}}
+{{-   $baseTui := pick (get $base "tui" | default dict) "status_line" "status_line_use_colors" -}}
+{{-   $_ := set $out "tui" (mustMergeOverwrite (deepCopy (get $live "tui")) $baseTui) -}}
+{{- end -}}
+
+{{- $projects := mustMergeOverwrite (deepCopy (get $base "projects" | default dict)) (deepCopy (get $live "projects" | default dict)) -}}
+{{- $_ := set $out "projects" $projects -}}
+{{ toToml $out }}

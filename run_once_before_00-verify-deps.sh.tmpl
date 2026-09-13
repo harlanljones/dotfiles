@@ -25,6 +25,9 @@ fi
 
 opt_hint="brew bundle --file=~/.Brewfile"
 optional="mise eza delta starship gh fzf zoxide atuin direnv nvim lazygit ghostty"
+{{- else if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "ubuntu") }}
+opt_hint="xargs -a ~/.config/apt/pkglist.txt sudo apt-get install -y; then mise install"
+optional="mise eza delta starship gh fzf zoxide atuin direnv nvim lazygit"
 {{- else }}
 opt_hint="sudo pacman -S --needed <packages>; AUR entries: see ~/.config/pacman/aurlist.txt"
 optional="mise eza delta starship gh fzf zoxide atuin direnv nvim lazygit ollama ghostty"
@@ -40,6 +43,8 @@ if [ -n "$missing_hard" ]; then
     echo "ERROR: required tools not found:$missing_hard" >&2
     {{- if eq .chezmoi.os "darwin" }}
     echo "Install with: brew install$missing_hard" >&2
+    {{- else if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "ubuntu") }}
+    echo "Install with: sudo apt-get install -y$missing_hard" >&2
     {{- else }}
     echo "Install with: sudo pacman -S --needed$missing_hard" >&2
     {{- end }}

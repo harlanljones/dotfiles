@@ -28,6 +28,16 @@ jobs:
           chezmoi execute-template --source "$GITHUB_WORKSPACE" -f .chezmoi.toml.tmpl > "$RUNNER_TEMP/chezmoi.toml"
           chezmoi apply --config "$RUNNER_TEMP/chezmoi.toml" --source "$GITHUB_WORKSPACE" --dry-run --exclude encrypted
 
+      # The runner is neither a WSL kernel nor DESKTOP-UTOJEVB, so pin the
+      # rendered machine to exercise Vespasian's ignore and template paths.
+      - name: Dry-run apply as Vespasian (WSL)
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          chezmoi execute-template --source "$GITHUB_WORKSPACE" -f .chezmoi.toml.tmpl \
+            | sed -E "s/^machine = '.*'$/machine = 'vespasian'/" > "$RUNNER_TEMP/chezmoi-vespasian.toml"
+          grep -q "^machine = 'vespasian'$" "$RUNNER_TEMP/chezmoi-vespasian.toml"
+          chezmoi apply --config "$RUNNER_TEMP/chezmoi-vespasian.toml" --source "$GITHUB_WORKSPACE" --dry-run --exclude encrypted
+
       - name: Verify dependency gate script renders and runs
         run: |
           export PATH="$HOME/.local/bin:$PATH"

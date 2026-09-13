@@ -21,3 +21,31 @@ machines:
       accent: "bold purple"
     ghostty:
       fontSize: 14
+  vespasian:
+    displayName: Vespasian
+    os: linux
+    # Ubuntu under WSL2 on the Windows gaming PC. No Omarchy base layer, no
+    # desktop session: the terminal is Windows Terminal, so Linux GUI configs
+    # (hypr, ghostty, systemd agent units) are gated off in .chezmoiignore.tmpl.
+    platform: wsl
+    hostname: DESKTOP-UTOJEVB
+    role: "The builder of the arena"
+    backstory: "Vespasian restored order after a year of chaos and raised the Colosseum, making him the natural name for the box that hosts both the games and the work between them."
+    theme:
+      accent: "bold yellow"
+      # Key into .chezmoidata/themes.yaml. Change with `dots theme set <name>`
+      # (it edits this line and re-applies). Starship, opencode and Codex use
+      # ANSI/system colors, so they follow the terminal scheme automatically.
+      name: tokyonight-night
+    # Windows Terminal renders this box. The fragment written by
+    # run_onchange_after_40-vespasian-windows-terminal.sh.tmpl updates the
+    # WSL-generated Ubuntu profile in place (settings.json is never edited).
+    windowsTerminal:
+      profileGuid: "{cb4cd45f-28d6-5a0d-ad7e-0197f99e4ce9}"
+      fontFace: "JetBrainsMono Nerd Font"
+      fontSize: 11
+      nerdFontsVersion: v3.5.1
+    # Not rendered on Vespasian (ghostty is ignored there); present so any
+    # template indexing .ghostty.fontSize cannot fail on this machine.
+    ghostty:
+      fontSize: 12

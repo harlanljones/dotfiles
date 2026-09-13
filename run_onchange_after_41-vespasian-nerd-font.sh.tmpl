@@ -1,0 +1,51 @@
+{{- /* hasKey: CI's shellcheck job renders scripts without a chezmoi config. */ -}}
+{{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
+{{- $wt := (index .machines "vespasian").windowsTerminal -}}
+#!/usr/bin/env bash
+# Install JetBrainsMono Nerd Font for the current Windows user.
+#
+# Windows Terminal draws this box's glyphs, so the font has to exist on the
+# Windows side. A per-user install (copy into %LOCALAPPDATA%\Microsoft\Windows\
+# Fonts plus an HKCU registry entry) needs no administrator rights. Re-runs when
+# the pinned release in .chezmoidata/machines.yaml changes: {{ $wt.nerdFontsVersion }}
+
+set -euo pipefail
+
+if ! command -v reg.exe >/dev/null 2>&1 || ! command -v wslpath >/dev/null 2>&1; then
+  echo "nerd-font: not running under WSL, skipping"
+  exit 0
+fi
+
+version="{{ $wt.nerdFontsVersion }}"
+win_localappdata="$(cd /mnt/c && cmd.exe /d /c 'echo %LOCALAPPDATA%' 2>/dev/null | tr -d '\r')"
+win_fonts_dir="$win_localappdata\\Microsoft\\Windows\\Fonts"
+fonts_dir="$(wslpath "$win_localappdata")/Microsoft/Windows/Fonts"
+marker="$fonts_dir/.jetbrainsmono-nerd-font-$version"
+
+if [[ -f "$marker" ]]; then
+  echo "nerd-font: JetBrainsMono Nerd Font $version already installed"
+  exit 0
+fi
+
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+
+echo "nerd-font: downloading JetBrainsMono Nerd Font $version"
+curl -fsSL -o "$tmp/JetBrainsMono.zip" \
+  "https://github.com/ryanoasis/nerd-fonts/releases/download/$version/JetBrainsMono.zip"
+# Only the terminal family (not the Mono/Propo variants) is needed.
+unzip -q -o "$tmp/JetBrainsMono.zip" 'JetBrainsMonoNerdFont-*.ttf' -d "$tmp/ttf"
+
+mkdir -p "$fonts_dir"
+count=0
+for ttf in "$tmp"/ttf/*.ttf; do
+  file="${ttf##*/}"
+  cp -f "$ttf" "$fonts_dir/$file"
+  reg.exe add 'HKCU\Software\Microsoft\Windows NT\CurrentVersion\Fonts' \
+    /v "${file%.ttf} (TrueType)" /t REG_SZ /d "$win_fonts_dir\\$file" /f >/dev/null
+  count=$((count + 1))
+done
+touch "$marker"
+
+echo "nerd-font: installed $count faces into $win_fonts_dir (restart Windows Terminal)"
+{{- end -}}

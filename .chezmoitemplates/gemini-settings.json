@@ -1,4 +1,12 @@
 {
+{{- if eq .machine "vespasian" }}
+{{- /* Theme selected with `dots theme`: .chezmoitemplates/themes/<name>/gemini.json */}}
+{{- $gemini := include (printf ".chezmoitemplates/themes/%s/gemini.json" (index .machines .machine).theme.name) | fromJson }}
+  "ui": {
+    "theme": {{ $gemini.name | toJson }},
+    "customThemes": { {{ $gemini.name | toJson }}: {{ $gemini | toJson }} }
+  },
+{{- end }}
   "mcpServers": {
     "codebase-memory-mcp": {"command":"/home/harlan/.local/bin/codebase-memory-mcp","args":[]}
   },

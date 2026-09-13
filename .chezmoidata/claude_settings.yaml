@@ -7,33 +7,32 @@ claudeSettings:
     deny:
       - "Bash(git push *)"
       - "Bash(git commit *)"
-  model: "opus"
   hooks:
     SessionStart:
       - matcher: "*"
         hooks:
           - type: "command"
-            command: "bash '/home/harlan/.claude/hooks/herdr-agent-state.sh' session"
+            command: "test ! -r '/home/harlan/.claude/hooks/herdr-agent-state.sh' || bash '/home/harlan/.claude/hooks/herdr-agent-state.sh' session"
             timeout: 10
       - matcher: "startup"
         hooks:
           - type: "command"
-            command: "\"$HOME/.claude/hooks/cbm-session-reminder\""
+            command: "test ! -x \"$HOME/.claude/hooks/cbm-session-reminder\" || \"$HOME/.claude/hooks/cbm-session-reminder\""
             timeout: 5
       - matcher: "resume"
         hooks:
           - type: "command"
-            command: "\"$HOME/.claude/hooks/cbm-session-reminder\""
+            command: "test ! -x \"$HOME/.claude/hooks/cbm-session-reminder\" || \"$HOME/.claude/hooks/cbm-session-reminder\""
             timeout: 5
       - matcher: "clear"
         hooks:
           - type: "command"
-            command: "\"$HOME/.claude/hooks/cbm-session-reminder\""
+            command: "test ! -x \"$HOME/.claude/hooks/cbm-session-reminder\" || \"$HOME/.claude/hooks/cbm-session-reminder\""
             timeout: 5
       - matcher: "compact"
         hooks:
           - type: "command"
-            command: "\"$HOME/.claude/hooks/cbm-session-reminder\""
+            command: "test ! -x \"$HOME/.claude/hooks/cbm-session-reminder\" || \"$HOME/.claude/hooks/cbm-session-reminder\""
             timeout: 5
     UserPromptSubmit:
       - matcher: "*"
@@ -45,7 +44,7 @@ claudeSettings:
       - matcher: "Grep|Glob"
         hooks:
           - type: "command"
-            command: "\"$HOME/.claude/hooks/cbm-code-discovery-gate\""
+            command: "test ! -x \"$HOME/.claude/hooks/cbm-code-discovery-gate\" || \"$HOME/.claude/hooks/cbm-code-discovery-gate\""
             timeout: 5
       - matcher: "*"
         hooks:
@@ -56,7 +55,7 @@ claudeSettings:
       - matcher: "Read"
         hooks:
           - type: "command"
-            command: "\"$HOME/.claude/hooks/cbm-code-discovery-gate\""
+            command: "test ! -x \"$HOME/.claude/hooks/cbm-code-discovery-gate\" || \"$HOME/.claude/hooks/cbm-code-discovery-gate\""
             timeout: 5
     Notification:
       - matcher: "*"
@@ -80,7 +79,7 @@ claudeSettings:
       - matcher: "*"
         hooks:
           - type: "command"
-            command: "\"$HOME/.claude/hooks/cbm-subagent-reminder\""
+            command: "test ! -x \"$HOME/.claude/hooks/cbm-subagent-reminder\" || \"$HOME/.claude/hooks/cbm-subagent-reminder\""
             timeout: 5
   enabledPlugins:
     frontend-design@claude-plugins-official: true
@@ -97,6 +96,13 @@ claudeSettings:
       source:
         source: "github"
         repo: "pbakaus/impeccable"
+  skipDangerousModePermissionPrompt: true
+
+# Seeds, not policy: Claude Code rewrites these itself (/model, /effort, /tui),
+# so run_onchange_after_28 applies them only when the live settings file does
+# not have the key yet. Put a key in claudeSettings above only if every apply
+# should force it back.
+claudeSettingsDefaults:
+  model: "opus"
   effortLevel: "medium"
   tui: "fullscreen"
-  skipDangerousModePermissionPrompt: true

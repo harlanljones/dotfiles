@@ -1,0 +1,4 @@
+{{- $name := (index .machines .machine).theme.name -}}
+# eza colors for the {{ (index .themes $name).label }} theme, selected with `dots theme`.
+# Source: .chezmoitemplates/themes/{{ $name }}/eza.yml
+{{ include (printf ".chezmoitemplates/themes/%s/eza.yml" $name) }}

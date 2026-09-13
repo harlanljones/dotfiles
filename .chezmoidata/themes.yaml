@@ -1,0 +1,31 @@
+# Theme registry for `dots theme`.
+#
+# Each key names a directory in .chezmoitemplates/themes/<key>/ holding the
+# upstream per-tool ports (windows_terminal.json, lazygit.yml, delta.gitconfig,
+# fzf.sh, eza.yml, bat.tmTheme, gemini.json), copied verbatim from the theme's
+# extras. A machine selects one with machines.<machine>.theme.name; switching
+# with `dots theme set <key>` edits that value and re-applies.
+#
+# Adding a theme: create the directory with all seven files, add an entry here,
+# then `dots theme set <key>`.
+themes:
+  tokyonight-night:
+    label: "Tokyo Night (night)"
+    appearance: dark
+    nvimStyle: night
+    nvimColorscheme: tokyonight-night
+  tokyonight-storm:
+    label: "Tokyo Night (storm)"
+    appearance: dark
+    nvimStyle: storm
+    nvimColorscheme: tokyonight-storm
+  tokyonight-moon:
+    label: "Tokyo Night (moon)"
+    appearance: dark
+    nvimStyle: moon
+    nvimColorscheme: tokyonight-moon
+  tokyonight-day:
+    label: "Tokyo Night (day, light)"
+    appearance: light
+    nvimStyle: day
+    nvimColorscheme: tokyonight-day

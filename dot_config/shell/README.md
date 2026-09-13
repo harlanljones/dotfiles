@@ -21,6 +21,7 @@ here is shellchecked.
 | --- | --- |
 | `00-env.sh` | Shell detection (`SHELL_KIND`), `_path_prepend`, `PATH`, `EDITOR`/`VISUAL` |
 | `10-tools.sh` | Environment read by tools: ripgrep, fzf, pager, `MANPAGER` |
+| `15-base-bash.sh` | Bash base layer (history, completion, mise, `starship init bash`) when Omarchy's rc is absent — Vespasian/WSL |
 | `20-integrations.sh` | zoxide / fzf / atuin / direnv hooks, mise (zsh) |
 | `30-navigation.sh` | `zj` / `zp` jumping and their key bindings |
 | `40-aliases.sh` | Listing and traversal aliases, agent launchers, `n` |

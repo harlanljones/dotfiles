@@ -1,0 +1,8 @@
+{{- $name := (index .machines .machine).theme.name -}}
+# delta colors for the {{ (index .themes $name).label }} theme, selected with `dots theme`.
+# Included from ~/.config/git/config on Vespasian. syntax-theme points at bat's
+# compiled "dots" theme (~/.config/bat/themes/dots.tmTheme); delta reads bat's
+# theme cache, not bat's config file.
+[delta]
+  syntax-theme = dots
+{{ include (printf ".chezmoitemplates/themes/%s/delta.gitconfig" $name) }}

@@ -1,0 +1,36 @@
+{{- /* hasKey: CI's shellcheck job renders scripts without a chezmoi config. */ -}}
+{{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
+{{- $name := (index .machines "vespasian").theme.name -}}
+{{- $claudeTheme := ternary "light-ansi" "dark-ansi" (eq (index .themes $name).appearance "light") -}}
+#!/usr/bin/env bash
+# Theme state that lives outside managed files on Vespasian.
+#
+# - bat (and delta, which reuses bat's cache) only sees themes after
+#   `bat cache --build`. Re-runs whenever `dots theme set` changes the theme:
+#   {{ $name }} tmTheme sha256 {{ include (printf ".chezmoitemplates/themes/%s/bat.tmTheme" $name) | sha256sum }}
+# - Claude Code keeps its theme in ~/.claude.json, which is runtime state and
+#   not a managed file. The "-ansi" themes draw with the terminal's 16 colors,
+#   so they follow the Windows Terminal scheme; light vs dark follows the
+#   selected theme's appearance.
+
+set -euo pipefail
+
+if command -v bat >/dev/null 2>&1; then
+  bat cache --build >/dev/null
+  echo "theme-state: rebuilt bat theme cache"
+else
+  echo "theme-state: bat not installed yet (mise install), re-run dots sync afterwards"
+fi
+
+claude_json="$HOME/.claude.json"
+if [[ -f "$claude_json" ]] && jq -e . "$claude_json" >/dev/null 2>&1; then
+  if [[ "$(jq -r '.theme // ""' "$claude_json")" != "{{ $claudeTheme }}" ]]; then
+    cp "$claude_json" "$claude_json.bak-theme"
+    tmp="$(mktemp)"
+    jq '.theme = "{{ $claudeTheme }}"' "$claude_json" >"$tmp"
+    mv "$tmp" "$claude_json"
+    chmod 600 "$claude_json"
+    echo "theme-state: set Claude Code theme to {{ $claudeTheme }} (backup: $claude_json.bak-theme)"
+  fi
+fi
+{{- end -}}

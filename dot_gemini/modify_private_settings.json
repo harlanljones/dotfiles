@@ -1,0 +1,18 @@
+chezmoi:modify-template
+{{- /* The marker line above makes chezmoi render this file as a template with
+       the live target on .chezmoi.stdin instead of executing it as a script.
+       chezmoi deletes that whole line before rendering, so it must stay on a
+       line of its own.
+
+       ~/.gemini/settings.json is shared with Gemini CLI, which writes its own
+       choices (model, auth, UI preferences) into it. The repo baseline
+       (.chezmoitemplates/gemini-settings.json) owns only the keys it defines --
+       mcpServers, hooks and, on Vespasian, the theme -- and is merged over the
+       live file on every apply. Every other key stays as Gemini left it. */ -}}
+{{- $live := dict -}}
+{{- /* stdin is absent when rendered outside apply/diff (e.g. execute-template). */ -}}
+{{- if and (hasKey .chezmoi "stdin") .chezmoi.stdin -}}
+{{-   $live = fromJson .chezmoi.stdin -}}
+{{- end -}}
+{{- $base := includeTemplate "gemini-settings.json" . | fromJson -}}
+{{ mustMergeOverwrite (dict) (deepCopy $live) $base | toPrettyJson }}

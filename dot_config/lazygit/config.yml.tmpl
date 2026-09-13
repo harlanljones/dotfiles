@@ -11,6 +11,11 @@ customCommands:
     command: 'LAZYGIT_OLLAMA_NO_PUSH=1 ~/.local/bin/lazygit-ollama-commit.sh'
     loadingText: 'Generating commit message with Ollama...'
     output: terminal
+{{ if eq .machine "vespasian" -}}
+{{- $name := (index .machines .machine).theme.name -}}
+# Theme selected with `dots theme`: .chezmoitemplates/themes/{{ $name }}/lazygit.yml
+{{ include (printf ".chezmoitemplates/themes/%s/lazygit.yml" $name) | trim }}
+{{ end -}}
 {{ if lookPath "delta" -}}
 git:
   # Only rendered when delta is installed

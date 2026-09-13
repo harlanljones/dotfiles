@@ -9,25 +9,25 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**4594 tracked entries** across 16 categories.
+**4643 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
-| [Shell](#shell) | 14 |
+| [Shell](#shell) | 16 |
 | [Prompt](#prompt) | 1 |
 | [Terminal & multiplexer](#terminal--multiplexer) | 4 |
-| [Editors](#editors) | 12 |
+| [Editors](#editors) | 17 |
 | [Desktop & window manager](#desktop--window-manager) | 58 |
 | [Version control](#version-control) | 4 |
 | [Navigation & search](#navigation--search) | 3 |
-| [Toolchain & packages](#toolchain--packages) | 4 |
+| [Toolchain & packages](#toolchain--packages) | 5 |
 | [AI agent harnesses](#ai-agent-harnesses) | 41 |
 | [Background services](#background-services) | 17 |
 | [Custom executables](#custom-executables) | 32 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Other configuration](#other-configuration) | 1 |
-| [Apply hooks (`run_*`)](#apply-hooks-run) | 16 |
-| [Chezmoi control files](#chezmoi-control-files) | 7 |
+| [Other configuration](#other-configuration) | 37 |
+| [Apply hooks (`run_*`)](#apply-hooks-run) | 19 |
+| [Chezmoi control files](#chezmoi-control-files) | 9 |
 | [Repository material (not applied)](#repository-material-not-applied) | 4378 |
 
 ---
@@ -40,6 +40,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.bashrc` | `dot_bashrc` | bash | — |
 | `~/.config/shell/00-env.sh` | `dot_config/shell/00-env.sh` | shared shell modules | — |
 | `~/.config/shell/10-tools.sh` | `dot_config/shell/10-tools.sh` | shared shell modules | — |
+| `~/.config/shell/15-base-bash.sh` | `dot_config/shell/15-base-bash.sh` | shared shell modules | — |
 | `~/.config/shell/20-integrations.sh` | `dot_config/shell/20-integrations.sh` | shared shell modules | — |
 | `~/.config/shell/30-navigation.sh` | `dot_config/shell/30-navigation.sh` | shared shell modules | — |
 | `~/.config/shell/40-aliases.sh` | `dot_config/shell/40-aliases.sh` | shared shell modules | — |
@@ -47,6 +48,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/shell/50-agents.sh` | `dot_config/shell/50-agents.sh` | shared shell modules | — |
 | `~/.config/shell/55-apps.sh` | `dot_config/shell/55-apps.sh` | shared shell modules | — |
 | `~/.config/shell/60-prompt.sh` | `dot_config/shell/60-prompt.sh` | shared shell modules | — |
+| `~/.config/shell/65-theme.sh` | `dot_config/shell/65-theme.sh` | shared shell modules | — |
 | `~/.config/shell/70-cloud.sh` | `dot_config/shell/70-cloud.sh` | shared shell modules | — |
 | `~/.config/shell/README.md` | `dot_config/shell/README.md` | shared shell modules | — |
 | `~/.zshrc` | `dot_zshrc` | zsh | — |
@@ -70,9 +72,13 @@ agents and the showcase app should read. This page is the same data for humans.
 
 | Target | Source | Subsystem | Attributes |
 | --- | --- | --- | --- |
+| `~/.config/nvim/init.lua` | `dot_config/nvim/init.lua` | neovim / LazyVim | — |
 | `~/.config/nvim/lazy-lock.json` | `dot_config/nvim/lazy-lock.json` | neovim / LazyVim | — |
 | `~/.config/nvim/lazyvim.json` | `dot_config/nvim/lazyvim.json` | neovim / LazyVim | — |
+| `~/.config/nvim/lua/config/autocmds.lua` | `dot_config/nvim/lua/config/autocmds.lua` | neovim / LazyVim | — |
 | `~/.config/nvim/lua/config/keymaps.lua` | `dot_config/nvim/lua/config/keymaps.lua` | neovim / LazyVim | — |
+| `~/.config/nvim/lua/config/lazy.lua` | `dot_config/nvim/lua/config/lazy.lua` | neovim / LazyVim | — |
+| `~/.config/nvim/lua/config/options.lua` | `dot_config/nvim/lua/config/options.lua` | neovim / LazyVim | — |
 | `~/.config/nvim/lua/plugins/blink-cmp.lua` | `dot_config/nvim/lua/plugins/blink-cmp.lua` | neovim / LazyVim | — |
 | `~/.config/nvim/lua/plugins/copilot-lualine.lua` | `dot_config/nvim/lua/plugins/copilot-lualine.lua` | neovim / LazyVim | — |
 | `~/.config/nvim/lua/plugins/copilot.lua` | `dot_config/nvim/lua/plugins/copilot.lua` | neovim / LazyVim | — |
@@ -80,6 +86,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/nvim/lua/plugins/example.lua` | `dot_config/nvim/lua/plugins/example.lua` | neovim / LazyVim | — |
 | `~/.config/nvim/lua/plugins/faster-smear-cursor.lua` | `dot_config/nvim/lua/plugins/faster-smear-cursor.lua` | neovim / LazyVim | — |
 | `~/.config/nvim/lua/plugins/mini-animate-disable-cursor.lua` | `dot_config/nvim/lua/plugins/mini-animate-disable-cursor.lua` | neovim / LazyVim | — |
+| `~/.config/nvim/lua/plugins/theme.lua` | `dot_config/nvim/lua/plugins/theme.lua.tmpl` | neovim / LazyVim | template |
 | `~/.config/nvim/lua/plugins/vim-be-good.lua` | `dot_config/nvim/lua/plugins/vim-be-good.lua` | neovim / LazyVim | — |
 | `~/.config/Cursor/User/settings.json` | `dot_config/private_Cursor/User/settings.json` | cursor | private |
 
@@ -168,6 +175,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | Target | Source | Subsystem | Attributes |
 | --- | --- | --- | --- |
 | `~/.Brewfile` | `dot_Brewfile` | homebrew | — |
+| `~/.config/mise/conf.d/vespasian.toml` | `dot_config/mise/conf.d/vespasian.toml` | mise | — |
 | `~/.config/mise/config.toml` | `dot_config/mise/config.toml` | mise | — |
 | `~/.config/pacman/aurlist.txt` | `dot_config/pacman/aurlist.txt` | pacman / AUR | — |
 | `~/.config/pacman/pkglist.txt` | `dot_config/pacman/pkglist.txt` | pacman / AUR | — |
@@ -181,8 +189,8 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.cline/data/settings/global-settings.json` | `dot_cline/data/settings/global-settings.json` | cline | — |
 | `~/.cline/skills/project-doc-planner` | `dot_cline/skills/symlink_project-doc-planner` | cline | symlink |
 | `~/.codex/hooks.json` | `dot_codex/hooks.json` | codex | — |
+| `~/.codex/config.toml` | `dot_codex/modify_private_config.toml` | codex | modify, private |
 | `~/.codex/AGENTS.md` | `dot_codex/private_AGENTS.md` | codex | private |
-| `~/.codex/config.toml` | `dot_codex/private_config.toml` | codex | private |
 | `~/.codex/rules/default.rules` | `dot_codex/rules/default.rules` | codex | — |
 | `~/.codex/skills/dots/SKILL.md` | `dot_codex/skills/dots/SKILL.md` | codex | — |
 | `~/.codex/skills/frontier-sweep/SKILL.md` | `dot_codex/skills/frontier-sweep/SKILL.md` | codex | — |
@@ -210,8 +218,8 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.gemini/agents/codebase-memory.md` | `dot_gemini/agents/private_codebase-memory.md` | gemini | private |
 | `~/.gemini/config/mcp_config.json` | `dot_gemini/config/mcp_config.json` | gemini | — |
 | `~/.gemini/config/skills/project-doc-planner` | `dot_gemini/config/skills/symlink_project-doc-planner` | gemini | symlink |
+| `~/.gemini/settings.json` | `dot_gemini/modify_private_settings.json` | gemini | modify, private |
 | `~/.gemini/GEMINI.md` | `dot_gemini/private_GEMINI.md` | gemini | private |
-| `~/.gemini/settings.json` | `dot_gemini/private_settings.json` | gemini | private |
 | `~/.gemini/skills/project-doc-planner` | `dot_gemini/skills/symlink_project-doc-planner` | gemini | symlink |
 | `~/.grok/hooks/herdr-agent-state.sh` | `dot_grok/hooks/executable_herdr-agent-state.sh` | grok | executable |
 | `~/.grok/hooks/herdr.json` | `dot_grok/hooks/herdr.json` | grok | — |
@@ -288,7 +296,43 @@ agents and the showcase app should read. This page is the same data for humans.
 
 | Target | Source | Subsystem | Attributes |
 | --- | --- | --- | --- |
+| `~/.chezmoitemplates/codex-config.toml` | `.chezmoitemplates/codex-config.toml` | — | — |
+| `~/.chezmoitemplates/gemini-settings.json` | `.chezmoitemplates/gemini-settings.json` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-day/bat.tmTheme` | `.chezmoitemplates/themes/tokyonight-day/bat.tmTheme` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-day/delta.gitconfig` | `.chezmoitemplates/themes/tokyonight-day/delta.gitconfig` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-day/eza.yml` | `.chezmoitemplates/themes/tokyonight-day/eza.yml` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-day/fzf.sh` | `.chezmoitemplates/themes/tokyonight-day/fzf.sh` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-day/gemini.json` | `.chezmoitemplates/themes/tokyonight-day/gemini.json` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-day/lazygit.yml` | `.chezmoitemplates/themes/tokyonight-day/lazygit.yml` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-day/windows_terminal.json` | `.chezmoitemplates/themes/tokyonight-day/windows_terminal.json` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-moon/bat.tmTheme` | `.chezmoitemplates/themes/tokyonight-moon/bat.tmTheme` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-moon/delta.gitconfig` | `.chezmoitemplates/themes/tokyonight-moon/delta.gitconfig` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-moon/eza.yml` | `.chezmoitemplates/themes/tokyonight-moon/eza.yml` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-moon/fzf.sh` | `.chezmoitemplates/themes/tokyonight-moon/fzf.sh` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-moon/gemini.json` | `.chezmoitemplates/themes/tokyonight-moon/gemini.json` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-moon/lazygit.yml` | `.chezmoitemplates/themes/tokyonight-moon/lazygit.yml` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-moon/windows_terminal.json` | `.chezmoitemplates/themes/tokyonight-moon/windows_terminal.json` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-night/bat.tmTheme` | `.chezmoitemplates/themes/tokyonight-night/bat.tmTheme` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-night/delta.gitconfig` | `.chezmoitemplates/themes/tokyonight-night/delta.gitconfig` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-night/eza.yml` | `.chezmoitemplates/themes/tokyonight-night/eza.yml` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-night/fzf.sh` | `.chezmoitemplates/themes/tokyonight-night/fzf.sh` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-night/gemini.json` | `.chezmoitemplates/themes/tokyonight-night/gemini.json` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-night/lazygit.yml` | `.chezmoitemplates/themes/tokyonight-night/lazygit.yml` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-night/windows_terminal.json` | `.chezmoitemplates/themes/tokyonight-night/windows_terminal.json` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-storm/bat.tmTheme` | `.chezmoitemplates/themes/tokyonight-storm/bat.tmTheme` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-storm/delta.gitconfig` | `.chezmoitemplates/themes/tokyonight-storm/delta.gitconfig` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-storm/eza.yml` | `.chezmoitemplates/themes/tokyonight-storm/eza.yml` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-storm/fzf.sh` | `.chezmoitemplates/themes/tokyonight-storm/fzf.sh` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-storm/gemini.json` | `.chezmoitemplates/themes/tokyonight-storm/gemini.json` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-storm/lazygit.yml` | `.chezmoitemplates/themes/tokyonight-storm/lazygit.yml` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-storm/windows_terminal.json` | `.chezmoitemplates/themes/tokyonight-storm/windows_terminal.json` | — | — |
 | `~/PR_DESCRIPTION.md` | `PR_DESCRIPTION.md` | — | — |
+| `~/.config/apt/pkglist.txt` | `dot_config/apt/pkglist.txt` | — | — |
+| `~/.config/bat/config` | `dot_config/bat/config` | — | — |
+| `~/.config/bat/themes/dots.tmTheme` | `dot_config/bat/themes/dots.tmTheme.tmpl` | — | template |
+| `~/.config/delta/theme.gitconfig` | `dot_config/delta/theme.gitconfig.tmpl` | — | template |
+| `~/.config/eza/theme.yml` | `dot_config/eza/theme.yml.tmpl` | — | template |
+| `~/.config/fzf/theme.sh` | `dot_config/fzf/theme.sh.tmpl` | — | template |
 
 ## Apply hooks (`run_*`)
 
@@ -310,6 +354,9 @@ agents and the showcase app should read. This page is the same data for humans.
 | 30 | `run_onchange_after_30-macos-defaults.sh.tmpl` | runs when this script's contents change | after |
 | 31 | `run_onchange_after_31-mouse-dpi.sh.tmpl` | runs when this script's contents change | after |
 | 32 | `run_onchange_after_32-setup-omarchy-pi.sh.tmpl` | runs when this script's contents change | after |
+| 40 | `run_onchange_after_40-vespasian-windows-terminal.sh.tmpl` | runs when this script's contents change | after |
+| 41 | `run_onchange_after_41-vespasian-nerd-font.sh.tmpl` | runs when this script's contents change | after |
+| 42 | `run_onchange_after_42-vespasian-theme-state.sh.tmpl` | runs when this script's contents change | after |
 
 ## Chezmoi control files
 
@@ -319,8 +366,10 @@ agents and the showcase app should read. This page is the same data for humans.
 | `.chezmoidata/agent_skills.yaml` | Controls how chezmoi renders and applies this tree |
 | `.chezmoidata/claude_mcp.yaml` | Controls how chezmoi renders and applies this tree |
 | `.chezmoidata/claude_settings.yaml` | Controls how chezmoi renders and applies this tree |
+| `.chezmoidata/codex_projects.yaml` | Controls how chezmoi renders and applies this tree |
 | `.chezmoidata/machines.yaml` | Controls how chezmoi renders and applies this tree |
 | `.chezmoidata/omarchy_plugins.yaml` | Controls how chezmoi renders and applies this tree |
+| `.chezmoidata/themes.yaml` | Controls how chezmoi renders and applies this tree |
 | `.chezmoiignore.tmpl` | Controls how chezmoi renders and applies this tree |
 
 ## Repository material (not applied)
