@@ -43,6 +43,9 @@ alias mr='mise run'
 
 alias lg="lazygit"
 
+# 1Password CLI (WSL desktop integration)
+command -v op.exe >/dev/null 2>&1 && alias op="op.exe"
+
 # Aliases managed by the Omarchy Alias Manager plugin (leoom.aliases)
 [ -r "$HOME/.config/omarchy/aliases" ] && source "$HOME/.config/omarchy/aliases"
 

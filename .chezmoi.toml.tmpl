@@ -13,6 +13,9 @@ recipient = "age1hf4200nhdqg0l3xs68v4gef6mn0nuvmh72573m3nfj8kqpcs7pnsmfkuw6"
 
 [onepassword]
 prompt = true
+{{- if and (eq .chezmoi.os "linux") (contains "microsoft" (lower .chezmoi.kernel.osrelease)) }}
+command = "op.exe"
+{{- end }}
 
 {{/* Machine identity. Hostname-first so a box is pinned deterministically,
      with an OS fallback for a machine that has not been registered yet.
