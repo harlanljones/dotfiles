@@ -12,6 +12,10 @@ __pycache__/
 .unlazy/
 .unlazy-hook-state.json
 
+# Claude Code agent worktrees (isolation: "worktree") are ephemeral checkouts
+# of this repo, not content to track; git also warns about embedded repos here.
+.claude/worktrees/
+
 # OS cruft
 .DS_Store
 

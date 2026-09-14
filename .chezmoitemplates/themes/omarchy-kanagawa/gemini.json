@@ -1,0 +1,40 @@
+{
+  "name": "Omarchy Kanagawa",
+  "type": "custom",
+  "text": {
+    "primary": "#dcd7ba",
+    "secondary": "#727169",
+    "response": "#dcd7ba"
+  },
+  "background": {
+    "primary": "#1f1f28",
+    "diff": {
+      "added": "#2d3233",
+      "removed": "#39242c"
+    }
+  },
+  "border": {
+    "default": "#363646",
+    "focused": "#dcd7ba"
+  },
+  "ui": {
+    "comment": "#54546d",
+    "symbol": "#727169",
+    "gradient": ["#7e9cd8", "#957fb8", "#6a9589"]
+  },
+  "Background": "#1f1f28",
+  "Foreground": "#dcd7ba",
+  "LightBlue": "#6a9589",
+  "AccentBlue": "#957fb8",
+  "AccentPurple": "#957fb8",
+  "AccentCyan": "#6a9589",
+  "AccentGreen": "#c0a36e",
+  "AccentYellow": "#76946a",
+  "AccentRed": "#c34043",
+  "DiffAdded": "#2d3233",
+  "DiffRemoved": "#39242c",
+  "Comment": "#54546d",
+  "Gray": "#727169",
+  "DarkGray": "#17171e",
+  "GradientColors": ["#7e9cd8", "#957fb8", "#6a9589"]
+}

@@ -2,10 +2,12 @@
 {{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
 {{- $wt := (index .machines "vespasian").windowsTerminal -}}
 {{- $name := (index .machines "vespasian").theme.name -}}
+{{- $appearance := (index .themes $name).appearance -}}
 {{- /* Upstream WT ports start with `#` comment lines; strip them before parsing. */ -}}
 {{- $scheme := regexReplaceAll "(?m)^#.*$" (include (printf ".chezmoitemplates/themes/%s/windows_terminal.json" $name)) "" | fromJson -}}
 #!/usr/bin/env bash
-# Theme the Ubuntu profile in Windows Terminal with the `dots theme` selection
+# Theme Windows and the Ubuntu profile in Windows Terminal with the dots theme
+# selection
 # ({{ (index .themes $name).label }}).
 #
 # Writes additive JSON fragments and updates Windows Terminal settings.json so
@@ -23,7 +25,36 @@ fi
 win_localappdata="$(cd /mnt/c && cmd.exe /d /c 'echo %LOCALAPPDATA%' 2>/dev/null | tr -d '\r')"
 wsl_localappdata="$(wslpath "$win_localappdata")"
 
-# 1. Write fragments to standard unpackaged and packaged locations
+# 1. Match Windows system and app appearance to the coordinated theme.
+# Day uses Windows light mode; Night, Moon, and Storm use dark mode.
+powershell.exe -NoProfile -Command '
+  $path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
+  $desired = {{ if eq $appearance "light" }}1{{ else }}0{{ end }};
+  $current = Get-ItemProperty -Path $path -ErrorAction SilentlyContinue;
+  $changed = $null -eq $current -or
+    $current.AppsUseLightTheme -ne $desired -or
+    $current.SystemUsesLightTheme -ne $desired;
+  New-Item -Path $path -Force | Out-Null;
+  Set-ItemProperty -Path $path -Name AppsUseLightTheme -Type DWord -Value $desired;
+  Set-ItemProperty -Path $path -Name SystemUsesLightTheme -Type DWord -Value $desired;
+  Set-ItemProperty -Path $path -Name EnableTransparency -Type DWord -Value 1;
+  if ($changed) {
+    Stop-Process -Name explorer -Force
+  }
+
+  # Explorer restart covers taskbar/Start/File Explorer, but most other
+  # running apps (Settings, Notepad, Windows Terminal, VS Code, ...) only
+  # pick up dark/light mode live if they see the same WM_SETTINGCHANGE
+  # broadcast the Settings app sends when you flip the toggle by hand.
+  # Without this, they stay on the theme they had at launch until restarted.
+  Add-Type -TypeDefinition "using System; using System.Runtime.InteropServices; public class Win32Broadcast { [DllImport(`"user32.dll`", SetLastError = true, CharSet = CharSet.Auto)] public static extern IntPtr SendMessageTimeout(IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam, uint fuFlags, uint uTimeout, out UIntPtr lpdwResult); }" -ErrorAction SilentlyContinue;
+  $HWND_BROADCAST = [IntPtr]0xffff;
+  $WM_SETTINGCHANGE = 0x1A;
+  $result = [UIntPtr]::Zero;
+  [Win32Broadcast]::SendMessageTimeout($HWND_BROADCAST, $WM_SETTINGCHANGE, [UIntPtr]::Zero, "ImmersiveColorSet", 2, 5000, [ref]$result) | Out-Null;
+  [Win32Broadcast]::SendMessageTimeout($HWND_BROADCAST, $WM_SETTINGCHANGE, [UIntPtr]::Zero, "WindowsThemeElement", 2, 5000, [ref]$result) | Out-Null;' < /dev/null
+
+# 2. Write fragments to standard unpackaged and packaged locations
 fragment_dirs=(
   "$wsl_localappdata/Microsoft/Windows Terminal/Fragments/dots"
   "$wsl_localappdata/Packages/Microsoft.WindowsTerminal_8wekyb3d8bbwe/LocalState/Fragments/dots"
@@ -57,7 +88,7 @@ for dir in "${fragment_dirs[@]}"; do
   fi
 done
 
-# 2. Directly update settings.json in Windows Terminal to ensure live reload
+# 3. Directly update settings.json in Windows Terminal to ensure live reload
 # and overcome dynamic WSL profile fragment priority limitations
 python3 - "$wsl_localappdata" <<'PY_EOF'
 import json
@@ -119,5 +150,5 @@ for path in settings_candidates:
     print(f"windows-terminal: updated {path}")
 PY_EOF
 
-echo "windows-terminal: applied {{ $scheme.name }} ({{ (index .themes $name).label }}) to Windows Terminal"
+echo "windows-terminal: applied {{ $scheme.name }} ({{ (index .themes $name).label }}) to Windows and Windows Terminal"
 {{- end -}}

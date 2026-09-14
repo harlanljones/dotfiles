@@ -13,6 +13,7 @@
 #              shells out here for display (payload passed straight through).
 #
 # Cross-platform: runs on macOS (hadrian) and Linux/Omarchy (augustus).
+# All agent harnesses synced via dots dotfiles management.
 
 set -uo pipefail
 
@@ -23,13 +24,18 @@ mapfile -t F < <(
     (.model.display_name // .model.id // "claude"),
     (.workspace.current_dir // .cwd // "."),
     (.context_window.used_percentage // -1 | floor),
+    (.context_window.total_characters // 0),
+    (.context_window.used_characters // 0),
+    (.usage.rate_limited // 0),
+    (.usage.usage_limit_reason // ""),
     (.cost.total_lines_added // 0),
     (.cost.total_lines_removed // 0),
     (.cost.total_cost_usd // 0),
     (.output_style.name // "default")'
 )
 MODEL=${F[0]:-claude}; DIR=${F[1]:-.}; PCT=${F[2]:--1}
-ADDED=${F[3]:-0}; REMOVED=${F[4]:-0}; COST=${F[5]:-0}; STYLE=${F[6]:-default}
+TOTAL_CTX=${F[3]:-0}; USED_CTX=${F[4]:-0}; RATE_LIMITED=${F[5]:-0}; LIMIT_REASON=${F[6]:-""}
+ADDED=${F[7]:-0}; REMOVED=${F[8]:-0}; COST=${F[9]:-0}; STYLE=${F[10]:-default}
 
 C_RESET=$'\033[0m'; C_DIM=$'\033[90m'; C_CYAN=$'\033[36m'
 C_GREEN=$'\033[32m'; C_YELLOW=$'\033[33m'; C_RED=$'\033[31m'; C_MAGENTA=$'\033[35m'
@@ -37,13 +43,28 @@ C_GREEN=$'\033[32m'; C_YELLOW=$'\033[33m'; C_RED=$'\033[31m'; C_MAGENTA=$'\033[3
 # Directory (with ~ collapsed)
 SHORT_DIR="${DIR/#$HOME/\~}"
 
-# Git branch + dirty marker
+# Git branch + status (dirty, staged, untracked, behind/ahead)
 GIT=""
 if branch=$(git -C "$DIR" branch --show-current 2>/dev/null); then
   [ -z "$branch" ] && branch=$(git -C "$DIR" rev-parse --short HEAD 2>/dev/null)
-  dirty=""
-  git -C "$DIR" diff --quiet --ignore-submodules HEAD 2>/dev/null || dirty="*"
-  GIT=" ${C_DIM}on${C_RESET} ${C_GREEN}${branch}${C_YELLOW}${dirty}${C_RESET}"
+
+  # Status indicators: * = unstaged, ~ = staged, ? = untracked, ↓↑ = tracking diff
+  status_indicators=""
+  git -C "$DIR" diff --quiet --ignore-submodules HEAD 2>/dev/null || status_indicators+="*"
+  git -C "$DIR" diff --quiet --cached --ignore-submodules HEAD 2>/dev/null || status_indicators+="~"
+  [[ -n "$(git -C "$DIR" ls-files --others --exclude-standard 2>/dev/null)" ]] && status_indicators+="?"
+
+  # Track tracking branch diff (ahead/behind)
+  tracking=$(git -C "$DIR" rev-parse --abbrev-ref "@{u}" 2>/dev/null || echo "")
+  if [[ -n "$tracking" && "$tracking" != "@{u}" ]]; then
+    ahead=$(git -C "$DIR" rev-list --left-only --count "$tracking"..."HEAD" 2>/dev/null || echo 0)
+    behind=$(git -C "$DIR" rev-list --right-only --count "$tracking"..."HEAD" 2>/dev/null || echo 0)
+    [[ "$ahead" -gt 0 ]] && status_indicators+="↑"
+    [[ "$behind" -gt 0 ]] && status_indicators+="↓"
+  fi
+
+  GIT=" ${C_DIM}on${C_RESET} ${C_GREEN}${branch}${C_RESET}"
+  [[ -n "$status_indicators" ]] && GIT="${GIT}${C_YELLOW}${status_indicators}${C_RESET}"
 fi
 
 # Context meter
@@ -64,6 +85,20 @@ if [ "${ADDED:-0}" -gt 0 ] || [ "${REMOVED:-0}" -gt 0 ]; then
   DIFF=" ${C_DIM}|${C_RESET} ${C_GREEN}+${ADDED}${C_RESET}/${C_RED}-${REMOVED}${C_RESET}"
 fi
 
+# Usage limit status (rate limit, budget remaining, etc.)
+LIMIT=""
+if [ "$RATE_LIMITED" = "true" ] || [ "$RATE_LIMITED" = "1" ]; then
+  LIMIT=" ${C_DIM}|${C_RESET} ${C_RED}🚫 rate limited${C_RESET}"
+  [ -n "$LIMIT_REASON" ] && LIMIT="${LIMIT} ${C_DIM}(${LIMIT_REASON})${C_RESET}"
+elif [ "${USED_CTX:-0}" -gt 0 ] && [ "${TOTAL_CTX:-0}" -gt 0 ]; then
+  ctx_pct=$(( USED_CTX * 100 / TOTAL_CTX ))
+  if [ "$ctx_pct" -ge 95 ]; then
+    LIMIT=" ${C_DIM}|${C_RESET} ${C_RED}💾 ${ctx_pct}% used${C_RESET}"
+  elif [ "$ctx_pct" -ge 75 ]; then
+    LIMIT=" ${C_DIM}|${C_RESET} ${C_YELLOW}💾 ${ctx_pct}% used${C_RESET}"
+  fi
+fi
+
 # Session cost
 CST=""
 if [ -n "${COST:-}" ] && awk "BEGIN{exit !($COST > 0.005)}" 2>/dev/null; then
@@ -74,6 +109,6 @@ fi
 STY=""
 [ "$STYLE" != "default" ] && STY=" ${C_DIM}| ${STYLE}${C_RESET}"
 
-printf "%s%s%s %s%s%s%s%s%s" \
+printf "%s%s%s %s%s%s%s%s%s%s%s" \
   "$C_MAGENTA" "$MODEL" "$C_RESET" \
-  "${C_CYAN}${SHORT_DIR}${C_RESET}" "$GIT" "$CTX" "$DIFF" "$CST" "$STY"
+  "${C_CYAN}${SHORT_DIR}${C_RESET}" "$GIT" "$CTX" "$LIMIT" "$DIFF" "$CST" "$STY"

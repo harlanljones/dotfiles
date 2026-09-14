@@ -8,6 +8,8 @@
 # - Zebar (status bar)
 # - Flow Launcher (keyboard launcher)
 # - QuickLook (spacebar preview)
+# - TranslucentTB (transparent Windows taskbar)
+# - AutoHotkey (prevents Super bindings from opening the Start menu)
 #
 # Theme: {{ (index .themes $name).label }}
 # Active border: {{ $scheme.blue }}
@@ -80,7 +82,37 @@ if [[ ! -f "$quicklook_dir/QuickLook.exe" ]]; then
   rm -rf "$tmp_dir"
 fi
 
-# 5. Ensure paths are registered in Windows user PATH
+# 5. Install TranslucentTB for a transparent taskbar if missing
+if command -v winget.exe >/dev/null 2>&1 && \
+   ! winget.exe list --id CharlesMilette.TranslucentTB --exact --accept-source-agreements >/dev/null 2>&1; then
+  echo "desktop-tools: installing TranslucentTB..."
+  winget.exe install \
+    --id CharlesMilette.TranslucentTB \
+    --exact \
+    --source winget \
+    --scope user \
+    --silent \
+    --accept-package-agreements \
+    --accept-source-agreements \
+    --disable-interactivity < /dev/null
+fi
+
+# 6. Install AutoHotkey v2 for the Super-key mask if missing
+autohotkey_exe="$wsl_localappdata/Programs/AutoHotkey/v2/AutoHotkey64.exe"
+if command -v winget.exe >/dev/null 2>&1 && [[ ! -f "$autohotkey_exe" ]]; then
+  echo "desktop-tools: installing AutoHotkey v2..."
+  winget.exe install \
+    --id AutoHotkey.AutoHotkey \
+    --exact \
+    --source winget \
+    --scope user \
+    --silent \
+    --accept-package-agreements \
+    --accept-source-agreements \
+    --disable-interactivity < /dev/null
+fi
+
+# 7. Ensure paths are registered in Windows user PATH
 python3 - "$win_localappdata" <<'PY_EOF'
 import subprocess
 import sys
@@ -109,7 +141,7 @@ if updated:
     subprocess.run(["powershell.exe", "-NoProfile", "-Command", set_cmd], check=True)
 PY_EOF
 
-# 6. Configure GlazeWM with Tokyo Night styling and dev keybindings
+# 8. Configure GlazeWM with the active dots theme's border colors and dev keybindings
 glzr_dir="$wsl_userprofile/.glzr/glazewm"
 mkdir -p "$glzr_dir"
 
@@ -166,9 +198,17 @@ window_behavior:
       shown_on_top: false
 
 workspaces:
+  # Match Augustus's Hyprland connector order:
+  #   1 = LG UltraGear (DP-1, bottom left)
+  #   2 = Lenovo T32p-20 (DP-2, right)
+  #   3 = Acer XF270HU (DP-3, upper left)
+  # GlazeWM indexes monitors geometrically as Acer=0, LG=1, Lenovo=2.
   - name: '1'
+    bind_to_monitor: 1
   - name: '2'
+    bind_to_monitor: 2
   - name: '3'
+    bind_to_monitor: 0
   - name: '4'
   - name: '5'
   - name: '6'
@@ -300,9 +340,17 @@ keybindings:
     bindings: ['lwin+shift+9', 'alt+shift+9']
 EOF_CONFIG
 
-# 7. Deploy Zebar Tokyo Night status bar with mode indicator
+# 9. Deploy the Zebar status bar with mode indicator, themed from the active
+# dots theme's colors (same $scheme source as Windows Terminal, above).
 zebar_conf_dir="$wsl_userprofile/.glzr/zebar"
-mkdir -p "$zebar_conf_dir/tokyonight"
+
+# Previously shipped as a Tokyo-Night-only pack; drop the old directory so a
+# theme switch doesn't leave a stale, unreferenced copy behind.
+if [[ -d "$zebar_conf_dir/tokyonight" ]]; then
+  rm -rf "$zebar_conf_dir/tokyonight"
+fi
+
+mkdir -p "$zebar_conf_dir/dots"
 
 # settings.json — point Zebar at our custom pack
 cat <<'ZEBAR_SETTINGS' > "$zebar_conf_dir/settings.json"
@@ -310,7 +358,7 @@ cat <<'ZEBAR_SETTINGS' > "$zebar_conf_dir/settings.json"
   "$schema": "https://github.com/glzr-io/zebar/raw/v3.3.1/resources/settings-schema.json",
   "startupConfigs": [
     {
-      "pack": "tokyonight",
+      "pack": "dots",
       "widget": "bar",
       "preset": "default"
     }
@@ -319,12 +367,12 @@ cat <<'ZEBAR_SETTINGS' > "$zebar_conf_dir/settings.json"
 ZEBAR_SETTINGS
 
 # zpack.json — widget pack manifest
-cat <<'ZBAR_PACK' > "$zebar_conf_dir/tokyonight/zpack.json"
+cat <<'ZBAR_PACK' > "$zebar_conf_dir/dots/zpack.json"
 {
   "$schema": "https://github.com/glzr-io/zebar/raw/v3.0.0/resources/zpack-schema.json",
-  "name": "tokyonight",
+  "name": "dots",
   "version": "1.0.0",
-  "description": "Tokyo Night status bar for GlazeWM with Gaming vs Dev mode indicator",
+  "description": "dots-themed status bar for GlazeWM with Gaming vs Dev mode indicator",
   "widgets": [
     {
       "name": "bar",
@@ -352,22 +400,30 @@ cat <<'ZBAR_PACK' > "$zebar_conf_dir/tokyonight/zpack.json"
 }
 ZBAR_PACK
 
-# styles.css — Tokyo Night bar theme (templated from active palette)
-cat > "$zebar_conf_dir/tokyonight/styles.css" <<'ZBAR_CSS'
+# styles.css — bar theme derived from the active dots theme's palette. Alpha
+# variants use CSS color-mix() so no rgba() literal here is tied to any one
+# theme's colors (WebView2/Chromium 111+ required; Zebar's runtime qualifies).
+cat > "$zebar_conf_dir/dots/styles.css" <<'ZBAR_CSS'
 @import 'https://www.nerdfonts.com/assets/css/webfont.css';
 
 :root {
-  --bg-primary: rgba(36, 40, 59, 0.90);
-  --bg-secondary: rgba(29, 32, 47, 0.70);
-  --text-main: {{ $scheme.foreground }};
-  --text-muted: {{ $scheme.blue }};
+  --bg: {{ $scheme.background }};
+  --bg-dark: {{ $scheme.black }};
+  --fg: {{ $scheme.foreground }};
+  --fg-bright: {{ $scheme.brightWhite }};
+  --muted: {{ $scheme.brightBlack }};
   --accent-blue: {{ $scheme.blue }};
   --accent-cyan: {{ $scheme.cyan }};
   --accent-green: {{ $scheme.green }};
   --accent-purple: {{ $scheme.purple }};
   --accent-red: {{ $scheme.red }};
   --accent-yellow: {{ $scheme.yellow }};
-  --border-color: rgba(65, 72, 104, 0.6);
+
+  --bg-primary: color-mix(in srgb, var(--bg) 90%, transparent);
+  --bg-secondary: color-mix(in srgb, var(--bg-dark) 70%, transparent);
+  --text-main: var(--fg);
+  --text-muted: var(--accent-blue);
+  --border-color: color-mix(in srgb, var(--muted) 60%, transparent);
 }
 
 * {
@@ -433,36 +489,36 @@ body {
 }
 
 .mode-badge.dev {
-  background: rgba(122, 162, 247, 0.18);
+  background: color-mix(in srgb, var(--accent-blue) 18%, transparent);
   border-color: var(--accent-blue);
   color: var(--accent-blue);
 }
 
 .mode-badge.dev:hover {
-  background: rgba(122, 162, 247, 0.35);
+  background: color-mix(in srgb, var(--accent-blue) 35%, transparent);
 }
 
 .mode-badge.gaming {
-  background: rgba(247, 118, 142, 0.25);
+  background: color-mix(in srgb, var(--accent-red) 25%, transparent);
   border-color: var(--accent-red);
   color: var(--accent-red);
   animation: pulse-glow 2s infinite;
 }
 
 .mode-badge.gaming:hover {
-  background: rgba(247, 118, 142, 0.40);
+  background: color-mix(in srgb, var(--accent-red) 40%, transparent);
 }
 
 .mode-badge.resize {
-  background: rgba(187, 154, 247, 0.25);
+  background: color-mix(in srgb, var(--accent-purple) 25%, transparent);
   border-color: var(--accent-purple);
   color: var(--accent-purple);
 }
 
 @keyframes pulse-glow {
-  0% { box-shadow: 0 0 0 0 rgba(247, 118, 142, 0.4); }
-  70% { box-shadow: 0 0 0 6px rgba(247, 118, 142, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(247, 118, 142, 0); }
+  0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-red) 40%, transparent); }
+  70% { box-shadow: 0 0 0 6px color-mix(in srgb, var(--accent-red) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-red) 0%, transparent); }
 }
 
 /* Workspaces */
@@ -485,25 +541,25 @@ body {
 }
 
 .ws-btn:hover {
-  background: rgba(122, 162, 247, 0.25);
+  background: color-mix(in srgb, var(--accent-blue) 25%, transparent);
   border-color: var(--accent-blue);
 }
 
 .ws-btn.focused {
   background: var(--accent-blue);
-  color: #1a1b26;
+  color: var(--bg);
   font-weight: 700;
   border-color: var(--accent-blue);
 }
 
 .ws-btn.displayed:not(.focused) {
-  background: rgba(122, 162, 247, 0.15);
-  border-color: rgba(122, 162, 247, 0.4);
+  background: color-mix(in srgb, var(--accent-blue) 15%, transparent);
+  border-color: color-mix(in srgb, var(--accent-blue) 40%, transparent);
 }
 
 /* Window title */
 .window-title {
-  color: {{ $scheme.white }};
+  color: var(--fg-bright);
   font-size: 11px;
   font-weight: 500;
   max-width: 450px;
@@ -531,7 +587,7 @@ body {
 ZBAR_CSS
 
 # index.html — React widget with live Gaming/Dev mode indicator
-cat <<'ZBAR_HTML' > "$zebar_conf_dir/tokyonight/index.html"
+cat <<'ZBAR_HTML' > "$zebar_conf_dir/dots/index.html"
 <!doctype html>
 <html lang="en">
   <head>
@@ -672,7 +728,7 @@ cat <<'ZBAR_HTML' > "$zebar_conf_dir/tokyonight/index.html"
 </html>
 ZBAR_HTML
 
-# 7b. Deploy mode-switch notification script for GlazeWM
+# 9b. Deploy mode-switch notification script for GlazeWM
 cat > "$glazewm_dir/notify-mode.ps1" <<'PS_NOTIFY'
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
@@ -697,7 +753,18 @@ if (Test-Path $cli) {
 }
 PS_NOTIFY
 
-# 8. Setup user startup shortcuts so tools auto-start on Windows login
+# Pass the Windows key through to GlazeWM while sending an unused key event.
+# Windows then treats Super as part of a chord and does not open Start on key-up.
+cat > "$glazewm_dir/super-mask.ahk" <<'AHK_SUPER_MASK'
+#Requires AutoHotkey v2.0
+#SingleInstance Force
+#UseHook
+
+~LWin::Send "{Blind}{vkE8}"
+~RWin::Send "{Blind}{vkE8}"
+AHK_SUPER_MASK
+
+# 10. Setup user startup shortcuts so tools auto-start on Windows login
 startup_dir="$wsl_userprofile/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup"
 mkdir -p "$startup_dir"
 
@@ -707,27 +774,44 @@ import sys
 
 win_userprofile, win_appdata = sys.argv[1], sys.argv[2]
 targets = {
-    "GlazeWM.lnk": rf"{win_appdata}\Programs\glazewm\glazewm.exe",
-    "FlowLauncher.lnk": rf"{win_appdata}\FlowLauncher\Flow.Launcher.exe",
-    "QuickLook.lnk": rf"{win_appdata}\Programs\QuickLook\QuickLook.exe",
+    "GlazeWM.lnk": (rf"{win_appdata}\Programs\glazewm\glazewm.exe", ""),
+    "GlazeWM Super Key Mask.lnk": (
+        rf"{win_appdata}\Programs\AutoHotkey\v2\AutoHotkey64.exe",
+        rf'"{win_appdata}\Programs\glazewm\super-mask.ahk"',
+    ),
+    "FlowLauncher.lnk": (rf"{win_appdata}\FlowLauncher\Flow.Launcher.exe", ""),
+    "QuickLook.lnk": (rf"{win_appdata}\Programs\QuickLook\QuickLook.exe", ""),
 }
 
-for name, target in targets.items():
+for name, (target, arguments) in targets.items():
     link_path = rf"{win_userprofile}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\{name}"
     ps = rf'''
     $ws = New-Object -ComObject WScript.Shell
     $s = $ws.CreateShortcut("{link_path}")
     $s.TargetPath = "{target}"
+    $s.Arguments = '{arguments}'
     $s.WorkingDirectory = [System.IO.Path]::GetDirectoryName("{target}")
     $s.Save()
     '''
     subprocess.run(["powershell.exe", "-NoProfile", "-Command", ps], check=True)
 PY_EOF
 
-# 9. Trigger live GlazeWM reload if running
+# 11. Start the Super-key mask and TranslucentTB, then reload GlazeWM
+if [[ -f "$autohotkey_exe" ]]; then
+  "$autohotkey_exe" "$(wslpath -w "$glazewm_dir/super-mask.ahk")" </dev/null >/dev/null 2>&1 &
+fi
+
+powershell.exe -NoProfile -Command '
+  if (-not (Get-Process TranslucentTB -ErrorAction SilentlyContinue)) {
+    $package = Get-AppxPackage -Name "*TranslucentTB*";
+    if ($package) {
+      Start-Process explorer.exe "shell:AppsFolder\$($package.PackageFamilyName)!TranslucentTB"
+    }
+  }' < /dev/null
+
 if [[ -f "$glazewm_dir/cli/glazewm.exe" ]]; then
   "$glazewm_dir/cli/glazewm.exe" command wm-reload-config </dev/null 2>&1 || true
 fi
 
-echo "desktop-tools: GlazeWM, Zebar, Flow Launcher, QuickLook configured successfully"
+echo "desktop-tools: GlazeWM, Zebar, Flow Launcher, QuickLook, TranslucentTB, Super-key mask configured successfully"
 {{- end -}}

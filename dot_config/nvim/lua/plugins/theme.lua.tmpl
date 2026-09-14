@@ -3,6 +3,7 @@
 -- Vespasian only (ignored on other machines, where Omarchy links its own
 -- theme.lua here). {{ $theme.label }}, selected with `dots theme set`, matching
 -- Windows Terminal, lazygit, delta, bat, eza and fzf on this box.
+{{- if hasKey $theme "nvimStyle" }}
 return {
   {
     "folke/tokyonight.nvim",
@@ -14,3 +15,23 @@ return {
     opts = { colorscheme = "{{ $theme.nvimColorscheme }}" },
   },
 }
+{{- else }}
+-- {{ $name }} was imported via `dots theme import-aether` and has a generated
+-- .chezmoitemplates/themes/{{ $name }}/nvim.lua palette, but it is not yet
+-- wired up as a real lazy.nvim colorscheme plugin (see
+-- docs/aether-theming-integration-proposal.md, Phase 1 nvim item). Until
+-- then, keep the terminal/CLI tools on this theme's own palette while
+-- Neovim falls back to Tokyo Night Storm so `dots sync` never leaves it on a
+-- broken colorscheme.
+return {
+  {
+    "folke/tokyonight.nvim",
+    priority = 1000,
+    opts = { style = "storm" },
+  },
+  {
+    "LazyVim/LazyVim",
+    opts = { colorscheme = "tokyonight-storm" },
+  },
+}
+{{- end }}

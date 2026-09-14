@@ -1,0 +1,40 @@
+{
+  "name": "Omarchy Nord",
+  "type": "custom",
+  "text": {
+    "primary": "#d8dee9",
+    "secondary": "#667080",
+    "response": "#d8dee9"
+  },
+  "background": {
+    "primary": "#2e3440",
+    "diff": {
+      "added": "#414a4c",
+      "removed": "#453b47"
+    }
+  },
+  "border": {
+    "default": "#434c5e",
+    "focused": "#81a1c1"
+  },
+  "ui": {
+    "comment": "#4c566a",
+    "symbol": "#667080",
+    "gradient": ["#81a1c1", "#b48ead", "#88c0d0"]
+  },
+  "Background": "#2e3440",
+  "Foreground": "#d8dee9",
+  "LightBlue": "#88c0d0",
+  "AccentBlue": "#b48ead",
+  "AccentPurple": "#b48ead",
+  "AccentCyan": "#88c0d0",
+  "AccentGreen": "#ebcb8b",
+  "AccentYellow": "#a3be8c",
+  "AccentRed": "#bf616a",
+  "DiffAdded": "#414a4c",
+  "DiffRemoved": "#453b47",
+  "Comment": "#4c566a",
+  "Gray": "#667080",
+  "DarkGray": "#222730",
+  "GradientColors": ["#81a1c1", "#b48ead", "#88c0d0"]
+}

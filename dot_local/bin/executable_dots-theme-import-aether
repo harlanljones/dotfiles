@@ -1,0 +1,424 @@
+#!/usr/bin/env python3
+"""dots-theme-import-aether - snapshot bridge from Aether/Omarchy palettes
+into chezmoi-managed dots themes.
+
+Implements the "Snapshot bridge" phase of
+docs/aether-theming-integration-proposal.md: it takes a canonical Omarchy v4
+`colors.toml` palette (the same format Aether emits, and what Omarchy themes
+publish), derives the per-tool color roles this repo's `dots theme` already
+consumes, renders them from .chezmoitemplates/aether-adapters/*.tmpl, and
+registers a new immutable entry in .chezmoidata/themes.yaml.
+
+Two entry points:
+  --from-colors-toml PATH   Import a colors.toml file directly (works
+                             anywhere - this is how public Omarchy themes are
+                             tested on a machine that has neither Aether nor
+                             Omarchy installed, e.g. Vespasian/WSL).
+  --from-aether [NAME]      Ask a locally installed `aether` CLI to export a
+                             blueprint (or the live theme) and import the
+                             colors.toml it produces. Requires Augustus
+                             (native Omarchy + Aether); refuses cleanly
+                             otherwise.
+
+Only colors and a small allowlist of declarative theme files are accepted;
+this importer never executes or vendors code from an imported theme.
+"""
+from __future__ import annotations
+
+import argparse
+import datetime
+import hashlib
+import json
+import re
+import shutil
+import string
+import struct
+import subprocess
+import sys
+import tempfile
+import tomllib
+import zlib
+from pathlib import Path
+
+BRIDGE_VERSION = "1"
+
+REQUIRED_KEYS = [
+    "mode",
+    "accent",
+    "selection",
+    "muted",
+    "background",
+    "dark_background",
+    "darker_background",
+    "lighter_background",
+    "foreground",
+    "dark_foreground",
+    "light_foreground",
+    "bright_foreground",
+    "red",
+    "yellow",
+    "orange",
+    "green",
+    "cyan",
+    "blue",
+    "magenta",
+    "brown",
+    "bright_red",
+    "bright_yellow",
+    "bright_green",
+    "bright_cyan",
+    "bright_blue",
+    "bright_magenta",
+]
+
+HEX_RE = re.compile(r"^#[0-9a-fA-F]{6}$")
+SLUG_RE = re.compile(r"^[a-z][a-z0-9]*(-[a-z0-9]+)*$")
+
+ADAPTER_FILES = [
+    "windows_terminal.json",
+    "lazygit.yml",
+    "delta.gitconfig",
+    "fzf.sh",
+    "eza.yml",
+    "bat.tmTheme",
+    "gemini.json",
+    "zebar.css",
+    "nvim.lua",
+]
+
+
+def fail(msg: str) -> "NoReturn":
+    print(f"error: {msg}", file=sys.stderr)
+    sys.exit(1)
+
+
+def repo_root() -> Path:
+    try:
+        out = subprocess.run(
+            ["chezmoi", "source-path"], capture_output=True, text=True, check=True
+        )
+        return Path(out.stdout.strip())
+    except Exception:
+        return Path.home() / ".local/share/chezmoi"
+
+
+def normalize_hex(value: str, field: str) -> str:
+    if not isinstance(value, str) or not HEX_RE.match(value):
+        fail(f"palette field '{field}' is not a #RRGGBB hex color: {value!r}")
+    return value.lower()
+
+
+def blend(fg: str, bg: str, t: float) -> str:
+    """Alpha-blend fg over bg at weight t (0..1), both #RRGGBB."""
+    fr, fgn, fb = int(fg[1:3], 16), int(fg[3:5], 16), int(fg[5:7], 16)
+    br, bgn, bb = int(bg[1:3], 16), int(bg[3:5], 16), int(bg[5:7], 16)
+    r = round(fr * t + br * (1 - t))
+    g = round(fgn * t + bgn * (1 - t))
+    b = round(fb * t + bb * (1 - t))
+    return f"#{r:02x}{g:02x}{b:02x}"
+
+
+def load_colors_toml(path: Path) -> dict:
+    try:
+        data = tomllib.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        fail(f"could not parse '{path}' as TOML: {exc}")
+    missing = [k for k in REQUIRED_KEYS if k not in data]
+    if missing:
+        fail(f"'{path}' is missing required Omarchy v4 palette keys: {', '.join(missing)}")
+    if data["mode"] not in ("dark", "light"):
+        fail(f"palette 'mode' must be 'dark' or 'light', got {data['mode']!r}")
+    for k in REQUIRED_KEYS:
+        if k == "mode":
+            continue
+        data[k] = normalize_hex(str(data[k]), k)
+    return data
+
+
+def derive_vars(palette: dict, label: str, slug: str) -> dict:
+    p = palette
+    minus_bg = blend(p["red"], p["background"], 0.16)
+    minus_emph_bg = blend(p["red"], p["background"], 0.30)
+    plus_bg = blend(p["green"], p["background"], 0.16)
+    plus_emph_bg = blend(p["green"], p["background"], 0.30)
+    return {
+        "label": label,
+        "slug": slug,
+        "appearance": p["mode"],
+        "accent": p["accent"],
+        "selection": p["selection"],
+        "muted": p["muted"],
+        "background": p["background"],
+        "dark_background": p["dark_background"],
+        "darker_background": p["darker_background"],
+        "lighter_background": p["lighter_background"],
+        "foreground": p["foreground"],
+        "dim_foreground": p["dark_foreground"],
+        "white": p["light_foreground"],
+        "bright_white": p["bright_foreground"],
+        "black": p["darker_background"],
+        "bright_black": p["muted"],
+        "cursor": p["bright_foreground"],
+        "red": p["red"],
+        "yellow": p["yellow"],
+        "orange": p["orange"],
+        "green": p["green"],
+        "cyan": p["cyan"],
+        "blue": p["blue"],
+        "magenta": p["magenta"],
+        "brown": p["brown"],
+        "bright_red": p["bright_red"],
+        "bright_yellow": p["bright_yellow"],
+        "bright_green": p["bright_green"],
+        "bright_cyan": p["bright_cyan"],
+        "bright_blue": p["bright_blue"],
+        "bright_magenta": p["bright_magenta"],
+        "minus_bg": minus_bg,
+        "minus_emph_bg": minus_emph_bg,
+        "plus_bg": plus_bg,
+        "plus_emph_bg": plus_emph_bg,
+        "uuid": hashlib.sha256(slug.encode()).hexdigest(),
+    }
+
+
+def _png_chunk(tag: bytes, data: bytes) -> bytes:
+    return struct.pack(">I", len(data)) + tag + data + struct.pack(">I", zlib.crc32(tag + data) & 0xFFFFFFFF)
+
+
+def _hex_rgb(h: str):
+    return tuple(int(h[i:i + 2], 16) for i in (1, 3, 5))
+
+
+def generate_wallpaper_png(top_hex: str, background_hex: str, accent_hex: str,
+                            width: int = 1920, height: int = 1080, accent_strength: float = 0.55) -> bytes:
+    """A vertical gradient from the theme's darkest background up top to an
+    accent-tinted glow at the bottom. Two near-black background shades (e.g.
+    darker_background -> background) are visually indistinguishable from a
+    blank desktop on most monitors, so the bottom stop blends real accent
+    color into the background rather than another background shade.
+    Generated, not downloaded: sidesteps the wallpaper redistribution-rights
+    question the proposal raises for real Omarchy/Aether wallpaper assets."""
+    tr, tg, tb = _hex_rgb(top_hex)
+    bgr, bgg, bgb = _hex_rgb(background_hex)
+    ar, ag, ab = _hex_rgb(accent_hex)
+    br = round(bgr + (ar - bgr) * accent_strength)
+    bg = round(bgg + (ag - bgg) * accent_strength)
+    bb = round(bgb + (ab - bgb) * accent_strength)
+    rows = bytearray()
+    for y in range(height):
+        t = y / (height - 1)
+        r = round(tr + (br - tr) * t)
+        g = round(tg + (bg - tg) * t)
+        b = round(tb + (bb - tb) * t)
+        rows.append(0)
+        rows.extend(bytes((r, g, b)) * width)
+    ihdr = struct.pack(">IIBBBBB", width, height, 8, 2, 0, 0, 0)
+    idat = zlib.compress(bytes(rows), 9)
+    return b"\x89PNG\r\n\x1a\n" + _png_chunk(b"IHDR", ihdr) + _png_chunk(b"IDAT", idat) + _png_chunk(b"IEND", b"")
+
+
+def render_adapters(adapters_dir: Path, out_dir: Path, tmpl_vars: dict) -> None:
+    for name in ADAPTER_FILES:
+        tmpl_path = adapters_dir / f"{name}.tmpl"
+        if not tmpl_path.exists():
+            fail(f"missing adapter template: {tmpl_path}")
+        rendered = string.Template(tmpl_path.read_text(encoding="utf-8")).substitute(tmpl_vars)
+        if "${" in rendered or "$missing" in rendered:
+            fail(f"unresolved template placeholder while rendering {name}")
+        (out_dir / name).write_text(rendered, encoding="utf-8")
+
+    manifest_tmpl = adapters_dir / "manifest.yaml.tmpl"
+    manifest = string.Template(manifest_tmpl.read_text(encoding="utf-8")).substitute(tmpl_vars)
+    (out_dir / "manifest.yaml").write_text(manifest, encoding="utf-8")
+
+
+def strip_leading_comments(text: str) -> str:
+    lines = text.splitlines()
+    while lines and lines[0].lstrip().startswith("#"):
+        lines.pop(0)
+    return "\n".join(lines)
+
+
+def validate_outputs(out_dir: Path) -> None:
+    json.loads(strip_leading_comments((out_dir / "windows_terminal.json").read_text()))
+    json.loads((out_dir / "gemini.json").read_text())
+    for name in ("lazygit.yml", "eza.yml"):
+        text = (out_dir / name).read_text()
+        if "${" in text:
+            fail(f"{name} still has unresolved placeholders")
+    import xml.etree.ElementTree as ET
+
+    ET.fromstring((out_dir / "bat.tmTheme").read_text())
+    subprocess.run(["bash", "-n", str(out_dir / "fzf.sh")], check=True)
+    if (out_dir / "wallpaper.png").read_bytes()[:8] != b"\x89PNG\r\n\x1a\n":
+        fail("generated wallpaper.png has an invalid PNG signature")
+    nvim = shutil.which("nvim")
+    if nvim:
+        result = subprocess.run(
+            [nvim, "--headless", "-u", "NONE", "-c", f"luafile {out_dir / 'nvim.lua'}", "-c", "quit"],
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            fail(f"nvim.lua failed to load: {result.stderr.strip()}")
+
+
+def append_registry_entry(themes_yaml: Path, slug: str, label: str, appearance: str,
+                           source_kind: str, source_name: str, source_repo: str,
+                           colors_sha256: str, imported_at: str, accent: str) -> None:
+    text = themes_yaml.read_text(encoding="utf-8")
+    if re.search(rf"(?m)^  {re.escape(slug)}:\s*$", text):
+        fail(f"theme '{slug}' already exists in {themes_yaml} (use --replace to overwrite)")
+    entry_lines = [
+        f"  {slug}:",
+        f'    label: "{label}"',
+        f"    appearance: {appearance}",
+        "    format: omarchy-v4",
+        "    source:",
+        f"      kind: {source_kind}",
+        f'      name: "{source_name}"',
+        f'      repo: "{source_repo}"',
+        f'      colorsSha256: "{colors_sha256}"',
+        f'      importedAt: "{imported_at}"',
+        "    windows:",
+        f'      accent: "{accent}"',
+        "      colorPrevalence: true",
+        "",
+    ]
+    if not text.endswith("\n"):
+        text += "\n"
+    themes_yaml.write_text(text + "\n".join(entry_lines), encoding="utf-8")
+
+
+def remove_registry_entry(themes_yaml: Path, slug: str) -> None:
+    text = themes_yaml.read_text(encoding="utf-8")
+    lines = text.split("\n")
+    try:
+        start = lines.index(f"  {slug}:")
+    except ValueError:
+        return
+    end = start + 1
+    while end < len(lines) and (lines[end] == "" or lines[end].startswith("    ")):
+        end += 1
+    del lines[start:end]
+    themes_yaml.write_text("\n".join(lines), encoding="utf-8")
+
+
+def cmd_from_colors_toml(args: argparse.Namespace) -> None:
+    src = repo_root()
+    themes_yaml = src / ".chezmoidata" / "themes.yaml"
+    adapters_dir = src / ".chezmoitemplates" / "aether-adapters"
+    dest_dir = src / ".chezmoitemplates" / "themes" / args.id
+
+    if not SLUG_RE.match(args.id):
+        fail("--id must be a lowercase slug like 'aether-forest-20260913' (letters, digits, single hyphens)")
+    if dest_dir.exists() and not args.replace:
+        fail(f"{dest_dir} already exists (pass --replace to overwrite)")
+
+    colors_path = Path(args.from_colors_toml).expanduser().resolve()
+    if not colors_path.is_file():
+        fail(f"no such file: {colors_path}")
+    raw_bytes = colors_path.read_bytes()
+    colors_sha256 = hashlib.sha256(raw_bytes).hexdigest()
+
+    palette = load_colors_toml(colors_path)
+    appearance = palette["mode"]
+    tmpl_vars = derive_vars(palette, args.label, args.id)
+    imported_at = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    tmpl_vars.update(
+        {
+            "imported_at": imported_at,
+            "bridge_version": BRIDGE_VERSION,
+            "source_kind": args.source_kind,
+            "source_name": args.source_name or args.label,
+            "source_repo": args.source_repo or "",
+            "colors_sha256": colors_sha256,
+        }
+    )
+
+    with tempfile.TemporaryDirectory() as tmp:
+        staging = Path(tmp) / args.id
+        staging.mkdir()
+        render_adapters(adapters_dir, staging, tmpl_vars)
+        shutil.copyfile(colors_path, staging / "colors.toml")
+        (staging / "wallpaper.png").write_bytes(
+            generate_wallpaper_png(palette["darker_background"], palette["background"], palette["accent"])
+        )
+        validate_outputs(staging)
+
+        if dest_dir.exists():
+            shutil.rmtree(dest_dir)
+            remove_registry_entry(themes_yaml, args.id)
+        shutil.move(str(staging), str(dest_dir))
+
+    append_registry_entry(
+        themes_yaml,
+        args.id,
+        args.label,
+        appearance,
+        args.source_kind,
+        args.source_name or args.label,
+        args.source_repo or "",
+        colors_sha256,
+        imported_at,
+        palette["accent"],
+    )
+
+    print(f"\033[0;32m✓\033[0m imported theme '{args.id}' ({args.label}, {appearance})")
+    print(f"  snapshot: {dest_dir}")
+    print(f"  registry: {themes_yaml}")
+    print(f"  colors.toml sha256: {colors_sha256}")
+    print(f"  try it:   dots theme set {args.id}")
+
+
+def cmd_from_aether(args: argparse.Namespace) -> None:
+    aether = shutil.which("aether")
+    if not aether:
+        fail(
+            "the 'aether' CLI is not installed on this machine. Per "
+            "docs/aether-theming-integration-proposal.md this import path is "
+            "Augustus-only (native Omarchy + Aether). Use "
+            "--from-colors-toml on any machine instead, e.g. to test with a "
+            "public Omarchy theme's colors.toml."
+        )
+    with tempfile.TemporaryDirectory() as tmp:
+        out_dir = Path(tmp) / "aether-export"
+        cmd = [aether, "--no-apply", "--output", str(out_dir)]
+        if args.from_aether:
+            cmd = [aether, "--apply-blueprint", args.from_aether, "--no-apply", "--output", str(out_dir)]
+        result = subprocess.run(cmd, capture_output=True, text=True)
+        if result.returncode != 0:
+            fail(f"aether export failed: {result.stderr.strip() or result.stdout.strip()}")
+        colors_toml = out_dir / "colors.toml"
+        if not colors_toml.is_file():
+            fail(f"aether did not produce {colors_toml}")
+        args.from_colors_toml = str(colors_toml)
+        args.source_kind = "aether"
+        args.source_name = args.from_aether or "live"
+        cmd_from_colors_toml(args)
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        prog="dots-theme-import-aether",
+        description="Import an Omarchy v4 palette (from Aether or a public Omarchy theme) as a dots theme snapshot.",
+    )
+    source = parser.add_mutually_exclusive_group(required=True)
+    source.add_argument("--from-colors-toml", metavar="PATH", help="Import a colors.toml file directly")
+    source.add_argument("--from-aether", metavar="BLUEPRINT", nargs="?", const="", help="Export from a local Aether install (Augustus only); omit BLUEPRINT to use the live theme")
+    parser.add_argument("--id", required=True, help="Immutable slug for the new theme, e.g. aether-forest-20260913")
+    parser.add_argument("--label", required=True, help="Human-readable label shown in 'dots theme list'")
+    parser.add_argument("--source-name", default="", help="Upstream theme/blueprint name, for provenance")
+    parser.add_argument("--source-repo", default="", help="Upstream repo URL, for provenance")
+    parser.add_argument("--source-kind", default="omarchy-colors-toml", help="Provenance kind recorded in themes.yaml (default: omarchy-colors-toml)")
+    parser.add_argument("--replace", action="store_true", help="Overwrite an existing snapshot with this id")
+    args = parser.parse_args()
+
+    if args.from_colors_toml:
+        cmd_from_colors_toml(args)
+    else:
+        cmd_from_aether(args)
+
+
+if __name__ == "__main__":
+    main()

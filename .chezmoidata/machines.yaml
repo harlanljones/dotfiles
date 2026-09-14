@@ -36,7 +36,7 @@ machines:
       # Key into .chezmoidata/themes.yaml. Change with `dots theme set <name>`
       # (it edits this line and re-applies). Starship, opencode and Codex use
       # ANSI/system colors, so they follow the terminal scheme automatically.
-      name: tokyonight-storm
+      name: omarchy-tokyo-night
     # Windows Terminal renders this box. The fragment written by
     # run_onchange_after_40-vespasian-windows-terminal.sh.tmpl updates the
     # WSL-generated Ubuntu profile in place (settings.json is never edited).

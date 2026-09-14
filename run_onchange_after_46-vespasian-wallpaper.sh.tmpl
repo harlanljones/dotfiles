@@ -1,0 +1,68 @@
+{{- /* hasKey: CI's shellcheck job renders scripts without a chezmoi config. */ -}}
+{{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
+{{- $name := (index .machines "vespasian").theme.name -}}
+{{- $theme := index .themes $name -}}
+{{- $wallpaperSrc := printf ".chezmoitemplates/themes/%s/wallpaper.png" $name -}}
+#!/usr/bin/env bash
+# Set the Windows desktop wallpaper from the active dots theme
+# ({{ $theme.label }}). The wallpaper is a generated gradient
+# (.chezmoitemplates/themes/{{ $name }}/wallpaper.png), not a downloaded
+# image, so there is no redistribution-rights question to track (see
+# docs/aether-theming-integration-proposal.md, "Security, licensing,
+# updates, and reproducibility").
+#
+# wallpaper.png sha256 (chezmoi only reruns run_onchange_ scripts when their
+# own rendered text changes, and this script's text otherwise only embeds a
+# path, not the image bytes, so a wallpaper regenerated in place would
+# silently stop applying without this hash forcing a rerun):
+# {{ if stat $wallpaperSrc }}{{ include $wallpaperSrc | sha256sum }}{{ end }}
+#
+# Windows accent color is intentionally NOT set here: Windows recomputes
+# HKCU:\Software\Microsoft\Windows\DWM's AccentColor from the wallpaper's own
+# pixels on every SPI_SETDESKWALLPAPER call, and the registry key that is
+# supposed to disable that ("AutoColorization") did not stop it in testing
+# on this machine, so an explicit accent write was unreliable and silently
+# reverted. Left for a follow-up once the correct mechanism is confirmed
+# (possibly the Settings > Personalization > Colors "Manual" mode itself,
+# rather than a registry flag under it).
+
+set -euo pipefail
+
+if ! command -v cmd.exe >/dev/null 2>&1 || ! command -v wslpath >/dev/null 2>&1; then
+  echo "wallpaper: not running under WSL, skipping"
+  exit 0
+fi
+
+wallpaper_src="{{ .chezmoi.sourceDir }}/{{ $wallpaperSrc }}"
+if [[ ! -f "$wallpaper_src" ]]; then
+  echo "wallpaper: no wallpaper.png for theme '{{ $name }}', skipping"
+  exit 0
+fi
+
+win_localappdata="$(cd /mnt/c && cmd.exe /d /c 'echo %LOCALAPPDATA%' 2>/dev/null | tr -d '\r')"
+wsl_localappdata="$(wslpath "$win_localappdata")"
+cache_dir="$wsl_localappdata/dots/themes/{{ $name }}"
+mkdir -p "$cache_dir"
+cp "$wallpaper_src" "$cache_dir/wallpaper.png"
+win_wallpaper_path="$(cd /mnt/c && cmd.exe /d /c "echo $(wslpath -w "$cache_dir/wallpaper.png")" 2>/dev/null | tr -d '\r')"
+
+powershell.exe -NoProfile -Command "
+  \$path = \"$win_wallpaper_path\";
+  \$current = (Get-ItemProperty -Path 'HKCU:\Control Panel\Desktop' -Name Wallpaper -ErrorAction SilentlyContinue).Wallpaper;
+  Set-ItemProperty -Path 'HKCU:\Control Panel\Desktop' -Name Wallpaper -Value \$path;
+  Set-ItemProperty -Path 'HKCU:\Control Panel\Desktop' -Name WallpaperStyle -Value '10';
+  Set-ItemProperty -Path 'HKCU:\Control Panel\Desktop' -Name TileWallpaper -Value '0';
+  if (\$current -ne \$path) {
+    Add-Type -TypeDefinition '
+      using System.Runtime.InteropServices;
+      public class Wp {
+        [DllImport(\"user32.dll\", CharSet = CharSet.Auto)]
+        public static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+      }
+    ' -ErrorAction SilentlyContinue;
+    [Wp]::SystemParametersInfo(20, 0, \$path, 3) | Out-Null;
+  }
+" < /dev/null
+
+echo "wallpaper: set to {{ $name }} ($win_wallpaper_path)"
+{{- end -}}

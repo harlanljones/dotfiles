@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**4598 tracked entries** across 16 categories.
+**4664 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -23,12 +23,12 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Toolchain & packages](#toolchain--packages) | 5 |
 | [AI agent harnesses](#ai-agent-harnesses) | 41 |
 | [Background services](#background-services) | 17 |
-| [Custom executables](#custom-executables) | 32 |
+| [Custom executables](#custom-executables) | 34 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Other configuration](#other-configuration) | 37 |
-| [Apply hooks (`run_*`)](#apply-hooks-run) | 22 |
+| [Other configuration](#other-configuration) | 99 |
+| [Apply hooks (`run_*`)](#apply-hooks-run) | 23 |
 | [Chezmoi control files](#chezmoi-control-files) | 9 |
-| [Repository material (not applied)](#repository-material-not-applied) | 4378 |
+| [Repository material (not applied)](#repository-material-not-applied) | 4379 |
 
 ---
 
@@ -205,9 +205,11 @@ agents and the showcase app should read. This page is the same data for humans.
 | Target | Source | Subsystem | Attributes |
 | --- | --- | --- | --- |
 | `~/.local/bin/cline-safety/git` | `dot_local/bin/cline-safety/executable_git` | cline git interceptor | executable |
+| `~/.local/bin/chrome-profile` | `dot_local/bin/executable_chrome-profile` | custom executables | executable |
 | `~/.local/bin/cursor` | `dot_local/bin/executable_cursor` | custom executables | executable |
 | `~/.local/bin/dots` | `dot_local/bin/executable_dots` | custom executables | executable |
 | `~/.local/bin/dots-push` | `dot_local/bin/executable_dots-push` | custom executables | executable |
+| `~/.local/bin/dots-theme-import-aether` | `dot_local/bin/executable_dots-theme-import-aether` | custom executables | executable |
 | `~/.local/bin/herdr-agent-lifecycle` | `dot_local/bin/executable_herdr-agent-lifecycle` | custom executables | executable |
 | `~/.local/bin/lazygit-ollama-commit.sh` | `dot_local/bin/executable_lazygit-ollama-commit.sh` | custom executables | executable |
 | `~/.local/bin/ollama-commit-msg.sh` | `dot_local/bin/executable_ollama-commit-msg.sh` | custom executables | executable |
@@ -248,14 +250,73 @@ agents and the showcase app should read. This page is the same data for humans.
 
 | Target | Source | Subsystem | Attributes |
 | --- | --- | --- | --- |
+| `~/.chezmoitemplates/aether-adapters/bat.tmTheme` | `.chezmoitemplates/aether-adapters/bat.tmTheme.tmpl` | — | template |
+| `~/.chezmoitemplates/aether-adapters/delta.gitconfig` | `.chezmoitemplates/aether-adapters/delta.gitconfig.tmpl` | — | template |
+| `~/.chezmoitemplates/aether-adapters/eza.yml` | `.chezmoitemplates/aether-adapters/eza.yml.tmpl` | — | template |
+| `~/.chezmoitemplates/aether-adapters/fzf.sh` | `.chezmoitemplates/aether-adapters/fzf.sh.tmpl` | — | template |
+| `~/.chezmoitemplates/aether-adapters/gemini.json` | `.chezmoitemplates/aether-adapters/gemini.json.tmpl` | — | template |
+| `~/.chezmoitemplates/aether-adapters/lazygit.yml` | `.chezmoitemplates/aether-adapters/lazygit.yml.tmpl` | — | template |
+| `~/.chezmoitemplates/aether-adapters/manifest.yaml` | `.chezmoitemplates/aether-adapters/manifest.yaml.tmpl` | — | template |
+| `~/.chezmoitemplates/aether-adapters/nvim.lua` | `.chezmoitemplates/aether-adapters/nvim.lua.tmpl` | — | template |
+| `~/.chezmoitemplates/aether-adapters/windows_terminal.json` | `.chezmoitemplates/aether-adapters/windows_terminal.json.tmpl` | — | template |
+| `~/.chezmoitemplates/aether-adapters/zebar.css` | `.chezmoitemplates/aether-adapters/zebar.css.tmpl` | — | template |
 | `~/.chezmoitemplates/codex-config.toml` | `.chezmoitemplates/codex-config.toml` | — | — |
 | `~/.chezmoitemplates/gemini-settings.json` | `.chezmoitemplates/gemini-settings.json` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-everforest/bat.tmTheme` | `.chezmoitemplates/themes/omarchy-everforest/bat.tmTheme` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-everforest/colors.toml` | `.chezmoitemplates/themes/omarchy-everforest/colors.toml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-everforest/delta.gitconfig` | `.chezmoitemplates/themes/omarchy-everforest/delta.gitconfig` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-everforest/eza.yml` | `.chezmoitemplates/themes/omarchy-everforest/eza.yml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-everforest/fzf.sh` | `.chezmoitemplates/themes/omarchy-everforest/fzf.sh` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-everforest/gemini.json` | `.chezmoitemplates/themes/omarchy-everforest/gemini.json` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-everforest/lazygit.yml` | `.chezmoitemplates/themes/omarchy-everforest/lazygit.yml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-everforest/manifest.yaml` | `.chezmoitemplates/themes/omarchy-everforest/manifest.yaml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-everforest/nvim.lua` | `.chezmoitemplates/themes/omarchy-everforest/nvim.lua` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-everforest/wallpaper.png` | `.chezmoitemplates/themes/omarchy-everforest/wallpaper.png` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-everforest/windows_terminal.json` | `.chezmoitemplates/themes/omarchy-everforest/windows_terminal.json` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-everforest/zebar.css` | `.chezmoitemplates/themes/omarchy-everforest/zebar.css` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-kanagawa/bat.tmTheme` | `.chezmoitemplates/themes/omarchy-kanagawa/bat.tmTheme` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-kanagawa/colors.toml` | `.chezmoitemplates/themes/omarchy-kanagawa/colors.toml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-kanagawa/delta.gitconfig` | `.chezmoitemplates/themes/omarchy-kanagawa/delta.gitconfig` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-kanagawa/eza.yml` | `.chezmoitemplates/themes/omarchy-kanagawa/eza.yml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-kanagawa/fzf.sh` | `.chezmoitemplates/themes/omarchy-kanagawa/fzf.sh` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-kanagawa/gemini.json` | `.chezmoitemplates/themes/omarchy-kanagawa/gemini.json` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-kanagawa/lazygit.yml` | `.chezmoitemplates/themes/omarchy-kanagawa/lazygit.yml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-kanagawa/manifest.yaml` | `.chezmoitemplates/themes/omarchy-kanagawa/manifest.yaml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-kanagawa/nvim.lua` | `.chezmoitemplates/themes/omarchy-kanagawa/nvim.lua` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-kanagawa/wallpaper.png` | `.chezmoitemplates/themes/omarchy-kanagawa/wallpaper.png` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-kanagawa/windows_terminal.json` | `.chezmoitemplates/themes/omarchy-kanagawa/windows_terminal.json` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-kanagawa/zebar.css` | `.chezmoitemplates/themes/omarchy-kanagawa/zebar.css` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-nord/bat.tmTheme` | `.chezmoitemplates/themes/omarchy-nord/bat.tmTheme` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-nord/colors.toml` | `.chezmoitemplates/themes/omarchy-nord/colors.toml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-nord/delta.gitconfig` | `.chezmoitemplates/themes/omarchy-nord/delta.gitconfig` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-nord/eza.yml` | `.chezmoitemplates/themes/omarchy-nord/eza.yml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-nord/fzf.sh` | `.chezmoitemplates/themes/omarchy-nord/fzf.sh` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-nord/gemini.json` | `.chezmoitemplates/themes/omarchy-nord/gemini.json` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-nord/lazygit.yml` | `.chezmoitemplates/themes/omarchy-nord/lazygit.yml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-nord/manifest.yaml` | `.chezmoitemplates/themes/omarchy-nord/manifest.yaml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-nord/nvim.lua` | `.chezmoitemplates/themes/omarchy-nord/nvim.lua` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-nord/wallpaper.png` | `.chezmoitemplates/themes/omarchy-nord/wallpaper.png` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-nord/windows_terminal.json` | `.chezmoitemplates/themes/omarchy-nord/windows_terminal.json` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-nord/zebar.css` | `.chezmoitemplates/themes/omarchy-nord/zebar.css` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-tokyo-night/bat.tmTheme` | `.chezmoitemplates/themes/omarchy-tokyo-night/bat.tmTheme` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-tokyo-night/colors.toml` | `.chezmoitemplates/themes/omarchy-tokyo-night/colors.toml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-tokyo-night/delta.gitconfig` | `.chezmoitemplates/themes/omarchy-tokyo-night/delta.gitconfig` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-tokyo-night/eza.yml` | `.chezmoitemplates/themes/omarchy-tokyo-night/eza.yml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-tokyo-night/fzf.sh` | `.chezmoitemplates/themes/omarchy-tokyo-night/fzf.sh` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-tokyo-night/gemini.json` | `.chezmoitemplates/themes/omarchy-tokyo-night/gemini.json` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-tokyo-night/lazygit.yml` | `.chezmoitemplates/themes/omarchy-tokyo-night/lazygit.yml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-tokyo-night/manifest.yaml` | `.chezmoitemplates/themes/omarchy-tokyo-night/manifest.yaml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-tokyo-night/nvim.lua` | `.chezmoitemplates/themes/omarchy-tokyo-night/nvim.lua` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-tokyo-night/wallpaper.png` | `.chezmoitemplates/themes/omarchy-tokyo-night/wallpaper.png` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-tokyo-night/windows_terminal.json` | `.chezmoitemplates/themes/omarchy-tokyo-night/windows_terminal.json` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-tokyo-night/zebar.css` | `.chezmoitemplates/themes/omarchy-tokyo-night/zebar.css` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-day/bat.tmTheme` | `.chezmoitemplates/themes/tokyonight-day/bat.tmTheme` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-day/delta.gitconfig` | `.chezmoitemplates/themes/tokyonight-day/delta.gitconfig` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-day/eza.yml` | `.chezmoitemplates/themes/tokyonight-day/eza.yml` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-day/fzf.sh` | `.chezmoitemplates/themes/tokyonight-day/fzf.sh` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-day/gemini.json` | `.chezmoitemplates/themes/tokyonight-day/gemini.json` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-day/lazygit.yml` | `.chezmoitemplates/themes/tokyonight-day/lazygit.yml` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-day/wallpaper.png` | `.chezmoitemplates/themes/tokyonight-day/wallpaper.png` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-day/windows_terminal.json` | `.chezmoitemplates/themes/tokyonight-day/windows_terminal.json` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-moon/bat.tmTheme` | `.chezmoitemplates/themes/tokyonight-moon/bat.tmTheme` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-moon/delta.gitconfig` | `.chezmoitemplates/themes/tokyonight-moon/delta.gitconfig` | — | — |
@@ -263,6 +324,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.chezmoitemplates/themes/tokyonight-moon/fzf.sh` | `.chezmoitemplates/themes/tokyonight-moon/fzf.sh` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-moon/gemini.json` | `.chezmoitemplates/themes/tokyonight-moon/gemini.json` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-moon/lazygit.yml` | `.chezmoitemplates/themes/tokyonight-moon/lazygit.yml` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-moon/wallpaper.png` | `.chezmoitemplates/themes/tokyonight-moon/wallpaper.png` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-moon/windows_terminal.json` | `.chezmoitemplates/themes/tokyonight-moon/windows_terminal.json` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-night/bat.tmTheme` | `.chezmoitemplates/themes/tokyonight-night/bat.tmTheme` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-night/delta.gitconfig` | `.chezmoitemplates/themes/tokyonight-night/delta.gitconfig` | — | — |
@@ -270,6 +332,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.chezmoitemplates/themes/tokyonight-night/fzf.sh` | `.chezmoitemplates/themes/tokyonight-night/fzf.sh` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-night/gemini.json` | `.chezmoitemplates/themes/tokyonight-night/gemini.json` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-night/lazygit.yml` | `.chezmoitemplates/themes/tokyonight-night/lazygit.yml` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-night/wallpaper.png` | `.chezmoitemplates/themes/tokyonight-night/wallpaper.png` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-night/windows_terminal.json` | `.chezmoitemplates/themes/tokyonight-night/windows_terminal.json` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-storm/bat.tmTheme` | `.chezmoitemplates/themes/tokyonight-storm/bat.tmTheme` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-storm/delta.gitconfig` | `.chezmoitemplates/themes/tokyonight-storm/delta.gitconfig` | — | — |
@@ -277,6 +340,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.chezmoitemplates/themes/tokyonight-storm/fzf.sh` | `.chezmoitemplates/themes/tokyonight-storm/fzf.sh` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-storm/gemini.json` | `.chezmoitemplates/themes/tokyonight-storm/gemini.json` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-storm/lazygit.yml` | `.chezmoitemplates/themes/tokyonight-storm/lazygit.yml` | — | — |
+| `~/.chezmoitemplates/themes/tokyonight-storm/wallpaper.png` | `.chezmoitemplates/themes/tokyonight-storm/wallpaper.png` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-storm/windows_terminal.json` | `.chezmoitemplates/themes/tokyonight-storm/windows_terminal.json` | — | — |
 | `~/.config/apt/pkglist.txt` | `dot_config/apt/pkglist.txt` | — | — |
 | `~/.config/bat/config` | `dot_config/bat/config` | — | — |
@@ -312,6 +376,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | 43 | `run_onchange_after_43-vespasian-1password-ssh-bridge.sh.tmpl` | runs when this script's contents change | after |
 | 44 | `run_onchange_after_44-vespasian-windows-debloat.sh.tmpl` | runs when this script's contents change | after |
 | 45 | `run_onchange_after_45-vespasian-desktop-tools.sh.tmpl` | runs when this script's contents change | after |
+| 46 | `run_onchange_after_46-vespasian-wallpaper.sh.tmpl` | runs when this script's contents change | after |
 
 ## Chezmoi control files
 
@@ -342,6 +407,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `INDEX.md` | Generated human-readable index (this artifact) |
 | `README.md` | Human-facing repository overview |
 | `bun.lock` | Lockfile for the above |
+| `docs/aether-theming-integration-proposal.md` | Recovery guide and repository maintenance scripts |
 | `docs/agents/issue-tracker.md` | Recovery guide and repository maintenance scripts |
 | `docs/generate_index.py` | Recovery guide and repository maintenance scripts |
 | `docs/generate_readme_tree.py` | Recovery guide and repository maintenance scripts |

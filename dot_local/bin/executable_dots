@@ -107,7 +107,7 @@ ${BOLD}COMMANDS:${NC}
   ${CYAN}update, pull${NC}      Pull latest dotfiles from git remote and apply
   ${CYAN}push, pp${NC}          Capture templates, commit & push with Ollama-generated message
   ${CYAN}doctor${NC}            Run diagnostics on tools, age keys, agent links, template drift
-  ${CYAN}theme${NC}             List, show, or switch this machine's color theme
+  ${CYAN}theme${NC}             Pick, list, show, or switch this machine's color theme
   ${CYAN}age, key${NC}          Manage age encryption key & 1Password backup/restore
   ${CYAN}setup${NC}             Run interactive system onboarding & setup wizard
   ${CYAN}help${NC}              Show this help message
@@ -119,6 +119,13 @@ ${BOLD}OPTIONS FOR SYNC:${NC}
 
 ${BOLD}OPTIONS FOR DIFF:${NC}
   -a, --all          Include generated script contents in the diff output
+
+${BOLD}OPTIONS FOR THEME:${NC}
+  dots theme                   Open the interactive picker in a terminal
+  dots theme menu              Open the picker explicitly
+  dots theme list              Print all available coordinated themes
+  dots theme set <name>        Select a theme by name
+  --no-sync                    Update the machine selection without applying it
 
 ${BOLD}OPTIONS FOR PUSH:${NC}
   Captures `create_` templates (shell.json) + plugin manifest via
@@ -156,6 +163,13 @@ ${BOLD}OPTIONS FOR THEME:${NC}
   current            Print the current theme key
   set <name>         Switch theme and run dots sync
     --no-sync        Only edit the source repo; apply later with dots sync
+  inspect <name>     Show a theme's registry entry and snapshot manifest
+  import-aether      Import an Omarchy v4 colors.toml (from Aether, or a
+                     public Omarchy theme) as a new immutable theme snapshot.
+                     See docs/aether-theming-integration-proposal.md.
+      --from-colors-toml PATH --id <slug> --label <text>  [--source-name ..]
+                     [--source-repo URL] [--replace]
+      --from-aether [BLUEPRINT]  (Augustus only; requires the aether CLI)
 ${BOLD}OPTIONS FOR AGE / KEY:${NC}
   status             Show key file path, derived public key, and 1Password status
   backup [vault]     Save age private key to 1Password vault (default: Personal)
@@ -198,10 +212,22 @@ theme_names() {
 
 cmd_theme() {
   ensure_chezmoi
-  local sub="${1:-list}"
-  [[ $# -gt 0 ]] && shift
+  local sub
+  if [[ $# -eq 0 ]]; then
+    if [[ -t 0 && -t 1 ]]; then
+      sub="menu"
+    else
+      sub="list"
+    fi
+  else
+    sub="$1"
+    shift
+  fi
 
   case "$sub" in
+    menu|pick|select)
+      cmd_theme_menu "$@"
+      ;;
     list|ls)
       local current name label
       current="$(theme_current)"
@@ -221,11 +247,98 @@ cmd_theme() {
     set)
       cmd_theme_set "$@"
       ;;
+    inspect)
+      cmd_theme_inspect "$@"
+      ;;
+    import-aether)
+      if ! command -v dots-theme-import-aether >/dev/null 2>&1; then
+        echo -e "${RED}error:${NC} dots-theme-import-aether is not installed or not in PATH." >&2
+        exit 1
+      fi
+      exec dots-theme-import-aether "$@"
+      ;;
     *)
-      echo -e "${RED}error:${NC} Unknown theme command '$sub'. Use: dots theme [list|current|set <name>]" >&2
+      echo -e "${RED}error:${NC} Unknown theme command '$sub'. Use: dots theme [menu|list|current|set <name>|inspect <name>|import-aether ...]" >&2
       exit 1
       ;;
   esac
+}
+
+cmd_theme_inspect() {
+  local name="${1:-}"
+  if [[ -z "$name" ]]; then
+    echo "Usage: dots theme inspect <name>" >&2
+    exit 1
+  fi
+  if ! theme_names | cut -f1 | grep -qxF "$name"; then
+    echo -e "${RED}error:${NC} unknown theme '$name'." >&2
+    exit 1
+  fi
+  chezmoi execute-template "{{ toJson (index .themes \"$name\") }}" | jq . 2>/dev/null || \
+    chezmoi execute-template "{{ toJson (index .themes \"$name\") }}"
+  local snapshot_dir manifest
+  snapshot_dir="$(get_source_dir)/.chezmoitemplates/themes/$name"
+  manifest="$snapshot_dir/manifest.yaml"
+  if [[ -f "$manifest" ]]; then
+    echo -e "\n${DIM}snapshot manifest ($manifest):${NC}"
+    cat "$manifest"
+  fi
+}
+
+cmd_theme_menu() {
+  local no_sync=0
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --no-sync) no_sync=1 ;;
+      -*) echo -e "${RED}error:${NC} Unknown option '$1'." >&2; exit 1 ;;
+      *) echo -e "${RED}error:${NC} Unexpected argument '$1'." >&2; exit 1 ;;
+    esac
+    shift
+  done
+
+  local current selection name
+  current="$(theme_current)"
+
+  if command -v fzf >/dev/null 2>&1; then
+    selection="$(
+      theme_names |
+        fzf \
+          --delimiter=$'\t' \
+          --with-nth=2 \
+          --height=60% \
+          --layout=reverse \
+          --border=rounded \
+          --prompt='Theme › ' \
+          --header="Current: ${current:-none}  •  Enter applies  •  Esc cancels"
+    )" || return 0
+    name="${selection%%$'\t'*}"
+  else
+    local -a names labels
+    local theme_name label
+    while IFS=$'\t' read -r theme_name label; do
+      [[ -n "$theme_name" ]] || continue
+      names+=("$theme_name")
+      labels+=("$label [$theme_name]")
+    done < <(theme_names)
+
+    echo -e "${BOLD}Choose a theme for this machine${NC} (current: ${current:-none})"
+    PS3="Theme number (or Ctrl-C to cancel): "
+    select selection in "${labels[@]}"; do
+      [[ -n "$selection" ]] || {
+        echo -e "${YELLOW}Choose one of the numbered themes.${NC}" >&2
+        continue
+      }
+      name="${names[REPLY - 1]}"
+      break
+    done
+  fi
+
+  [[ -n "${name:-}" ]] || return 0
+  if [[ $no_sync -eq 1 ]]; then
+    cmd_theme_set "$name" --no-sync
+  else
+    cmd_theme_set "$name"
+  fi
 }
 
 cmd_theme_set() {
@@ -446,13 +559,13 @@ cmd_capture() {
 
 cmd_absorb() {
   ensure_chezmoi
-  local dry_run=0 prune=0 omarchy_only=0
+  local dry_run=0 omarchy_only=0
   local sync_args=() targets=()
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
       -n|--dry-run) dry_run=1; sync_args+=("-n") ;;
-      --prune) prune=1; sync_args+=("--prune") ;;
+      --prune) sync_args+=("--prune") ;;
       --omarchy) omarchy_only=1 ;;
       -h|--help)
         echo "Usage: dots absorb [-n|--dry-run] [--prune] [--omarchy] [<file-path ...>]"

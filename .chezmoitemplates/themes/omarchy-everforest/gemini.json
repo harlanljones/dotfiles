@@ -1,0 +1,40 @@
+{
+  "name": "Omarchy Everforest",
+  "type": "custom",
+  "text": {
+    "primary": "#d3c6aa",
+    "secondary": "#4f585e",
+    "response": "#d3c6aa"
+  },
+  "background": {
+    "primary": "#2d353b",
+    "diff": {
+      "added": "#414b46",
+      "removed": "#4b4146"
+    }
+  },
+  "border": {
+    "default": "#3d484d",
+    "focused": "#7fbbb3"
+  },
+  "ui": {
+    "comment": "#475258",
+    "symbol": "#4f585e",
+    "gradient": ["#7fbbb3", "#d699b6", "#83c092"]
+  },
+  "Background": "#2d353b",
+  "Foreground": "#d3c6aa",
+  "LightBlue": "#83c092",
+  "AccentBlue": "#d699b6",
+  "AccentPurple": "#d699b6",
+  "AccentCyan": "#83c092",
+  "AccentGreen": "#dbbc7f",
+  "AccentYellow": "#a7c080",
+  "AccentRed": "#e67e80",
+  "DiffAdded": "#414b46",
+  "DiffRemoved": "#4b4146",
+  "Comment": "#475258",
+  "Gray": "#4f585e",
+  "DarkGray": "#21272c",
+  "GradientColors": ["#7fbbb3", "#d699b6", "#83c092"]
+}

@@ -14,18 +14,82 @@ themes:
     appearance: dark
     nvimStyle: night
     nvimColorscheme: tokyonight-night
+    windows:
+      accent: "#7aa2f7"
+      colorPrevalence: true
   tokyonight-storm:
     label: "Tokyo Night (storm)"
     appearance: dark
     nvimStyle: storm
     nvimColorscheme: tokyonight-storm
+    windows:
+      accent: "#7aa2f7"
+      colorPrevalence: true
   tokyonight-moon:
     label: "Tokyo Night (moon)"
     appearance: dark
     nvimStyle: moon
     nvimColorscheme: tokyonight-moon
+    windows:
+      accent: "#82aaff"
+      colorPrevalence: true
   tokyonight-day:
     label: "Tokyo Night (day, light)"
     appearance: light
     nvimStyle: day
     nvimColorscheme: tokyonight-day
+    windows:
+      accent: "#2e7de9"
+      colorPrevalence: true
+  omarchy-kanagawa:
+    label: "Omarchy Kanagawa"
+    appearance: dark
+    format: omarchy-v4
+    source:
+      kind: omarchy-public-theme
+      name: "kanagawa"
+      repo: "https://github.com/basecamp/omarchy/tree/master/themes/kanagawa"
+      colorsSha256: "93c0ad7187196f39350b940b7e0f100305ab0c72aba19a621d696df715edb953"
+      importedAt: "2026-09-14T00:21:45Z"
+    windows:
+      accent: "#dcd7ba"
+      colorPrevalence: true
+  omarchy-tokyo-night:
+    label: "Omarchy Tokyo Night"
+    appearance: dark
+    format: omarchy-v4
+    source:
+      kind: omarchy-public-theme
+      name: "tokyo-night"
+      repo: "https://github.com/basecamp/omarchy/tree/master/themes/tokyo-night"
+      colorsSha256: "8b5f53ba35b9305aafa72776dd56ea2029faaf29015e2e42db5e19ef698a8e0e"
+      importedAt: "2026-09-14T00:21:57Z"
+    windows:
+      accent: "#7aa2f7"
+      colorPrevalence: true
+  omarchy-everforest:
+    label: "Omarchy Everforest"
+    appearance: dark
+    format: omarchy-v4
+    source:
+      kind: omarchy-public-theme
+      name: "everforest"
+      repo: "https://github.com/basecamp/omarchy/tree/master/themes/everforest"
+      colorsSha256: "1adc95c8b6ee34d71106bacf23079f14667b82ec7d8f0b7a478ce3f8d57d1c09"
+      importedAt: "2026-09-14T00:21:57Z"
+    windows:
+      accent: "#7fbbb3"
+      colorPrevalence: true
+  omarchy-nord:
+    label: "Omarchy Nord"
+    appearance: dark
+    format: omarchy-v4
+    source:
+      kind: omarchy-public-theme
+      name: "nord"
+      repo: "https://github.com/basecamp/omarchy/tree/master/themes/nord"
+      colorsSha256: "62d1739a488db2a66b88f2f054579bdfd08c4ec771d2acf5659b9f9d976c57e2"
+      importedAt: "2026-09-14T00:53:35Z"
+    windows:
+      accent: "#81a1c1"
+      colorPrevalence: true

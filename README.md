@@ -128,7 +128,37 @@ The entire environment shares a consistent color palette.
 The default theme is Tokyo Night.
 Theme settings synchronize across Windows Terminal, Neovim, lazygit, delta, bat, eza, and fzf.
 On Windows WSL2 systems, Windows Terminal updates immediately and launches into Ubuntu by default.
-You can switch themes across all tools by running `dots theme set <theme-name>`.
+
+You can switch themes across all tools by running:
+
+```bash
+dots theme set <theme-name>
+dots theme              # List all available themes
+dots theme inspect <name>  # Show theme details and palette
+```
+
+#### Aether Integration
+
+The repository includes an Aether/Omarchy importer that bridges public themes from Omarchy into Vespasian's Windows environment without requiring Aether or Omarchy to be installed locally. Four public Omarchy themes are included as fixtures:
+
+- `omarchy-tokyo-night` — Tokyo Night from basecamp/omarchy
+- `omarchy-kanagawa` — Kanagawa from basecamp/omarchy
+- `omarchy-everforest` — Everforest from basecamp/omarchy
+- `omarchy-nord` — Nord from basecamp/omarchy
+
+Each theme includes generated adapters for all terminal tools, a Windows Terminal color scheme, CSS styling for the desktop taskbar (Zebar), and a procedurally generated wallpaper gradient.
+
+#### Vespasian (Windows WSL2) Theming
+
+On Vespasian, theming extends to Windows surfaces:
+
+- **Dark/light mode sync:** Windows Registry is updated and a `WM_SETTINGCHANGE` broadcast notifies running apps (Settings, Notepad, Windows Terminal, VS Code, etc.) to refresh immediately without restarting.
+- **Desktop wallpaper:** Procedurally generated from the theme palette (deterministic gradient from dark background to accent color).
+- **Windows Terminal:** Color scheme, profile settings, opacity, and acrylic effects.
+- **GlazeWM:** Window manager borders use theme accent (focused) and muted colors (unfocused).
+- **Zebar:** Theme-driven CSS styling for the status bar.
+
+See [`docs/vespasian-theming.md`](docs/vespasian-theming.md) for detailed Vespasian setup and troubleshooting.
 
 ## Documentation and Index
 
@@ -383,6 +413,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   ├── bin
 │   │   ├── cline-safety
 │   │   │   └── executable_git
+│   │   ├── executable_chrome-profile
 │   │   ├── executable_cursor
 │   │   ├── executable_dots
 │   │   ├── executable_dots-push
