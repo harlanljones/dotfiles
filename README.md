@@ -478,6 +478,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   └── rc
 │   ├── shell
 │   │   ├── 00-env.sh
+│   │   ├── 05-omarchy-detect.sh
 │   │   ├── 10-tools.sh
 │   │   ├── 15-base-bash.sh
 │   │   ├── 20-integrations.sh
@@ -489,6 +490,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   ├── 60-prompt.sh
 │   │   ├── 65-theme.sh
 │   │   ├── 70-cloud.sh
+│   │   ├── 75-tool-paths.sh
 │   │   └── README.md
 │   ├── starship.toml.tmpl
 │   ├── systemd
