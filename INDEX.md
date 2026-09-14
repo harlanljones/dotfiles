@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**4716 tracked entries** across 16 categories.
+**4718 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -25,10 +25,10 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Background services](#background-services) | 17 |
 | [Custom executables](#custom-executables) | 35 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Other configuration](#other-configuration) | 148 |
+| [Other configuration](#other-configuration) | 149 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 24 |
 | [Chezmoi control files](#chezmoi-control-files) | 9 |
-| [Repository material (not applied)](#repository-material-not-applied) | 4380 |
+| [Repository material (not applied)](#repository-material-not-applied) | 4381 |
 
 ---
 
@@ -390,6 +390,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/delta/theme.gitconfig` | `dot_config/delta/theme.gitconfig.tmpl` | — | template |
 | `~/.config/eza/theme.yml` | `dot_config/eza/theme.yml.tmpl` | — | template |
 | `~/.config/fzf/theme.sh` | `dot_config/fzf/theme.sh.tmpl` | — | template |
+| `~/.local/share/omarchy-patches/esemczak.theme-modes-profiles.patch` | `dot_local/share/omarchy-patches/esemczak.theme-modes-profiles.patch` | — | — |
 | `~/.local/share/wsl-ssh-bridge/main.go` | `dot_local/share/wsl-ssh-bridge/main.go` | — | — |
 | `~/theme-assets/omarchy-catppuccin-latte/wallpaper.png` | `theme-assets/omarchy-catppuccin-latte/wallpaper.png` | — | — |
 | `~/theme-assets/omarchy-catppuccin/wallpaper.png` | `theme-assets/omarchy-catppuccin/wallpaper.png` | — | — |
@@ -4825,5 +4826,6 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/test_gitleaks.py` | Recovery guide and repository maintenance scripts |
 | `docs/vespasian-boot.md` | Recovery guide and repository maintenance scripts |
 | `docs/vespasian-theming.md` | Recovery guide and repository maintenance scripts |
+| `dotfiles-showcase` | Submodule — the showcase web app; never applied |
 | `package.json` | Runtime CLI deps installed outside mise |
 | `setup.sh` | Interactive new machine onboarding & setup wizard |

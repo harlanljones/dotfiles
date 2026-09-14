@@ -30,6 +30,17 @@ installed_id_for_url() {
   return 0
 }
 
+# The Theme modes plugin is locally patched below. Temporarily reverse that
+# patch before an upstream update so Git sees a clean worktree, then reapply it
+# after all plugin updates have finished.
+theme_modes_dir="$PLUGINS_DIR/esemczak.theme-modes"
+theme_modes_patch="$HOME/.local/share/omarchy-patches/esemczak.theme-modes-profiles.patch"
+if [[ -d "$theme_modes_dir/.git" && -f "$theme_modes_patch" ]] \
+  && git -C "$theme_modes_dir" apply --reverse --check "$theme_modes_patch"; then
+  echo "omarchy plugin: temporarily removing Theme modes profiles patch for update"
+  git -C "$theme_modes_dir" apply --reverse "$theme_modes_patch"
+fi
+
 {{- range .omarchyPlugins }}
 {{- if .enabled }}
 
@@ -44,4 +55,17 @@ else
 fi
 {{- end }}
 {{- end }}
+
+# Keep local Theme modes enhancements after its upstream repository is updated.
+if [[ -d "$theme_modes_dir/.git" && -f "$theme_modes_patch" ]]; then
+  if git -C "$theme_modes_dir" apply --reverse --check "$theme_modes_patch"; then
+    echo "omarchy plugin: Theme modes profiles patch already applied"
+  elif git -C "$theme_modes_dir" apply --check "$theme_modes_patch"; then
+    echo "omarchy plugin: applying Theme modes profiles patch"
+    git -C "$theme_modes_dir" apply "$theme_modes_patch"
+  else
+    echo "omarchy plugin: Theme modes profiles patch no longer applies; update the managed patch before continuing" >&2
+    exit 1
+  fi
+fi
 {{- end -}}

@@ -20,12 +20,13 @@
           "verticalFormat": "HH\n—\nmm"
         },
         {
-          "activeGroupId": "extras",
+          "activeGroupId": "default",
           "groups": "[{\"id\":\"default\",\"name\":\"Agents\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"harlan.agents\",\"harlan.agent-leaderboard\",\"robzolkos.github\",\"io.github.rolfkoenders.umarchy\"]},{\"id\":\"work\",\"name\":\"This PC\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"im0001gt.hw-tooltip\",\"omarchy.network\",\"io.github.this-is-npc.dockmarchy\",\"io.github.mtolhuys.disk-lens\",\"hzerrad.bottleneck\",\"taufderl.ipinfo\",\"io.github.tymurbogach.any-monitor\"]},{\"id\":\"settings\",\"name\":\"Settings\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"omarchy.audio\",\"omarchy.bluetooth\",\"omarchy.monitor\",\"esemczak.theme-modes\",\"leoom.aliases\",\"crmne.hyprmoncfg\",\"io.github.imryiuk.workspace-profiles\"]},{\"id\":\"extras\",\"name\":\"Extras\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"omarchy.weather\",\"sportsbar\",\"cristianocorsi.countdown\",\"io.github.omashift.omashift\",\"io.github.letsfg.flights\",\"ryanyogan.hydrate\",\"mohamedmansour.finance\"]}]",
           "id": "io.github.patrickfanella.shelfish",
           "policies": "{}",
           "revealSeconds": 8,
-          "watchedPaths": "{}"
+          "watchedPaths": "{}",
+          "widgetConfigs": "{\"harlan.agents\":{\"id\":\"harlan.agents\"},\"harlan.agent-leaderboard\":{\"id\":\"harlan.agent-leaderboard\"},\"robzolkos.github\":{\"id\":\"robzolkos.github\",\"includeForks\":true,\"linkBehavior\":\"Web app window\",\"refreshIntervalSec\":600,\"repositoryScope\":\"Owned and organizations\"},\"im0001gt.hw-tooltip\":{\"id\":\"im0001gt.hw-tooltip\"},\"omarchy.network\":{\"id\":\"omarchy.network\"},\"io.github.this-is-npc.dockmarchy\":{\"id\":\"io.github.this-is-npc.dockmarchy\",\"language\":\"en\"},\"io.github.mtolhuys.disk-lens\":{\"id\":\"io.github.mtolhuys.disk-lens\"},\"hzerrad.bottleneck\":{\"id\":\"hzerrad.bottleneck\"},\"taufderl.ipinfo\":{\"id\":\"taufderl.ipinfo\"},\"io.github.tymurbogach.any-monitor\":{\"id\":\"io.github.tymurbogach.any-monitor\"},\"omarchy.audio\":{\"id\":\"omarchy.audio\"},\"omarchy.bluetooth\":{\"id\":\"omarchy.bluetooth\"},\"omarchy.monitor\":{\"id\":\"omarchy.monitor\"},\"esemczak.theme-modes\":{\"id\":\"esemczak.theme-modes\"},\"leoom.aliases\":{\"id\":\"leoom.aliases\"},\"crmne.hyprmoncfg\":{\"id\":\"crmne.hyprmoncfg\"},\"io.github.imryiuk.workspace-profiles\":{\"id\":\"io.github.imryiuk.workspace-profiles\"},\"omarchy.weather\":{\"id\":\"omarchy.weather\"},\"sportsbar\":{\"id\":\"sportsbar\"},\"io.github.omashift.omashift\":{\"id\":\"io.github.omashift.omashift\"},\"io.github.letsfg.flights\":{\"id\":\"io.github.letsfg.flights\"},\"mohamedmansour.finance\":{\"id\":\"mohamedmansour.finance\",\"barSection\":\"center\"},\"cristianocorsi.countdown\":{\"id\":\"cristianocorsi.countdown\"},\"ryanyogan.hydrate\":{\"id\":\"ryanyogan.hydrate\"},\"io.github.rolfkoenders.umarchy\":{\"id\":\"io.github.rolfkoenders.umarchy\"} }"
         },
         {
           "id": "io.github.patrickfanella.shelfish.group.default",
@@ -46,31 +47,12 @@
           "repositoryScope": "Owned and organizations"
         },
         {
+          "id": "io.github.rolfkoenders.umarchy"
+        },
+        {
           "id": "io.github.patrickfanella.shelfish.group.work",
           "source": "{{ .chezmoi.homeDir }}/.config/omarchy/plugins/io.github.patrickfanella.shelfish/GroupButton.qml",
           "shelfishGroupId": "work"
-        },
-        {
-          "id": "im0001gt.hw-tooltip"
-        },
-        {
-          "id": "omarchy.network"
-        },
-        {
-          "id": "io.github.this-is-npc.dockmarchy",
-          "language": "en"
-        },
-        {
-          "id": "io.github.mtolhuys.disk-lens"
-        },
-        {
-          "id": "hzerrad.bottleneck"
-        },
-        {
-          "id": "taufderl.ipinfo"
-        },
-        {
-          "id": "io.github.tymurbogach.any-monitor"
         },
         {
           "id": "io.github.patrickfanella.shelfish.group.settings",
@@ -78,43 +60,9 @@
           "shelfishGroupId": "settings"
         },
         {
-          "id": "omarchy.audio"
-        },
-        {
-          "id": "omarchy.bluetooth"
-        },
-        {
-          "id": "omarchy.monitor"
-        },
-        {
-          "id": "esemczak.theme-modes"
-        },
-        {
-          "id": "leoom.aliases"
-        },
-        {
-          "id": "crmne.hyprmoncfg"
-        },
-        {
-          "id": "io.github.imryiuk.workspace-profiles"
-        },
-        {
           "id": "io.github.patrickfanella.shelfish.group.extras",
           "source": "{{ .chezmoi.homeDir }}/.config/omarchy/plugins/io.github.patrickfanella.shelfish/GroupButton.qml",
           "shelfishGroupId": "extras"
-        },
-        {
-          "id": "omarchy.weather"
-        },
-        {
-          "id": "sportsbar"
-        },
-        {
-          "id": "io.github.omashift.omashift"
-        },
-        {
-          "id": "mohamedmansour.finance",
-          "barSection": "center"
         },
         {
           "id": "anothadev.omachord"
@@ -127,6 +75,9 @@
           ],
           "id": "omarchy.tray",
           "pinned": []
+        },
+        {
+          "id": "community.omarchy-x-native-bundle"
         }
       ],
       "left": [
@@ -138,9 +89,6 @@
         }
       ],
       "right": [
-        {
-          "id": "community.omarchy-x-native-bundle"
-        },
         {
           "id": "io.github.irhop.mouse-odometer",
           "gamify": true,
@@ -165,7 +113,7 @@
       ]
     },
     "position": "top",
-    "transparent": false
+    "transparent": true
   },
   "cloneSourceRestores": [
     "shmall.lock"

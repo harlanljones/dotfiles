@@ -570,6 +570,8 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   └── share
 │       ├── applications
 │       │   └── cursor-desktop.desktop
+│       ├── omarchy-patches
+│       │   └── esemczak.theme-modes-profiles.patch
 │       └── wsl-ssh-bridge
 │           └── main.go
 ├── dot_pi

@@ -51,3 +51,5 @@ omarchyPlugins:
     enabled: true
   - url: https://github.com/mohamedmansour/omafinance.git
     enabled: true
+  - url: https://github.com/GreyforgeLabs/reprieve.git
+    enabled: true

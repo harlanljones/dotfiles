@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 4716,
+    "total": 4718,
     "by_category": {
       "shell": 16,
       "prompt": 1,
@@ -17,10 +17,10 @@
       "services": 17,
       "scripts": 35,
       "security": 2,
-      "other": 148,
+      "other": 149,
       "hooks": 24,
       "chezmoi": 9,
-      "repo": 4380
+      "repo": 4381
     }
   },
   "categories": [
@@ -2492,6 +2492,13 @@
       "attributes": [
         "template"
       ]
+    },
+    {
+      "source": "dot_local/share/omarchy-patches/esemczak.theme-modes-profiles.patch",
+      "target": "~/.local/share/omarchy-patches/esemczak.theme-modes-profiles.patch",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
     },
     {
       "source": "dot_local/share/wsl-ssh-bridge/main.go",
@@ -29189,6 +29196,12 @@
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "dotfiles-showcase",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Submodule \u2014 the showcase web app; never applied"
     },
     {
       "source": "package.json",
