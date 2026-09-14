@@ -53,3 +53,5 @@ omarchyPlugins:
     enabled: true
   - url: https://github.com/GreyforgeLabs/reprieve.git
     enabled: true
+  - url: https://github.com/harlanljones/omarchy-theme-modes.git
+    enabled: true
