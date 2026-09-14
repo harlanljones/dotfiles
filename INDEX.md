@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**4666 tracked entries** across 16 categories.
+**4669 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -23,12 +23,12 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Toolchain & packages](#toolchain--packages) | 5 |
 | [AI agent harnesses](#ai-agent-harnesses) | 41 |
 | [Background services](#background-services) | 17 |
-| [Custom executables](#custom-executables) | 34 |
+| [Custom executables](#custom-executables) | 35 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
 | [Other configuration](#other-configuration) | 100 |
-| [Apply hooks (`run_*`)](#apply-hooks-run) | 23 |
+| [Apply hooks (`run_*`)](#apply-hooks-run) | 24 |
 | [Chezmoi control files](#chezmoi-control-files) | 9 |
-| [Repository material (not applied)](#repository-material-not-applied) | 4380 |
+| [Repository material (not applied)](#repository-material-not-applied) | 4381 |
 
 ---
 
@@ -237,6 +237,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.local/bin/piper` | `dot_local/bin/executable_piper` | custom executables | executable |
 | `~/.local/bin/ratbagctl` | `dot_local/bin/executable_ratbagctl` | custom executables | executable |
 | `~/.local/bin/statusline` | `dot_local/bin/executable_statusline.tmpl` | custom executables | executable, template |
+| `~/.local/bin/wsl-windows-tool` | `dot_local/bin/executable_wsl-windows-tool` | custom executables | executable |
 | `~/.local/bin/evot` | `dot_local/bin/symlink_evot` | custom executables | symlink |
 
 ## Credentials & SSH
@@ -378,6 +379,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | 44 | `run_onchange_after_44-vespasian-windows-debloat.sh.tmpl` | runs when this script's contents change | after |
 | 45 | `run_onchange_after_45-vespasian-desktop-tools.sh.tmpl` | runs when this script's contents change | after |
 | 46 | `run_onchange_after_46-vespasian-wallpaper.sh.tmpl` | runs when this script's contents change | after |
+| 47 | `run_onchange_after_47-vespasian-wsl-boot.sh.tmpl` | runs when this script's contents change | after |
 
 ## Chezmoi control files
 
@@ -4773,6 +4775,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/test_inventory.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/test_review.py` | Recovery guide and repository maintenance scripts |
 | `docs/test_gitleaks.py` | Recovery guide and repository maintenance scripts |
+| `docs/vespasian-boot.md` | Recovery guide and repository maintenance scripts |
 | `docs/vespasian-theming.md` | Recovery guide and repository maintenance scripts |
 | `dotfiles-showcase` | Submodule — the showcase web app; never applied |
 | `package.json` | Runtime CLI deps installed outside mise |
