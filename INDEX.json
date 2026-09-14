@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 4666,
+    "total": 4669,
     "by_category": {
       "shell": 16,
       "prompt": 1,
@@ -15,12 +15,12 @@
       "toolchain": 5,
       "agents": 41,
       "services": 17,
-      "scripts": 34,
+      "scripts": 35,
       "security": 2,
       "other": 100,
-      "hooks": 23,
+      "hooks": 24,
       "chezmoi": 9,
-      "repo": 4380
+      "repo": 4381
     }
   },
   "categories": [
@@ -1454,6 +1454,16 @@
       "subsystem": "custom executables"
     },
     {
+      "source": "dot_local/bin/executable_wsl-windows-tool",
+      "target": "~/.local/bin/wsl-windows-tool",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
       "source": "dot_local/bin/symlink_evot",
       "target": "~/.local/bin/evot",
       "kind": "dotfile",
@@ -2493,6 +2503,19 @@
         "phase": "after",
         "order": 46,
         "name": "vespasian-wallpaper",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_after_47-vespasian-wsl-boot.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 47,
+        "name": "vespasian-wsl-boot",
         "template": true
       }
     },
@@ -28815,6 +28838,12 @@
     },
     {
       "source": "docs/test_gitleaks.py",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/vespasian-boot.md",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
