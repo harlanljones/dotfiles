@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 4664,
+    "total": 4665,
     "by_category": {
       "shell": 16,
       "prompt": 1,
@@ -17,7 +17,7 @@
       "services": 17,
       "scripts": 34,
       "security": 2,
-      "other": 99,
+      "other": 100,
       "hooks": 23,
       "chezmoi": 9,
       "repo": 4379
@@ -1582,6 +1582,13 @@
     {
       "source": ".chezmoitemplates/gemini-settings.json",
       "target": "~/.chezmoitemplates/gemini-settings.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/littlebigmouse/Current.xml",
+      "target": "~/.chezmoitemplates/littlebigmouse/Current.xml",
       "kind": "dotfile",
       "category": "other",
       "attributes": []
@@ -28813,10 +28820,10 @@
       "role": "Recovery guide and repository maintenance scripts"
     },
     {
-      "source": "dotfiles-showcase",
+      "source": "docs/vespasian-theming.md",
       "kind": "repo",
       "category": "repo",
-      "role": "Submodule \u2014 the showcase web app; never applied"
+      "role": "Recovery guide and repository maintenance scripts"
     },
     {
       "source": "package.json",

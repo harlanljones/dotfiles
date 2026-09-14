@@ -187,9 +187,74 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   └── themes.yaml
 ├── .chezmoiignore.tmpl
 ├── .chezmoitemplates
+│   ├── aether-adapters
+│   │   ├── bat.tmTheme.tmpl
+│   │   ├── delta.gitconfig.tmpl
+│   │   ├── eza.yml.tmpl
+│   │   ├── fzf.sh.tmpl
+│   │   ├── gemini.json.tmpl
+│   │   ├── lazygit.yml.tmpl
+│   │   ├── manifest.yaml.tmpl
+│   │   ├── nvim.lua.tmpl
+│   │   ├── windows_terminal.json.tmpl
+│   │   └── zebar.css.tmpl
 │   ├── codex-config.toml
 │   ├── gemini-settings.json
+│   ├── littlebigmouse
+│   │   └── Current.xml
 │   └── themes
+│       ├── omarchy-everforest
+│       │   ├── bat.tmTheme
+│       │   ├── colors.toml
+│       │   ├── delta.gitconfig
+│       │   ├── eza.yml
+│       │   ├── fzf.sh
+│       │   ├── gemini.json
+│       │   ├── lazygit.yml
+│       │   ├── manifest.yaml
+│       │   ├── nvim.lua
+│       │   ├── wallpaper.png
+│       │   ├── windows_terminal.json
+│       │   └── zebar.css
+│       ├── omarchy-kanagawa
+│       │   ├── bat.tmTheme
+│       │   ├── colors.toml
+│       │   ├── delta.gitconfig
+│       │   ├── eza.yml
+│       │   ├── fzf.sh
+│       │   ├── gemini.json
+│       │   ├── lazygit.yml
+│       │   ├── manifest.yaml
+│       │   ├── nvim.lua
+│       │   ├── wallpaper.png
+│       │   ├── windows_terminal.json
+│       │   └── zebar.css
+│       ├── omarchy-nord
+│       │   ├── bat.tmTheme
+│       │   ├── colors.toml
+│       │   ├── delta.gitconfig
+│       │   ├── eza.yml
+│       │   ├── fzf.sh
+│       │   ├── gemini.json
+│       │   ├── lazygit.yml
+│       │   ├── manifest.yaml
+│       │   ├── nvim.lua
+│       │   ├── wallpaper.png
+│       │   ├── windows_terminal.json
+│       │   └── zebar.css
+│       ├── omarchy-tokyo-night
+│       │   ├── bat.tmTheme
+│       │   ├── colors.toml
+│       │   ├── delta.gitconfig
+│       │   ├── eza.yml
+│       │   ├── fzf.sh
+│       │   ├── gemini.json
+│       │   ├── lazygit.yml
+│       │   ├── manifest.yaml
+│       │   ├── nvim.lua
+│       │   ├── wallpaper.png
+│       │   ├── windows_terminal.json
+│       │   └── zebar.css
 │       ├── tokyonight-day
 │       │   ├── bat.tmTheme
 │       │   ├── delta.gitconfig
@@ -197,6 +262,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │       │   ├── fzf.sh
 │       │   ├── gemini.json
 │       │   ├── lazygit.yml
+│       │   ├── wallpaper.png
 │       │   └── windows_terminal.json
 │       ├── tokyonight-moon
 │       │   ├── bat.tmTheme
@@ -205,6 +271,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │       │   ├── fzf.sh
 │       │   ├── gemini.json
 │       │   ├── lazygit.yml
+│       │   ├── wallpaper.png
 │       │   └── windows_terminal.json
 │       ├── tokyonight-night
 │       │   ├── bat.tmTheme
@@ -213,6 +280,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │       │   ├── fzf.sh
 │       │   ├── gemini.json
 │       │   ├── lazygit.yml
+│       │   ├── wallpaper.png
 │       │   └── windows_terminal.json
 │       └── tokyonight-storm
 │           ├── bat.tmTheme
@@ -221,6 +289,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │           ├── fzf.sh
 │           ├── gemini.json
 │           ├── lazygit.yml
+│           ├── wallpaper.png
 │           └── windows_terminal.json
 ├── dot_Brewfile
 ├── dot_agents
@@ -417,6 +486,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   ├── executable_cursor
 │   │   ├── executable_dots
 │   │   ├── executable_dots-push
+│   │   ├── executable_dots-theme-import-aether
 │   │   ├── executable_herdr-agent-lifecycle
 │   │   ├── executable_lazygit-ollama-commit.sh
 │   │   ├── executable_ollama-commit-msg.sh
@@ -480,6 +550,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 ├── run_onchange_after_43-vespasian-1password-ssh-bridge.sh.tmpl
 ├── run_onchange_after_44-vespasian-windows-debloat.sh.tmpl
 ├── run_onchange_after_45-vespasian-desktop-tools.sh.tmpl
+├── run_onchange_after_46-vespasian-wallpaper.sh.tmpl
 └── run_onchange_before_09-install-agent-skills.sh.tmpl
 ```
 <!-- END REPO TREE -->

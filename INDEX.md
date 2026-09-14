@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**4664 tracked entries** across 16 categories.
+**4665 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -25,7 +25,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Background services](#background-services) | 17 |
 | [Custom executables](#custom-executables) | 34 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Other configuration](#other-configuration) | 99 |
+| [Other configuration](#other-configuration) | 100 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 23 |
 | [Chezmoi control files](#chezmoi-control-files) | 9 |
 | [Repository material (not applied)](#repository-material-not-applied) | 4379 |
@@ -262,6 +262,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.chezmoitemplates/aether-adapters/zebar.css` | `.chezmoitemplates/aether-adapters/zebar.css.tmpl` | — | template |
 | `~/.chezmoitemplates/codex-config.toml` | `.chezmoitemplates/codex-config.toml` | — | — |
 | `~/.chezmoitemplates/gemini-settings.json` | `.chezmoitemplates/gemini-settings.json` | — | — |
+| `~/.chezmoitemplates/littlebigmouse/Current.xml` | `.chezmoitemplates/littlebigmouse/Current.xml` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-everforest/bat.tmTheme` | `.chezmoitemplates/themes/omarchy-everforest/bat.tmTheme` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-everforest/colors.toml` | `.chezmoitemplates/themes/omarchy-everforest/colors.toml` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-everforest/delta.gitconfig` | `.chezmoitemplates/themes/omarchy-everforest/delta.gitconfig` | — | — |
@@ -4772,6 +4773,6 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/test_inventory.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/test_review.py` | Recovery guide and repository maintenance scripts |
 | `docs/test_gitleaks.py` | Recovery guide and repository maintenance scripts |
-| `dotfiles-showcase` | Submodule — the showcase web app; never applied |
+| `docs/vespasian-theming.md` | Recovery guide and repository maintenance scripts |
 | `package.json` | Runtime CLI deps installed outside mise |
 | `setup.sh` | Interactive new machine onboarding & setup wizard |
