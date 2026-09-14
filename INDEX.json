@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 4669,
+    "total": 4716,
     "by_category": {
       "shell": 16,
       "prompt": 1,
@@ -17,10 +17,10 @@
       "services": 17,
       "scripts": 35,
       "security": 2,
-      "other": 100,
+      "other": 148,
       "hooks": 24,
       "chezmoi": 9,
-      "repo": 4381
+      "repo": 4380
     }
   },
   "categories": [
@@ -1604,6 +1604,160 @@
       "attributes": []
     },
     {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin-latte/bat.tmTheme",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin-latte/bat.tmTheme",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin-latte/colors.toml",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin-latte/colors.toml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin-latte/delta.gitconfig",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin-latte/delta.gitconfig",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin-latte/eza.yml",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin-latte/eza.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin-latte/fzf.sh",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin-latte/fzf.sh",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin-latte/gemini.json",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin-latte/gemini.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin-latte/lazygit.yml",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin-latte/lazygit.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin-latte/manifest.yaml",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin-latte/manifest.yaml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin-latte/nvim.lua",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin-latte/nvim.lua",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin-latte/windows_terminal.json",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin-latte/windows_terminal.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin-latte/zebar.css",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin-latte/zebar.css",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin/bat.tmTheme",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin/bat.tmTheme",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin/colors.toml",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin/colors.toml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin/delta.gitconfig",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin/delta.gitconfig",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin/eza.yml",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin/eza.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin/fzf.sh",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin/fzf.sh",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin/gemini.json",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin/gemini.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin/lazygit.yml",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin/lazygit.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin/manifest.yaml",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin/manifest.yaml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin/nvim.lua",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin/nvim.lua",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin/windows_terminal.json",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin/windows_terminal.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-catppuccin/zebar.css",
+      "target": "~/.chezmoitemplates/themes/omarchy-catppuccin/zebar.css",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
       "source": ".chezmoitemplates/themes/omarchy-everforest/bat.tmTheme",
       "target": "~/.chezmoitemplates/themes/omarchy-everforest/bat.tmTheme",
       "kind": "dotfile",
@@ -1667,13 +1821,6 @@
       "attributes": []
     },
     {
-      "source": ".chezmoitemplates/themes/omarchy-everforest/wallpaper.png",
-      "target": "~/.chezmoitemplates/themes/omarchy-everforest/wallpaper.png",
-      "kind": "dotfile",
-      "category": "other",
-      "attributes": []
-    },
-    {
       "source": ".chezmoitemplates/themes/omarchy-everforest/windows_terminal.json",
       "target": "~/.chezmoitemplates/themes/omarchy-everforest/windows_terminal.json",
       "kind": "dotfile",
@@ -1683,6 +1830,83 @@
     {
       "source": ".chezmoitemplates/themes/omarchy-everforest/zebar.css",
       "target": "~/.chezmoitemplates/themes/omarchy-everforest/zebar.css",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-gruvbox/bat.tmTheme",
+      "target": "~/.chezmoitemplates/themes/omarchy-gruvbox/bat.tmTheme",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-gruvbox/colors.toml",
+      "target": "~/.chezmoitemplates/themes/omarchy-gruvbox/colors.toml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-gruvbox/delta.gitconfig",
+      "target": "~/.chezmoitemplates/themes/omarchy-gruvbox/delta.gitconfig",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-gruvbox/eza.yml",
+      "target": "~/.chezmoitemplates/themes/omarchy-gruvbox/eza.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-gruvbox/fzf.sh",
+      "target": "~/.chezmoitemplates/themes/omarchy-gruvbox/fzf.sh",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-gruvbox/gemini.json",
+      "target": "~/.chezmoitemplates/themes/omarchy-gruvbox/gemini.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-gruvbox/lazygit.yml",
+      "target": "~/.chezmoitemplates/themes/omarchy-gruvbox/lazygit.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-gruvbox/manifest.yaml",
+      "target": "~/.chezmoitemplates/themes/omarchy-gruvbox/manifest.yaml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-gruvbox/nvim.lua",
+      "target": "~/.chezmoitemplates/themes/omarchy-gruvbox/nvim.lua",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-gruvbox/windows_terminal.json",
+      "target": "~/.chezmoitemplates/themes/omarchy-gruvbox/windows_terminal.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-gruvbox/zebar.css",
+      "target": "~/.chezmoitemplates/themes/omarchy-gruvbox/zebar.css",
       "kind": "dotfile",
       "category": "other",
       "attributes": []
@@ -1746,13 +1970,6 @@
     {
       "source": ".chezmoitemplates/themes/omarchy-kanagawa/nvim.lua",
       "target": "~/.chezmoitemplates/themes/omarchy-kanagawa/nvim.lua",
-      "kind": "dotfile",
-      "category": "other",
-      "attributes": []
-    },
-    {
-      "source": ".chezmoitemplates/themes/omarchy-kanagawa/wallpaper.png",
-      "target": "~/.chezmoitemplates/themes/omarchy-kanagawa/wallpaper.png",
       "kind": "dotfile",
       "category": "other",
       "attributes": []
@@ -1835,13 +2052,6 @@
       "attributes": []
     },
     {
-      "source": ".chezmoitemplates/themes/omarchy-nord/wallpaper.png",
-      "target": "~/.chezmoitemplates/themes/omarchy-nord/wallpaper.png",
-      "kind": "dotfile",
-      "category": "other",
-      "attributes": []
-    },
-    {
       "source": ".chezmoitemplates/themes/omarchy-nord/windows_terminal.json",
       "target": "~/.chezmoitemplates/themes/omarchy-nord/windows_terminal.json",
       "kind": "dotfile",
@@ -1851,6 +2061,83 @@
     {
       "source": ".chezmoitemplates/themes/omarchy-nord/zebar.css",
       "target": "~/.chezmoitemplates/themes/omarchy-nord/zebar.css",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-rose-pine/bat.tmTheme",
+      "target": "~/.chezmoitemplates/themes/omarchy-rose-pine/bat.tmTheme",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-rose-pine/colors.toml",
+      "target": "~/.chezmoitemplates/themes/omarchy-rose-pine/colors.toml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-rose-pine/delta.gitconfig",
+      "target": "~/.chezmoitemplates/themes/omarchy-rose-pine/delta.gitconfig",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-rose-pine/eza.yml",
+      "target": "~/.chezmoitemplates/themes/omarchy-rose-pine/eza.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-rose-pine/fzf.sh",
+      "target": "~/.chezmoitemplates/themes/omarchy-rose-pine/fzf.sh",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-rose-pine/gemini.json",
+      "target": "~/.chezmoitemplates/themes/omarchy-rose-pine/gemini.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-rose-pine/lazygit.yml",
+      "target": "~/.chezmoitemplates/themes/omarchy-rose-pine/lazygit.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-rose-pine/manifest.yaml",
+      "target": "~/.chezmoitemplates/themes/omarchy-rose-pine/manifest.yaml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-rose-pine/nvim.lua",
+      "target": "~/.chezmoitemplates/themes/omarchy-rose-pine/nvim.lua",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-rose-pine/windows_terminal.json",
+      "target": "~/.chezmoitemplates/themes/omarchy-rose-pine/windows_terminal.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/omarchy-rose-pine/zebar.css",
+      "target": "~/.chezmoitemplates/themes/omarchy-rose-pine/zebar.css",
       "kind": "dotfile",
       "category": "other",
       "attributes": []
@@ -1914,13 +2201,6 @@
     {
       "source": ".chezmoitemplates/themes/omarchy-tokyo-night/nvim.lua",
       "target": "~/.chezmoitemplates/themes/omarchy-tokyo-night/nvim.lua",
-      "kind": "dotfile",
-      "category": "other",
-      "attributes": []
-    },
-    {
-      "source": ".chezmoitemplates/themes/omarchy-tokyo-night/wallpaper.png",
-      "target": "~/.chezmoitemplates/themes/omarchy-tokyo-night/wallpaper.png",
       "kind": "dotfile",
       "category": "other",
       "attributes": []
@@ -2216,6 +2496,62 @@
     {
       "source": "dot_local/share/wsl-ssh-bridge/main.go",
       "target": "~/.local/share/wsl-ssh-bridge/main.go",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "theme-assets/omarchy-catppuccin-latte/wallpaper.png",
+      "target": "~/theme-assets/omarchy-catppuccin-latte/wallpaper.png",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "theme-assets/omarchy-catppuccin/wallpaper.png",
+      "target": "~/theme-assets/omarchy-catppuccin/wallpaper.png",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "theme-assets/omarchy-everforest/wallpaper.png",
+      "target": "~/theme-assets/omarchy-everforest/wallpaper.png",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "theme-assets/omarchy-gruvbox/wallpaper.png",
+      "target": "~/theme-assets/omarchy-gruvbox/wallpaper.png",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "theme-assets/omarchy-kanagawa/wallpaper.png",
+      "target": "~/theme-assets/omarchy-kanagawa/wallpaper.png",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "theme-assets/omarchy-nord/wallpaper.png",
+      "target": "~/theme-assets/omarchy-nord/wallpaper.png",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "theme-assets/omarchy-rose-pine/wallpaper.png",
+      "target": "~/theme-assets/omarchy-rose-pine/wallpaper.png",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "theme-assets/omarchy-tokyo-night/wallpaper.png",
+      "target": "~/theme-assets/omarchy-tokyo-night/wallpaper.png",
       "kind": "dotfile",
       "category": "other",
       "attributes": []
@@ -28853,12 +29189,6 @@
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
-    },
-    {
-      "source": "dotfiles-showcase",
-      "kind": "repo",
-      "category": "repo",
-      "role": "Submodule \u2014 the showcase web app; never applied"
     },
     {
       "source": "package.json",
