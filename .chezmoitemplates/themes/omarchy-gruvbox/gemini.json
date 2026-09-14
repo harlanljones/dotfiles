@@ -1,0 +1,40 @@
+{
+  "name": "Omarchy Gruvbox",
+  "type": "custom",
+  "text": {
+    "primary": "#d4be98",
+    "secondary": "#7c6f64",
+    "response": "#d4be98"
+  },
+  "background": {
+    "primary": "#282828",
+    "diff": {
+      "added": "#3d3f32",
+      "removed": "#473231"
+    }
+  },
+  "border": {
+    "default": "#504945",
+    "focused": "#7daea3"
+  },
+  "ui": {
+    "comment": "#665c54",
+    "symbol": "#7c6f64",
+    "gradient": ["#7daea3", "#d3869b", "#89b482"]
+  },
+  "Background": "#282828",
+  "Foreground": "#d4be98",
+  "LightBlue": "#89b482",
+  "AccentBlue": "#d3869b",
+  "AccentPurple": "#d3869b",
+  "AccentCyan": "#89b482",
+  "AccentGreen": "#d8a657",
+  "AccentYellow": "#a9b665",
+  "AccentRed": "#ea6962",
+  "DiffAdded": "#3d3f32",
+  "DiffRemoved": "#473231",
+  "Comment": "#665c54",
+  "Gray": "#7c6f64",
+  "DarkGray": "#1e1e1e",
+  "GradientColors": ["#7daea3", "#d3869b", "#89b482"]
+}

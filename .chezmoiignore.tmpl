@@ -23,6 +23,17 @@ dotfiles-showcase/**
 docs
 docs/**
 
+# Binary theme wallpapers. Real photographic PNGs live outside
+# .chezmoitemplates because chezmoi eagerly parses every file under that
+# directory as a Go template (regardless of extension); a photo's bytes are
+# effectively certain to contain a Go template action delimiter pair
+# somewhere, which corrupts that combined template parse
+# (non-deterministically, since which file trips it depends on map iteration
+# order). Read via the include function from
+# run_onchange_after_46-vespasian-wallpaper.sh.tmpl; never deployed as-is.
+theme-assets
+theme-assets/**
+
 # Local tooling/state may exist in the source tree even when Git ignores it.
 node_modules
 node_modules/**

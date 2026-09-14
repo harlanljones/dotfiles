@@ -12,3 +12,9 @@ source:
   name: "nord"
   repo: "https://github.com/basecamp/omarchy/tree/master/themes/nord"
   colorsSha256: "62d1739a488db2a66b88f2f054579bdfd08c4ec771d2acf5659b9f9d976c57e2"
+wallpaper:
+  kind: omarchy-public-background
+  originalFile: "0-black-moon.jpg"
+  repo: "https://github.com/basecamp/omarchy/tree/quattro/themes/nord/backgrounds"
+  license: MIT (basecamp/omarchy repository license covers all repo content, backgrounds included)
+  note: Downscaled/cropped to 1920x1080 and re-encoded as PNG; not the generated gradient.

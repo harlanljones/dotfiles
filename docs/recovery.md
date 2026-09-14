@@ -173,7 +173,7 @@ on older impeccable releases) and treats download failures as non-fatal warnings
 so `chezmoi apply` completes. Once network connectivity or provider support is
 ready, re-run `dots sync` to install any remaining skills.
 
-Theme switching on Vespasian uses `dots theme set <name>` (e.g. `dots theme set tokyonight-storm`).
+Theme switching on Vespasian uses `dots theme set <name>` (e.g. `dots theme set omarchy-gruvbox`).
 This re-renders the Windows Terminal fragment (`vespasian.json`), updates the JetBrainsMono
 Nerd Font if the pinned release changed, rebuilds the `bat` cache, and updates `~/.claude.json`.
 Restart Windows Terminal and Neovim to load the new theme.

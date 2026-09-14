@@ -1,0 +1,40 @@
+{
+  "name": "Omarchy Catppuccin Latte",
+  "type": "custom",
+  "text": {
+    "primary": "#4c4f69",
+    "secondary": "#9ca0b0",
+    "response": "#4c4f69"
+  },
+  "background": {
+    "primary": "#eff1f5",
+    "diff": {
+      "added": "#d3e4d5",
+      "removed": "#eacdd7"
+    }
+  },
+  "border": {
+    "default": "#ccd0da",
+    "focused": "#1e66f5"
+  },
+  "ui": {
+    "comment": "#acb0be",
+    "symbol": "#9ca0b0",
+    "gradient": ["#1e66f5", "#ea76cb", "#179299"]
+  },
+  "Background": "#eff1f5",
+  "Foreground": "#4c4f69",
+  "LightBlue": "#179299",
+  "AccentBlue": "#ea76cb",
+  "AccentPurple": "#ea76cb",
+  "AccentCyan": "#179299",
+  "AccentGreen": "#df8e1d",
+  "AccentYellow": "#40a02b",
+  "AccentRed": "#d20f39",
+  "DiffAdded": "#d3e4d5",
+  "DiffRemoved": "#eacdd7",
+  "Comment": "#acb0be",
+  "Gray": "#9ca0b0",
+  "DarkGray": "#e3e4e8",
+  "GradientColors": ["#1e66f5", "#ea76cb", "#179299"]
+}

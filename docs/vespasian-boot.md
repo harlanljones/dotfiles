@@ -96,3 +96,16 @@ WezTerm is the native primary terminal shortcut (`Win+Enter`), running natively
 on Windows with DirectWrite hardware acceleration, the synchronized dots theme,
 and default WSL domain. Windows Terminal remains available via `Alt+Enter` as a
 native fallback.
+
+## Gaps, borders, and rounding (Hyprland parity)
+
+GlazeWM's gaps (`inner_gap: 4px`, `outer_gap: 8px` on all edges) mirror
+Augustus's Hyprland `gaps_in=2`/`gaps_out=5` ratio. Zebar reserves its own
+space via `dockToEdge` (44px bar height, in `zpack.json`), so GlazeWM's work
+area already excludes the bar and `outer_gap.top` only needs the same small
+margin as the other edges, not extra clearance for the bar itself. Window
+borders use `border_size`-equivalent
+styling (2px, colored by the active theme) and `small_rounded` corners to match
+Hyprland's `rounding=8` — closer to that modest radius than Windows 11's larger
+default `rounded` style. Flow Launcher's window uses the same 2px border and 8px
+corner radius (see [`docs/vespasian-theming.md`](vespasian-theming.md#flow-launcher)).

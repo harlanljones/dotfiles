@@ -2,14 +2,17 @@
 {{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
 {{- $name := (index .machines "vespasian").theme.name -}}
 {{- $theme := index .themes $name -}}
-{{- $wallpaperSrc := printf ".chezmoitemplates/themes/%s/wallpaper.png" $name -}}
+{{- $wallpaperSrc := printf "theme-assets/%s/wallpaper.png" $name -}}
 #!/usr/bin/env bash
 # Set the Windows desktop wallpaper from the active dots theme
-# ({{ $theme.label }}). The wallpaper is a generated gradient
-# (.chezmoitemplates/themes/{{ $name }}/wallpaper.png), not a downloaded
-# image, so there is no redistribution-rights question to track (see
-# docs/aether-theming-integration-proposal.md, "Security, licensing,
-# updates, and reproducibility").
+# ({{ $theme.label }}). The wallpaper ({{ $wallpaperSrc }}) is that theme's
+# real Omarchy background image (basecamp/omarchy is MIT-licensed as a whole
+# repo, backgrounds included - see docs/vespasian-theming.md#wallpaper), or a
+# generated gradient as a fallback for a theme with no bundled background.
+# It lives outside .chezmoitemplates because chezmoi eagerly parses every
+# file under that directory as one combined Go template set, and a
+# photographic PNG's bytes are effectively certain to contain a Go template
+# action delimiter pair somewhere, corrupting that parse.
 #
 # wallpaper.png sha256 (chezmoi only reruns run_onchange_ scripts when their
 # own rendered text changes, and this script's text otherwise only embeds a
@@ -48,22 +51,27 @@ mkdir -p "$cache_dir"
 cp "$wallpaper_src" "$cache_dir/wallpaper.png"
 win_wallpaper_path="$(cd /mnt/c && "$cmd_exe" /d /c "echo $(wslpath -w "$cache_dir/wallpaper.png")" 2>/dev/null | tr -d '\r')"
 
+# Always calls SystemParametersInfo, even when $path is unchanged from last
+# run: this script only runs when chezmoi detects the rendered text changed,
+# which includes the sha256 hash comment in the header above, so reaching
+# this line already means the theme name or the wallpaper bytes changed.
+# Gating this call on the registry path string (as a prior version did)
+# skipped the actual repaint whenever a theme's wallpaper.png was replaced
+# in place (same cache path, new content) - Windows kept showing the old
+# bitmap it already had loaded even though the file on disk was correct.
 "$powershell_exe" -NoProfile -Command "
   \$path = \"$win_wallpaper_path\";
-  \$current = (Get-ItemProperty -Path 'HKCU:\Control Panel\Desktop' -Name Wallpaper -ErrorAction SilentlyContinue).Wallpaper;
   Set-ItemProperty -Path 'HKCU:\Control Panel\Desktop' -Name Wallpaper -Value \$path;
   Set-ItemProperty -Path 'HKCU:\Control Panel\Desktop' -Name WallpaperStyle -Value '10';
   Set-ItemProperty -Path 'HKCU:\Control Panel\Desktop' -Name TileWallpaper -Value '0';
-  if (\$current -ne \$path) {
-    Add-Type -TypeDefinition '
-      using System.Runtime.InteropServices;
-      public class Wp {
-        [DllImport(\"user32.dll\", CharSet = CharSet.Auto)]
-        public static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
-      }
-    ' -ErrorAction SilentlyContinue;
-    [Wp]::SystemParametersInfo(20, 0, \$path, 3) | Out-Null;
-  }
+  Add-Type -TypeDefinition '
+    using System.Runtime.InteropServices;
+    public class Wp {
+      [DllImport(\"user32.dll\", CharSet = CharSet.Auto)]
+      public static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+    }
+  ' -ErrorAction SilentlyContinue;
+  [Wp]::SystemParametersInfo(20, 0, \$path, 3) | Out-Null;
 " < /dev/null
 
 echo "wallpaper: set to {{ $name }} ($win_wallpaper_path)"

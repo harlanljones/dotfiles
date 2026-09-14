@@ -10,7 +10,8 @@ Set the active theme for Vespasian:
 dots theme set <theme-name>
 ```
 
-Available themes include the built-in Tokyo Night variants and imported Omarchy themes:
+Available themes are all imported from Omarchy (see below) — there are no
+hand-built themes on this box:
 
 ```bash
 dots theme         # List all themes
@@ -28,20 +29,24 @@ The importer creates immutable theme snapshots in `.chezmoitemplates/themes/<the
 - `colors.toml` — canonical Omarchy v4 semantic palette
 - `manifest.yaml` — provenance, checksums, import timestamp
 - Platform adapters: `windows_terminal.json`, `zebar.css`, `nvim.lua`, `lazygit.yml`, `delta.gitconfig`, `fzf.sh`, `eza.yml`, `bat.tmTheme`, `gemini.json`
-- `wallpaper.png` — generated gradient (procedurally blended from palette colors)
+- `wallpaper.png` — the theme's real Omarchy background (see below), downscaled/cropped to 1920x1080 and re-encoded as PNG
 
 The importer runs on Augustus (where Aether and Omarchy are native); Vespasian simply consumes the committed snapshots.
 
-### Testing public Omarchy themes
+### The 8 themes
 
-Four public Omarchy themes are included as fixtures for validation:
+Eight Omarchy themes make up the full roster:
 
 - `omarchy-tokyo-night` — Tokyo Night v4 from basecamp/omarchy
 - `omarchy-kanagawa` — Kanagawa from basecamp/omarchy
-- `omarchy-everforest` — Everforest from basecamp/omarchy  
+- `omarchy-everforest` — Everforest from basecamp/omarchy
 - `omarchy-nord` — Nord from basecamp/omarchy
+- `omarchy-gruvbox` — Gruvbox from basecamp/omarchy
+- `omarchy-catppuccin` — Catppuccin (Mocha) from basecamp/omarchy
+- `omarchy-rose-pine` — Rosé Pine from basecamp/omarchy (Omarchy ships this variant as `mode = "light"`)
+- `omarchy-catppuccin-latte` — Catppuccin Latte from basecamp/omarchy (light)
 
-These are immutable snapshots; they do not receive updates if the upstream Omarchy theme changes.
+These are immutable snapshots; they do not receive updates if the upstream Omarchy theme changes. Each snapshot's `manifest.yaml` records both the palette source (`source:`) and the wallpaper source (`wallpaper:` — original filename, repo path, license).
 
 ## Windows Integration
 
@@ -62,12 +67,18 @@ Script `run_onchange_after_46-vespasian-wallpaper.sh.tmpl` applies the theme's w
 3. Uses `SystemParametersInfo(SPI_SETDESKWALLPAPER)` to apply the wallpaper to the Windows desktop.
 4. Sets wallpaper style to "fill" (stretch to fill, preserving aspect ratio).
 
-The wallpaper is **procedurally generated** from the theme's palette using a vertical gradient:
-
-- Top: `darker_background` (near-black base)
-- Bottom: `background` blended 55% toward `accent` (visible color transition)
-
-This approach avoids redistribution rights questions and ensures reproducibility—the same palette always generates the same gradient bytes.
+The wallpaper is the theme's **real Omarchy background image** — one file
+picked from that theme's `themes/<name>/backgrounds/` directory in
+basecamp/omarchy, downscaled/cropped to 1920x1080 and re-encoded as PNG.
+basecamp/omarchy is MIT-licensed as a whole repository (confirmed via its
+README and `LICENSE` file), which covers the bundled background images, so
+there's no redistribution-rights concern importing them verbatim into this
+repo. Earlier versions of this pipeline generated a procedural gradient
+instead specifically to sidestep that question before the license had been
+checked; `dot_local/bin/executable_dots-theme-import-aether` still has a
+`generate_wallpaper_png` fallback for a theme that ships no real
+background of its own (e.g. an Aether export from a custom, unpublished
+theme).
 
 ### Windows Terminal
 
@@ -139,9 +150,13 @@ machines:
 
 ### Generation and caching
 
-Theme adapters are generated when a snapshot is imported, then cached in `.chezmoitemplates/themes/<name>/`. The `run_onchange_*` scripts read these cached files and apply them to Windows.
+Theme adapters (palette-derived text files) are generated when a snapshot is imported, then cached in `.chezmoitemplates/themes/<name>/`. Wallpapers are binary and live separately in `theme-assets/<name>/wallpaper.png` — see "Binary assets live outside .chezmoitemplates" below. The `run_onchange_*` scripts read both and apply them to Windows.
 
-Wallpaper generation is deterministic: the same palette always produces the same gradient PNG (same byte sequence). The script header includes a SHA-256 hash comment of the wallpaper source file, so chezmoi reruns the script if the wallpaper bytes change—avoiding a silent skip when the image is regenerated in place.
+The wallpaper script's rerun trigger doesn't depend on the wallpaper being deterministic: the script header includes a SHA-256 hash comment of the wallpaper file's actual bytes, so chezmoi reruns the script whenever those bytes change (a new real image, a re-generated gradient, or a switch to a different theme) — avoiding a silent skip when only the image content changes at the same cache path. The script itself always calls `SystemParametersInfo` when it runs, rather than gating that call on whether the registry's wallpaper *path* changed, since a real image swap keeps the same path (`theme-assets/<name>/wallpaper.png`) with new content.
+
+### Binary assets live outside .chezmoitemplates
+
+chezmoi eagerly parses every file under `.chezmoitemplates/` as one combined Go template set — regardless of file extension — because that directory exists specifically to hold `template`/`include` sources. A real photographic PNG's bytes are effectively certain to contain a byte sequence that looks like a Go template action delimiter pair somewhere in several hundred KB of image data, which corrupts that combined parse; which file trips it is non-deterministic (depends on Go's randomized map iteration order), so the same repo state can fail on a different file each run. Wallpaper PNGs therefore live in `theme-assets/<name>/wallpaper.png` — a plain directory, excluded from deployment via `.chezmoiignore.tmpl`, read only through `{{ include }}` by `run_onchange_after_46-vespasian-wallpaper.sh.tmpl`. The palette-derived text adapters (`colors.toml`, `manifest.yaml`, `windows_terminal.json`, etc.) stay in `.chezmoitemplates/themes/<name>/` since plain-text hex colors and YAML/JSON never coincidentally contain that byte sequence.
 
 ### Validation
 
@@ -173,8 +188,11 @@ dots sync
 
 If Windows Terminal doesn't refresh, close all Terminal windows and re-open; the profile/scheme change requires Terminal to reload its settings file.
 
-**Wallpaper appears black or blank:**
-The gradient generation blends palette colors. Check that the theme's `darker_background`, `background`, and `accent` are sufficiently distinct. A near-black palette (e.g., Gruvbox) will produce a subtle gradient; lighter themes produce more visible transitions.
+**Wallpaper doesn't change even though the script reports success:**
+Confirm the fix described above landed: the script must call `SystemParametersInfo` unconditionally, not only when the registry's wallpaper path differs from the new one. A theme's wallpaper path is stable (`theme-assets/<name>/wallpaper.png`), so replacing that file's content while keeping the same theme active previously left Windows showing its already-loaded bitmap.
+
+**Wallpaper appears black or blank (only relevant for the generated-gradient fallback):**
+A theme with no bundled Omarchy background falls back to a generated gradient blending palette colors. Check that the theme's `darker_background`, `background`, and `accent` are sufficiently distinct. A near-black palette will produce a subtle gradient; lighter themes produce more visible transitions.
 
 **Windows light/dark mode toggle in Settings doesn't sync:**
 If manually toggling Settings > Personalization > Colors does not update the registry, check the current values:
@@ -185,11 +203,51 @@ Get-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\P
 
 If `AppsUseLightTheme` and `SystemUsesLightTheme` are correct but apps don't change, the issue is likely that the apps were already open when the mode changed. Restart them individually, or run `dots sync` again to re-broadcast the notification.
 
+### Flow Launcher
+
+Script `run_onchange_after_45-vespasian-desktop-tools.sh.tmpl` generates a custom
+Flow Launcher theme (`UserData/Themes/Dots.xaml`) from the same `$scheme` palette
+as WezTerm and Zebar, and sets it active in `UserData/Settings/Settings.json`
+(merged in, preserving any other settings Flow Launcher has already written).
+`BorderThickness`/`CornerRadius` on the launcher window match GlazeWM's
+`border_size`/`corner_style` so the two feel like the same system.
+
+### Desktop icons
+
+Script `run_onchange_after_45-vespasian-desktop-tools.sh.tmpl` hides desktop
+icons so the themed wallpaper is the whole visible desktop surface, and apps
+are launched via Flow Launcher (`Win+Space` / `Alt+Space`) instead of
+desktop shortcuts. There's no plain registry setting for "Show desktop
+icons" — it's a `Progman` `WM_COMMAND` toggle (`0x7402`) — so the script
+sends that message directly, matching what the context-menu item does. It
+first checks `HKCU\...\Explorer\Advanced\HideIcons` (the value Windows
+persists after the toggle) so re-running is a no-op when icons are already
+hidden. No elevation needed, and it never touches `explorer.exe`'s process,
+so it can't disturb Zebar's `dockToEdge` reservation.
+
+### System UI font
+
+Script `run_onchange_after_41-vespasian-nerd-font.sh.tmpl` also substitutes
+`JetBrainsMono Nerd Font` for `Segoe UI` system-wide via the HKLM
+`FontSubstitutes` registry key, after installing the font. Because that key is
+under HKLM, the write needs a one-time UAC-elevated PowerShell prompt (approve
+it when `dots sync` asks); the current value is read first so re-applying is a
+no-op and doesn't re-prompt. This covers File Explorer, dialog boxes, title
+bars, and most classic Win32 UI. Windows 11's Fluent surfaces (Settings, Start
+menu, some Store apps) render with `Segoe UI Variable` instead and are not
+covered. FontSubstitutes is read into a per-session win32k font-mapper cache,
+not re-read when an individual process restarts — confirmed by testing:
+killing and relaunching `explorer.exe` left desktop icon labels on the old
+font. So the script does not restart `explorer.exe` (that would only add
+risk, since killing it also drops Zebar's `dockToEdge` work-area reservation
+with nothing to re-register it); a full sign-out/sign-in is the only way to
+make every surface — including desktop icon labels, the taskbar, File
+Explorer, and any other already-running app — pick up the new font.
+
 ## Future enhancements
 
 - **Windows accent color:** Attempted but found to be unreliable on this machine (Windows appears to auto-recompute it from the wallpaper, and the `AutoColorization` registry key did not prevent that behavior).
 - **TranslucentTB profile:** Not yet integrated due to uncertainty about its persisted configuration format on packaged vs. portable releases.
-- **Flow Launcher theme:** Currently unimplemented; the launcher picks up Windows dark/light mode automatically, providing basic theming without custom integration.
 - **Icon and cursor packs:** Omarchy has icon themes, but Windows icon/cursor packs are installed via Settings and have no direct programmatic API. Explicit allowlisting could be added if a specific set of icon packs is identified.
 
 ## See also

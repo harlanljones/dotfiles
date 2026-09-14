@@ -9,38 +9,6 @@
 # Adding a theme: create the directory with all seven files, add an entry here,
 # then `dots theme set <key>`.
 themes:
-  tokyonight-night:
-    label: "Tokyo Night (night)"
-    appearance: dark
-    nvimStyle: night
-    nvimColorscheme: tokyonight-night
-    windows:
-      accent: "#7aa2f7"
-      colorPrevalence: true
-  tokyonight-storm:
-    label: "Tokyo Night (storm)"
-    appearance: dark
-    nvimStyle: storm
-    nvimColorscheme: tokyonight-storm
-    windows:
-      accent: "#7aa2f7"
-      colorPrevalence: true
-  tokyonight-moon:
-    label: "Tokyo Night (moon)"
-    appearance: dark
-    nvimStyle: moon
-    nvimColorscheme: tokyonight-moon
-    windows:
-      accent: "#82aaff"
-      colorPrevalence: true
-  tokyonight-day:
-    label: "Tokyo Night (day, light)"
-    appearance: light
-    nvimStyle: day
-    nvimColorscheme: tokyonight-day
-    windows:
-      accent: "#2e7de9"
-      colorPrevalence: true
   omarchy-kanagawa:
     label: "Omarchy Kanagawa"
     appearance: dark
@@ -92,4 +60,56 @@ themes:
       importedAt: "2026-09-14T00:53:35Z"
     windows:
       accent: "#81a1c1"
+      colorPrevalence: true
+  omarchy-gruvbox:
+    label: "Omarchy Gruvbox"
+    appearance: dark
+    format: omarchy-v4
+    source:
+      kind: omarchy-public-theme
+      name: "gruvbox"
+      repo: "https://github.com/basecamp/omarchy/tree/quattro/themes/gruvbox"
+      colorsSha256: "dc30923fe0f19220ff8087f7830c3e7aa5760829b7f2d2f9a10cadc17e02abe0"
+      importedAt: "2026-09-14T06:16:04Z"
+    windows:
+      accent: "#7daea3"
+      colorPrevalence: true
+  omarchy-catppuccin:
+    label: "Omarchy Catppuccin"
+    appearance: dark
+    format: omarchy-v4
+    source:
+      kind: omarchy-public-theme
+      name: "catppuccin"
+      repo: "https://github.com/basecamp/omarchy/tree/quattro/themes/catppuccin"
+      colorsSha256: "a7eddcf3342ee0bee5df5ed7aad71c0e8c07ba5549bba7e040064fc5abc09eea"
+      importedAt: "2026-09-14T06:16:04Z"
+    windows:
+      accent: "#89b4fa"
+      colorPrevalence: true
+  omarchy-rose-pine:
+    label: "Omarchy Rosé Pine"
+    appearance: light
+    format: omarchy-v4
+    source:
+      kind: omarchy-public-theme
+      name: "rose-pine"
+      repo: "https://github.com/basecamp/omarchy/tree/quattro/themes/rose-pine"
+      colorsSha256: "c9d45f2434edc45520d9a05765b88d42d3053796b6531b4be3d6cc34d2839ae1"
+      importedAt: "2026-09-14T06:16:04Z"
+    windows:
+      accent: "#56949f"
+      colorPrevalence: true
+  omarchy-catppuccin-latte:
+    label: "Omarchy Catppuccin Latte"
+    appearance: light
+    format: omarchy-v4
+    source:
+      kind: omarchy-public-theme
+      name: "catppuccin-latte"
+      repo: "https://github.com/basecamp/omarchy/tree/quattro/themes/catppuccin-latte"
+      colorsSha256: "071e27fe9b0dd7ee0063c7a3a55288648dcc6ac05a6cf7702caeb51c9ca4398e"
+      importedAt: "2026-09-14T06:16:05Z"
+    windows:
+      accent: "#1e66f5"
       colorPrevalence: true

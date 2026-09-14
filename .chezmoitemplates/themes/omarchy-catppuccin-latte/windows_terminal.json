@@ -1,0 +1,25 @@
+# Add the following object to your Windows Terminal configuration
+# https://learn.microsoft.com/en-us/windows/terminal/customize-settings/color-schemes#creating-your-own-color-scheme
+{
+    "background": "#eff1f5",
+    "black": "#d7d8dc",
+    "blue": "#1e66f5",
+    "brightBlack": "#acb0be",
+    "brightBlue": "#1e66f5",
+    "brightCyan": "#179299",
+    "brightGreen": "#40a02b",
+    "brightPurple": "#ea76cb",
+    "brightRed": "#d20f39",
+    "brightWhite": "#4c4f69",
+    "brightYellow": "#df8e1d",
+    "cursorColor": "#4c4f69",
+    "cyan": "#179299",
+    "foreground": "#4c4f69",
+    "green": "#40a02b",
+    "name": "Omarchy Catppuccin Latte",
+    "purple": "#ea76cb",
+    "red": "#d20f39",
+    "selectionBackground": "#ccd0da",
+    "white": "#5c5f77",
+    "yellow": "#df8e1d"
+}

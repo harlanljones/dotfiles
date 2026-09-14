@@ -26,8 +26,7 @@ marker="$fonts_dir/.jetbrainsmono-nerd-font-$version"
 
 if [[ -f "$marker" ]]; then
   echo "nerd-font: JetBrainsMono Nerd Font $version already installed"
-  exit 0
-fi
+else
 
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
@@ -59,4 +58,51 @@ fi
 touch "$marker"
 
 echo "nerd-font: installed $count faces into Windows and WSL font cache (restart Windows Terminal)"
+
+fi
+
+# Substitute the Nerd Font for Segoe UI system-wide (File Explorer, dialog
+# boxes, title bars, most classic Win32 UI) via the FontSubstitutes registry
+# key. This key lives under HKLM, so the write needs one UAC-elevated
+# PowerShell prompt; read the current value first (HKLM is readable without
+# elevation) so re-applying is a no-op and doesn't re-prompt every sync.
+#
+# Windows 11's Fluent surfaces (Settings, Start menu, some Store apps) render
+# with "Segoe UI Variable" instead of "Segoe UI" and are NOT covered by this
+# substitution. FontSubstitutes is read into a per-session win32k font-mapper
+# cache, not re-read when an individual process (even explorer.exe) restarts
+# - confirmed by testing: killing and relaunching explorer.exe left desktop
+# icon labels on the old font. So this script does NOT restart explorer.exe
+# (that would only add risk, since killing it also drops Zebar's dockToEdge
+# work-area reservation with nothing to re-register it) - a full
+# sign-out/sign-in is the only way to make every surface, including desktop
+# icon labels, pick up the new font.
+target_font="{{ $wt.fontFace }}"
+current_sub="$("$reg_exe" query 'HKLM\SOFTWARE\Microsoft\Windows NT\CurrentVersion\FontSubstitutes' /v 'Segoe UI' 2>/dev/null | grep -oP 'REG_SZ\s+\K.*' | tr -d '\r' || true)"
+
+if [[ "$current_sub" == "$target_font" ]]; then
+  echo "nerd-font: system UI font substitution already set to '$target_font'"
+else
+  if ! powershell_exe="$($windows_tool path powershell)"; then
+    echo "nerd-font: could not resolve powershell.exe, skipping system UI font substitution"
+  else
+    echo "nerd-font: elevating to set Segoe UI -> '$target_font' system-wide (approve the UAC prompt)"
+    "$powershell_exe" -NoProfile -Command "
+      \$psi = New-Object System.Diagnostics.ProcessStartInfo;
+      \$psi.FileName = 'powershell.exe';
+      \$psi.Verb = 'runas';
+      \$psi.Arguments = '-NoProfile -Command \"' +
+        'Set-ItemProperty -Path ''HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\FontSubstitutes'' -Name ''Segoe UI'' -Value ''$target_font'' -Type String' +
+        '\"';
+      \$psi.WindowStyle = 'Hidden';
+      try {
+        \$p = [System.Diagnostics.Process]::Start(\$psi);
+        \$p.WaitForExit();
+      } catch {
+        Write-Output 'nerd-font: UAC prompt was declined or elevation failed, skipping';
+      }
+    " < /dev/null
+    echo "nerd-font: system UI font substitution applied (sign out and back in for every app to pick it up)"
+  fi
+fi
 {{- end -}}

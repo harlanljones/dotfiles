@@ -12,3 +12,9 @@ source:
   name: "everforest"
   repo: "https://github.com/basecamp/omarchy/tree/master/themes/everforest"
   colorsSha256: "1adc95c8b6ee34d71106bacf23079f14667b82ec7d8f0b7a478ce3f8d57d1c09"
+wallpaper:
+  kind: omarchy-public-background
+  originalFile: "1-tree-tops.webp"
+  repo: "https://github.com/basecamp/omarchy/tree/quattro/themes/everforest/backgrounds"
+  license: MIT (basecamp/omarchy repository license covers all repo content, backgrounds included)
+  note: Downscaled/cropped to 1920x1080 and re-encoded as PNG; not the generated gradient.

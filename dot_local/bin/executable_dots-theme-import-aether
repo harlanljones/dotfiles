@@ -309,6 +309,13 @@ def cmd_from_colors_toml(args: argparse.Namespace) -> None:
     themes_yaml = src / ".chezmoidata" / "themes.yaml"
     adapters_dir = src / ".chezmoitemplates" / "aether-adapters"
     dest_dir = src / ".chezmoitemplates" / "themes" / args.id
+    # Binary wallpaper lives outside .chezmoitemplates: chezmoi eagerly parses
+    # every file under that directory as one combined Go template set, and a
+    # real photographic PNG's bytes are effectively certain to contain a
+    # "{{"/"}}" sequence somewhere, corrupting that parse (see
+    # .chezmoiignore.tmpl's theme-assets entry and
+    # docs/vespasian-theming.md#wallpaper).
+    wallpaper_dir = src / "theme-assets" / args.id
 
     if not SLUG_RE.match(args.id):
         fail("--id must be a lowercase slug like 'aether-forest-20260913' (letters, digits, single hyphens)")
@@ -341,15 +348,29 @@ def cmd_from_colors_toml(args: argparse.Namespace) -> None:
         staging.mkdir()
         render_adapters(adapters_dir, staging, tmpl_vars)
         shutil.copyfile(colors_path, staging / "colors.toml")
-        (staging / "wallpaper.png").write_bytes(
-            generate_wallpaper_png(palette["darker_background"], palette["background"], palette["accent"])
-        )
+        existing_wallpaper = wallpaper_dir / "wallpaper.png"
+        had_existing_wallpaper = existing_wallpaper.is_file()
+        if had_existing_wallpaper:
+            # A real background was already placed here (see
+            # convert_wallpapers-style tooling / docs/vespasian-theming.md);
+            # a re-import (e.g. refreshing the palette) must not clobber it
+            # with the procedural fallback.
+            wallpaper_bytes = existing_wallpaper.read_bytes()
+        else:
+            wallpaper_bytes = generate_wallpaper_png(
+                palette["darker_background"], palette["background"], palette["accent"]
+            )
+        (staging / "wallpaper.png").write_bytes(wallpaper_bytes)
         validate_outputs(staging)
+        (staging / "wallpaper.png").unlink()
 
         if dest_dir.exists():
             shutil.rmtree(dest_dir)
             remove_registry_entry(themes_yaml, args.id)
         shutil.move(str(staging), str(dest_dir))
+
+        wallpaper_dir.mkdir(parents=True, exist_ok=True)
+        (wallpaper_dir / "wallpaper.png").write_bytes(wallpaper_bytes)
 
     append_registry_entry(
         themes_yaml,
@@ -364,9 +385,11 @@ def cmd_from_colors_toml(args: argparse.Namespace) -> None:
         palette["accent"],
     )
 
+    wallpaper_note = "kept existing" if had_existing_wallpaper else "generated gradient fallback - drop a real image at this path and re-run to use it instead"
     print(f"\033[0;32m✓\033[0m imported theme '{args.id}' ({args.label}, {appearance})")
-    print(f"  snapshot: {dest_dir}")
-    print(f"  registry: {themes_yaml}")
+    print(f"  snapshot:  {dest_dir}")
+    print(f"  wallpaper: {wallpaper_dir / 'wallpaper.png'} ({wallpaper_note})")
+    print(f"  registry:  {themes_yaml}")
     print(f"  colors.toml sha256: {colors_sha256}")
     print(f"  try it:   dots theme set {args.id}")
 

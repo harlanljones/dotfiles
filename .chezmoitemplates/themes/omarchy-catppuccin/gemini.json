@@ -1,0 +1,40 @@
+{
+  "name": "Omarchy Catppuccin",
+  "type": "custom",
+  "text": {
+    "primary": "#cdd6f4",
+    "secondary": "#6c7086",
+    "response": "#cdd6f4"
+  },
+  "background": {
+    "primary": "#1e1e2e",
+    "diff": {
+      "added": "#343e40",
+      "removed": "#402f42"
+    }
+  },
+  "border": {
+    "default": "#45475a",
+    "focused": "#89b4fa"
+  },
+  "ui": {
+    "comment": "#585b70",
+    "symbol": "#6c7086",
+    "gradient": ["#89b4fa", "#f5c2e7", "#94e2d5"]
+  },
+  "Background": "#1e1e2e",
+  "Foreground": "#cdd6f4",
+  "LightBlue": "#94e2d5",
+  "AccentBlue": "#f5c2e7",
+  "AccentPurple": "#f5c2e7",
+  "AccentCyan": "#94e2d5",
+  "AccentGreen": "#f9e2af",
+  "AccentYellow": "#a6e3a1",
+  "AccentRed": "#f38ba8",
+  "DiffAdded": "#343e40",
+  "DiffRemoved": "#402f42",
+  "Comment": "#585b70",
+  "Gray": "#6c7086",
+  "DarkGray": "#161622",
+  "GradientColors": ["#89b4fa", "#f5c2e7", "#94e2d5"]
+}

@@ -176,13 +176,17 @@ general:
   show_all_in_taskbar: false
 
 gaps:
+  # Matches Augustus's Hyprland gaps_in=2/gaps_out=5 ratio. Zebar reserves its
+  # own space via dockToEdge (see zpack.json), so GlazeWM's work area already
+  # excludes the bar — outer_gap.top only needs the same small margin as the
+  # other edges, not extra clearance for the bar itself.
   scale_with_dpi: true
-  inner_gap: '12px'
+  inner_gap: '4px'
   outer_gap:
-    top: '48px'
-    right: '12px'
-    bottom: '12px'
-    left: '12px'
+    top: '8px'
+    right: '8px'
+    bottom: '8px'
+    left: '8px'
 
 window_effects:
   focused_window:
@@ -192,8 +196,10 @@ window_effects:
     hide_title_bar:
       enabled: false
     corner_style:
+      # 'small_rounded' is the closest match to Hyprland's modest rounding=8;
+      # 'rounded' is Windows 11's larger default radius.
       enabled: true
-      style: 'rounded'
+      style: 'small_rounded'
   other_windows:
     border:
       enabled: true
@@ -202,7 +208,7 @@ window_effects:
       enabled: false
     corner_style:
       enabled: true
-      style: 'rounded'
+      style: 'small_rounded'
 
 window_behavior:
   initial_state: 'tiling'
@@ -289,7 +295,7 @@ keybindings:
     bindings: ['lwin+r', 'alt+r']
 
   # Gaming & emergency pause toggle
-  - commands: ['wm-toggle-pause', 'shell-exec powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%LOCALAPPDATA%\Programs\glazewm\notify-mode.ps1"']
+  - commands: ['wm-toggle-pause']
     bindings: ['lwin+shift+p', 'alt+shift+p']
 
   # Layout controls (Omarchy / Hyprland parity)
@@ -453,9 +459,9 @@ cat <<'ZBAR_PACK' > "$zebar_conf_dir/dots/zpack.json"
           "offsetX": "0px",
           "offsetY": "0px",
           "width": "100%",
-          "height": "38px",
+          "height": "44px",
           "monitorSelection": { "type": "all" },
-          "dockToEdge": { "enabled": false, "edge": null, "windowMargin": "0px" }
+          "dockToEdge": { "enabled": true, "edge": "top", "windowMargin": "0px" }
         }
       ]
     }
@@ -505,7 +511,7 @@ html, body, #root {
 body {
   background: transparent;
   color: var(--text-main);
-  font-size: 12px;
+  font-size: 14px;
 }
 
 .bar-container {
@@ -536,6 +542,36 @@ body {
   justify-content: flex-end;
 }
 
+/* Right-side clusters: system / network / utility, each capped with a
+   micro-label so the eye can jump to a cluster instead of one long row. */
+.group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+.group-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.group-label {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: color-mix(in srgb, var(--fg) 55%, transparent);
+}
+
+.divider {
+  width: 1px;
+  height: 20px;
+  background: color-mix(in srgb, var(--fg) 55%, transparent);
+}
+
 /* Mode pill styling */
 .mode-badge {
   display: inline-flex;
@@ -543,7 +579,7 @@ body {
   gap: 6px;
   padding: 4px 10px;
   border-radius: 4px;
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.5px;
   cursor: pointer;
@@ -598,7 +634,7 @@ body {
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 4px;
   padding: 3px 8px;
-  font-size: 11px;
+  font-size: 13px;
   cursor: pointer;
   transition: all 0.15s ease;
 }
@@ -623,12 +659,18 @@ body {
 /* Window title */
 .window-title {
   color: var(--fg-bright);
-  font-size: 11px;
+  font-size: 13px;
   font-weight: 500;
   max-width: 450px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.window-title.idle {
+  color: var(--muted);
+  font-style: italic;
+  letter-spacing: 0.5px;
 }
 
 /* Right stats */
@@ -640,13 +682,55 @@ body {
   background: var(--bg-secondary);
   border-radius: 4px;
   border: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 11px;
+  font-size: 13px;
 }
 
 .stat-item i { color: var(--accent-cyan); }
 .stat-item.clock i { color: var(--accent-purple); }
 .stat-item.memory i { color: var(--accent-green); }
 .stat-item.cpu i { color: var(--accent-yellow); }
+.stat-item.ip i { color: var(--accent-blue); }
+.stat-item.network i { color: var(--accent-cyan); font-size: 10px; }
+.stat-item.volume { cursor: pointer; }
+.stat-item.volume i { color: var(--accent-blue); }
+.stat-item.disk i { color: var(--accent-green); }
+.stat-item.disk.low { border-color: var(--accent-red); }
+.stat-item.disk.low i { color: var(--accent-red); }
+.stat-item.weather i { color: var(--accent-yellow); }
+
+.sparkline {
+  color: var(--accent-yellow);
+  margin-left: 2px;
+}
+
+/* Systray menu: collapsed behind a toggle button (chevron + count) so hidden
+   icons don't clutter the bar by default; clicking reveals them inline. */
+.systray-menu {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.systray-toggle i { color: var(--accent-blue); }
+
+.systray {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+}
+
+.systray-icon {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+}
+
+.systray-icon:hover {
+  opacity: 1;
+}
 ZBAR_CSS
 
 # index.html — React widget with live Gaming/Dev mode indicator
@@ -675,7 +759,46 @@ cat <<'ZBAR_HTML' > "$zebar_conf_dir/dots/index.html"
         cpu: { type: 'cpu' },
         memory: { type: 'memory' },
         date: { type: 'date', formatting: 'EEE MMM d  HH:mm' },
+        network: { type: 'network' },
+        ip: { type: 'ip' },
+        audio: { type: 'audio' },
+        systray: { type: 'systray' },
+        disk: { type: 'disk' },
+        weather: { type: 'weather' },
       });
+
+      function formatDataRate(measure) {
+        if (!measure) return '0 KB/s';
+        return `${measure.siValue.toFixed(1)} ${measure.siUnit}/s`;
+      }
+
+      const WEATHER_ICONS = {
+        clear_day: 'nf-weather-day_sunny',
+        clear_night: 'nf-weather-night_clear',
+        cloudy_day: 'nf-weather-day_cloudy',
+        cloudy_night: 'nf-weather-night_alt_cloudy',
+        light_rain_day: 'nf-weather-day_rain',
+        light_rain_night: 'nf-weather-night_alt_rain',
+        heavy_rain_day: 'nf-weather-day_rain_wind',
+        heavy_rain_night: 'nf-weather-night_alt_rain_wind',
+        snow_day: 'nf-weather-day_snow',
+        snow_night: 'nf-weather-night_alt_snow',
+        thunder_day: 'nf-weather-day_thunderstorm',
+        thunder_night: 'nf-weather-night_alt_thunderstorm',
+      };
+
+      // Walks a workspace's focus order down to the actual focused window,
+      // rather than GlazeWM's global focusedContainer (which is the same for
+      // every monitor's bar). Returns null when the workspace has no windows.
+      function focusedWindowTitle(container) {
+        let node = container;
+        while (node && node.type !== 'window') {
+          if (!node.children || node.children.length === 0) return null;
+          const focusedId = node.childFocusOrder?.[0];
+          node = node.children.find(c => c.id === focusedId) ?? node.children[0];
+        }
+        return node?.title || null;
+      }
 
       createRoot(document.getElementById('root')).render(<App />);
 
@@ -690,9 +813,46 @@ cat <<'ZBAR_HTML' > "$zebar_conf_dir/dots/index.html"
         const isPaused = g?.isPaused ?? false;
         const bindingModes = g?.bindingModes ?? [];
         const workspaces = g?.currentWorkspaces ?? [];
-        const focusedContainer = g?.focusedContainer;
-        const windowTitle = focusedContainer?.title || '';
+        const displayedWorkspace = workspaces.find(ws => ws.isDisplayed);
+        const windowTitle = focusedWindowTitle(displayedWorkspace);
         const cursor_pointer = {cursor: 'pointer'};
+
+        // AudioDevice has no isMuted field, so track mute locally; this can
+        // drift if volume is changed from outside Zebar (e.g. Windows mixer).
+        const [isMuted, setIsMuted] = useState(false);
+        const [systrayOpen, setSystrayOpen] = useState(false);
+        const playbackDevice = output.audio?.defaultPlaybackDevice;
+        const volume = playbackDevice?.volume ?? 0;
+
+        const handleVolumeWheel = (e) => {
+          if (!output.audio) return;
+          const delta = e.deltaY < 0 ? 5 : -5;
+          const nextVolume = Math.max(0, Math.min(100, volume + delta));
+          output.audio.setVolume(nextVolume);
+        };
+
+        const toggleMute = () => {
+          if (!output.audio) return;
+          output.audio.setMute(!isMuted);
+          setIsMuted(!isMuted);
+        };
+
+        const traffic = output.network?.traffic;
+
+        // Rolling CPU usage history for the sparkline (last 20 samples).
+        const [cpuHistory, setCpuHistory] = useState([]);
+        useEffect(() => {
+          if (output.cpu) {
+            setCpuHistory(prev => [...prev.slice(-19), output.cpu.usage]);
+          }
+        }, [output.cpu?.usage]);
+
+        const primaryDisk = output.disk?.disks?.find(d =>
+          d.mountPoint.toUpperCase().startsWith('C'),
+        );
+        const diskPercentFree = primaryDisk
+          ? (primaryDisk.availableSpace.bytes / primaryDisk.totalSpace.bytes) * 100
+          : null;
 
         return (
           <div className="bar-container">
@@ -740,17 +900,8 @@ cat <<'ZBAR_HTML' > "$zebar_conf_dir/dots/index.html"
                   </button>
                 ))}
               </div>
-            </div>
 
-            <div className="center">
-              {windowTitle && (
-                <span className="window-title" title={windowTitle}>
-                  {windowTitle}
-                </span>
-              )}
-            </div>
-
-            <div className="right">
+              {/* Tiling direction toggle (workspace/WM control, lives with the others) */}
               {g && (
                 <span
                   className="stat-item"
@@ -761,26 +912,156 @@ cat <<'ZBAR_HTML' > "$zebar_conf_dir/dots/index.html"
                   {g.tilingDirection === 'horizontal' ? '󰤝 SPLIT-H' : '󰤼 SPLIT-V'}
                 </span>
               )}
+            </div>
 
-              {output.cpu && (
-                <span className="stat-item cpu">
-                  <i className="nf nf-oct-cpu"></i>
-                  {Math.round(output.cpu.usage)}%
-                </span>
-              )}
+            <div className="center">
+              <span className={`window-title ${windowTitle ? '' : 'idle'}`} title={windowTitle ?? ''}>
+                {windowTitle ?? 'IDLE'}
+              </span>
+            </div>
 
-              {output.memory && (
-                <span className="stat-item memory">
-                  <i className="nf nf-fae-chip"></i>
-                  {Math.round(output.memory.usage)}%
-                </span>
-              )}
+            <div className="right">
+              {/* System: cpu, memory, disk */}
+              <div className="group">
+                <div className="group-row">
+                  {output.cpu && (
+                    <span className="stat-item cpu">
+                      <i className="nf nf-oct-cpu"></i>
+                      {Math.round(output.cpu.usage)}%
+                      <svg className="sparkline" width="32" height="14" viewBox="0 0 32 14">
+                        <polyline
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="1.5"
+                          points={cpuHistory
+                            .map((v, i) => `${(i / Math.max(cpuHistory.length - 1, 1)) * 32},${14 - (v / 100) * 14}`)
+                            .join(' ')}
+                        />
+                      </svg>
+                    </span>
+                  )}
+
+                  {output.memory && (
+                    <span className="stat-item memory">
+                      <i className="nf nf-fae-chip"></i>
+                      {Math.round(output.memory.usage)}%
+                    </span>
+                  )}
+
+                  {primaryDisk && (
+                    <span
+                      className={`stat-item disk ${diskPercentFree < 15 ? 'low' : ''}`}
+                      title={`${primaryDisk.mountPoint} — ${primaryDisk.availableSpace.iecValue.toFixed(0)}${primaryDisk.availableSpace.iecUnit} free of ${primaryDisk.totalSpace.iecValue.toFixed(0)}${primaryDisk.totalSpace.iecUnit}`}
+                    >
+                      <i className="nf nf-oct-database"></i>
+                      {primaryDisk.availableSpace.iecValue.toFixed(0)}{primaryDisk.availableSpace.iecUnit} free
+                    </span>
+                  )}
+                </div>
+                <span className="group-label">SYSTEM</span>
+              </div>
+
+              <div className="divider"></div>
+
+              {/* Network: ip, throughput */}
+              <div className="group">
+                <div className="group-row">
+                  {output.ip && (
+                    <span
+                      className="stat-item ip"
+                      title={`Approx. location: ${output.ip.approxCity}, ${output.ip.approxCountry}`}
+                    >
+                      <i className="nf nf-fa-globe"></i>
+                      {output.ip.address}
+                    </span>
+                  )}
+
+                  {traffic && (
+                    <span
+                      className="stat-item network"
+                      title={output.network?.defaultInterface?.friendlyName ?? 'Network traffic'}
+                    >
+                      <i className="nf nf-fa-arrow_down"></i>
+                      {formatDataRate(traffic.received)}
+                      <i className="nf nf-fa-arrow_up"></i>
+                      {formatDataRate(traffic.transmitted)}
+                    </span>
+                  )}
+                </div>
+                <span className="group-label">NETWORK</span>
+              </div>
+
+              <div className="divider"></div>
+
+              {/* Utility: weather, volume, systray */}
+              <div className="group">
+                <div className="group-row">
+                  {output.weather && (
+                    <span
+                      className="stat-item weather"
+                      title={`Wind ${Math.round(output.weather.windSpeed)} mph`}
+                    >
+                      <i className={`nf ${WEATHER_ICONS[output.weather.status] ?? 'nf-weather-na'}`}></i>
+                      {Math.round(output.weather.fahrenheitTemp)}°F
+                    </span>
+                  )}
+
+                  {output.audio && (
+                    <span
+                      className="stat-item volume"
+                      style={cursor_pointer}
+                      onWheel={handleVolumeWheel}
+                      onClick={toggleMute}
+                      title="Scroll to change volume, click to mute/unmute"
+                    >
+                      <i className={`nf ${isMuted || volume === 0 ? 'nf-fa-volume_off' : 'nf-fa-volume_up'}`}></i>
+                      {isMuted ? 'MUTED' : `${Math.round(volume)}%`}
+                    </span>
+                  )}
+
+                  {output.systray && output.systray.icons.length > 0 && (
+                    <span className="systray-menu">
+                      {systrayOpen && (
+                        <span className="systray">
+                          {output.systray.icons.map(icon => (
+                            <img
+                              key={icon.id}
+                              className="systray-icon"
+                              src={icon.iconUrl}
+                              title={icon.tooltip}
+                              onClick={() => output.systray.onLeftClick(icon.id)}
+                              onDoubleClick={() => output.systray.onLeftDoubleClick(icon.id)}
+                              onContextMenu={(e) => { e.preventDefault(); output.systray.onRightClick(icon.id); }}
+                            />
+                          ))}
+                        </span>
+                      )}
+                      <button
+                        className="stat-item systray-toggle"
+                        onClick={() => setSystrayOpen(!systrayOpen)}
+                        title={systrayOpen ? 'Hide hidden icons' : 'Show hidden icons'}
+                      >
+                        <i className={`nf ${systrayOpen ? 'nf-md-chevron_down' : 'nf-md-chevron_up'}`}></i>
+                        {output.systray.icons.length}
+                      </button>
+                    </span>
+                  )}
+                </div>
+                <span className="group-label">UTILITY</span>
+              </div>
+
+              <div className="divider"></div>
 
               {output.date && (
-                <span className="stat-item clock">
-                  <i className="nf nf-fa-clock_o"></i>
-                  {output.date.formatted}
-                </span>
+                <div className="group">
+                  <div className="group-row">
+                    <span className="stat-item clock">
+                      <i className="nf nf-fa-clock_o"></i>
+                      {output.date.formatted}
+                    </span>
+                  </div>
+                  <span className="group-label">TIME</span>
+                </div>
               )}
             </div>
           </div>
@@ -790,31 +1071,6 @@ cat <<'ZBAR_HTML' > "$zebar_conf_dir/dots/index.html"
   </body>
 </html>
 ZBAR_HTML
-
-# 9b. Deploy mode-switch notification script for GlazeWM
-cat > "$glazewm_dir/notify-mode.ps1" <<'PS_NOTIFY'
-Add-Type -AssemblyName System.Windows.Forms
-Add-Type -AssemblyName System.Drawing
-
-$cli = "$env:LOCALAPPDATA\Programs\glazewm\cli\glazewm.exe"
-if (Test-Path $cli) {
-    $out = & $cli query paused | ConvertFrom-Json
-    $isPaused = $out.data
-
-    $title = if ($isPaused) { "Gaming Mode" } else { "Dev / Tiling Mode" }
-    $msg = if ($isPaused) { "Tiling paused & hotkeys released. Press Super+Shift+P to resume." } else { "Dynamic tiling active. Super+Enter for WSL terminal." }
-
-    $notification = New-Object System.Windows.Forms.NotifyIcon
-    $notification.Icon = [System.Drawing.SystemIcons]::Information
-    $notification.BalloonTipTitle = $title
-    $notification.BalloonTipText = $msg
-    $notification.BalloonTipIcon = [System.Windows.Forms.ToolTipIcon]::Info
-    $notification.Visible = $true
-    $notification.ShowBalloonTip(1500)
-    Start-Sleep -Milliseconds 1600
-    $notification.Dispose()
-}
-PS_NOTIFY
 
 # Pass the Windows key through to GlazeWM while sending an unused key event.
 # Windows then treats Super as part of a chord and does not open Start on key-up.
@@ -835,7 +1091,7 @@ local config = wezterm.config_builder()
 config.default_domain = 'WSL:Ubuntu-24.04'
 
 config.font = wezterm.font('JetBrainsMono Nerd Font')
-config.font_size = 10.0
+config.font_size = 12.0
 
 config.colors = {
   foreground = '{{ $scheme.foreground }}',
@@ -880,6 +1136,181 @@ config.window_decorations = "RESIZE"
 
 return config
 WEZTERM_LUA
+
+# 9d. Deploy a Flow Launcher theme (Dots.xaml) themed from the active dots
+# theme. Flow Launcher reads user themes from UserData/Themes and picks up
+# BorderThickness/CornerRadius to match GlazeWM's border_size/corner_style.
+flow_themes_dir="$flow_dir/UserData/Themes"
+mkdir -p "$flow_themes_dir"
+
+cat <<'EOF_FLOW_THEME' > "$flow_themes_dir/Dots.xaml"
+<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="pack://application:,,,/Themes/Base.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+    <Style
+        x:Key="WindowBorderStyle"
+        BasedOn="{StaticResource BaseWindowBorderStyle}"
+        TargetType="{x:Type Border}">
+        <Setter Property="BorderThickness" Value="2" />
+        <Setter Property="BorderBrush" Value="{{ $scheme.blue }}" />
+        <Setter Property="CornerRadius" Value="8" />
+        <Setter Property="Background" Value="{{ $scheme.background }}" />
+    </Style>
+    <Style
+        x:Key="QueryBoxStyle"
+        BasedOn="{StaticResource BaseQueryBoxStyle}"
+        TargetType="{x:Type TextBox}">
+        <Setter Property="SelectionBrush" Value="{{ $scheme.blue }}" />
+        <Setter Property="Foreground" Value="{{ $scheme.foreground }}" />
+        <Setter Property="CaretBrush" Value="{{ $scheme.cursorColor }}" />
+    </Style>
+    <Style
+        x:Key="QuerySuggestionBoxStyle"
+        BasedOn="{StaticResource BaseQuerySuggestionBoxStyle}"
+        TargetType="{x:Type TextBox}">
+        <Setter Property="Foreground" Value="{{ $scheme.brightBlack }}" />
+    </Style>
+    <Style
+        x:Key="ItemGlyph"
+        BasedOn="{StaticResource BaseGlyphStyle}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{{ $scheme.foreground }}" />
+    </Style>
+    <Style
+        x:Key="ItemTitleStyle"
+        BasedOn="{StaticResource BaseItemTitleStyle}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{{ $scheme.foreground }}" />
+    </Style>
+    <Style
+        x:Key="ItemSubTitleStyle"
+        BasedOn="{StaticResource BaseItemSubTitleStyle}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{{ $scheme.brightBlack }}" />
+    </Style>
+    <Style
+        x:Key="ItemNumberStyle"
+        BasedOn="{StaticResource BaseItemNumberStyle}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{{ $scheme.brightBlack }}" />
+    </Style>
+    <Style
+        x:Key="ItemTitleSelectedStyle"
+        BasedOn="{StaticResource BaseItemTitleSelectedStyle}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="Cursor" Value="Arrow" />
+        <Setter Property="Foreground" Value="{{ $scheme.blue }}" />
+    </Style>
+    <Style
+        x:Key="ItemSubTitleSelectedStyle"
+        BasedOn="{StaticResource BaseItemSubTitleSelectedStyle}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="Cursor" Value="Arrow" />
+        <Setter Property="Foreground" Value="{{ $scheme.brightBlack }}" />
+    </Style>
+    <SolidColorBrush x:Key="ItemSelectedBackgroundColor">{{ $scheme.brightBlack }}</SolidColorBrush>
+    <Style
+        x:Key="ItemHotkeyStyle"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{{ $scheme.brightBlack }}" />
+    </Style>
+    <Style
+        x:Key="ItemHotkeySelectedStyle"
+        BasedOn="{StaticResource BaseItemHotkeySelectedStyle}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{{ $scheme.blue }}" />
+    </Style>
+    <Style
+        x:Key="ThumbStyle"
+        BasedOn="{StaticResource BaseThumbStyle}"
+        TargetType="{x:Type Thumb}">
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Border
+                        Background="{{ $scheme.brightBlack }}"
+                        BorderThickness="0"
+                        CornerRadius="2"
+                        DockPanel.Dock="Right" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+    <Style
+        x:Key="SeparatorStyle"
+        BasedOn="{StaticResource BaseSeparatorStyle}"
+        TargetType="{x:Type Rectangle}">
+        <Setter Property="Fill" Value="{{ $scheme.brightBlack }}" />
+    </Style>
+    <Style
+        x:Key="SearchIconStyle"
+        BasedOn="{StaticResource BaseSearchIconStyle}"
+        TargetType="{x:Type Path}">
+        <Setter Property="Fill" Value="{{ $scheme.brightBlack }}" />
+    </Style>
+    <Style
+        x:Key="ClockBox"
+        BasedOn="{StaticResource BaseClockBox}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{{ $scheme.brightBlack }}" />
+    </Style>
+    <Style
+        x:Key="DateBox"
+        BasedOn="{StaticResource BaseDateBox}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{{ $scheme.brightBlack }}" />
+    </Style>
+    <Style
+        x:Key="PreviewBorderStyle"
+        BasedOn="{StaticResource BasePreviewBorderStyle}"
+        TargetType="{x:Type Border}">
+        <Setter Property="BorderBrush" Value="{{ $scheme.brightBlack }}" />
+    </Style>
+    <Style
+        x:Key="PreviewItemTitleStyle"
+        BasedOn="{StaticResource BasePreviewItemTitleStyle}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{{ $scheme.foreground }}" />
+    </Style>
+    <Style
+        x:Key="PreviewItemSubTitleStyle"
+        BasedOn="{StaticResource BasePreviewItemSubTitleStyle}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{{ $scheme.brightBlack }}" />
+    </Style>
+    <Style
+        x:Key="PreviewGlyph"
+        BasedOn="{StaticResource BasePreviewGlyph}"
+        TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{{ $scheme.foreground }}" />
+    </Style>
+</ResourceDictionary>
+EOF_FLOW_THEME
+
+# Set Flow Launcher's active theme to Dots, preserving any other settings
+# that already exist (Flow Launcher only writes Settings.json after first
+# launch, so it may not exist yet on a fresh install).
+flow_settings_dir="$flow_dir/UserData/Settings"
+mkdir -p "$flow_settings_dir"
+python3 - "$flow_settings_dir/Settings.json" <<'PY_EOF'
+import json
+import sys
+
+path = sys.argv[1]
+try:
+    with open(path) as f:
+        settings = json.load(f)
+except (FileNotFoundError, json.JSONDecodeError):
+    settings = {}
+
+settings["Theme"] = "Dots"
+
+with open(path, "w") as f:
+    json.dump(settings, f, indent=4)
+PY_EOF
 
 # 10. Setup user startup shortcuts so tools auto-start on Windows login
 startup_dir="$wsl_userprofile/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup"
@@ -952,6 +1383,52 @@ if [[ -f "$zebar_dir/zebar.exe" ]]; then
     }
   " < /dev/null
 fi
+
+# 11. Hide desktop icons so the themed wallpaper is the whole desktop surface
+# and apps are launched via Flow Launcher instead. There is no plain registry
+# setting for this - "Show desktop icons" is a Progman WM_COMMAND toggle - so
+# send the same message the context-menu item sends, but only when icons
+# aren't already hidden (Windows persists the resulting state in HideIcons,
+# so this read makes the toggle idempotent). FindWindow("Progman", ...) comes
+# back empty when called from this WSL-interop-launched PowerShell process
+# (tested directly - EnumWindows sees "Program Manager" with class "Progman"
+# just fine, but FindWindow can't resolve it, seemingly a window-station quirk
+# specific to how the interop spawns the process), so this walks EnumWindows
+# and matches by title instead.
+"$powershell_exe" -NoProfile -NonInteractive -Command '
+  $hideIcons = (Get-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name HideIcons -ErrorAction SilentlyContinue).HideIcons
+  if ($hideIcons -ne 1) {
+    Add-Type -Name Win32Toggle -Namespace DesktopIcons -MemberDefinition @"
+      [DllImport("user32.dll")]
+      public static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, System.IntPtr lParam);
+      [DllImport("user32.dll")]
+      public static extern int GetWindowText(System.IntPtr hWnd, System.Text.StringBuilder lpString, int nMaxCount);
+      [DllImport("user32.dll")]
+      public static extern System.IntPtr SendMessage(System.IntPtr hWnd, uint Msg, System.IntPtr wParam, System.IntPtr lParam);
+      public delegate bool EnumWindowsProc(System.IntPtr hWnd, System.IntPtr lParam);
+"@
+    $progman = [System.IntPtr]::Zero
+    $callback = {
+      param($hWnd, $lParam)
+      $sb = New-Object System.Text.StringBuilder 256
+      [DesktopIcons.Win32Toggle]::GetWindowText($hWnd, $sb, 256) | Out-Null
+      if ($sb.ToString() -eq "Program Manager") {
+        $script:progman = $hWnd
+        return $false
+      }
+      return $true
+    }
+    [DesktopIcons.Win32Toggle]::EnumWindows($callback, [System.IntPtr]::Zero) | Out-Null
+    if ($progman -ne [System.IntPtr]::Zero) {
+      [DesktopIcons.Win32Toggle]::SendMessage($progman, 0x111, [System.IntPtr]0x7402, [System.IntPtr]::Zero) | Out-Null
+      Write-Output "desktop-tools: hid desktop icons"
+    } else {
+      Write-Output "desktop-tools: could not find Program Manager window, skipping desktop icon hide"
+    }
+  } else {
+    Write-Output "desktop-tools: desktop icons already hidden"
+  }
+' < /dev/null
 
 echo "desktop-tools: GlazeWM, Zebar, Flow Launcher, QuickLook, TranslucentTB, Super-key mask configured successfully"
 {{- end -}}

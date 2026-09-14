@@ -12,3 +12,9 @@ source:
   name: "kanagawa"
   repo: "https://github.com/basecamp/omarchy/tree/master/themes/kanagawa"
   colorsSha256: "93c0ad7187196f39350b940b7e0f100305ab0c72aba19a621d696df715edb953"
+wallpaper:
+  kind: omarchy-public-background
+  originalFile: "1-kanagawa.jpg"
+  repo: "https://github.com/basecamp/omarchy/tree/quattro/themes/kanagawa/backgrounds"
+  license: MIT (basecamp/omarchy repository license covers all repo content, backgrounds included)
+  note: Downscaled/cropped to 1920x1080 and re-encoded as PNG; not the generated gradient.

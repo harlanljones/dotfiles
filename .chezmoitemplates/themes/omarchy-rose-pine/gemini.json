@@ -1,0 +1,40 @@
+{
+  "name": "Omarchy Rosé Pine",
+  "type": "custom",
+  "text": {
+    "primary": "#575279",
+    "secondary": "#9893a5",
+    "response": "#575279"
+  },
+  "background": {
+    "primary": "#faf4ed",
+    "diff": {
+      "added": "#d8dedc",
+      "removed": "#efdddb"
+    }
+  },
+  "border": {
+    "default": "#dfdad9",
+    "focused": "#56949f"
+  },
+  "ui": {
+    "comment": "#cecacd",
+    "symbol": "#9893a5",
+    "gradient": ["#56949f", "#907aa9", "#d7827e"]
+  },
+  "Background": "#faf4ed",
+  "Foreground": "#575279",
+  "LightBlue": "#d7827e",
+  "AccentBlue": "#907aa9",
+  "AccentPurple": "#907aa9",
+  "AccentCyan": "#d7827e",
+  "AccentGreen": "#ea9d34",
+  "AccentYellow": "#286983",
+  "AccentRed": "#b4637a",
+  "DiffAdded": "#d8dedc",
+  "DiffRemoved": "#efdddb",
+  "Comment": "#cecacd",
+  "Gray": "#9893a5",
+  "DarkGray": "#ede7e1",
+  "GradientColors": ["#56949f", "#907aa9", "#d7827e"]
+}

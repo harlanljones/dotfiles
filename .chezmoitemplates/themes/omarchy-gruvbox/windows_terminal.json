@@ -1,0 +1,25 @@
+# Add the following object to your Windows Terminal configuration
+# https://learn.microsoft.com/en-us/windows/terminal/customize-settings/color-schemes#creating-your-own-color-scheme
+{
+    "background": "#282828",
+    "black": "#161616",
+    "blue": "#7daea3",
+    "brightBlack": "#665c54",
+    "brightBlue": "#7daea3",
+    "brightCyan": "#89b482",
+    "brightGreen": "#a9b665",
+    "brightPurple": "#d3869b",
+    "brightRed": "#ea6962",
+    "brightWhite": "#d4be98",
+    "brightYellow": "#d8a657",
+    "cursorColor": "#d4be98",
+    "cyan": "#89b482",
+    "foreground": "#d4be98",
+    "green": "#a9b665",
+    "name": "Omarchy Gruvbox",
+    "purple": "#d3869b",
+    "red": "#ea6962",
+    "selectionBackground": "#504945",
+    "white": "#bdae93",
+    "yellow": "#d8a657"
+}
