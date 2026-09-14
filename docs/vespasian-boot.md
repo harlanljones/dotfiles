@@ -66,7 +66,7 @@ both `Win` and `Alt` modifiers:
 
 | Action | Binding (Win) | Binding (Alt) | Target Command |
 | :--- | :--- | :--- | :--- |
-| **Terminal** | `Win + Enter` | `Alt + Enter` | Ghostty (WSLg) / Windows Terminal fallback |
+| **Terminal** | `Win + Enter` | `Alt + Enter` | WezTerm (primary) / Windows Terminal fallback |
 | **Browser** | `Win + Shift + B`<br>`Win + B`<br>`Win + Shift + Enter` | `Alt + Shift + B`<br>`Alt + B`<br>`Alt + Shift + Enter` | Google Chrome |
 | **Private Browser** | `Win + Shift + Alt + B` | — | Google Chrome (Incognito) |
 | **File Manager** | `Win + Shift + F` | `Alt + Shift + F` | File Explorer (`explorer.exe`) |
@@ -92,6 +92,7 @@ both `Win` and `Alt` modifiers:
 | **X** | `Win + Shift + X` | `Alt + Shift + X` | `https://x.com` |
 | **YouTube** | `Win + Shift + Y` | `Alt + Shift + Y` | `https://youtube.com` |
 
-Ghostty is the preferred terminal shortcut (`Win+Enter`) and launches via
-WSLg. Windows Terminal remains available with `Alt+Enter` while Ghostty is not
-installed or needs troubleshooting.
+WezTerm is the native primary terminal shortcut (`Win+Enter`), running natively
+on Windows with DirectWrite hardware acceleration, the synchronized dots theme,
+and default WSL domain. Windows Terminal remains available via `Alt+Enter` as a
+native fallback.

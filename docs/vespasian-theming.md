@@ -1,6 +1,6 @@
 # Vespasian Theming and Windows Integration
 
-Vespasian is a Windows 11 workstation running Ubuntu 24.04 on WSL2. The theming system synchronizes colors, wallpaper, and dark/light mode across Windows, Windows Terminal, Neovim, and terminal tools.
+Vespasian is a Windows 11 workstation running Ubuntu 24.04 on WSL2. The theming system synchronizes colors, wallpaper, and dark/light mode across Windows, WezTerm, Windows Terminal, Neovim, and terminal tools.
 
 ## Theme Selection
 
@@ -95,6 +95,7 @@ All terminal tools share the same color palette and are configured through theme
 
 | Tool | Adapter | Notes |
 | :--- | :--- | :--- |
+| WezTerm | `.wezterm.lua` | Applied by script 45; generates config from Windows Terminal theme palette with WSL domain, font, opacity, acrylic. |
 | Windows Terminal | `windows_terminal.json` | Applied by script 40; includes ANSI palette, selection, cursor, opacity, acrylic. |
 | Neovim | `nvim.lua` | Generated palette-based plugin spec; includes theme selection for `folke/tokyonight.nvim` (legacy themes) or a fallback dark mode (Omarchy imports). |
 | lazygit | `lazygit.yml` | ANSI color mapping for lazygit UI. |

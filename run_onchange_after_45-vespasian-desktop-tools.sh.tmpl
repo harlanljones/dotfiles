@@ -116,6 +116,18 @@ if [[ -n "$winget_exe" && ! -f "$autohotkey_exe" ]]; then
     --disable-interactivity < /dev/null
 fi
 
+# 6c. Install WezTerm if missing
+wezterm_dir="$programs_dir/wezterm"
+if [[ ! -f "$wezterm_dir/wezterm-gui.exe" ]]; then
+  echo "desktop-tools: installing WezTerm v20240203..."
+  tmp_dir="$(mktemp -d -p "$wsl_localappdata/Temp")"
+  curl -fsSL -o "$tmp_dir/wezterm.zip" "https://github.com/wez/wezterm/releases/download/20240203-110809-5046fc22/WezTerm-windows-20240203-110809-5046fc22.zip"
+  mkdir -p "$wezterm_dir"
+  unzip -q -o "$tmp_dir/wezterm.zip" -d "$tmp_dir/extract"
+  mv "$tmp_dir/extract/WezTerm-windows-"*/* "$wezterm_dir/"
+  rm -rf "$tmp_dir"
+fi
+
 # 7. Ensure paths are registered in Windows user PATH
 python3 - "$win_localappdata" "$powershell_exe" <<'PY_EOF'
 import subprocess
@@ -126,6 +138,7 @@ extra_paths = [
     rf"{win_appdata}\Programs\glazewm",
     rf"{win_appdata}\Programs\glazewm\cli",
     rf"{win_appdata}\Programs\zebar",
+    rf"{win_appdata}\Programs\wezterm",
     rf"{win_appdata}\FlowLauncher",
 ]
 
@@ -251,25 +264,25 @@ binding_modes:
         bindings: ['escape', 'enter']
 
 keybindings:
-  # Vim-style focus (Super + HJKL or Alt + HJKL)
+  # Focus navigation (Arrow keys, plus Vim left/up/right)
   - commands: ['focus --direction left']
-    bindings: ['lwin+h', 'lwin+left', 'alt+h', 'alt+left']
+    bindings: ['lwin+left', 'alt+left', 'lwin+h', 'alt+h']
   - commands: ['focus --direction right']
-    bindings: ['lwin+l', 'lwin+right', 'alt+l', 'alt+right']
+    bindings: ['lwin+right', 'alt+right', 'lwin+l', 'alt+l']
   - commands: ['focus --direction up']
-    bindings: ['lwin+k', 'lwin+up', 'alt+k', 'alt+up']
+    bindings: ['lwin+up', 'alt+up', 'lwin+k', 'alt+k']
   - commands: ['focus --direction down']
-    bindings: ['lwin+j', 'lwin+down', 'alt+j', 'alt+down']
+    bindings: ['lwin+down', 'alt+down']
 
-  # Vim-style move (Super + Shift + HJKL or Alt + Shift + HJKL)
+  # Move window (Super + Shift + Arrows or Vim HJKL)
   - commands: ['move --direction left']
-    bindings: ['lwin+shift+h', 'lwin+shift+left', 'alt+shift+h', 'alt+shift+left']
+    bindings: ['lwin+shift+left', 'alt+shift+left', 'lwin+shift+h', 'alt+shift+h']
   - commands: ['move --direction right']
-    bindings: ['lwin+shift+l', 'lwin+shift+right', 'alt+shift+l', 'alt+shift+right']
+    bindings: ['lwin+shift+right', 'alt+shift+right', 'lwin+shift+l', 'alt+shift+l']
   - commands: ['move --direction up']
-    bindings: ['lwin+shift+k', 'lwin+shift+up', 'alt+shift+k', 'alt+shift+up']
+    bindings: ['lwin+shift+up', 'alt+shift+up', 'lwin+shift+k', 'alt+shift+k']
   - commands: ['move --direction down']
-    bindings: ['lwin+shift+j', 'lwin+shift+down', 'alt+shift+j', 'alt+shift+down']
+    bindings: ['lwin+shift+down', 'alt+shift+down', 'lwin+shift+j', 'alt+shift+j']
 
   # Resize mode (Super + R or Alt + R)
   - commands: ['wm-enable-binding-mode --name resize']
@@ -279,26 +292,28 @@ keybindings:
   - commands: ['wm-toggle-pause', 'shell-exec powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%LOCALAPPDATA%\Programs\glazewm\notify-mode.ps1"']
     bindings: ['lwin+shift+p', 'alt+shift+p']
 
-  # Layout controls
+  # Layout controls (Omarchy / Hyprland parity)
+  # Toggle split direction: Super + J (matches Hyprland togglesplit)
   - commands: ['toggle-tiling-direction']
-    bindings: ['lwin+v', 'alt+v']
+    bindings: ['lwin+j', 'alt+j']
+  # Toggle floating: Super + V or Super + T (matches Hyprland togglefloating)
   - commands: ['toggle-floating --centered']
-    bindings: ['lwin+t', 'alt+t', 'lwin+shift+space', 'alt+shift+space']
+    bindings: ['lwin+v', 'alt+v', 'lwin+t', 'alt+t', 'lwin+shift+space', 'alt+shift+space']
   - commands: ['toggle-fullscreen']
     bindings: ['lwin+f', 'alt+f']
   - commands: ['toggle-minimized']
     bindings: ['lwin+m', 'alt+m']
   - commands: ['close']
-    bindings: ['lwin+q', 'lwin+shift+q', 'alt+shift+q', 'lwin+w', 'alt+w']
+    bindings: ['lwin+w', 'alt+w', 'lwin+q', 'lwin+shift+q', 'alt+shift+q']
   - commands: ['wm-reload-config']
     bindings: ['lwin+shift+r', 'alt+shift+r']
   - commands: ['wm-exit']
     bindings: ['lwin+shift+e', 'alt+shift+e']
 
-  # Preferred terminal: Ghostty running in WSLg. Keep Windows Terminal as the
-  # Alt+Enter fallback while Ghostty is being installed or diagnosed.
-  - commands: ['shell-exec wsl.exe -d Ubuntu-24.04 --exec ghostty']
+  # Primary terminal: WezTerm running natively on Windows with DirectWrite and WSL domain
+  - commands: ['shell-exec C:\Users\harlan\AppData\Local\Programs\wezterm\wezterm-gui.exe']
     bindings: ['lwin+enter']
+  # Fallback terminal: Windows Terminal running Ubuntu profile natively
   - commands: ['shell-exec wt -p Ubuntu-24.04']
     bindings: ['alt+enter']
 
@@ -314,9 +329,9 @@ keybindings:
   - commands: ['shell-exec --hide-window cmd.exe /c start chrome --incognito']
     bindings: ['lwin+shift+alt+b']
 
-  # File manager: Explorer (Super + Shift + F)
+  # File manager: Explorer (Super + E, Super + Shift + F)
   - commands: ['shell-exec explorer.exe']
-    bindings: ['lwin+shift+f', 'alt+shift+f']
+    bindings: ['lwin+e', 'alt+e', 'lwin+shift+f', 'alt+shift+f']
 
   # Editor: VS Code (Super + Shift + N)
   - commands: ['shell-exec --hide-window cmd.exe /c start code']
@@ -811,6 +826,60 @@ cat > "$glazewm_dir/super-mask.ahk" <<'AHK_SUPER_MASK'
 ~LWin::Send "{Blind}{vkE8}"
 ~RWin::Send "{Blind}{vkE8}"
 AHK_SUPER_MASK
+
+# 9c. Deploy WezTerm configuration with active dots theme and WSL default domain
+cat > "$wsl_userprofile/.wezterm.lua" <<'WEZTERM_LUA'
+local wezterm = require 'wezterm'
+local config = wezterm.config_builder()
+
+config.default_domain = 'WSL:Ubuntu-24.04'
+
+config.font = wezterm.font('JetBrainsMono Nerd Font')
+config.font_size = 10.0
+
+config.colors = {
+  foreground = '{{ $scheme.foreground }}',
+  background = '{{ $scheme.background }}',
+  cursor_bg = '{{ $scheme.cursorColor }}',
+  cursor_border = '{{ $scheme.cursorColor }}',
+  cursor_fg = '{{ $scheme.background }}',
+  selection_bg = '{{ $scheme.selectionBackground }}',
+  selection_fg = '{{ $scheme.foreground }}',
+  ansi = {
+    '{{ $scheme.black }}',
+    '{{ $scheme.red }}',
+    '{{ $scheme.green }}',
+    '{{ $scheme.yellow }}',
+    '{{ $scheme.blue }}',
+    '{{ $scheme.purple }}',
+    '{{ $scheme.cyan }}',
+    '{{ $scheme.white }}',
+  },
+  brights = {
+    '{{ $scheme.brightBlack }}',
+    '{{ $scheme.brightRed }}',
+    '{{ $scheme.brightGreen }}',
+    '{{ $scheme.brightYellow }}',
+    '{{ $scheme.brightBlue }}',
+    '{{ $scheme.brightPurple }}',
+    '{{ $scheme.brightCyan }}',
+    '{{ $scheme.brightWhite }}',
+  },
+}
+
+config.window_background_opacity = 0.96
+config.win32_system_backdrop = 'Acrylic'
+config.window_padding = {
+  left = 12,
+  right = 12,
+  top = 8,
+  bottom = 8,
+}
+config.hide_tab_bar_if_only_one_tab = true
+config.window_decorations = "RESIZE"
+
+return config
+WEZTERM_LUA
 
 # 10. Setup user startup shortcuts so tools auto-start on Windows login
 startup_dir="$wsl_userprofile/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup"

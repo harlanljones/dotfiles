@@ -47,7 +47,16 @@ for ttf in "$tmp"/ttf/*.ttf; do
     /v "${file%.ttf} (TrueType)" /t REG_SZ /d "$win_fonts_dir\\$file" /f >/dev/null
   count=$((count + 1))
 done
+
+# Also install into the WSL user's local font cache so Linux tools and fontconfig discover it
+wsl_fonts_dir="$HOME/.local/share/fonts/JetBrainsMono"
+mkdir -p "$wsl_fonts_dir"
+cp -f "$tmp"/ttf/*.ttf "$wsl_fonts_dir/"
+if command -v fc-cache >/dev/null 2>&1; then
+  fc-cache -f "$HOME/.local/share/fonts"
+fi
+
 touch "$marker"
 
-echo "nerd-font: installed $count faces into $win_fonts_dir (restart Windows Terminal)"
+echo "nerd-font: installed $count faces into Windows and WSL font cache (restart Windows Terminal)"
 {{- end -}}

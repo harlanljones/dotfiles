@@ -79,7 +79,7 @@ ordering guarantee — treat each trigger class separately.
 | 42 | `run_onchange_after_42-vespasian-theme-state.sh.tmpl` | onchange (vespasian) | Rebuild bat's theme cache; set Claude Code theme to `dark-ansi`/`light-ansi` per the selected theme |
 | 43 | `run_onchange_after_43-vespasian-1password-ssh-bridge.sh.tmpl` | onchange (vespasian) | Build/configure the WSL 1Password SSH bridge |
 | 44 | `run_onchange_after_44-vespasian-windows-debloat.sh.tmpl` | onchange (vespasian) | Apply Windows developer-experience registry tweaks |
-| 45 | `run_onchange_after_45-vespasian-desktop-tools.sh.tmpl` | onchange (vespasian) | Install/configure GlazeWM, Zebar, Flow Launcher, QuickLook, TranslucentTB, and AutoHotkey |
+| 45 | `run_onchange_after_45-vespasian-desktop-tools.sh.tmpl` | onchange (vespasian) | Install/configure WezTerm, GlazeWM, Zebar, Flow Launcher, QuickLook, TranslucentTB, and AutoHotkey |
 | 46 | `run_onchange_after_46-vespasian-wallpaper.sh.tmpl` | onchange (vespasian) | Set the Windows desktop wallpaper from the selected theme |
 | 47 | `run_onchange_after_47-vespasian-wsl-boot.sh.tmpl` | onchange (vespasian) | Register WSL keepalive at Windows logon and reconcile portable user services |
 

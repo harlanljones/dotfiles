@@ -97,8 +97,7 @@ The prompt uses [Starship](https://starship.rs/).
 The prompt turns red when a command fails.
 The terminal multiplexer is [Herdr](https://github.com/harlanljones/herdr-outpost).
 Herdr provides tmux-compatible keybindings and workspace navigation.
-On Vespasian, Ghostty runs as the preferred WSLg terminal when installed;
-Windows Terminal remains available as the `Alt+Enter` fallback.
+On Vespasian, WezTerm runs as the preferred native GPU-accelerated Windows terminal launching directly into WSL; Windows Terminal remains available as the `Alt+Enter` fallback.
 
 ### Editor
 
@@ -128,8 +127,8 @@ Health checks verify that required mise tools are installed on the local system.
 
 The entire environment shares a consistent color palette.
 The default theme is Tokyo Night.
-Theme settings synchronize across Ghostty, Windows Terminal, Neovim, lazygit, delta, bat, eza, and fzf.
-On Windows WSL2 systems, Ghostty launches Ubuntu through WSLg by default, with Windows Terminal retained as a fallback.
+Theme settings synchronize across Ghostty, WezTerm, Windows Terminal, Neovim, lazygit, delta, bat, eza, and fzf.
+On Windows WSL2 systems, WezTerm runs natively on Windows with DirectWrite rendering and connects directly into WSL Ubuntu by default, with Windows Terminal retained as a fallback.
 
 You can switch themes across all tools by running:
 
