@@ -57,8 +57,8 @@ if branch=$(git -C "$DIR" branch --show-current 2>/dev/null); then
   # Track tracking branch diff (ahead/behind)
   tracking=$(git -C "$DIR" rev-parse --abbrev-ref "@{u}" 2>/dev/null || echo "")
   if [[ -n "$tracking" && "$tracking" != "@{u}" ]]; then
-    ahead=$(git -C "$DIR" rev-list --left-only --count "$tracking"..."HEAD" 2>/dev/null || echo 0)
-    behind=$(git -C "$DIR" rev-list --right-only --count "$tracking"..."HEAD" 2>/dev/null || echo 0)
+    ahead=$(git -C "$DIR" rev-list --left-only --count "${tracking}...HEAD" 2>/dev/null || echo 0)
+    behind=$(git -C "$DIR" rev-list --right-only --count "${tracking}...HEAD" 2>/dev/null || echo 0)
     [[ "$ahead" -gt 0 ]] && status_indicators+="↑"
     [[ "$behind" -gt 0 ]] && status_indicators+="↓"
   fi
@@ -109,6 +109,6 @@ fi
 STY=""
 [ "$STYLE" != "default" ] && STY=" ${C_DIM}| ${STYLE}${C_RESET}"
 
-printf "%s%s%s %s%s%s%s%s%s%s%s" \
+printf "%s%s%s %s%s%s%s%s%s%s" \
   "$C_MAGENTA" "$MODEL" "$C_RESET" \
   "${C_CYAN}${SHORT_DIR}${C_RESET}" "$GIT" "$CTX" "$LIMIT" "$DIFF" "$CST" "$STY"
