@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 4664,
+    "total": 4666,
     "by_category": {
       "shell": 16,
       "prompt": 1,
@@ -17,10 +17,10 @@
       "services": 17,
       "scripts": 34,
       "security": 2,
-      "other": 99,
+      "other": 100,
       "hooks": 23,
       "chezmoi": 9,
-      "repo": 4379
+      "repo": 4380
     }
   },
   "categories": [
@@ -1582,6 +1582,13 @@
     {
       "source": ".chezmoitemplates/gemini-settings.json",
       "target": "~/.chezmoitemplates/gemini-settings.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/littlebigmouse/Current.xml",
+      "target": "~/.chezmoitemplates/littlebigmouse/Current.xml",
       "kind": "dotfile",
       "category": "other",
       "attributes": []
@@ -28808,6 +28815,12 @@
     },
     {
       "source": "docs/test_gitleaks.py",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/vespasian-theming.md",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
