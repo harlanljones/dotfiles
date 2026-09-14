@@ -210,6 +210,30 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   ├── littlebigmouse
 │   │   └── Current.xml
 │   └── themes
+│       ├── omarchy-catppuccin
+│       │   ├── bat.tmTheme
+│       │   ├── colors.toml
+│       │   ├── delta.gitconfig
+│       │   ├── eza.yml
+│       │   ├── fzf.sh
+│       │   ├── gemini.json
+│       │   ├── lazygit.yml
+│       │   ├── manifest.yaml
+│       │   ├── nvim.lua
+│       │   ├── windows_terminal.json
+│       │   └── zebar.css
+│       ├── omarchy-catppuccin-latte
+│       │   ├── bat.tmTheme
+│       │   ├── colors.toml
+│       │   ├── delta.gitconfig
+│       │   ├── eza.yml
+│       │   ├── fzf.sh
+│       │   ├── gemini.json
+│       │   ├── lazygit.yml
+│       │   ├── manifest.yaml
+│       │   ├── nvim.lua
+│       │   ├── windows_terminal.json
+│       │   └── zebar.css
 │       ├── omarchy-everforest
 │       │   ├── bat.tmTheme
 │       │   ├── colors.toml
@@ -220,7 +244,18 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │       │   ├── lazygit.yml
 │       │   ├── manifest.yaml
 │       │   ├── nvim.lua
-│       │   ├── wallpaper.png
+│       │   ├── windows_terminal.json
+│       │   └── zebar.css
+│       ├── omarchy-gruvbox
+│       │   ├── bat.tmTheme
+│       │   ├── colors.toml
+│       │   ├── delta.gitconfig
+│       │   ├── eza.yml
+│       │   ├── fzf.sh
+│       │   ├── gemini.json
+│       │   ├── lazygit.yml
+│       │   ├── manifest.yaml
+│       │   ├── nvim.lua
 │       │   ├── windows_terminal.json
 │       │   └── zebar.css
 │       ├── omarchy-kanagawa
@@ -233,7 +268,6 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │       │   ├── lazygit.yml
 │       │   ├── manifest.yaml
 │       │   ├── nvim.lua
-│       │   ├── wallpaper.png
 │       │   ├── windows_terminal.json
 │       │   └── zebar.css
 │       ├── omarchy-nord
@@ -246,7 +280,18 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │       │   ├── lazygit.yml
 │       │   ├── manifest.yaml
 │       │   ├── nvim.lua
-│       │   ├── wallpaper.png
+│       │   ├── windows_terminal.json
+│       │   └── zebar.css
+│       ├── omarchy-rose-pine
+│       │   ├── bat.tmTheme
+│       │   ├── colors.toml
+│       │   ├── delta.gitconfig
+│       │   ├── eza.yml
+│       │   ├── fzf.sh
+│       │   ├── gemini.json
+│       │   ├── lazygit.yml
+│       │   ├── manifest.yaml
+│       │   ├── nvim.lua
 │       │   ├── windows_terminal.json
 │       │   └── zebar.css
 │       ├── omarchy-tokyo-night
@@ -259,7 +304,6 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │       │   ├── lazygit.yml
 │       │   ├── manifest.yaml
 │       │   ├── nvim.lua
-│       │   ├── wallpaper.png
 │       │   ├── windows_terminal.json
 │       │   └── zebar.css
 │       ├── tokyonight-day
@@ -560,6 +604,23 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 ├── run_onchange_after_45-vespasian-desktop-tools.sh.tmpl
 ├── run_onchange_after_46-vespasian-wallpaper.sh.tmpl
 ├── run_onchange_after_47-vespasian-wsl-boot.sh.tmpl
-└── run_onchange_before_09-install-agent-skills.sh.tmpl
+├── run_onchange_before_09-install-agent-skills.sh.tmpl
+└── theme-assets
+    ├── omarchy-catppuccin
+    │   └── wallpaper.png
+    ├── omarchy-catppuccin-latte
+    │   └── wallpaper.png
+    ├── omarchy-everforest
+    │   └── wallpaper.png
+    ├── omarchy-gruvbox
+    │   └── wallpaper.png
+    ├── omarchy-kanagawa
+    │   └── wallpaper.png
+    ├── omarchy-nord
+    │   └── wallpaper.png
+    ├── omarchy-rose-pine
+    │   └── wallpaper.png
+    └── omarchy-tokyo-night
+        └── wallpaper.png
 ```
 <!-- END REPO TREE -->

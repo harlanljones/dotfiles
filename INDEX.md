@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**4669 tracked entries** across 16 categories.
+**4716 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -25,10 +25,10 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Background services](#background-services) | 17 |
 | [Custom executables](#custom-executables) | 35 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Other configuration](#other-configuration) | 100 |
+| [Other configuration](#other-configuration) | 148 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 24 |
 | [Chezmoi control files](#chezmoi-control-files) | 9 |
-| [Repository material (not applied)](#repository-material-not-applied) | 4381 |
+| [Repository material (not applied)](#repository-material-not-applied) | 4380 |
 
 ---
 
@@ -264,6 +264,28 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.chezmoitemplates/codex-config.toml` | `.chezmoitemplates/codex-config.toml` | — | — |
 | `~/.chezmoitemplates/gemini-settings.json` | `.chezmoitemplates/gemini-settings.json` | — | — |
 | `~/.chezmoitemplates/littlebigmouse/Current.xml` | `.chezmoitemplates/littlebigmouse/Current.xml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/bat.tmTheme` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/bat.tmTheme` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/colors.toml` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/colors.toml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/delta.gitconfig` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/delta.gitconfig` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/eza.yml` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/eza.yml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/fzf.sh` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/fzf.sh` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/gemini.json` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/gemini.json` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/lazygit.yml` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/lazygit.yml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/manifest.yaml` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/manifest.yaml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/nvim.lua` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/nvim.lua` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/windows_terminal.json` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/windows_terminal.json` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/zebar.css` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/zebar.css` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin/bat.tmTheme` | `.chezmoitemplates/themes/omarchy-catppuccin/bat.tmTheme` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin/colors.toml` | `.chezmoitemplates/themes/omarchy-catppuccin/colors.toml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin/delta.gitconfig` | `.chezmoitemplates/themes/omarchy-catppuccin/delta.gitconfig` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin/eza.yml` | `.chezmoitemplates/themes/omarchy-catppuccin/eza.yml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin/fzf.sh` | `.chezmoitemplates/themes/omarchy-catppuccin/fzf.sh` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin/gemini.json` | `.chezmoitemplates/themes/omarchy-catppuccin/gemini.json` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin/lazygit.yml` | `.chezmoitemplates/themes/omarchy-catppuccin/lazygit.yml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin/manifest.yaml` | `.chezmoitemplates/themes/omarchy-catppuccin/manifest.yaml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin/nvim.lua` | `.chezmoitemplates/themes/omarchy-catppuccin/nvim.lua` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin/windows_terminal.json` | `.chezmoitemplates/themes/omarchy-catppuccin/windows_terminal.json` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-catppuccin/zebar.css` | `.chezmoitemplates/themes/omarchy-catppuccin/zebar.css` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-everforest/bat.tmTheme` | `.chezmoitemplates/themes/omarchy-everforest/bat.tmTheme` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-everforest/colors.toml` | `.chezmoitemplates/themes/omarchy-everforest/colors.toml` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-everforest/delta.gitconfig` | `.chezmoitemplates/themes/omarchy-everforest/delta.gitconfig` | — | — |
@@ -273,9 +295,19 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.chezmoitemplates/themes/omarchy-everforest/lazygit.yml` | `.chezmoitemplates/themes/omarchy-everforest/lazygit.yml` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-everforest/manifest.yaml` | `.chezmoitemplates/themes/omarchy-everforest/manifest.yaml` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-everforest/nvim.lua` | `.chezmoitemplates/themes/omarchy-everforest/nvim.lua` | — | — |
-| `~/.chezmoitemplates/themes/omarchy-everforest/wallpaper.png` | `.chezmoitemplates/themes/omarchy-everforest/wallpaper.png` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-everforest/windows_terminal.json` | `.chezmoitemplates/themes/omarchy-everforest/windows_terminal.json` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-everforest/zebar.css` | `.chezmoitemplates/themes/omarchy-everforest/zebar.css` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-gruvbox/bat.tmTheme` | `.chezmoitemplates/themes/omarchy-gruvbox/bat.tmTheme` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-gruvbox/colors.toml` | `.chezmoitemplates/themes/omarchy-gruvbox/colors.toml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-gruvbox/delta.gitconfig` | `.chezmoitemplates/themes/omarchy-gruvbox/delta.gitconfig` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-gruvbox/eza.yml` | `.chezmoitemplates/themes/omarchy-gruvbox/eza.yml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-gruvbox/fzf.sh` | `.chezmoitemplates/themes/omarchy-gruvbox/fzf.sh` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-gruvbox/gemini.json` | `.chezmoitemplates/themes/omarchy-gruvbox/gemini.json` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-gruvbox/lazygit.yml` | `.chezmoitemplates/themes/omarchy-gruvbox/lazygit.yml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-gruvbox/manifest.yaml` | `.chezmoitemplates/themes/omarchy-gruvbox/manifest.yaml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-gruvbox/nvim.lua` | `.chezmoitemplates/themes/omarchy-gruvbox/nvim.lua` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-gruvbox/windows_terminal.json` | `.chezmoitemplates/themes/omarchy-gruvbox/windows_terminal.json` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-gruvbox/zebar.css` | `.chezmoitemplates/themes/omarchy-gruvbox/zebar.css` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-kanagawa/bat.tmTheme` | `.chezmoitemplates/themes/omarchy-kanagawa/bat.tmTheme` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-kanagawa/colors.toml` | `.chezmoitemplates/themes/omarchy-kanagawa/colors.toml` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-kanagawa/delta.gitconfig` | `.chezmoitemplates/themes/omarchy-kanagawa/delta.gitconfig` | — | — |
@@ -285,7 +317,6 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.chezmoitemplates/themes/omarchy-kanagawa/lazygit.yml` | `.chezmoitemplates/themes/omarchy-kanagawa/lazygit.yml` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-kanagawa/manifest.yaml` | `.chezmoitemplates/themes/omarchy-kanagawa/manifest.yaml` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-kanagawa/nvim.lua` | `.chezmoitemplates/themes/omarchy-kanagawa/nvim.lua` | — | — |
-| `~/.chezmoitemplates/themes/omarchy-kanagawa/wallpaper.png` | `.chezmoitemplates/themes/omarchy-kanagawa/wallpaper.png` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-kanagawa/windows_terminal.json` | `.chezmoitemplates/themes/omarchy-kanagawa/windows_terminal.json` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-kanagawa/zebar.css` | `.chezmoitemplates/themes/omarchy-kanagawa/zebar.css` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-nord/bat.tmTheme` | `.chezmoitemplates/themes/omarchy-nord/bat.tmTheme` | — | — |
@@ -297,9 +328,19 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.chezmoitemplates/themes/omarchy-nord/lazygit.yml` | `.chezmoitemplates/themes/omarchy-nord/lazygit.yml` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-nord/manifest.yaml` | `.chezmoitemplates/themes/omarchy-nord/manifest.yaml` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-nord/nvim.lua` | `.chezmoitemplates/themes/omarchy-nord/nvim.lua` | — | — |
-| `~/.chezmoitemplates/themes/omarchy-nord/wallpaper.png` | `.chezmoitemplates/themes/omarchy-nord/wallpaper.png` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-nord/windows_terminal.json` | `.chezmoitemplates/themes/omarchy-nord/windows_terminal.json` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-nord/zebar.css` | `.chezmoitemplates/themes/omarchy-nord/zebar.css` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-rose-pine/bat.tmTheme` | `.chezmoitemplates/themes/omarchy-rose-pine/bat.tmTheme` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-rose-pine/colors.toml` | `.chezmoitemplates/themes/omarchy-rose-pine/colors.toml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-rose-pine/delta.gitconfig` | `.chezmoitemplates/themes/omarchy-rose-pine/delta.gitconfig` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-rose-pine/eza.yml` | `.chezmoitemplates/themes/omarchy-rose-pine/eza.yml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-rose-pine/fzf.sh` | `.chezmoitemplates/themes/omarchy-rose-pine/fzf.sh` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-rose-pine/gemini.json` | `.chezmoitemplates/themes/omarchy-rose-pine/gemini.json` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-rose-pine/lazygit.yml` | `.chezmoitemplates/themes/omarchy-rose-pine/lazygit.yml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-rose-pine/manifest.yaml` | `.chezmoitemplates/themes/omarchy-rose-pine/manifest.yaml` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-rose-pine/nvim.lua` | `.chezmoitemplates/themes/omarchy-rose-pine/nvim.lua` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-rose-pine/windows_terminal.json` | `.chezmoitemplates/themes/omarchy-rose-pine/windows_terminal.json` | — | — |
+| `~/.chezmoitemplates/themes/omarchy-rose-pine/zebar.css` | `.chezmoitemplates/themes/omarchy-rose-pine/zebar.css` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-tokyo-night/bat.tmTheme` | `.chezmoitemplates/themes/omarchy-tokyo-night/bat.tmTheme` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-tokyo-night/colors.toml` | `.chezmoitemplates/themes/omarchy-tokyo-night/colors.toml` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-tokyo-night/delta.gitconfig` | `.chezmoitemplates/themes/omarchy-tokyo-night/delta.gitconfig` | — | — |
@@ -309,7 +350,6 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.chezmoitemplates/themes/omarchy-tokyo-night/lazygit.yml` | `.chezmoitemplates/themes/omarchy-tokyo-night/lazygit.yml` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-tokyo-night/manifest.yaml` | `.chezmoitemplates/themes/omarchy-tokyo-night/manifest.yaml` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-tokyo-night/nvim.lua` | `.chezmoitemplates/themes/omarchy-tokyo-night/nvim.lua` | — | — |
-| `~/.chezmoitemplates/themes/omarchy-tokyo-night/wallpaper.png` | `.chezmoitemplates/themes/omarchy-tokyo-night/wallpaper.png` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-tokyo-night/windows_terminal.json` | `.chezmoitemplates/themes/omarchy-tokyo-night/windows_terminal.json` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-tokyo-night/zebar.css` | `.chezmoitemplates/themes/omarchy-tokyo-night/zebar.css` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-day/bat.tmTheme` | `.chezmoitemplates/themes/tokyonight-day/bat.tmTheme` | — | — |
@@ -351,6 +391,14 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/eza/theme.yml` | `dot_config/eza/theme.yml.tmpl` | — | template |
 | `~/.config/fzf/theme.sh` | `dot_config/fzf/theme.sh.tmpl` | — | template |
 | `~/.local/share/wsl-ssh-bridge/main.go` | `dot_local/share/wsl-ssh-bridge/main.go` | — | — |
+| `~/theme-assets/omarchy-catppuccin-latte/wallpaper.png` | `theme-assets/omarchy-catppuccin-latte/wallpaper.png` | — | — |
+| `~/theme-assets/omarchy-catppuccin/wallpaper.png` | `theme-assets/omarchy-catppuccin/wallpaper.png` | — | — |
+| `~/theme-assets/omarchy-everforest/wallpaper.png` | `theme-assets/omarchy-everforest/wallpaper.png` | — | — |
+| `~/theme-assets/omarchy-gruvbox/wallpaper.png` | `theme-assets/omarchy-gruvbox/wallpaper.png` | — | — |
+| `~/theme-assets/omarchy-kanagawa/wallpaper.png` | `theme-assets/omarchy-kanagawa/wallpaper.png` | — | — |
+| `~/theme-assets/omarchy-nord/wallpaper.png` | `theme-assets/omarchy-nord/wallpaper.png` | — | — |
+| `~/theme-assets/omarchy-rose-pine/wallpaper.png` | `theme-assets/omarchy-rose-pine/wallpaper.png` | — | — |
+| `~/theme-assets/omarchy-tokyo-night/wallpaper.png` | `theme-assets/omarchy-tokyo-night/wallpaper.png` | — | — |
 
 ## Apply hooks (`run_*`)
 
@@ -4777,6 +4825,5 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/test_gitleaks.py` | Recovery guide and repository maintenance scripts |
 | `docs/vespasian-boot.md` | Recovery guide and repository maintenance scripts |
 | `docs/vespasian-theming.md` | Recovery guide and repository maintenance scripts |
-| `dotfiles-showcase` | Submodule — the showcase web app; never applied |
 | `package.json` | Runtime CLI deps installed outside mise |
 | `setup.sh` | Interactive new machine onboarding & setup wizard |
