@@ -1,4 +1,4 @@
-{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+{{- if eq .machine "augustus" -}}
 #!/bin/bash
 # Registers the pi harness (local Ollama agent) with the Omarchy Agents
 # leaderboard plugin. Managed by chezmoi.

@@ -1,11 +1,11 @@
-{{- /* hasKey: CI's shellcheck job renders scripts without a chezmoi config. */ -}}
+#!/usr/bin/env bash
+# Vespasian (WSL) setup; non-vespasian machines: no-op.
 {{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
-{{- $wt := (index .machines "vespasian").windowsTerminal -}}
-{{- $name := (index .machines "vespasian").theme.name -}}
+{{- $wt := (index .machines .machine).windowsTerminal -}}
+{{- $name := (index .machines .machine).theme.name -}}
 {{- $appearance := (index .themes $name).appearance -}}
 {{- /* Upstream WT ports start with `#` comment lines; strip them before parsing. */ -}}
 {{- $scheme := regexReplaceAll "(?m)^#.*$" (include (printf ".chezmoitemplates/themes/%s/windows_terminal.json" $name)) "" | fromJson -}}
-#!/usr/bin/env bash
 # Theme Windows and the Ubuntu profile in Windows Terminal with the dots theme
 # selection
 # ({{ (index .themes $name).label }}).

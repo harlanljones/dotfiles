@@ -27,8 +27,11 @@ omarchyPlugins:
     enabled: true
   - url: https://github.com/crmne/omarchy-hyprmoncfg.git
     enabled: true
+  # Superseded by the harlanljones fork below (same plugin id esemczak.theme-modes,
+  # which carries the custom multi-profile support); keeping the upstream enabled
+  # here collides on install, so it is disabled.
   - url: https://github.com/esemczak/omarchy-theme-modes.git
-    enabled: true
+    enabled: false
   - url: https://github.com/hzerrad/hzerrad.bottleneck.git
     enabled: true
   - url: https://github.com/imRYiUK/omarchy-workspace-profiles.git

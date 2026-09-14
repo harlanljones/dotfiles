@@ -1,4 +1,4 @@
-{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+{{- if eq .machine "augustus" -}}
 #!/usr/bin/python3
 # omarchy:summary=Record real Cursor plan usage read from Cursor Agent or dashboard
 # omarchy:args=--included PCT [--auto PCT] [--api PCT] [--reset-date YYYY-MM-DD]

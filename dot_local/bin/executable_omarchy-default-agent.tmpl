@@ -1,4 +1,4 @@
-{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+{{- if eq .machine "augustus" -}}
 #!/bin/bash
 
 # omarchy:summary=Set and launch the default coding agent

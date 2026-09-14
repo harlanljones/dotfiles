@@ -56,6 +56,13 @@ Chezmoi auto-runs scripts matching `run_*.sh` in the source root. Trigger semant
 Number prefixes establish **intra-phase** order. There is no strict cross-type
 ordering guarantee — treat each trigger class separately.
 
+Script names follow `run_<trigger>_<phase>_<NN>-[<machine>|shared|omarchy]-<action>.sh.tmpl`:
+the optional `<machine>` token (`augustus`/`hadrian`/`vespasian`) marks a
+machine-scoped hook (mirrors the `vespasian-*` scripts), `omarchy-` marks an
+Omarchy-feature hook (effectively Augustus-only), and `shared-`/`none` marks a
+hook that runs on every machine (gated internally on `.machine`). Gaps in the
+`<NN>` sequence (e.g. `11-19`, `33-39`) are intentional room for insertion.
+
 | Order | Script | Trigger | Purpose |
 | --- | --- | --- | --- |
 | 00 | `run_once_before_00-verify-deps.sh.tmpl` | once | Fail early if `git`/`age` missing; warn on optional tools |
@@ -71,8 +78,8 @@ ordering guarantee — treat each trigger class separately.
 | 27 | `run_onchange_after_27-sync-claude-mcp.sh.tmpl` | onchange | Sync Claude Code MCP config |
 | 28 | `run_onchange_after_28-sync-claude-settings.sh.tmpl` | onchange | Sync Claude Code permissions/hooks |
 | 29 | `run_onchange_after_29-setup-omarchy-drift-capture.sh.tmpl` | onchange | Set up Omarchy shell drift capture |
-| 30 | `run_onchange_after_30-macos-defaults.sh.tmpl` | onchange (darwin) | Declarative `defaults write` preferences |
-| 31 | `run_onchange_after_31-mouse-dpi.sh.tmpl` | onchange | Pin Logitech mice to 400 DPI |
+| 30 | `run_onchange_after_30-hadrian-macos-defaults.sh.tmpl` | onchange (hadrian) | Declarative `defaults write` preferences |
+| 31 | `run_onchange_after_31-augustus-mouse-dpi.sh.tmpl` | onchange (augustus) | Pin Logitech mice to 400 DPI |
 | 32 | `run_onchange_after_32-setup-omarchy-pi.sh.tmpl` | onchange | Pi (local Ollama) usage collector setup |
 | 40 | `run_onchange_after_40-vespasian-windows-terminal.sh.tmpl` | onchange (vespasian) | Write the Tokyo Night Windows Terminal fragment (scheme + Ubuntu profile update) |
 | 41 | `run_onchange_after_41-vespasian-nerd-font.sh.tmpl` | onchange (vespasian) | Per-user install of the pinned JetBrainsMono Nerd Font on Windows |

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# 45-omarchy-parity.sh -- the portable half of Omarchy's base alias layer.
+# 45-omarchy-portable-aliases.sh -- the portable half of Omarchy's base alias layer.
 #
 # On Linux, ~/.bashrc sources "$OMARCHY_PATH/default/bash/rc" before these
 # modules, so bash there already has `cd`->`zd`, the git shortcuts and the fzf

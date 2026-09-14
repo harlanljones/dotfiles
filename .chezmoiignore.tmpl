@@ -75,7 +75,7 @@ settings.local.json
 {{- end }}
 .gemini/antigravity-cli
 .gemini/antigravity-cli/**
-{{- if and (eq .chezmoi.os "linux") (ne .machine "augustus") }}
+{{- if ne .machine "augustus" }}
 .config/omarchy
 .config/omarchy/**
 .config/pacman
@@ -129,19 +129,13 @@ settings.local.json
 # so it is portable: once absorbed on Augustus it syncs here too.
 !.config/omarchy/aliases
 24-setup-omarchy-agents.sh
-31-mouse-dpi.sh
+31-augustus-mouse-dpi.sh
 {{- end }}
-{{- if eq .chezmoi.os "darwin" }}
+{{- if eq .machine "hadrian" }}
 .bashrc
 .bash_profile
 .config/hypr
 .config/hypr/**
-.config/omarchy
-.config/omarchy/**
-.config/pacman
-.config/pacman/**
-.config/btop
-.config/btop/**
 .config/environment.d
 .config/environment.d/**
 .config/systemd

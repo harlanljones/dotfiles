@@ -1,4 +1,4 @@
-{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+{{- if eq .machine "augustus" -}}
 #!/bin/bash
 # Enables the timer that keeps the omarchy agent monitor's Cline Pass
 # limits current without any manual /usage runs. Managed by chezmoi.

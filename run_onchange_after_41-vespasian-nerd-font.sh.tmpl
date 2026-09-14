@@ -1,7 +1,7 @@
-{{- /* hasKey: CI's shellcheck job renders scripts without a chezmoi config. */ -}}
-{{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
-{{- $wt := (index .machines "vespasian").windowsTerminal -}}
 #!/usr/bin/env bash
+# Vespasian (WSL) setup; non-vespasian machines: no-op.
+{{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
+{{- $wt := (index .machines .machine).windowsTerminal -}}
 # Install JetBrainsMono Nerd Font for the current Windows user.
 #
 # Windows Terminal draws this box's glyphs, so the font has to exist on the

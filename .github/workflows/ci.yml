@@ -47,7 +47,9 @@ jobs:
       - name: Verify dependency gate script renders and runs
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          chezmoi execute-template --source "$GITHUB_WORKSPACE" < run_once_before_00-verify-deps.sh.tmpl > /tmp/verify-deps.sh
+          # Reuse the config from the dry-run step so [data].machine is present;
+          # bare execute-template has no .machine and fails after the gating refactor.
+          chezmoi execute-template --config "$RUNNER_TEMP/chezmoi.toml" --source "$GITHUB_WORKSPACE" < run_once_before_00-verify-deps.sh.tmpl > /tmp/verify-deps.sh
           sh -n /tmp/verify-deps.sh && sh /tmp/verify-deps.sh
 
   validate-macos:
