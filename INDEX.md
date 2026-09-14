@@ -9,11 +9,11 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**4718 tracked entries** across 16 categories.
+**4720 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
-| [Shell](#shell) | 16 |
+| [Shell](#shell) | 18 |
 | [Prompt](#prompt) | 1 |
 | [Terminal & multiplexer](#terminal--multiplexer) | 4 |
 | [Editors](#editors) | 17 |
@@ -39,6 +39,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.bash_profile` | `dot_bash_profile` | bash | — |
 | `~/.bashrc` | `dot_bashrc` | bash | — |
 | `~/.config/shell/00-env.sh` | `dot_config/shell/00-env.sh` | shared shell modules | — |
+| `~/.config/shell/05-omarchy-detect.sh` | `dot_config/shell/05-omarchy-detect.sh` | shared shell modules | — |
 | `~/.config/shell/10-tools.sh` | `dot_config/shell/10-tools.sh` | shared shell modules | — |
 | `~/.config/shell/15-base-bash.sh` | `dot_config/shell/15-base-bash.sh` | shared shell modules | — |
 | `~/.config/shell/20-integrations.sh` | `dot_config/shell/20-integrations.sh` | shared shell modules | — |
@@ -50,6 +51,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/shell/60-prompt.sh` | `dot_config/shell/60-prompt.sh` | shared shell modules | — |
 | `~/.config/shell/65-theme.sh` | `dot_config/shell/65-theme.sh` | shared shell modules | — |
 | `~/.config/shell/70-cloud.sh` | `dot_config/shell/70-cloud.sh` | shared shell modules | — |
+| `~/.config/shell/75-tool-paths.sh` | `dot_config/shell/75-tool-paths.sh` | shared shell modules | — |
 | `~/.config/shell/README.md` | `dot_config/shell/README.md` | shared shell modules | — |
 | `~/.zshrc` | `dot_zshrc` | zsh | — |
 

@@ -3,9 +3,9 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 4718,
+    "total": 4720,
     "by_category": {
-      "shell": 16,
+      "shell": 18,
       "prompt": 1,
       "terminal": 4,
       "editor": 17,
@@ -115,6 +115,14 @@
       "subsystem": "shared shell modules"
     },
     {
+      "source": "dot_config/shell/05-omarchy-detect.sh",
+      "target": "~/.config/shell/05-omarchy-detect.sh",
+      "kind": "dotfile",
+      "category": "shell",
+      "attributes": [],
+      "subsystem": "shared shell modules"
+    },
+    {
       "source": "dot_config/shell/10-tools.sh",
       "target": "~/.config/shell/10-tools.sh",
       "kind": "dotfile",
@@ -197,6 +205,14 @@
     {
       "source": "dot_config/shell/70-cloud.sh",
       "target": "~/.config/shell/70-cloud.sh",
+      "kind": "dotfile",
+      "category": "shell",
+      "attributes": [],
+      "subsystem": "shared shell modules"
+    },
+    {
+      "source": "dot_config/shell/75-tool-paths.sh",
+      "target": "~/.config/shell/75-tool-paths.sh",
       "kind": "dotfile",
       "category": "shell",
       "attributes": [],
