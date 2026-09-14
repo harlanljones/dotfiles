@@ -1,4 +1,4 @@
-{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+{{- if eq .machine "augustus" -}}
 #!/bin/bash
 # Enables the path unit that auto-captures omarchy live drift (shell.json
 # template + plugin manifest) into the chezmoi source tree. Managed by chezmoi.

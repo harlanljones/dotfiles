@@ -1,4 +1,4 @@
-{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+{{- if eq .machine "augustus" -}}
 #!/usr/bin/env node
 // omarchy:summary=One-time login for the automatic Cline usage scraper
 // omarchy:hidden=true

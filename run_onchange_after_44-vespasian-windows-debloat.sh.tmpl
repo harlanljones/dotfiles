@@ -1,6 +1,6 @@
-{{- /* hasKey: CI's shellcheck job renders scripts without a chezmoi config. */ -}}
-{{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
 #!/usr/bin/env bash
+# Vespasian (WSL) setup; non-vespasian machines: no-op.
+{{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
 # Windows 11 Developer Experience & Debloat Tweaks:
 # - Restores instant classic right-click context menu (bypasses slow "Show more options")
 # - Disables Bing web search suggestions in Start Menu

@@ -1,4 +1,4 @@
-{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+{{- if eq .machine "augustus" -}}
 #!/bin/bash
 # omarchy:summary=Regenerate AI agent usage data files (including user collectors)
 # omarchy:args=[--force] [--limits-only] [--except <agent>] [agent...]

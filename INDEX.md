@@ -44,7 +44,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/shell/20-integrations.sh` | `dot_config/shell/20-integrations.sh` | shared shell modules | — |
 | `~/.config/shell/30-navigation.sh` | `dot_config/shell/30-navigation.sh` | shared shell modules | — |
 | `~/.config/shell/40-aliases.sh` | `dot_config/shell/40-aliases.sh` | shared shell modules | — |
-| `~/.config/shell/45-omarchy-parity.sh` | `dot_config/shell/45-omarchy-parity.sh` | shared shell modules | — |
+| `~/.config/shell/45-omarchy-portable-aliases.sh` | `dot_config/shell/45-omarchy-portable-aliases.sh` | shared shell modules | — |
 | `~/.config/shell/50-agents.sh` | `dot_config/shell/50-agents.sh` | shared shell modules | — |
 | `~/.config/shell/55-apps.sh` | `dot_config/shell/55-apps.sh` | shared shell modules | — |
 | `~/.config/shell/60-prompt.sh` | `dot_config/shell/60-prompt.sh` | shared shell modules | — |
@@ -418,8 +418,8 @@ agents and the showcase app should read. This page is the same data for humans.
 | 27 | `run_onchange_after_27-sync-claude-mcp.sh.tmpl` | runs when this script's contents change | after |
 | 28 | `run_onchange_after_28-sync-claude-settings.sh.tmpl` | runs when this script's contents change | after |
 | 29 | `run_onchange_after_29-setup-omarchy-drift-capture.sh.tmpl` | runs when this script's contents change | after |
-| 30 | `run_onchange_after_30-macos-defaults.sh.tmpl` | runs when this script's contents change | after |
-| 31 | `run_onchange_after_31-mouse-dpi.sh.tmpl` | runs when this script's contents change | after |
+| 30 | `run_onchange_after_30-hadrian-macos-defaults.sh.tmpl` | runs when this script's contents change | after |
+| 31 | `run_onchange_after_31-augustus-mouse-dpi.sh.tmpl` | runs when this script's contents change | after |
 | 32 | `run_onchange_after_32-setup-omarchy-pi.sh.tmpl` | runs when this script's contents change | after |
 | 40 | `run_onchange_after_40-vespasian-windows-terminal.sh.tmpl` | runs when this script's contents change | after |
 | 41 | `run_onchange_after_41-vespasian-nerd-font.sh.tmpl` | runs when this script's contents change | after |

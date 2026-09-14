@@ -155,8 +155,8 @@
       "subsystem": "shared shell modules"
     },
     {
-      "source": "dot_config/shell/45-omarchy-parity.sh",
-      "target": "~/.config/shell/45-omarchy-parity.sh",
+      "source": "dot_config/shell/45-omarchy-portable-aliases.sh",
+      "target": "~/.config/shell/45-omarchy-portable-aliases.sh",
       "kind": "dotfile",
       "category": "shell",
       "attributes": [],
@@ -2720,7 +2720,7 @@
       }
     },
     {
-      "source": "run_onchange_after_30-macos-defaults.sh.tmpl",
+      "source": "run_onchange_after_30-hadrian-macos-defaults.sh.tmpl",
       "kind": "hook",
       "category": "hooks",
       "hook": {
@@ -2728,12 +2728,12 @@
         "trigger_description": "runs when this script's contents change",
         "phase": "after",
         "order": 30,
-        "name": "macos-defaults",
+        "name": "hadrian-macos-defaults",
         "template": true
       }
     },
     {
-      "source": "run_onchange_after_31-mouse-dpi.sh.tmpl",
+      "source": "run_onchange_after_31-augustus-mouse-dpi.sh.tmpl",
       "kind": "hook",
       "category": "hooks",
       "hook": {
@@ -2741,7 +2741,7 @@
         "trigger_description": "runs when this script's contents change",
         "phase": "after",
         "order": 31,
-        "name": "mouse-dpi",
+        "name": "augustus-mouse-dpi",
         "template": true
       }
     },

@@ -1,4 +1,4 @@
-{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+{{- if eq .machine "augustus" -}}
 #!/bin/bash
 # Builds and deploys omarchy-agents workspace when package manifests change
 # or when OMARCHY_AGENTS_FORCE_BUILD=1 is set.

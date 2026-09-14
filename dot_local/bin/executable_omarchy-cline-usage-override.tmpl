@@ -1,4 +1,4 @@
-{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+{{- if eq .machine "augustus" -}}
 #!/usr/bin/python3
 # omarchy:summary=Record real Cline Pass limits read off the dashboard
 # omarchy:args=[--session PCT] [--weekly PCT [--weekly-resets DURATION]] [--monthly PCT [--monthly-resets DURATION]]

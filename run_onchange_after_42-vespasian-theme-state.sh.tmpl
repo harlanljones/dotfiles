@@ -1,8 +1,8 @@
-{{- /* hasKey: CI's shellcheck job renders scripts without a chezmoi config. */ -}}
-{{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
-{{- $name := (index .machines "vespasian").theme.name -}}
-{{- $claudeTheme := ternary "light-ansi" "dark-ansi" (eq (index .themes $name).appearance "light") -}}
 #!/usr/bin/env bash
+# Vespasian (WSL) setup; non-vespasian machines: no-op.
+{{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
+{{- $name := (index .machines .machine).theme.name -}}
+{{- $claudeTheme := ternary "light-ansi" "dark-ansi" (eq (index .themes $name).appearance "light") -}}
 # Theme state that lives outside managed files on Vespasian.
 #
 # - bat (and delta, which reuses bat's cache) only sees themes after

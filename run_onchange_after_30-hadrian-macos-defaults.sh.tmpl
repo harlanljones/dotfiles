@@ -2,7 +2,7 @@
 # Apply macOS user defaults declaratively. chezmoi re-runs this whenever the
 # script content changes (run_onchange). Linux machines: no-op.
 
-{{ if eq .chezmoi.os "darwin" -}}
+{{ if eq .machine "hadrian" -}}
 mkdir -p ~/Pictures/Screenshots
 
 # Screenshots land in ~/Pictures/Screenshots

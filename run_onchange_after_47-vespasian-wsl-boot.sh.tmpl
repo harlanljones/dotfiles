@@ -1,6 +1,6 @@
-{{- /* hasKey: CI's shellcheck job renders scripts without a chezmoi config. */ -}}
-{{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
 #!/usr/bin/env bash
+# Vespasian (WSL) setup; non-vespasian machines: no-op.
+{{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
 # Keep Vespasian's WSL instance alive at Windows logon and reconcile the
 # portable Linux user service. Windows GUI processes remain Windows-owned and
 # are started by the shortcuts created in run_onchange_after_45.

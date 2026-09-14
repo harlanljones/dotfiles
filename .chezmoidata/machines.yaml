@@ -1,7 +1,7 @@
 machines:
   augustus:
     displayName: Augustus
-    os: linux
+    platform: omarchy
     hostname: omarchy
     role: "The foundational architect"
     backstory: "You built this machine from the ground up to establish order over the bare metal, making it the supreme ruler of your local network."
@@ -13,7 +13,7 @@ machines:
       fontSize: 9
   hadrian:
     displayName: Hadrian
-    os: darwin
+    platform: macos
     hostname: MacBookPro
     role: "The roaming administrator"
     backstory: "Hadrian spent most of his reign traveling the empire inspecting borders, making it a fitting title for a mobile, highly engineered Unix daily driver."
@@ -23,14 +23,13 @@ machines:
       fontSize: 14
   vespasian:
     displayName: Vespasian
-    os: linux
+    platform: wsl
+    hostname: DESKTOP-UTOJEVB
+    role: "The builder of the arena"
     # Ubuntu under WSL2 on the Windows gaming PC. No Omarchy base layer, no
     # desktop session: Windows owns the window manager and desktop tools; WSLg
     # may host Linux GUI apps such as Ghostty, and systemd owns portable Linux
     # daemons.
-    platform: wsl
-    hostname: DESKTOP-UTOJEVB
-    role: "The builder of the arena"
     backstory: "Vespasian restored order after a year of chaos and raised the Colosseum, making him the natural name for the box that hosts both the games and the work between them."
     theme:
       accent: "bold yellow"

@@ -1,4 +1,4 @@
-{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+{{- if eq .machine "augustus" -}}
 #!/usr/bin/python3
 # omarchy:summary=Capture real Cursor plan usage and refresh the agent monitor
 # omarchy:hidden=true

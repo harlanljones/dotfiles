@@ -1,4 +1,4 @@
-{{- if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+{{- if eq .machine "augustus" -}}
 #!/usr/bin/python3
 # omarchy:summary=Print the opencode usage record as JSON
 # omarchy:args=[--force] [--limits-only]

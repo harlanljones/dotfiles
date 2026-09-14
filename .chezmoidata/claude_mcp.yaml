@@ -1,4 +1,4 @@
-claude:
+claudeMcp:
   mcpServers:
     codebase-memory-mcp:
       command: __HOME__/.local/bin/codebase-memory-mcp

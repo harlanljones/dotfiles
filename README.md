@@ -483,7 +483,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   ├── 20-integrations.sh
 │   │   ├── 30-navigation.sh
 │   │   ├── 40-aliases.sh
-│   │   ├── 45-omarchy-parity.sh
+│   │   ├── 45-omarchy-portable-aliases.sh
 │   │   ├── 50-agents.sh
 │   │   ├── 55-apps.sh
 │   │   ├── 60-prompt.sh
@@ -595,8 +595,8 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 ├── run_onchange_after_27-sync-claude-mcp.sh.tmpl
 ├── run_onchange_after_28-sync-claude-settings.sh.tmpl
 ├── run_onchange_after_29-setup-omarchy-drift-capture.sh.tmpl
-├── run_onchange_after_30-macos-defaults.sh.tmpl
-├── run_onchange_after_31-mouse-dpi.sh.tmpl
+├── run_onchange_after_30-hadrian-macos-defaults.sh.tmpl
+├── run_onchange_after_31-augustus-mouse-dpi.sh.tmpl
 ├── run_onchange_after_32-setup-omarchy-pi.sh.tmpl
 ├── run_onchange_after_40-vespasian-windows-terminal.sh.tmpl
 ├── run_onchange_after_41-vespasian-nerd-font.sh.tmpl

@@ -32,7 +32,7 @@ os.replace(tmp_path, config_path)
 PY_EOF
 done
 
-{{ if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "omarchy") -}}
+{{ if eq .machine "augustus" -}}
 PLUGIN_DIR="$HOME/.config/omarchy/plugins/harlan.agent-leaderboard"
 if [[ -d "$PLUGIN_DIR" ]]; then
   # 2. Deploy SVG asset.

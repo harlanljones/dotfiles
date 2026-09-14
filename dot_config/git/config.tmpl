@@ -1,5 +1,5 @@
 {{- $gh := "" -}}
-{{- if eq .chezmoi.os "darwin" -}}
+{{- if eq .machine "hadrian" -}}
 {{-   $gh = "/opt/homebrew/bin/gh" -}}
 {{- else -}}
 {{-   $gh = "/usr/bin/gh" -}}
@@ -48,9 +48,9 @@
 [gpg]
 	format = ssh
 [gpg "ssh"]
-{{- if eq .chezmoi.os "darwin" }}
+{{- if eq .machine "hadrian" }}
 	program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
-{{- else if and (eq .chezmoi.os "linux") (contains "microsoft" (lower .chezmoi.kernel.osrelease)) }}
+{{- else if eq .machine "vespasian" }}
 	program = "op-ssh-sign"
 {{- else }}
 	program = "/opt/1Password/op-ssh-sign"

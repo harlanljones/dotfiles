@@ -1,8 +1,8 @@
-{{- /* hasKey: CI's shellcheck job renders scripts without a chezmoi config. */ -}}
-{{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
-{{- $name := (index .machines "vespasian").theme.name -}}
-{{- $scheme := regexReplaceAll "(?m)^#.*$" (include (printf ".chezmoitemplates/themes/%s/windows_terminal.json" $name)) "" | fromJson -}}
 #!/usr/bin/env bash
+# Vespasian (WSL) setup; non-vespasian machines: no-op.
+{{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
+{{- $name := (index .machines .machine).theme.name -}}
+{{- $scheme := regexReplaceAll "(?m)^#.*$" (include (printf ".chezmoitemplates/themes/%s/windows_terminal.json" $name)) "" | fromJson -}}
 # Deploy and configure Linux-like desktop tools on Windows for Vespasian:
 # - GlazeWM (tiling window manager)
 # - Zebar (status bar)

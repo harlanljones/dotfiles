@@ -1,4 +1,4 @@
-{{ if eq .chezmoi.os "linux" -}}
+{{ if eq .machine "augustus" -}}
 # Dynamic theme colors, written by Omarchy's theme switcher. The `?` prefix
 # makes it optional, but the path only ever exists on Augustus.
 config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"
@@ -15,7 +15,7 @@ window-padding-x = 14
 window-padding-y = 14
 confirm-close-surface=false
 resize-overlay = never
-{{- if eq .chezmoi.os "linux" }}
+{{- if eq .machine "augustus" }}
 gtk-toolbar-style = flat
 {{- end }}
 
@@ -26,7 +26,7 @@ cursor-style-blink = false
 # Cursor styling + SSH session terminfo
 # (all shell integration options must be passed together)
 shell-integration-features = no-cursor,ssh-env
-{{- if eq .chezmoi.os "darwin" }}
+{{- if eq .machine "hadrian" }}
 
 # Send Option as Alt rather than composing accented characters. Without this
 # the Alt-Z / Alt-X zoxide jump bindings from ~/.config/shell/30-navigation.sh
@@ -48,7 +48,7 @@ keybind = super+control+shift+alt+arrow_right=resize_split:right,100
 
 # Slowdown mouse scrolling
 mouse-scroll-multiplier = 0.95
-{{- if eq .chezmoi.os "linux" }}
+{{- if eq .machine "augustus" }}
 
 # Fix general slowness on hyprland (https://github.com/ghostty-org/ghostty/discussions/3224).
 # epoll is Linux-only; macOS has no such backend.

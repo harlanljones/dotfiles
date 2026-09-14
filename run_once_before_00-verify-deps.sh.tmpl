@@ -17,7 +17,7 @@ for cmd in git age; do
     fi
 done
 
-{{- if eq .chezmoi.os "darwin" }}
+{{- if eq .machine "hadrian" }}
 if ! have brew; then
     echo "ERROR: Homebrew is required (https://brew.sh) before applying these dotfiles." >&2
     exit 1
@@ -25,7 +25,7 @@ fi
 
 opt_hint="brew bundle --file=~/.Brewfile"
 optional="mise eza delta starship gh fzf zoxide atuin direnv nvim lazygit ghostty"
-{{- else if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "ubuntu") }}
+{{- else if eq .machine "vespasian" }}
 opt_hint="xargs -a ~/.config/apt/pkglist.txt sudo apt-get install -y; then mise install; Ghostty may require a separate WSLg install on Ubuntu 24.04"
 optional="mise eza delta starship gh fzf zoxide atuin direnv nvim lazygit ghostty"
 {{- else }}
@@ -39,9 +39,9 @@ for cmd in $optional; do
     fi
 done
 
-{{- if eq .chezmoi.os "darwin" }}
+{{- if eq .machine "hadrian" }}
 install_hard_cmd="brew install$missing_hard"
-{{- else if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "ubuntu") }}
+{{- else if eq .machine "vespasian" }}
 install_hard_cmd="sudo apt-get update && sudo apt-get install -y$missing_hard"
 {{- else }}
 install_hard_cmd="sudo pacman -S --needed$missing_hard"
@@ -80,9 +80,9 @@ if [ -n "$missing_opt" ]; then
         read -r reply || reply=""
         case "${reply:-N}" in
             [yY]|[yY][eE][sS])
-                {{- if eq .chezmoi.os "darwin" }}
+                {{- if eq .machine "hadrian" }}
                 brew bundle --file=~/.Brewfile || true
-                {{- else if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "ubuntu") }}
+                {{- else if eq .machine "vespasian" }}
                 if [ -r ~/.config/apt/pkglist.txt ]; then
                     xargs -a ~/.config/apt/pkglist.txt sudo apt-get install -y || true
                 fi

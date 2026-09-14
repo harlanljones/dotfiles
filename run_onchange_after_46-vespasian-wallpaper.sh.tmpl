@@ -1,9 +1,9 @@
-{{- /* hasKey: CI's shellcheck job renders scripts without a chezmoi config. */ -}}
+#!/usr/bin/env bash
+# Vespasian (WSL) setup; non-vespasian machines: no-op.
 {{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
-{{- $name := (index .machines "vespasian").theme.name -}}
+{{- $name := (index .machines .machine).theme.name -}}
 {{- $theme := index .themes $name -}}
 {{- $wallpaperSrc := printf "theme-assets/%s/wallpaper.png" $name -}}
-#!/usr/bin/env bash
 # Set the Windows desktop wallpaper from the active dots theme
 # ({{ $theme.label }}). The wallpaper ({{ $wallpaperSrc }}) is that theme's
 # real Omarchy background image (basecamp/omarchy is MIT-licensed as a whole
