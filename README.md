@@ -97,6 +97,8 @@ The prompt uses [Starship](https://starship.rs/).
 The prompt turns red when a command fails.
 The terminal multiplexer is [Herdr](https://github.com/harlanljones/herdr-outpost).
 Herdr provides tmux-compatible keybindings and workspace navigation.
+On Vespasian, Ghostty runs as the preferred WSLg terminal when installed;
+Windows Terminal remains available as the `Alt+Enter` fallback.
 
 ### Editor
 
@@ -126,8 +128,8 @@ Health checks verify that required mise tools are installed on the local system.
 
 The entire environment shares a consistent color palette.
 The default theme is Tokyo Night.
-Theme settings synchronize across Windows Terminal, Neovim, lazygit, delta, bat, eza, and fzf.
-On Windows WSL2 systems, Windows Terminal updates immediately and launches into Ubuntu by default.
+Theme settings synchronize across Ghostty, Windows Terminal, Neovim, lazygit, delta, bat, eza, and fzf.
+On Windows WSL2 systems, Ghostty launches Ubuntu through WSLg by default, with Windows Terminal retained as a fallback.
 
 You can switch themes across all tools by running:
 
@@ -158,6 +160,10 @@ On Vespasian, theming extends to Windows surfaces:
 - **GlazeWM:** Window manager borders use theme accent (focused) and muted colors (unfocused).
 - **Zebar:** Theme-driven CSS styling for the status bar.
 
+Vespasian's Windows GUI tools start at Windows logon. A hidden scheduled task
+keeps the WSL instance alive so portable user services can start under systemd;
+see [`docs/vespasian-boot.md`](docs/vespasian-boot.md).
+
 See [`docs/vespasian-theming.md`](docs/vespasian-theming.md) for detailed Vespasian setup and troubleshooting.
 
 ## Documentation and Index
@@ -167,6 +173,8 @@ The repository includes several guides for maintenance and recovery:
 - [`INDEX.md`](INDEX.md): A complete categorized directory of all tracked dotfiles.
 - [`docs/recovery.md`](docs/recovery.md): Step-by-step disaster recovery and age key management.
 - [`dot_config/shell/README.md`](dot_config/shell/README.md): Detailed guide to the modular shell setup.
+- [`docs/vespasian-boot.md`](docs/vespasian-boot.md): WSL2 boot model, keepalive background task, and desktop keybindings for Windows.
+- [`docs/vespasian-theming.md`](docs/vespasian-theming.md): Cross-platform theme synchronization across Windows, Windows Terminal, and GlazeWM/Zebar.
 - [`docs/agents/issue-tracker.md`](docs/agents/issue-tracker.md): Guide for coding agent coordination.
 
 The index file `INDEX.md` is generated automatically by `docs/generate_index.py`.

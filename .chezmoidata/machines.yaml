@@ -25,8 +25,9 @@ machines:
     displayName: Vespasian
     os: linux
     # Ubuntu under WSL2 on the Windows gaming PC. No Omarchy base layer, no
-    # desktop session: the terminal is Windows Terminal, so Linux GUI configs
-    # (hypr, ghostty, systemd agent units) are gated off in .chezmoiignore.tmpl.
+    # desktop session: Windows owns the window manager and desktop tools; WSLg
+    # may host Linux GUI apps such as Ghostty, and systemd owns portable Linux
+    # daemons.
     platform: wsl
     hostname: DESKTOP-UTOJEVB
     role: "The builder of the arena"
@@ -37,7 +38,7 @@ machines:
       # (it edits this line and re-applies). Starship, opencode and Codex use
       # ANSI/system colors, so they follow the terminal scheme automatically.
       name: omarchy-tokyo-night
-    # Windows Terminal renders this box. The fragment written by
+    # Windows Terminal remains the fallback box. The fragment written by
     # run_onchange_after_40-vespasian-windows-terminal.sh.tmpl updates the
     # WSL-generated Ubuntu profile in place (settings.json is never edited).
     windowsTerminal:
@@ -45,7 +46,7 @@ machines:
       fontFace: "JetBrainsMono Nerd Font"
       fontSize: 11
       nerdFontsVersion: v3.5.1
-    # Not rendered on Vespasian (ghostty is ignored there); present so any
-    # template indexing .ghostty.fontSize cannot fail on this machine.
+    # Ghostty is rendered on Vespasian through WSLg; this value also keeps
+    # template indexing .ghostty.fontSize total on every machine.
     ghostty:
       fontSize: 12

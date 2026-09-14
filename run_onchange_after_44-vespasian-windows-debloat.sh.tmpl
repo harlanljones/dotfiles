@@ -12,7 +12,9 @@
 
 set -euo pipefail
 
-if ! command -v reg.exe >/dev/null 2>&1; then
+windows_tool="$HOME/.local/bin/wsl-windows-tool"
+if [[ ! -x "$windows_tool" ]] || ! reg_exe="$($windows_tool path reg)" || \
+   ! powershell_exe="$($windows_tool path powershell)"; then
   echo "windows-debloat: not running under WSL, skipping"
   exit 0
 fi
@@ -22,7 +24,7 @@ echo "windows-debloat: applying Windows developer registry tweaks..."
 set_reg() {
   local key="$1"
   shift
-  reg.exe add "$key" "$@" >/dev/null 2>&1 || true
+  "$reg_exe" add "$key" "$@" >/dev/null 2>&1 || true
 }
 
 # 1. Classic Windows 10/compact context menu
@@ -46,7 +48,7 @@ set_reg 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' /v Sh
 set_reg 'HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced' /v ShowCopilotButton /t REG_DWORD /d 0 /f
 
 # StuckRects3 byte 8: 3 enables taskbar auto-hide; 2 keeps it always visible.
-powershell.exe -NoProfile -Command '
+"$powershell_exe" -NoProfile -Command '
   $path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\StuckRects3";
   $settings = (Get-ItemProperty -Path $path -Name Settings -ErrorAction SilentlyContinue).Settings;
   if ($settings -and $settings[8] -ne 3) {

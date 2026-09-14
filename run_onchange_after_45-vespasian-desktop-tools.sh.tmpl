@@ -17,14 +17,18 @@
 
 set -euo pipefail
 
-if ! command -v cmd.exe >/dev/null 2>&1 || ! command -v wslpath >/dev/null 2>&1; then
+windows_tool="$HOME/.local/bin/wsl-windows-tool"
+if [[ ! -x "$windows_tool" ]] || ! command -v wslpath >/dev/null 2>&1 || \
+   ! cmd_exe="$($windows_tool path cmd)" || ! powershell_exe="$($windows_tool path powershell)"; then
   echo "desktop-tools: not running under WSL, skipping"
   exit 0
 fi
+winget_exe=""
+winget_exe="$($windows_tool path winget 2>/dev/null || true)"
 
-win_localappdata="$(cd /mnt/c && cmd.exe /d /c 'echo %LOCALAPPDATA%' 2>/dev/null | tr -d '\r')"
+win_localappdata="$(cd /mnt/c && "$cmd_exe" /d /c 'echo %LOCALAPPDATA%' 2>/dev/null | tr -d '\r')"
 wsl_localappdata="$(wslpath "$win_localappdata")"
-win_userprofile="$(cd /mnt/c && cmd.exe /d /c 'echo %USERPROFILE%' 2>/dev/null | tr -d '\r')"
+win_userprofile="$(cd /mnt/c && "$cmd_exe" /d /c 'echo %USERPROFILE%' 2>/dev/null | tr -d '\r')"
 wsl_userprofile="$(wslpath "$win_userprofile")"
 
 programs_dir="$wsl_localappdata/Programs"
@@ -36,8 +40,8 @@ if [[ ! -f "$glazewm_dir/glazewm.exe" ]]; then
   echo "desktop-tools: installing GlazeWM v3.10.1..."
   tmp_dir="$(mktemp -d -p "$wsl_localappdata/Temp")"
   curl -fsSL -o "$tmp_dir/glazewm.msi" "https://github.com/glzr-io/glazewm/releases/download/v3.10.1/standalone-glazewm-v3.10.1-x64.msi"
-  win_tmp="$(cd /mnt/c && cmd.exe /d /c "echo $(wslpath -w "$tmp_dir/glazewm.msi")" 2>/dev/null | tr -d '\r')"
-  cmd.exe /c "msiexec.exe /a \"$win_tmp\" /qn TARGETDIR=\"$win_localappdata\\Programs\\glazewm_extract\"" < /dev/null
+  win_tmp="$(cd /mnt/c && "$cmd_exe" /d /c "echo $(wslpath -w "$tmp_dir/glazewm.msi")" 2>/dev/null | tr -d '\r')"
+  "$cmd_exe" /c "msiexec.exe /a \"$win_tmp\" /qn TARGETDIR=\"$win_localappdata\\Programs\\glazewm_extract\"" < /dev/null
   mkdir -p "$glazewm_dir"
   mv "$wsl_localappdata/Programs/glazewm_extract/PFiles64/glzr.io/glazewm/"* "$glazewm_dir/"
   rm -rf "$tmp_dir" "$wsl_localappdata/Programs/glazewm_extract"
@@ -49,8 +53,8 @@ if [[ ! -f "$zebar_dir/zebar.exe" ]]; then
   echo "desktop-tools: installing Zebar v3.3.1..."
   tmp_dir="$(mktemp -d -p "$wsl_localappdata/Temp")"
   curl -fsSL -o "$tmp_dir/zebar.msi" "https://github.com/glzr-io/zebar/releases/download/v3.3.1/zebar-v3.3.1-opt1-x64.msi"
-  win_tmp="$(cd /mnt/c && cmd.exe /d /c "echo $(wslpath -w "$tmp_dir/zebar.msi")" 2>/dev/null | tr -d '\r')"
-  cmd.exe /c "msiexec.exe /a \"$win_tmp\" /qn TARGETDIR=\"$win_localappdata\\Programs\\zebar_extract\"" < /dev/null
+  win_tmp="$(cd /mnt/c && "$cmd_exe" /d /c "echo $(wslpath -w "$tmp_dir/zebar.msi")" 2>/dev/null | tr -d '\r')"
+  "$cmd_exe" /c "msiexec.exe /a \"$win_tmp\" /qn TARGETDIR=\"$win_localappdata\\Programs\\zebar_extract\"" < /dev/null
   mkdir -p "$zebar_dir"
   mv "$wsl_localappdata/Programs/zebar_extract/PFiles/glzr.io/Zebar/"* "$zebar_dir/"
   rm -rf "$tmp_dir" "$wsl_localappdata/Programs/zebar_extract"
@@ -83,10 +87,10 @@ if [[ ! -f "$quicklook_dir/QuickLook.exe" ]]; then
 fi
 
 # 5. Install TranslucentTB for a transparent taskbar if missing
-if command -v winget.exe >/dev/null 2>&1 && \
-   ! winget.exe list --id CharlesMilette.TranslucentTB --exact --accept-source-agreements >/dev/null 2>&1; then
+if [[ -n "$winget_exe" ]] && \
+   ! "$winget_exe" list --id CharlesMilette.TranslucentTB --exact --accept-source-agreements >/dev/null 2>&1; then
   echo "desktop-tools: installing TranslucentTB..."
-  winget.exe install \
+  "$winget_exe" install \
     --id CharlesMilette.TranslucentTB \
     --exact \
     --source winget \
@@ -99,9 +103,9 @@ fi
 
 # 6. Install AutoHotkey v2 for the Super-key mask if missing
 autohotkey_exe="$wsl_localappdata/Programs/AutoHotkey/v2/AutoHotkey64.exe"
-if command -v winget.exe >/dev/null 2>&1 && [[ ! -f "$autohotkey_exe" ]]; then
+if [[ -n "$winget_exe" && ! -f "$autohotkey_exe" ]]; then
   echo "desktop-tools: installing AutoHotkey v2..."
-  winget.exe install \
+  "$winget_exe" install \
     --id AutoHotkey.AutoHotkey \
     --exact \
     --source winget \
@@ -113,11 +117,11 @@ if command -v winget.exe >/dev/null 2>&1 && [[ ! -f "$autohotkey_exe" ]]; then
 fi
 
 # 7. Ensure paths are registered in Windows user PATH
-python3 - "$win_localappdata" <<'PY_EOF'
+python3 - "$win_localappdata" "$powershell_exe" <<'PY_EOF'
 import subprocess
 import sys
 
-win_appdata = sys.argv[1]
+win_appdata, powershell_exe = sys.argv[1:3]
 extra_paths = [
     rf"{win_appdata}\Programs\glazewm",
     rf"{win_appdata}\Programs\glazewm\cli",
@@ -126,7 +130,7 @@ extra_paths = [
 ]
 
 ps_cmd = r'(Get-ItemProperty -Path HKCU:\Environment -Name Path -ErrorAction SilentlyContinue).Path'
-current_path = subprocess.check_output(["powershell.exe", "-NoProfile", "-Command", ps_cmd], text=True).strip()
+current_path = subprocess.check_output([powershell_exe, "-NoProfile", "-Command", ps_cmd], text=True).strip()
 
 parts = [p.strip() for p in current_path.split(';') if p.strip()]
 updated = False
@@ -138,7 +142,7 @@ for ep in extra_paths:
 if updated:
     new_path = ';'.join(parts) + ';'
     set_cmd = f'[Environment]::SetEnvironmentVariable("Path", "{new_path}", [System.EnvironmentVariableTarget]::User)'
-    subprocess.run(["powershell.exe", "-NoProfile", "-Command", set_cmd], check=True)
+    subprocess.run([powershell_exe, "-NoProfile", "-Command", set_cmd], check=True)
 PY_EOF
 
 # 8. Configure GlazeWM with the active dots theme's border colors and dev keybindings
@@ -147,8 +151,8 @@ mkdir -p "$glzr_dir"
 
 cat <<'EOF_CONFIG' > "$glzr_dir/config.yaml"
 general:
-  startup_commands: ['shell-exec zebar']
-  shutdown_commands: ['shell-exec taskkill /IM zebar.exe /F']
+  startup_commands: ['shell-exec C:\Users\harlan\AppData\Local\Programs\zebar\zebar.exe']
+  shutdown_commands: []
   config_reload_commands: []
   focus_follows_cursor: false
   toggle_workspace_on_refocus: false
@@ -279,25 +283,69 @@ keybindings:
   - commands: ['toggle-tiling-direction']
     bindings: ['lwin+v', 'alt+v']
   - commands: ['toggle-floating --centered']
-    bindings: ['lwin+shift+space', 'alt+shift+space']
+    bindings: ['lwin+t', 'alt+t', 'lwin+shift+space', 'alt+shift+space']
   - commands: ['toggle-fullscreen']
     bindings: ['lwin+f', 'alt+f']
   - commands: ['toggle-minimized']
     bindings: ['lwin+m', 'alt+m']
   - commands: ['close']
-    bindings: ['lwin+q', 'lwin+shift+q', 'alt+shift+q']
+    bindings: ['lwin+q', 'lwin+shift+q', 'alt+shift+q', 'lwin+w', 'alt+w']
   - commands: ['wm-reload-config']
     bindings: ['lwin+shift+r', 'alt+shift+r']
   - commands: ['wm-exit']
     bindings: ['lwin+shift+e', 'alt+shift+e']
 
-  # Terminal launcher: Windows Terminal with Ubuntu WSL (Super + Enter or Alt + Enter)
+  # Preferred terminal: Ghostty running in WSLg. Keep Windows Terminal as the
+  # Alt+Enter fallback while Ghostty is being installed or diagnosed.
+  - commands: ['shell-exec wsl.exe -d Ubuntu-24.04 --exec ghostty']
+    bindings: ['lwin+enter']
   - commands: ['shell-exec wt -p Ubuntu-24.04']
-    bindings: ['lwin+enter', 'alt+enter']
+    bindings: ['alt+enter']
 
   # App launcher: Flow Launcher (Super + Space)
   - commands: ['shell-exec C:\Users\harlan\AppData\Local\FlowLauncher\Flow.Launcher.exe']
-    bindings: ['lwin+space']
+    bindings: ['lwin+space', 'alt+space']
+
+  # Browser launcher: Google Chrome (Super + Shift + B, Super + B, Super + Shift + Enter, Alt fallbacks)
+  - commands: ['shell-exec --hide-window cmd.exe /c start chrome']
+    bindings: ['lwin+shift+b', 'lwin+b', 'lwin+shift+enter', 'alt+shift+b', 'alt+b', 'alt+shift+enter']
+
+  # Browser private / incognito (Super + Shift + Alt + B)
+  - commands: ['shell-exec --hide-window cmd.exe /c start chrome --incognito']
+    bindings: ['lwin+shift+alt+b']
+
+  # File manager: Explorer (Super + Shift + F)
+  - commands: ['shell-exec explorer.exe']
+    bindings: ['lwin+shift+f', 'alt+shift+f']
+
+  # Editor: VS Code (Super + Shift + N)
+  - commands: ['shell-exec --hide-window cmd.exe /c start code']
+    bindings: ['lwin+shift+n', 'alt+shift+n']
+
+  # Passwords: 1Password (Super + Shift + Slash)
+  - commands: ['shell-exec --hide-window cmd.exe /c start 1password:']
+    bindings: ['lwin+shift+slash', 'alt+shift+slash']
+
+  # Calculator: Windows Calculator (Super + Ctrl + Q)
+  - commands: ['shell-exec calc.exe']
+    bindings: ['lwin+ctrl+q', 'alt+ctrl+q']
+
+  # Web apps (Omarchy defaults)
+  # ChatGPT (Super + Shift + A)
+  - commands: ['shell-exec --hide-window cmd.exe /c start https://chatgpt.com']
+    bindings: ['lwin+shift+a', 'alt+shift+a']
+
+  # Grok (Super + Shift + Alt + A)
+  - commands: ['shell-exec --hide-window cmd.exe /c start https://grok.com']
+    bindings: ['lwin+shift+alt+a']
+
+  # X (Super + Shift + X)
+  - commands: ['shell-exec --hide-window cmd.exe /c start https://x.com']
+    bindings: ['lwin+shift+x', 'alt+shift+x']
+
+  # YouTube (Super + Shift + Y)
+  - commands: ['shell-exec --hide-window cmd.exe /c start https://youtube.com']
+    bindings: ['lwin+shift+y', 'alt+shift+y']
 
   # Workspace switching (Super + 1..9 or Alt + 1..9)
   - commands: ['focus --workspace 1']
@@ -768,17 +816,18 @@ AHK_SUPER_MASK
 startup_dir="$wsl_userprofile/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup"
 mkdir -p "$startup_dir"
 
-python3 - "$win_userprofile" "$win_localappdata" <<'PY_EOF'
+python3 - "$win_userprofile" "$win_localappdata" "$powershell_exe" <<'PY_EOF'
 import subprocess
 import sys
 
-win_userprofile, win_appdata = sys.argv[1], sys.argv[2]
+win_userprofile, win_appdata, powershell_exe = sys.argv[1:4]
 targets = {
     "GlazeWM.lnk": (rf"{win_appdata}\Programs\glazewm\glazewm.exe", ""),
     "GlazeWM Super Key Mask.lnk": (
         rf"{win_appdata}\Programs\AutoHotkey\v2\AutoHotkey64.exe",
         rf'"{win_appdata}\Programs\glazewm\super-mask.ahk"',
     ),
+    "Zebar.lnk": (rf"{win_appdata}\Programs\zebar\zebar.exe", ""),
     "FlowLauncher.lnk": (rf"{win_appdata}\FlowLauncher\Flow.Launcher.exe", ""),
     "QuickLook.lnk": (rf"{win_appdata}\Programs\QuickLook\QuickLook.exe", ""),
 }
@@ -793,15 +842,21 @@ for name, (target, arguments) in targets.items():
     $s.WorkingDirectory = [System.IO.Path]::GetDirectoryName("{target}")
     $s.Save()
     '''
-    subprocess.run(["powershell.exe", "-NoProfile", "-Command", ps], check=True)
+    subprocess.run([powershell_exe, "-NoProfile", "-Command", ps], check=True)
 PY_EOF
 
-# 11. Start the Super-key mask and TranslucentTB, then reload GlazeWM
+# 11. Ensure desktop tools are running as detached Windows processes, then reload GlazeWM
 if [[ -f "$autohotkey_exe" ]]; then
-  "$autohotkey_exe" "$(wslpath -w "$glazewm_dir/super-mask.ahk")" </dev/null >/dev/null 2>&1 &
+  ahk_win_exe="$(wslpath -w "$autohotkey_exe")"
+  ahk_win_script="$(wslpath -w "$glazewm_dir/super-mask.ahk")"
+  "$powershell_exe" -NoProfile -NonInteractive -Command "
+    if (-not (Get-Process AutoHotkey64 -ErrorAction SilentlyContinue)) {
+      Start-Process -FilePath '$ahk_win_exe' -ArgumentList '\"$ahk_win_script\"'
+    }
+  " < /dev/null
 fi
 
-powershell.exe -NoProfile -Command '
+"$powershell_exe" -NoProfile -Command '
   if (-not (Get-Process TranslucentTB -ErrorAction SilentlyContinue)) {
     $package = Get-AppxPackage -Name "*TranslucentTB*";
     if ($package) {
@@ -811,6 +866,22 @@ powershell.exe -NoProfile -Command '
 
 if [[ -f "$glazewm_dir/cli/glazewm.exe" ]]; then
   "$glazewm_dir/cli/glazewm.exe" command wm-reload-config </dev/null 2>&1 || true
+fi
+
+glazewm_win_exe="$(wslpath -w "$glazewm_dir/glazewm.exe")"
+"$powershell_exe" -NoProfile -NonInteractive -Command "
+  if (-not (Get-Process glazewm -ErrorAction SilentlyContinue)) {
+    Start-Process -FilePath '$glazewm_win_exe'
+  }
+" < /dev/null
+
+if [[ -f "$zebar_dir/zebar.exe" ]]; then
+  zebar_win_exe="$(wslpath -w "$zebar_dir/zebar.exe")"
+  "$powershell_exe" -NoProfile -NonInteractive -Command "
+    if (-not (Get-Process zebar -ErrorAction SilentlyContinue)) {
+      Start-Process -FilePath '$zebar_win_exe'
+    }
+  " < /dev/null
 fi
 
 echo "desktop-tools: GlazeWM, Zebar, Flow Launcher, QuickLook, TranslucentTB, Super-key mask configured successfully"

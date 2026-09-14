@@ -1,6 +1,9 @@
 [Unit]
 Description=herdr-outpost Relay Daemon
-After=network.target
+After=network-online.target
+Wants=network-online.target
+ConditionPathExists=%h/dev/herdr-outpost/relay/herdr_relay.py
+ConditionPathExists=%h/.config/herdr-outpost/config.env
 
 [Service]
 Type=simple

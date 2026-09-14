@@ -77,6 +77,11 @@ ordering guarantee — treat each trigger class separately.
 | 40 | `run_onchange_after_40-vespasian-windows-terminal.sh.tmpl` | onchange (vespasian) | Write the Tokyo Night Windows Terminal fragment (scheme + Ubuntu profile update) |
 | 41 | `run_onchange_after_41-vespasian-nerd-font.sh.tmpl` | onchange (vespasian) | Per-user install of the pinned JetBrainsMono Nerd Font on Windows |
 | 42 | `run_onchange_after_42-vespasian-theme-state.sh.tmpl` | onchange (vespasian) | Rebuild bat's theme cache; set Claude Code theme to `dark-ansi`/`light-ansi` per the selected theme |
+| 43 | `run_onchange_after_43-vespasian-1password-ssh-bridge.sh.tmpl` | onchange (vespasian) | Build/configure the WSL 1Password SSH bridge |
+| 44 | `run_onchange_after_44-vespasian-windows-debloat.sh.tmpl` | onchange (vespasian) | Apply Windows developer-experience registry tweaks |
+| 45 | `run_onchange_after_45-vespasian-desktop-tools.sh.tmpl` | onchange (vespasian) | Install/configure GlazeWM, Zebar, Flow Launcher, QuickLook, TranslucentTB, and AutoHotkey |
+| 46 | `run_onchange_after_46-vespasian-wallpaper.sh.tmpl` | onchange (vespasian) | Set the Windows desktop wallpaper from the selected theme |
+| 47 | `run_onchange_after_47-vespasian-wsl-boot.sh.tmpl` | onchange (vespasian) | Register WSL keepalive at Windows logon and reconcile portable user services |
 
 ## 4. Contents map
 
@@ -102,7 +107,7 @@ The table below is the orienting summary; the index is the detail.
 | `dot_evotai/` | EVOT LLM provider environment config (`~/.evotai/evot.env`) |
 | `.chezmoidata/` | YAML data sources read by `.tmpl`s (`machines`, `agent_skills`, `omarchy_plugins`, `claude_mcp`, `claude_settings`, `codex_projects`, `themes`) |
 | `.chezmoitemplates/themes/<name>/` | Verbatim upstream per-tool theme ports (Windows Terminal, lazygit, delta, fzf, eza, bat, Gemini) included by the themed templates; never applied. Select with `dots theme set <name>` (edits `machines.<machine>.theme.name`), never by editing rendered targets |
-| `docs/` | Recovery guide, reorganization proposal, and generator scripts (chezmoi-ignored, git-tracked) |
+| `docs/` | Recovery guide, Vespasian boot & theming guides, reorganization proposal, and generator scripts (chezmoi-ignored, git-tracked) |
 | `docs/agents/`, `docs/skill-review/` | Cross-agent tracking guide and candidate-only skill review evidence; never deploy or execute copied workflows as repo automation |
 | `INDEX.json` / `INDEX.md` | **Generated** file index (see above); never hand-edit |
 | `Documents/` | Non-config content (Cline workflow docs) |

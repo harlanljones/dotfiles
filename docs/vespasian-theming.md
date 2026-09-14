@@ -80,13 +80,14 @@ Script `run_onchange_after_40-vespasian-windows-terminal.sh.tmpl` applies the co
 
 ### GlazeWM and Zebar
 
-Script `run_onchange_after_45-vespasian-desktop-tools.sh.tmpl` configures the taskbar window manager and status bar:
+Script `run_onchange_after_45-vespasian-desktop-tools.sh.tmpl` configures the tiling window manager and status bar:
 
-1. Reads the Windows Terminal color scheme to extract the palette.
+1. Reads the Windows Terminal color scheme to extract the active theme's palette.
 2. Generates `zebar.css` with CSS custom properties for all palette colors and opacity variants.
-3. Updates Zebar's `index.html` to use theme-driven colors instead of hardcoded Tokyo Night RGBA values.
-4. Configures GlazeWM window borders using theme `accent` (focused) and `muted` (unfocused).
-5. Moves stale theme directories to prevent configuration cruft.
+3. Configures Zebar's widget pack and GlazeWM window borders using theme `accent` (focused) and `muted` (unfocused).
+4. Registers GlazeWM, Zebar (`Zebar.lnk`), AutoHotkey, Flow Launcher, and QuickLook in the Windows Startup folder so they launch on logon as detached native Windows processes.
+5. Configures GlazeWM keybindings matching Omarchy (Hyprland) defaults from Augustus (terminal, Chrome browser with incognito, Explorer, VS Code, 1Password, calculator, and webapps); see [`docs/vespasian-boot.md`](vespasian-boot.md) for the full keymap.
+6. Moves stale theme directories to prevent configuration cruft.
 
 ## Terminal Tools
 

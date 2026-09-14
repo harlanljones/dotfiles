@@ -1,0 +1,49 @@
+{{- /* hasKey: CI's shellcheck job renders scripts without a chezmoi config. */ -}}
+{{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
+#!/usr/bin/env bash
+# Keep Vespasian's WSL instance alive at Windows logon and reconcile the
+# portable Linux user service. Windows GUI processes remain Windows-owned and
+# are started by the shortcuts created in run_onchange_after_45.
+
+set -euo pipefail
+
+windows_tool="$HOME/.local/bin/wsl-windows-tool"
+if [[ ! -x "$windows_tool" ]] || ! command -v wslpath >/dev/null 2>&1 || \
+   ! powershell_exe="$($windows_tool path powershell)" || \
+   ! wsl_exe="$($windows_tool path wsl)"; then
+  echo "wsl-boot: Windows interop unavailable; scheduled startup skipped" >&2
+  exit 0
+fi
+wsl_win_exe="$(wslpath -w "$wsl_exe")"
+
+# A WSL systemd service does not keep the distribution alive after the last
+# terminal closes. This hidden logon task supplies one low-cost resident WSL
+# process so the user system manager can remain available.
+distro="${WSL_DISTRO_NAME:-Ubuntu-24.04}"
+"$powershell_exe" -NoProfile -NonInteractive -Command '
+  $taskName = "Dots WSL Ubuntu-24.04 Keepalive"
+  $distro = "'"$distro"'"
+  $action = New-ScheduledTaskAction -Execute "'"$wsl_win_exe"'" -Argument "-d $distro --exec /usr/bin/sleep infinity"
+  $trigger = New-ScheduledTaskTrigger -AtLogOn -User "$env:USERDOMAIN\$env:USERNAME"
+  $settings = New-ScheduledTaskSettingsSet -Hidden -AllowStartIfOnBatteries -StartWhenAvailable -RestartCount 3 -RestartInterval (New-TimeSpan -Minutes 1) -ExecutionTimeLimit ([TimeSpan]::Zero)
+  $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Limited
+  Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Force | Out-Null
+  Start-ScheduledTask -TaskName $taskName
+' < /dev/null
+
+if command -v loginctl >/dev/null 2>&1; then
+  linger="$(loginctl show-user "$USER" -p Linger --value 2>/dev/null || true)"
+  if [[ "$linger" != yes ]]; then
+    echo "wsl-boot: user lingering is not enabled; run 'sudo loginctl enable-linger $USER' once" >&2
+  fi
+fi
+
+if command -v systemctl >/dev/null 2>&1 && systemctl --user daemon-reload 2>/dev/null; then
+  systemctl --user enable --now herdr-outpost-relay.service >/dev/null 2>&1 || true
+  echo "wsl-boot: refreshed portable user services"
+else
+  echo "wsl-boot: user systemd unavailable during apply; retry after WSL restarts" >&2
+fi
+
+echo "wsl-boot: registered 'Dots WSL Ubuntu-24.04 Keepalive' for Windows logon"
+{{- end -}}

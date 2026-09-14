@@ -28,7 +28,9 @@
 
 set -euo pipefail
 
-if ! command -v cmd.exe >/dev/null 2>&1 || ! command -v wslpath >/dev/null 2>&1; then
+windows_tool="$HOME/.local/bin/wsl-windows-tool"
+if [[ ! -x "$windows_tool" ]] || ! command -v wslpath >/dev/null 2>&1 || \
+   ! cmd_exe="$($windows_tool path cmd)" || ! powershell_exe="$($windows_tool path powershell)"; then
   echo "wallpaper: not running under WSL, skipping"
   exit 0
 fi
@@ -39,14 +41,14 @@ if [[ ! -f "$wallpaper_src" ]]; then
   exit 0
 fi
 
-win_localappdata="$(cd /mnt/c && cmd.exe /d /c 'echo %LOCALAPPDATA%' 2>/dev/null | tr -d '\r')"
+win_localappdata="$(cd /mnt/c && "$cmd_exe" /d /c 'echo %LOCALAPPDATA%' 2>/dev/null | tr -d '\r')"
 wsl_localappdata="$(wslpath "$win_localappdata")"
 cache_dir="$wsl_localappdata/dots/themes/{{ $name }}"
 mkdir -p "$cache_dir"
 cp "$wallpaper_src" "$cache_dir/wallpaper.png"
-win_wallpaper_path="$(cd /mnt/c && cmd.exe /d /c "echo $(wslpath -w "$cache_dir/wallpaper.png")" 2>/dev/null | tr -d '\r')"
+win_wallpaper_path="$(cd /mnt/c && "$cmd_exe" /d /c "echo $(wslpath -w "$cache_dir/wallpaper.png")" 2>/dev/null | tr -d '\r')"
 
-powershell.exe -NoProfile -Command "
+"$powershell_exe" -NoProfile -Command "
   \$path = \"$win_wallpaper_path\";
   \$current = (Get-ItemProperty -Path 'HKCU:\Control Panel\Desktop' -Name Wallpaper -ErrorAction SilentlyContinue).Wallpaper;
   Set-ItemProperty -Path 'HKCU:\Control Panel\Desktop' -Name Wallpaper -Value \$path;

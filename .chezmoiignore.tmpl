@@ -95,14 +95,16 @@ settings.local.json
 .config/delta/**
 {{- end }}
 {{- if eq .machine "vespasian" }}
-# WSL Ubuntu: no Linux desktop session (Windows Terminal is the terminal), no
-# Omarchy agent daemons, and the mice are configured from Windows.
+# WSL Ubuntu has no Omarchy desktop, but it does have WSLg and a systemd user
+# manager. Keep Linux GUI/portable service config separate from Omarchy-only
+# desktop config below.
 .config/hypr
 .config/hypr/**
-.config/ghostty
-.config/ghostty/**
 .config/systemd
 .config/systemd/**
+!.config/systemd/
+!.config/systemd/user/
+!.config/systemd/user/herdr-outpost-relay.service
 .config/1password
 .config/1password/**
 .config/chrome-flags.conf

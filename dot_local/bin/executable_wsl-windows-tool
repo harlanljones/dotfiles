@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# Resolve Windows executables from WSL even when appendWindowsPath has not
+# populated PATH (for example, in a systemd-launched or restricted session).
+
+set -euo pipefail
+
+usage() {
+  echo "usage: wsl-windows-tool path {cmd|powershell|reg|winget|wsl}" >&2
+  exit 2
+}
+
+[[ $# -eq 2 && $1 == path ]] || usage
+
+tool="${2%.exe}"
+candidates=()
+
+case "$tool" in
+  cmd)
+    candidates=(
+      "$(command -v cmd.exe 2>/dev/null || true)"
+      /mnt/c/Windows/System32/cmd.exe
+    )
+    ;;
+  powershell)
+    candidates=(
+      "$(command -v powershell.exe 2>/dev/null || true)"
+      /mnt/c/Windows/System32/WindowsPowerShell/v1.0/powershell.exe
+      /mnt/c/Windows/System32/powershell.exe
+    )
+    ;;
+  reg)
+    candidates=(
+      "$(command -v reg.exe 2>/dev/null || true)"
+      /mnt/c/Windows/System32/reg.exe
+    )
+    ;;
+  winget)
+    candidates=(
+      "$(command -v winget.exe 2>/dev/null || true)"
+      /mnt/c/Windows/System32/winget.exe
+      /mnt/c/Users/*/AppData/Local/Microsoft/WindowsApps/winget.exe
+    )
+    ;;
+  wsl)
+    candidates=(
+      "$(command -v wsl.exe 2>/dev/null || true)"
+      /mnt/c/Windows/System32/wsl.exe
+    )
+    ;;
+  *)
+    echo "wsl-windows-tool: unsupported tool: $2" >&2
+    exit 2
+    ;;
+esac
+
+for candidate in "${candidates[@]}"; do
+  if [[ -n "$candidate" && -x "$candidate" ]]; then
+    printf '%s\n' "$candidate"
+    exit 0
+  fi
+done
+
+echo "wsl-windows-tool: unable to resolve $tool.exe" >&2
+exit 1

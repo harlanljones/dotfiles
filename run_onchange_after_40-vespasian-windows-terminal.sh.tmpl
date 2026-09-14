@@ -16,18 +16,20 @@
 
 set -euo pipefail
 
-if ! command -v cmd.exe >/dev/null 2>&1 || ! command -v wslpath >/dev/null 2>&1; then
+windows_tool="$HOME/.local/bin/wsl-windows-tool"
+if [[ ! -x "$windows_tool" ]] || ! command -v wslpath >/dev/null 2>&1 || \
+   ! cmd_exe="$($windows_tool path cmd)" || ! powershell_exe="$($windows_tool path powershell)"; then
   echo "windows-terminal: not running under WSL, skipping"
   exit 0
 fi
 
 # cmd.exe warns about UNC working directories; start it from a Windows path.
-win_localappdata="$(cd /mnt/c && cmd.exe /d /c 'echo %LOCALAPPDATA%' 2>/dev/null | tr -d '\r')"
+win_localappdata="$(cd /mnt/c && "$cmd_exe" /d /c 'echo %LOCALAPPDATA%' 2>/dev/null | tr -d '\r')"
 wsl_localappdata="$(wslpath "$win_localappdata")"
 
 # 1. Match Windows system and app appearance to the coordinated theme.
 # Day uses Windows light mode; Night, Moon, and Storm use dark mode.
-powershell.exe -NoProfile -Command '
+"$powershell_exe" -NoProfile -Command '
   $path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize";
   $desired = {{ if eq $appearance "light" }}1{{ else }}0{{ end }};
   $current = Get-ItemProperty -Path $path -ErrorAction SilentlyContinue;

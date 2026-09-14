@@ -11,13 +11,15 @@
 
 set -euo pipefail
 
-if ! command -v reg.exe >/dev/null 2>&1 || ! command -v wslpath >/dev/null 2>&1; then
+windows_tool="$HOME/.local/bin/wsl-windows-tool"
+if [[ ! -x "$windows_tool" ]] || ! command -v wslpath >/dev/null 2>&1 || \
+   ! cmd_exe="$($windows_tool path cmd)" || ! reg_exe="$($windows_tool path reg)"; then
   echo "nerd-font: not running under WSL, skipping"
   exit 0
 fi
 
 version="{{ $wt.nerdFontsVersion }}"
-win_localappdata="$(cd /mnt/c && cmd.exe /d /c 'echo %LOCALAPPDATA%' 2>/dev/null | tr -d '\r')"
+win_localappdata="$(cd /mnt/c && "$cmd_exe" /d /c 'echo %LOCALAPPDATA%' 2>/dev/null | tr -d '\r')"
 win_fonts_dir="$win_localappdata\\Microsoft\\Windows\\Fonts"
 fonts_dir="$(wslpath "$win_localappdata")/Microsoft/Windows/Fonts"
 marker="$fonts_dir/.jetbrainsmono-nerd-font-$version"
@@ -41,7 +43,7 @@ count=0
 for ttf in "$tmp"/ttf/*.ttf; do
   file="${ttf##*/}"
   cp -f "$ttf" "$fonts_dir/$file"
-  reg.exe add 'HKCU\Software\Microsoft\Windows NT\CurrentVersion\Fonts' \
+  "$reg_exe" add 'HKCU\Software\Microsoft\Windows NT\CurrentVersion\Fonts' \
     /v "${file%.ttf} (TrueType)" /t REG_SZ /d "$win_fonts_dir\\$file" /f >/dev/null
   count=$((count + 1))
 done

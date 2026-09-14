@@ -26,8 +26,8 @@ fi
 opt_hint="brew bundle --file=~/.Brewfile"
 optional="mise eza delta starship gh fzf zoxide atuin direnv nvim lazygit ghostty"
 {{- else if and (hasKey .chezmoi.osRelease "id") (eq .chezmoi.osRelease.id "ubuntu") }}
-opt_hint="xargs -a ~/.config/apt/pkglist.txt sudo apt-get install -y; then mise install"
-optional="mise eza delta starship gh fzf zoxide atuin direnv nvim lazygit"
+opt_hint="xargs -a ~/.config/apt/pkglist.txt sudo apt-get install -y; then mise install; Ghostty may require a separate WSLg install on Ubuntu 24.04"
+optional="mise eza delta starship gh fzf zoxide atuin direnv nvim lazygit ghostty"
 {{- else }}
 opt_hint="sudo pacman -S --needed <packages>; AUR entries: see ~/.config/pacman/aurlist.txt"
 optional="mise eza delta starship gh fzf zoxide atuin direnv nvim lazygit ollama ghostty"
@@ -102,4 +102,3 @@ if [ -n "$missing_opt" ]; then
 fi
 
 echo "verify-deps: OK"
-
