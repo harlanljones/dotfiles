@@ -522,6 +522,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   ├── executable_piper
 │   │   ├── executable_ratbagctl
 │   │   ├── executable_statusline.tmpl
+│   │   ├── executable_wsl-windows-tool
 │   │   └── symlink_evot
 │   └── share
 │       ├── applications
@@ -559,6 +560,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 ├── run_onchange_after_44-vespasian-windows-debloat.sh.tmpl
 ├── run_onchange_after_45-vespasian-desktop-tools.sh.tmpl
 ├── run_onchange_after_46-vespasian-wallpaper.sh.tmpl
+├── run_onchange_after_47-vespasian-wsl-boot.sh.tmpl
 └── run_onchange_before_09-install-agent-skills.sh.tmpl
 ```
 <!-- END REPO TREE -->
