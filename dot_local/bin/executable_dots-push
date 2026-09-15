@@ -5,18 +5,24 @@
 # Usage:
 #   dots-push
 #
-# Environment overrides:
-#   CHEZMOI_DIR           Chezmoi source directory (default: ~/.local/share/chezmoi)
-#   OLLAMA_COMMIT_MODEL   Model used for message generation
-#                         (default: qwen2.5-coder:7b)
-#   MAX_DIFF_LINES        Diff lines sent to Ollama (default: 400)
-#   DOTS_PUSH_NO_CAPTURE  Set to 1 to skip the omarchy template capture step
-#                         (used by `dots push`, which already captured).
+# Message generation is delegated to ollama-commit-msg.sh (the same generator
+# used by the <leader>P/<leader>C LazyVim keymaps): chat API + system prompt +
+# few-shot example, char-budgeted truncation, lockfile/minified exclusion, and
+# proper sanitization. Do not reinvent that here — a naive `ollama run` +
+# `head -n1` + blind 72-char cut mangles multi-line or larger-diff output
+# (truncates mid-token instead of stopping at a clean boundary).
+#
+# Environment overrides (see ollama-commit-msg.sh for the full list):
+#   CHEZMOI_DIR                 Chezmoi source directory (default: ~/.local/share/chezmoi)
+#   OLLAMA_COMMIT_MODEL         Model used for message generation
+#                               (default: qwen2.5-coder:7b)
+#   OLLAMA_COMMIT_MAX_DIFF_CHARS  Diff chars sent to Ollama (default: 20000)
+#   DOTS_PUSH_NO_CAPTURE        Set to 1 to skip the omarchy template capture step
+#                               (used by `dots push`, which already captured).
 set -euo pipefail
 
 DOTFILES="${CHEZMOI_DIR:-$HOME/.local/share/chezmoi}"
-MODEL="${OLLAMA_COMMIT_MODEL:-qwen2.5-coder:7b}"
-MAX_DIFF_LINES=400
+MSG_GENERATOR="$HOME/.local/bin/ollama-commit-msg.sh"
 
 cd "$DOTFILES"
 
@@ -39,17 +45,13 @@ fi
 
 git add -A
 
-set +o pipefail
-diff=$(git diff --cached | head -n "$MAX_DIFF_LINES")
-msg=$(ollama run "$MODEL" "Write one concise conventional-commit message line (max 72 chars) summarizing this diff of dotfiles. Reply with ONLY the message text, no quotes, no code fences, no explanation.
-
-Diff:
-$diff" 2>/dev/null | grep -v '^[[:space:]]*$' | head -n1)
-set -o pipefail
-msg=$(printf '%s' "$msg" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//;s/^```.*$//;s/```$//')
-msg=${msg:0:72}
+msg=""
+if [[ -x "$MSG_GENERATOR" ]]; then
+  msg="$("$MSG_GENERATOR" 2>/dev/null || true)"
+fi
+msg="$(printf '%s\n' "$msg" | sed '/./,$!d')"
 [ -z "$msg" ] && msg="chore: update dotfiles $(date +%Y-%m-%d)"
 
 git commit -m "$msg"
 git push
-echo "Pushed: $msg"
+echo "Pushed: $(printf '%s' "$msg" | head -n1)"
