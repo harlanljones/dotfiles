@@ -781,6 +781,23 @@ cmd_doctor() {
     if [[ "$missing_tools" -gt 0 ]]; then
       echo -e "   ${YELLOW}!${NC} ${DIM}$missing_tools requested mise tool(s) missing; run: mise install${NC}"
     fi
+
+    # 4a. pipx-backed mise tools can report "installed" with an empty venv
+    # (interrupted `uv tool install`); catch that before `hermes` etc. fail at runtime.
+    local pipx_installs="$HOME/.local/share/mise/installs"
+    if [[ -d "$pipx_installs" ]]; then
+      local version_dir tool_name venv_dir sp_dir
+      while IFS= read -r version_dir; do
+        tool_name="$(basename "$(dirname "$version_dir")")"
+        tool_name="${tool_name#pipx-}"
+        venv_dir="$version_dir/$tool_name"
+        [[ -d "$venv_dir" ]] || continue
+        sp_dir=$(find "$venv_dir/lib" -mindepth 2 -maxdepth 2 -type d -name "site-packages" 2>/dev/null | head -n1)
+        if [[ -z "$sp_dir" ]] || [[ -z "$(ls -A "$sp_dir" 2>/dev/null)" ]]; then
+          echo -e "   ${YELLOW}!${NC} ${DIM}pipx:$tool_name venv looks empty/broken; run: mise uninstall pipx:$tool_name && mise install pipx:$tool_name${NC}"
+        fi
+      done < <(find "$pipx_installs" -mindepth 2 -maxdepth 2 -type d -path "*/pipx-*" 2>/dev/null)
+    fi
   fi
   if command -v bun >/dev/null 2>&1; then
     local bun_ver
