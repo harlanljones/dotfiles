@@ -60,6 +60,8 @@ It wraps common chezmoi commands to simplify daily tasks.
 | `dots diff` | Displays pending changes between the repo and your home directory. |
 | `dots status` | Displays the status of modified, added, or untracked files. |
 | `dots absorb <file>` | Captures modified local files back into the chezmoi repository. |
+| `dots backup` | Archives the current state of files an apply would change to `~/.local/share/dots-backups/` (tar + sha256 manifest) for rollback. |
+| `dots uninstall` | Restores the latest backup, then removes chezmoi-managed files from the home directory (TTY confirmation or `--yes` required). |
 | `dots edit <file>` | Opens the source template for a managed file in your editor. |
 | `dots update` | Pulls the latest changes from git and applies them. |
 | `dots push` | Adds modified files, generates a commit message, and pushes to git. |

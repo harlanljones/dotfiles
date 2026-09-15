@@ -104,6 +104,8 @@ ${BOLD}COMMANDS:${NC}
   ${CYAN}capture, cap${NC}     Capture create_ templates + plugin manifest (live -> repo)
   ${CYAN}edit, ed${NC}          Edit the source template for a target managed file
   ${CYAN}cd${NC}                Open a shell or print the chezmoi source directory path
+  ${CYAN}backup${NC}           Snapshot files an apply would change (rollback safety)
+  ${CYAN}uninstall${NC}        Remove chezmoi-managed files (restores latest backup)
   ${CYAN}update, pull${NC}      Pull latest dotfiles from git remote and apply
   ${CYAN}push, pp${NC}          Capture templates, commit & push with Ollama-generated message
   ${CYAN}doctor${NC}            Run diagnostics on tools, age keys, agent links, template drift
@@ -154,6 +156,21 @@ ${BOLD}OPTIONS FOR ABSORB:${NC}
   -n, --dry-run      Preview template capture + re-add without writing
   --prune            Also drop plugin manifest entries no longer installed
   --omarchy          Capture omarchy templates/manifest only (skip generic re-add)
+
+${BOLD}OPTIONS FOR BACKUP:${NC}
+  Archives the current on-disk state of every managed target that an apply
+  would change (from 'chezmoi status'), so a bad apply can be rolled back.
+  Encrypted targets are backed up like ordinary files (their current
+  on-disk state; archives are chmod 600 and the backup dir is 700).
+  Location: ~/.local/share/dots-backups/<timestamp>.tar.gz (+ .manifest.tsv)
+  -n, --dry-run      List what would be archived without writing anything
+
+${BOLD}OPTIONS FOR UNINSTALL:${NC}
+  Restores the latest backup (if any), then removes every chezmoi-managed
+  file from the home directory. Never touches unmanaged files: ~/.hermes/
+  profiles, state.db, memories, sessions, .env, or dotfiles-showcase.
+  Requires confirmation on a TTY; refuses to run non-interactively without:
+  --yes              Skip the confirmation prompt (for non-interactive use)
 
 ${BOLD}OPTIONS FOR THEME:${NC}
   Themes are listed in .chezmoidata/themes.yaml; each machine picks one with
@@ -991,6 +1008,185 @@ cmd_setup() {
   fi
 }
 
+# --------------------------------------------------- backup / uninstall -----
+DOTS_BACKUP_DIR="$HOME/.local/share/dots-backups"
+
+# Print changed target paths from `chezmoi status` (one per line), excluding
+# run_* script entries. Paths are relative to $HOME (no ./ prefix).
+changed_managed_targets() {
+  chezmoi status 2>/dev/null | awk '
+    { path = substr($0, 4)
+      sub(/^\.\//, "", path)
+      if (path !~ /run_/ && path != "") print path
+    }' | sort -u
+}
+
+latest_backup_archive() {
+  ls -1t "$DOTS_BACKUP_DIR"/*.tar.gz 2>/dev/null | head -n 1
+}
+
+cmd_backup() {
+  ensure_chezmoi
+  local dry_run=0
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -n|--dry-run) dry_run=1 ;;
+      -h|--help)
+        echo "Usage: dots backup [-n|--dry-run]"
+        echo "  Archive the current state of targets an apply would change"
+        echo "  to $DOTS_BACKUP_DIR (tar.gz + sha256 manifest)."
+        return 0 ;;
+      -*) echo -e "${RED}error:${NC} Unknown backup flag '$1'." >&2; return 1 ;;
+      *) echo -e "${RED}error:${NC} dots backup takes no arguments." >&2; return 1 ;;
+    esac
+    shift
+  done
+
+  local t
+  # Drop targets that do not currently exist on disk (nothing to snapshot).
+  # Read line-by-line: targets may contain spaces.
+  local -a existing=()
+  while IFS= read -r t; do
+    [[ -n "$t" ]] || continue
+    [[ -e "$HOME/$t" || -L "$HOME/$t" ]] && existing+=("$t")
+  done < <(changed_managed_targets | sort -u)
+
+  if [[ ${#existing[@]} -eq 0 ]]; then
+    echo -e "${GREEN}✓${NC} Nothing to back up (no apply-modified managed files on disk)."
+    return 0
+  fi
+
+  if [[ $dry_run -eq 1 ]]; then
+    echo -e "${CYAN}Would archive (pre-apply state):${NC}"
+    printf '  %s\n' "${existing[@]}"
+    return 0
+  fi
+
+  mkdir -p "$DOTS_BACKUP_DIR"
+  chmod 700 "$DOTS_BACKUP_DIR"
+  local stamp archive manifest n
+  stamp="$(date +%Y%m%dT%H%M%S)"
+  # Second-resolution timestamps can collide with an earlier backup in the
+  # same run; append -N until the name is free.
+  n=2
+  while [[ -e "$DOTS_BACKUP_DIR/$stamp.tar.gz" ]]; do
+    stamp="$(date +%Y%m%dT%H%M%S)-$((n++))"
+  done
+  archive="$DOTS_BACKUP_DIR/$stamp.tar.gz"
+  manifest="$DOTS_BACKUP_DIR/$stamp.manifest.tsv"
+
+  {
+    printf 'path\tsha256\n'
+    for t in "${existing[@]}"; do
+      # .evotai/evot.env is intentionally NOT excluded here: it holds provider
+      # env config, so any backup of would-change targets must include it.
+      if [[ -L "$HOME/$t" ]]; then
+        printf '%s\tlink->%s\n' "$t" "$(readlink -- "$HOME/$t")"
+      else
+        printf '%s\t%s\n' "$t" "$(sha256sum -- "$HOME/$t" | awk '{print $1}')"
+      fi
+    done
+  } > "$manifest"
+
+  # Archive each target with its home-relative path preserved. tar archives
+  # symlinks as symlinks by default, so restore reproduces the link, not a
+  # copy of its target (deliberately no -h, which would dereference them).
+  if tar -C "$HOME" -czf "$archive" -- "${existing[@]}"; then
+    chmod 600 "$archive" "$manifest"
+    echo -e "${GREEN}✓${NC} Backed up ${#existing[@]} file(s) to ${BOLD}$archive${NC}"
+  else
+    rm -f "$archive" "$manifest"
+    echo -e "${RED}error:${NC} tar failed; no backup written." >&2
+    return 1
+  fi
+}
+
+# Targets that must never be removed by uninstall, even if chezmoi claims them.
+uninstall_is_protected() {
+  local t="$1"
+  case "$t" in
+    .hermes/profiles/*|.hermes/state.db|.hermes/memories*|.hermes/sessions*|.hermes/.env|.hermes/*/.env|.env|.config/opencode/opencode.json|.evotai/evot.env)
+      # .evotai/evot.env holds provider env config (secrets-adjacent); never delete.
+      return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+cmd_uninstall() {
+  ensure_chezmoi
+  local assume_yes=0 dry_run=0
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --yes|-y) assume_yes=1 ;;
+      -n|--dry-run) dry_run=1 ;;
+      -h|--help)
+        echo "Usage: dots uninstall [--yes] [-n|--dry-run]"
+        echo "  Restore the latest backup (if any), then remove every"
+        echo "  chezmoi-managed file from \$HOME. Non-interactive runs need --yes."
+        echo "  Always kept (never deleted): .hermes state/env, opencode.json,"
+        echo "  .evotai/evot.env (provider env config)."
+        return 0 ;;
+      -*) echo -e "${RED}error:${NC} Unknown uninstall flag '$1'." >&2; return 1 ;;
+      *) echo -e "${RED}error:${NC} dots uninstall takes no positional arguments." >&2; return 1 ;;
+    esac
+    shift
+  done
+
+  # Managed files only, excluding entries that require decryption (they
+  # would prompt); protected paths are dropped as a hard second guard.
+  local all_targets=() t
+  while IFS= read -r t; do
+    [[ -n "$t" ]] || continue
+    uninstall_is_protected "$t" && continue
+    all_targets+=("$t")
+  done < <(chezmoi managed --include files --exclude encrypted 2>/dev/null)
+
+  if [[ ${#all_targets[@]} -eq 0 ]]; then
+    echo -e "${GREEN}✓${NC} No removable managed files; nothing to uninstall."
+    return 0
+  fi
+
+  if [[ $dry_run -eq 1 ]]; then
+    echo -e "${CYAN}Would remove ${#all_targets[@]} managed file(s):${NC}"
+    printf '  %s\n' "${all_targets[@]}"
+    echo -e "${YELLOW}kept (protected):${NC} .hermes state/env, .config/opencode/opencode.json, .evotai/evot.env"
+    return 0
+  fi
+
+  if [[ $assume_yes -ne 1 ]]; then
+    if [[ ! -t 0 || ! -t 1 ]]; then
+      echo -e "${RED}error:${NC} refusing to uninstall without a TTY; pass --yes to confirm non-interactively." >&2
+      return 1
+    fi
+    echo -e "${YELLOW}This removes ${#all_targets[@]} chezmoi-managed file(s) from \$HOME.${NC}"
+    read -r -p "Type 'uninstall' to confirm: " reply
+    if [[ "$reply" != "uninstall" ]]; then
+      echo "Aborted."
+      return 1
+    fi
+  fi
+
+  # 1. Restore the latest backup before removal, so files an apply overwrote
+  #    come back to their pre-apply state (anything untracked is then removed).
+  local latest
+  latest="$(latest_backup_archive)"
+  if [[ -n "$latest" ]]; then
+    echo -e "${CYAN}Restoring latest backup: $(basename "$latest")${NC}"
+    tar -C "$HOME" -xzf "$latest"
+  else
+    echo -e "${DIM}no backup found in $DOTS_BACKUP_DIR; skipping restore.${NC}"
+  fi
+
+  # 2. Remove managed files (only if they exist; never touch anything else).
+  local removed=0
+  for t in "${all_targets[@]}"; do
+    if [[ -f "$HOME/$t" || -L "$HOME/$t" ]]; then
+      rm -f -- "$HOME/$t" && removed=$((removed + 1))
+    fi
+  done
+  echo -e "${GREEN}✓${NC} Uninstalled: removed $removed managed file(s) from \$HOME."
+}
+
 # Subcommand dispatch
 main() {
   local cmd="${1:-help}"
@@ -1005,6 +1201,8 @@ main() {
     edit|ed)        cmd_edit "$@" ;;
     cd)             cmd_cd "$@" ;;
     update|pull)    cmd_update "$@" ;;
+    backup)         cmd_backup "$@" ;;
+    uninstall)      cmd_uninstall "$@" ;;
     push|pp)        cmd_push "$@" ;;
     doctor)         cmd_doctor "$@" ;;
     theme)          cmd_theme "$@" ;;
