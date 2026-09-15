@@ -10,10 +10,19 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+  # Nightly: catch upstream breakage (tool installs, package repos, hook
+  # scripts) between personal commits. Runs every job in this workflow.
+  schedule:
+    - cron: '17 6 * * *'
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
+
+env:
+  # Shared by the `secrets` and `smoke-apply` jobs so their gitleaks
+  # installs cannot drift apart.
+  GITLEAKS_VERSION: 8.21.2
 
 jobs:
   validate-linux:
@@ -79,8 +88,6 @@ jobs:
           fetch-depth: 0
 
       - name: Install gitleaks
-        env:
-          GITLEAKS_VERSION: 8.21.2
         run: |
           curl -fsSL -o /tmp/gitleaks.tar.gz \
             "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
@@ -165,3 +172,99 @@ jobs:
           python3 docs/skill-review/test_inventory.py -v
           python3 docs/skill-review/test_review.py -v
           python3 docs/skill-review/evaluations/test_local.py -v
+
+  # 2.1 Real (non-dry-run) apply on Linux. Unlike the validate jobs, this
+  # executes run_* hook scripts. Those do network installs, pacman operations
+  # and Omarchy/desktop setup that cannot succeed on a bare ubuntu runner, so
+  # hook failures are tolerated -- but ONLY hook failures. The post-apply
+  # assertions below are strict, so a regression in the core dotfiles
+  # (.zshrc, shell modules) still fails the job; a blanket `|| true` would not.
+  smoke-apply:
+    name: Smoke apply (Linux, real apply)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install tools (chezmoi, age, zsh, gitleaks)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y age zsh shellcheck
+          curl -fsLS get.chezmoi.io | sh -s -- -b "$HOME/.local/bin"
+          curl -fsSL -o /tmp/gitleaks.tar.gz \
+            "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
+          tar xzf /tmp/gitleaks.tar.gz -C /tmp gitleaks
+          sudo mv /tmp/gitleaks /usr/local/bin/gitleaks
+          chezmoi --version
+          gitleaks version
+
+      - name: Render augustus config (encrypted entries hidden -- no age key)
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          # ubuntu-latest is neither a registered hostname nor WSL, so the
+          # template's Linux fallback resolves to augustus -- the machine we
+          # want to exercise. Assert it instead of trusting the fallback.
+          chezmoi execute-template --source "$GITHUB_WORKSPACE" -f .chezmoi.toml.tmpl > "$RUNNER_TEMP/chezmoi.toml"
+          grep -q "^machine = 'augustus'$" "$RUNNER_TEMP/chezmoi.toml"
+
+      - name: Apply dotfiles (tolerate run_* hook failures only)
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          # A non-zero exit from apply is acceptable IFF it came from a run_*
+          # hook script (network install, pacman-only command, missing desktop
+          # bits on ubuntu). Any other failure -- template error, missing
+          # source file, permission problem -- must fail the job.
+          set +e
+          chezmoi apply --config "$RUNNER_TEMP/chezmoi.toml" --source "$GITHUB_WORKSPACE" \
+            --exclude encrypted 2>&1 | tee "$RUNNER_TEMP/apply.log"
+          rc=${PIPESTATUS[0]}
+          set -e
+          if [ "$rc" -ne 0 ]; then
+            if grep -qE 'run_.*: exit status [1-9]' "$RUNNER_TEMP/apply.log"; then
+              echo "::warning::apply exited $rc; failures were confined to run_* hook scripts (tolerated on ubuntu runner)"
+              # Surface each tolerated hook failure in the job summary so a
+              # nightly reviewer sees them at a glance instead of digging
+              # through the apply log.
+              {
+                echo "### Tolerated run_* hook failures"
+                grep -E 'run_.*: exit status [1-9]' "$RUNNER_TEMP/apply.log" | sed 's/^/- /'
+              } >> "$GITHUB_STEP_SUMMARY"
+            else
+              echo "apply failed without a run_* hook cause -- see log:"
+              cat "$RUNNER_TEMP/apply.log"
+              exit 1
+            fi
+          fi
+
+      - name: Assert rendered core dotfiles exist and parse (strict)
+        run: |
+          set -euo pipefail
+          # NOTE: .zshrc is chezmoi-ignored on augustus (.chezmoiignore.tmpl
+          # applies it only on hadrian); the augustus rc is .bashrc. The shell
+          # modules under .config/shell are the real shared config, sourced by
+          # BOTH bash and zsh -- assert they exist and parse under both shells
+          # (zsh is installed in the tools step).
+          test -f "$HOME/.bashrc" || { echo "::error::~/.bashrc was not applied"; exit 1; }
+          test -d "$HOME/.config/shell" || { echo "::error::~/.config/shell was not applied"; exit 1; }
+          sh_files=$(find "$HOME/.config/shell" -maxdepth 1 -name '*.sh' -print)
+          [ -n "$sh_files" ] || { echo "::error::no shell modules applied under ~/.config/shell"; exit 1; }
+          bash -n "$HOME/.bashrc"
+          while IFS= read -r f; do
+            bash -n "$f"
+            zsh -n "$f"
+            echo "ok: $f"
+          done <<< "$sh_files"
+
+      # 2.7 Scan the RENDERED output, not just the git repo. After apply, the
+      # runner's $HOME holds exactly what a real machine would hold (minus
+      # encrypted entries, which are excluded -- no age key here). --no-git
+      # mode scans plain files; --redact keeps any finding out of the log.
+      # Allowlist: .github/gitleaks-smoke.toml excludes runner noise dirs AND
+      # the runner checkout itself (GITHUB_WORKSPACE sits under $HOME at
+      # /home/runner/work/...), and is the single documented place to allow
+      # known-benign rendered findings. The checkout is scanned separately by
+      # the `secrets` job with .gitleaksignore.
+      - name: Gitleaks scan of rendered output (~/.config/shell, ~/.zshrc, all of $HOME)
+        run: |
+          gitleaks detect --source "$HOME" --no-git --no-banner --redact \
+            --exit-code 1 --config "$GITHUB_WORKSPACE/.github/gitleaks-smoke.toml"

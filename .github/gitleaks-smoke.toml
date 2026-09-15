@@ -1,0 +1,39 @@
+# gitleaks config for the smoke-apply job's RENDERED-OUTPUT scan (CI task 2.7).
+#
+# The workflow scans the applied target directory ($HOME on the runner) with
+# `--no-git`. This file is the single documented place to allow known-benign
+# findings in rendered output. Repo history is scanned separately by the
+# `secrets` job (which uses .gitleaksignore) — keep the two allowlists distinct.
+#
+# `useDefault = true` extends gitleaks' built-in ruleset; this config only
+# adjusts the allowlist, it does not replace the rules.
+[extend]
+useDefault = true
+
+# Runner noise: package managers, caches and tool installs under $HOME that
+# the apply step itself triggers (or the ubuntu runner image ships) and that
+# regularly trip generic rules without being our secrets.
+[[allowlists]]
+description = "Runner/tool cache and state dirs that are not applied dotfiles"
+paths = [
+  '''(^|/)\.cache(/|$)''',
+  '''(^|/)\.local/state(/|$)''',
+  '''(^|/)\.local/share/\.cache(/|$)''',
+  '''(^|/)\.npm(/|$)''',
+  '''(^|/)\.bun(/|$)''',
+  '''(^|/)\.cargo(/|$)''',
+  '''(^|/)\.rustup(/|$)''',
+  '''(^|/)\.go(/|$)''',
+  '''(^|/)\.pyenv(/|$)''',
+  '''(^|/)\.mise(/|$)''',
+  # The runner checkout lives INSIDE $HOME on GitHub-hosted runners
+  # (/home/runner/work/<repo>/<repo>), so --source "$HOME" also sweeps the
+  # repo itself: docs/skill-review fixtures and .git objects whose findings
+  # this config does not allowlist and that .gitleaksignore does not apply
+  # to. The paths regex below excludes the workdir; the secrets job scans
+  # the same checkout with .gitleaksignore, so nothing escapes review.
+  '''(^|/)work(/|$)''',
+]
+
+# Add future allowlisted rendered findings here, each with a comment naming
+# the file and why the match is benign. Never allowlist an actual secret.

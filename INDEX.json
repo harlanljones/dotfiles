@@ -20,7 +20,7 @@
       "other": 149,
       "hooks": 24,
       "chezmoi": 10,
-      "repo": 4381
+      "repo": 4382
     }
   },
   "categories": [
@@ -10366,6 +10366,12 @@
       "kind": "chezmoi",
       "category": "chezmoi",
       "role": "Controls how chezmoi renders and applies this tree"
+    },
+    {
+      "source": ".github/gitleaks-smoke.toml",
+      "kind": "repo",
+      "category": "repo",
+      "role": "CI workflows"
     },
     {
       "source": ".github/workflows/ci.yml",

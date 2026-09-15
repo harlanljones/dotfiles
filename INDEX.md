@@ -28,7 +28,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Other configuration](#other-configuration) | 149 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 24 |
 | [Chezmoi control files](#chezmoi-control-files) | 10 |
-| [Repository material (not applied)](#repository-material-not-applied) | 4381 |
+| [Repository material (not applied)](#repository-material-not-applied) | 4382 |
 
 ---
 
@@ -909,6 +909,7 @@ agents and the showcase app should read. This page is the same data for humans.
 
 | Path | Role |
 | --- | --- |
+| `.github/gitleaks-smoke.toml` | CI workflows |
 | `.github/workflows/ci.yml` | CI workflows |
 | `.gitignore` | Git tracking rules |
 | `.gitleaks.toml` | Secret-scan defaults and narrow verified example exceptions |
