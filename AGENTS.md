@@ -110,7 +110,7 @@ The table below is the orienting summary; the index is the detail.
 | `dot_local/bin/cline-safety/` | `git` interceptor that refuses `commit`/`push` under Cline |
 | `dot_local/bin/executable_statusline.tmpl` | Shared cross-harness CLI statusline renderer (Claude Code + Cursor) → `~/.local/bin/statusline` |
 | `dot_local/bin/executable_chrome-profile` | **Chrome profile selector** → `~/.local/bin/chrome-profile`. Discovers profiles from Chrome's `Local State` JSON and launches Chrome in the chosen one (interactive `fzf` picker or fuzzy name/email filter). Cross-platform: Linux (`google-chrome-stable`), macOS (direct `.app` binary), WSL2 (Windows `chrome.exe` via `wslpath`). Shell aliases in `55-apps.sh`: `chrome` (picker), `chrome-work` (primeiq.ai), `chrome-personal` (Personal). Requires `jq`; `fzf` for interactive mode. Usage: `chrome-profile [filter] [URLs...]`, `chrome-profile --list` |
-| `dot_agents/`, `dot_claude/`, `dot_cline/`, `dot_codex/`, `dot_gemini/`, `dot_grok/`, `dot_pi/` | Per-harness config, skills, rules, MCP, hooks |
+| `dot_agents/`, `dot_claude/`, `dot_cline/`, `dot_codex/`, `dot_gemini/`, `dot_grok/`, `dot_hermes/`, `dot_pi/` | Per-harness config, skills, rules, MCP, hooks |
 | `dot_evotai/` | EVOT LLM provider environment config (`~/.evotai/evot.env`) |
 | `.chezmoidata/` | YAML data sources read by `.tmpl`s (`machines`, `agent_skills`, `omarchy_plugins`, `claude_mcp`, `claude_settings`, `codex_projects`, `themes`) |
 | `.chezmoitemplates/themes/<name>/` | Verbatim upstream per-tool theme ports (Windows Terminal, lazygit, delta, fzf, eza, bat, Gemini) included by the themed templates; never applied. Select with `dots theme set <name>` (edits `machines.<machine>.theme.name`), never by editing rendered targets |
@@ -184,6 +184,19 @@ Each CLI/runtime is owned by exactly one manager. Do not spread a tool across tw
   comment in it before "simplifying" it.
 - **After editing any `run_*` hook**, `git gc`/re-apply mentally: `run_onchange_*`
   will re-trigger if contents changed, which may re-run installs.
+- **Hermes is managed separately from the other harnesses.** `dot_hermes/`
+  contains only `~/.hermes/config.yaml` (settings-only; secrets belong in
+  `~/.hermes/.env`, which is never tracked). Hermes is deliberately excluded
+  from the shared cross-harness skills pool (`agent_skills.yaml`,
+  `run_onchange_before_09-install-agent-skills.sh`,
+  `run_after_23-sync-agent-skills.sh`, `~/.agents/skills`) — Hermes has its
+  own skills library, format and workflows. Hermes manages its own skills at
+  runtime (`skill_manage`, `hermes skills`); never add `dot_hermes/skills/`.
+  `~/.hermes/agent-hooks/*` scripts are owned by the repo `./dev`
+  entrypoints (verdict, flipforever), never by chezmoi. Profiles, `state.db`,
+  memories, sessions and caches stay unmanaged. Hermes rewrites `config.yaml`
+  at runtime; after meaningful drift, `chezmoi re-add ~/.hermes/config.yaml`
+  on the authoritative machine.
 - **`dots` CLI** is the human-friendly wrapper (`dots status/diff/update/push/doctor`).
   Prefer `dots push` to commit+push; it generates a Conventional Commit message via
   local Ollama and never commits agent work automatically.

@@ -1,20 +1,21 @@
 {
-  "version": 1,
-  "mcpBoxServers": [],
+  "accountScopes": {},
+  "activeAccountScope": "262d72d966afaf70dfb751ccffb59873b1424579f79f85af6197fa6b69f5f72f",
+  "autoUpdateWhenIdleOptIn": false,
+  "botColorInChatEnabled": false,
+  "egressTunnelEnabled": false,
   "hasSeenOnboarding": true,
   "hasSeenOnboardingAccountScope": "262d72d966afaf70dfb751ccffb59873b1424579f79f85af6197fa6b69f5f72f",
-  "autoUpdateWhenIdleOptIn": false,
-  "egressTunnelEnabled": false,
-  "webauthnProxyEnabled": true,
-  "botColorInChatEnabled": false,
-  "messagesEnabled": false,
+  "localEgressAllowed": true,
+  "localToolPermission": "ask",
+  "mcpBoxServers": [],
   "mcpCustomInstructions": {},
   "mcpCustomInstructionsByServerId": {},
   "mcpDisabledToolsByServerId": {},
-  "localToolPermission": "ask",
-  "activeAccountScope": "262d72d966afaf70dfb751ccffb59873b1424579f79f85af6197fa6b69f5f72f",
+  "messagesEnabled": false,
   "settingsMigrations": [
     "downgrade-persisted-max-fast"
   ],
-  "accountScopes": {}
+  "version": 1,
+  "webauthnProxyEnabled": true
 }

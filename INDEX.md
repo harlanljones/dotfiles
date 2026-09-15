@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**4720 tracked entries** across 16 categories.
+**4721 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -21,7 +21,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Version control](#version-control) | 4 |
 | [Navigation & search](#navigation--search) | 3 |
 | [Toolchain & packages](#toolchain--packages) | 5 |
-| [AI agent harnesses](#ai-agent-harnesses) | 41 |
+| [AI agent harnesses](#ai-agent-harnesses) | 42 |
 | [Background services](#background-services) | 17 |
 | [Custom executables](#custom-executables) | 35 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
@@ -177,6 +177,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.gemini/skills/project-doc-planner` | `dot_gemini/skills/symlink_project-doc-planner` | gemini | symlink |
 | `~/.grok/hooks/herdr-agent-state.sh` | `dot_grok/hooks/executable_herdr-agent-state.sh` | grok | executable |
 | `~/.grok/hooks/herdr.json` | `dot_grok/hooks/herdr.json` | grok | — |
+| `~/.hermes/config.yaml` | `dot_hermes/config.yaml.tmpl` | hermes | template |
 | `~/.pi/agent/skills/project-doc-planner` | `dot_pi/agent/skills/symlink_project-doc-planner` | pi | symlink |
 | `~/.grokbot/settings.json` | `private_dot_grokbot/settings.json` | grokbot | private |
 

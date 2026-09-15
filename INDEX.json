@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 4720,
+    "total": 4721,
     "by_category": {
       "shell": 18,
       "prompt": 1,
@@ -13,7 +13,7 @@
       "vcs": 4,
       "navigation": 3,
       "toolchain": 5,
-      "agents": 41,
+      "agents": 42,
       "services": 17,
       "scripts": 35,
       "security": 2,
@@ -961,6 +961,16 @@
       "category": "agents",
       "attributes": [],
       "subsystem": "grok"
+    },
+    {
+      "source": "dot_hermes/config.yaml.tmpl",
+      "target": "~/.hermes/config.yaml",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "template"
+      ],
+      "subsystem": "hermes"
     },
     {
       "source": "dot_pi/agent/skills/symlink_project-doc-planner",

@@ -39,13 +39,11 @@ fi
 
 git add -A
 
-set +o pipefail
 diff=$(git diff --cached | head -n "$MAX_DIFF_LINES")
 msg=$(ollama run "$MODEL" "Write one concise conventional-commit message line (max 72 chars) summarizing this diff of dotfiles. Reply with ONLY the message text, no quotes, no code fences, no explanation.
 
 Diff:
-$diff" 2>/dev/null | grep -v '^[[:space:]]*$' | head -n1)
-set -o pipefail
+$diff" 2>/dev/null | grep -v '^[[:space:]]*$' | head -n1 || true)
 msg=$(printf '%s' "$msg" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//;s/^```.*$//;s/```$//')
 msg=${msg:0:72}
 [ -z "$msg" ] && msg="chore: update dotfiles $(date +%Y-%m-%d)"

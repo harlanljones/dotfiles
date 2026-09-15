@@ -148,6 +148,7 @@ CATEGORY_RULES = (
     (".grok/", "agents", "grok"),
     (".grokbot/", "agents", "grokbot"),
     (".pi/", "agents", "pi"),
+    (".hermes/", "agents", "hermes"),
     (".evotai/", "agents", "evot"),
     (".config/opencode/", "agents", "opencode"),
     # background services

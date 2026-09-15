@@ -2,7 +2,6 @@
 -- language server; ghost text is a blink-copilot completion source, so TAB
 -- (super-tab preset in blink-cmp.lua) accepts it like any other completion.
 return {
-  { import = "lazyvim.plugins.extras.ai.copilot" },
   {
     "zbirenbaum/copilot.lua",
     opts = {

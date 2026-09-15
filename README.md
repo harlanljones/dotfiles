@@ -531,6 +531,8 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   └── hooks
 │       ├── executable_herdr-agent-state.sh
 │       └── herdr.json
+├── dot_hermes
+│   └── config.yaml.tmpl
 ├── dot_local
 │   ├── bin
 │   │   ├── cline-safety

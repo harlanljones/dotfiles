@@ -1,5 +1,4 @@
 [tools]
-"1password-cli" = "latest"
 bun = "latest"
 chezmoi = "latest"
 gemini = { version = "latest", allow_builds = ["@github/keytar", "node-pty"] }
@@ -11,6 +10,7 @@ node = "latest"
 pnpm = "latest"
 python = "3.12.13"
 ruby = "latest"
+rust = "stable"
 terraform = "latest"
 tflint = "latest"
 uv = "latest"
