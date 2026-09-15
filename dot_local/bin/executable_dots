@@ -686,7 +686,7 @@ cmd_push() {
   # (or the user explicitly opted out) — avoid running it twice.
   export DOTS_PUSH_NO_CAPTURE=1
   echo -e "${CYAN}== Committing & pushing dotfiles repo (Ollama-generated message) ==${NC}"
-  exec dots-push "${passthrough[@]}"
+  exec dots-push ${passthrough[@]+"${passthrough[@]}"}
 }
 
 cmd_doctor() {

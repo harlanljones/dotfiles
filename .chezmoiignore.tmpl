@@ -45,6 +45,10 @@ bun/**
 .pytest_cache/**
 .unlazy
 .unlazy/**
+# Hermes runtime regenerates its skills index cache under ~/.hermes/skills/.hub;
+# it is machine-local, huge (~47M) and never a skill itself.
+.hermes/skills/.hub
+.hermes/skills/.hub/**
 .unlazy-hook-state.json
 **/__pycache__
 **/__pycache__/**

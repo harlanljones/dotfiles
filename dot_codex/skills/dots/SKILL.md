@@ -73,16 +73,6 @@ When editing source files directly in the repository (`~/.local/share/chezmoi` o
 | `dots push` / `dots pp` | Re-add modified targets, generate a conventional commit message with Ollama (`qwen2.5-coder:7b`), commit, and push | `dots push` |
 | `dots doctor` | Run diagnostics on toolchains (`chezmoi`, `mise`, `bun`), age encryption keys, agent skill links, and settings drift | `dots doctor` |
 | `dots cd` | Print or navigate to the chezmoi source directory (`~/.local/share/chezmoi`) | `dots cd` |
-| `dots theme` | List themes (`list`, current marked `*`), print the current key (`current`), or switch (`set <name>`): rewrites `machines.<machine>.theme.name` in the source repo and runs `dots sync` | `dots theme set tokyonight-storm`<br>`--no-sync` (edit repo only) |
-
-### Workflow: Changing the color theme
-
-Never hand-edit themed targets (`~/.config/fzf/theme.sh`, `eza/theme.yml`, `bat/themes/dots.tmTheme`, `delta/theme.gitconfig`, `nvim/lua/plugins/theme.lua`, lazygit `gui:`, Gemini `ui`, the Windows Terminal fragment); they are rendered from the selected theme.
-
-1. `dots theme` to see available themes.
-2. `dots theme set <name>`; it re-applies, which re-runs the Windows Terminal fragment, bat cache, and Claude theme scripts.
-3. Restart Windows Terminal and reopen nvim, then `dots push` to sync the choice.
-4. To add a theme: create `.chezmoitemplates/themes/<name>/` with `windows_terminal.json`, `lazygit.yml`, `delta.gitconfig`, `fzf.sh`, `eza.yml`, `bat.tmTheme`, `gemini.json` (upstream ports, verbatim), register it in `.chezmoidata/themes.yaml` (`label`, `appearance`, `nvimStyle`, `nvimColorscheme`), then `dots theme set <name>`. Neovim loads `folke/tokyonight.nvim`; a non-Tokyo-Night family also needs its plugin in `dot_config/nvim/lua/plugins/theme.lua.tmpl`.
 
 ---
 
@@ -95,8 +85,3 @@ Never hand-edit themed targets (`~/.config/fzf/theme.sh`, `eza/theme.yml`, `bat/
 - **Templates and Scripts**:
   - Files with `.tmpl` are processed by the Go template engine.
   - Scripts prefixed with `run_onchange_` or `run_after_` execute during `dots sync` when modified.
-- **Harness configs are merged, not overwritten** (`dots absorb` / `chezmoi re-add` cannot capture them):
-  - `~/.codex/config.toml` ← `dot_codex/modify_private_config.toml.tmpl` merges the baseline `.chezmoitemplates/codex-config.toml` into the live file. Codex owns `model`, `model_reasoning_effort`, `plan_mode_reasoning_effort`, `service_tier`, `notice`, `hooks` (trust hashes) and tui counters, so model switches never show up in `dots diff`. Project trust is the union of live and `.chezmoidata/codex_projects.yaml`; add a path there only to pre-trust it on a fresh machine. To change a repo-owned key (MCP servers, plugins, features, status line), edit the baseline.
-  - `~/.gemini/settings.json` ← `dot_gemini/modify_private_settings.json.tmpl`: the baseline `.chezmoitemplates/gemini-settings.json` owns only the keys it defines.
-  - `~/.claude/settings.json` ← `run_onchange_after_28`: `claudeSettings` is enforced; `claudeSettingsDefaults` (model, effort, tui) only seeds missing keys.
-- **Machine gating**: three machines share this repo (augustus = Omarchy/Arch, hadrian = macOS, vespasian = Ubuntu on WSL). Gate Omarchy-only config on `eq .machine "augustus"`, not on `eq .chezmoi.os "linux"`.
