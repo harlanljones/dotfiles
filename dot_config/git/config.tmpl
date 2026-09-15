@@ -98,3 +98,11 @@
 {{- end }}
 {{- end }}
 
+# Sanctioned local-override include (same pattern as the shell's 80-local.sh):
+# git silently skips a missing include file, so this is a no-op until
+# ~/.gitconfig.local exists on the machine. That file is unmanaged by chezmoi
+# (no entry in the source tree), so `chezmoi apply` never overwrites it -- put
+# machine-specific git config there instead of editing this template.
+[include]
+	path = ~/.gitconfig.local
+

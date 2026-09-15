@@ -228,6 +228,22 @@ see [`docs/vespasian-boot.md`](docs/vespasian-boot.md).
 
 See [`docs/vespasian-theming.md`](docs/vespasian-theming.md) for detailed Vespasian setup and troubleshooting.
 
+## Local overrides
+
+Machine-local or personal edits should never enter the repo. Two sanctioned,
+unmanaged files exist for them:
+
+- `~/.config/shell/local.sh` — loaded last by the managed
+  `dot_config/shell/80-local.sh` (works in both bash and zsh). Because
+  `local.sh` has no entry in the source tree, chezmoi never creates, overwrites
+  or deletes it; every `chezmoi apply` leaves it untouched.
+- `~/.gitconfig.local` — included from `dot_config/git/config.tmpl`; git
+  silently skips the include until the file exists, and chezmoi never touches it.
+
+Edit these instead of managed files (`~/.bashrc`, `~/.zshrc`,
+`~/.config/git/config`): managed files are clobbered on the next apply. See
+[`dot_config/shell/README.md`](dot_config/shell/README.md) for details.
+
 ## Documentation and Index
 
 The repository includes several guides for maintenance and recovery:
@@ -273,6 +289,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   ├── gemini-settings.json
 │   ├── littlebigmouse
 │   │   └── Current.xml
+│   ├── machine-theme-name.tmpl
 │   └── themes
 │       ├── omarchy-catppuccin
 │       │   ├── bat.tmTheme
@@ -559,6 +576,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   ├── 65-theme.sh
 │   │   ├── 70-cloud.sh
 │   │   ├── 75-tool-paths.sh
+│   │   ├── 80-local.sh
 │   │   └── README.md
 │   ├── starship.toml.tmpl
 │   ├── systemd

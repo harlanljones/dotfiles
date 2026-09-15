@@ -5,7 +5,7 @@
   "summary": {
     "total": 5177,
     "by_category": {
-      "shell": 18,
+      "shell": 19,
       "prompt": 1,
       "terminal": 4,
       "editor": 17,
@@ -17,7 +17,7 @@
       "services": 17,
       "scripts": 35,
       "security": 2,
-      "other": 151,
+      "other": 152,
       "hooks": 24,
       "chezmoi": 10,
       "repo": 4383
@@ -213,6 +213,14 @@
     {
       "source": "dot_config/shell/75-tool-paths.sh",
       "target": "~/.config/shell/75-tool-paths.sh",
+      "kind": "dotfile",
+      "category": "shell",
+      "attributes": [],
+      "subsystem": "shared shell modules"
+    },
+    {
+      "source": "dot_config/shell/80-local.sh",
+      "target": "~/.config/shell/80-local.sh",
       "kind": "dotfile",
       "category": "shell",
       "attributes": [],
@@ -9034,6 +9042,15 @@
       "kind": "dotfile",
       "category": "other",
       "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/machine-theme-name.tmpl",
+      "target": "~/.chezmoitemplates/machine-theme-name",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": [
+        "template"
+      ]
     },
     {
       "source": ".chezmoitemplates/themes/omarchy-catppuccin-latte/bat.tmTheme",

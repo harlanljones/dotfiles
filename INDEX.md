@@ -13,7 +13,7 @@ agents and the showcase app should read. This page is the same data for humans.
 
 | Category | Entries |
 | --- | ---: |
-| [Shell](#shell) | 18 |
+| [Shell](#shell) | 19 |
 | [Prompt](#prompt) | 1 |
 | [Terminal & multiplexer](#terminal--multiplexer) | 4 |
 | [Editors](#editors) | 17 |
@@ -25,7 +25,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Background services](#background-services) | 17 |
 | [Custom executables](#custom-executables) | 35 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Other configuration](#other-configuration) | 151 |
+| [Other configuration](#other-configuration) | 152 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 24 |
 | [Chezmoi control files](#chezmoi-control-files) | 10 |
 | [Repository material (not applied)](#repository-material-not-applied) | 4383 |
@@ -52,6 +52,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/shell/65-theme.sh` | `dot_config/shell/65-theme.sh` | shared shell modules | — |
 | `~/.config/shell/70-cloud.sh` | `dot_config/shell/70-cloud.sh` | shared shell modules | — |
 | `~/.config/shell/75-tool-paths.sh` | `dot_config/shell/75-tool-paths.sh` | shared shell modules | — |
+| `~/.config/shell/80-local.sh` | `dot_config/shell/80-local.sh` | shared shell modules | — |
 | `~/.config/shell/README.md` | `dot_config/shell/README.md` | shared shell modules | — |
 | `~/.zshrc` | `dot_zshrc` | zsh | — |
 
@@ -724,6 +725,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.chezmoitemplates/codex-config.toml` | `.chezmoitemplates/codex-config.toml` | — | — |
 | `~/.chezmoitemplates/gemini-settings.json` | `.chezmoitemplates/gemini-settings.json` | — | — |
 | `~/.chezmoitemplates/littlebigmouse/Current.xml` | `.chezmoitemplates/littlebigmouse/Current.xml` | — | — |
+| `~/.chezmoitemplates/machine-theme-name` | `.chezmoitemplates/machine-theme-name.tmpl` | — | template |
 | `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/bat.tmTheme` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/bat.tmTheme` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/colors.toml` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/colors.toml` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/delta.gitconfig` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/delta.gitconfig` | — | — |

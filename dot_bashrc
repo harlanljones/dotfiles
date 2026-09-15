@@ -23,9 +23,10 @@ fi
 # sourced in numeric order. See that directory's README for what goes where.
 #
 # Do not add configuration to this file. Machine-local additions -- including
-# anything an installer appends -- belong in ~/.config/shell/99-local.sh, which
-# is untracked and sourced last. This file is managed by chezmoi, so edits made
-# here are overwritten on the next `chezmoi apply`.
+# anything an installer appends -- belong in ~/.config/shell/local.sh, which is
+# unmanaged and loaded last by dot_config/shell/80-local.sh. This file is
+# managed by chezmoi, so edits made here are overwritten on the next
+# `chezmoi apply`.
 for _shell_module in "${XDG_CONFIG_HOME:-$HOME/.config}"/shell/*.sh; do
   [ -r "$_shell_module" ] && source "$_shell_module"
 done
