@@ -4,7 +4,7 @@
     {
         "hooks": [
             {
-                "command": "bash '/home/harlan/.codex/herdr-agent-state.sh' session >/dev/null && printf '%s\\n' '{}'",
+                "command": "{ test ! -r '/home/harlan/.codex/herdr-agent-state.sh' || bash '/home/harlan/.codex/herdr-agent-state.sh' session >/dev/null; } && printf '%s\\n' '{}'",
                 "timeout": 10,
                 "type": "command"
             }

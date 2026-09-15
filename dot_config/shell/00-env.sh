@@ -30,6 +30,7 @@ _path_prepend() {
 }
 
 _path_prepend "$HOME/.local/bin"
+_path_prepend "$HOME/.local/share/mise/shims"
 _path_prepend "$HOME/.cache/.bun/bin"
 export PATH
 

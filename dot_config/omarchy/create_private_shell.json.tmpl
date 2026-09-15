@@ -20,7 +20,7 @@
           "verticalFormat": "HH\n—\nmm"
         },
         {
-          "activeGroupId": "default",
+          "activeGroupId": "settings",
           "groups": "[{\"id\":\"default\",\"name\":\"Agents\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"harlan.agents\",\"harlan.agent-leaderboard\",\"robzolkos.github\",\"io.github.rolfkoenders.umarchy\"]},{\"id\":\"work\",\"name\":\"This PC\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"im0001gt.hw-tooltip\",\"omarchy.network\",\"io.github.this-is-npc.dockmarchy\",\"io.github.mtolhuys.disk-lens\",\"hzerrad.bottleneck\",\"taufderl.ipinfo\",\"io.github.tymurbogach.any-monitor\"]},{\"id\":\"settings\",\"name\":\"Settings\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"omarchy.audio\",\"omarchy.bluetooth\",\"omarchy.monitor\",\"esemczak.theme-modes\",\"leoom.aliases\",\"crmne.hyprmoncfg\",\"io.github.imryiuk.workspace-profiles\"]},{\"id\":\"extras\",\"name\":\"Extras\",\"icon\":\"\",\"direction\":\"right\",\"widgets\":[\"omarchy.weather\",\"sportsbar\",\"cristianocorsi.countdown\",\"io.github.omashift.omashift\",\"io.github.letsfg.flights\",\"ryanyogan.hydrate\",\"mohamedmansour.finance\"]}]",
           "id": "io.github.patrickfanella.shelfish",
           "policies": "{}",
@@ -34,22 +34,6 @@
           "shelfishGroupId": "default"
         },
         {
-          "id": "harlan.agents"
-        },
-        {
-          "id": "harlan.agent-leaderboard"
-        },
-        {
-          "id": "robzolkos.github",
-          "includeForks": true,
-          "linkBehavior": "Web app window",
-          "refreshIntervalSec": 600,
-          "repositoryScope": "Owned and organizations"
-        },
-        {
-          "id": "io.github.rolfkoenders.umarchy"
-        },
-        {
           "id": "io.github.patrickfanella.shelfish.group.work",
           "source": "{{ .chezmoi.homeDir }}/.config/omarchy/plugins/io.github.patrickfanella.shelfish/GroupButton.qml",
           "shelfishGroupId": "work"
@@ -58,6 +42,27 @@
           "id": "io.github.patrickfanella.shelfish.group.settings",
           "source": "{{ .chezmoi.homeDir }}/.config/omarchy/plugins/io.github.patrickfanella.shelfish/GroupButton.qml",
           "shelfishGroupId": "settings"
+        },
+        {
+          "id": "omarchy.audio"
+        },
+        {
+          "id": "omarchy.bluetooth"
+        },
+        {
+          "id": "omarchy.monitor"
+        },
+        {
+          "id": "esemczak.theme-modes"
+        },
+        {
+          "id": "leoom.aliases"
+        },
+        {
+          "id": "crmne.hyprmoncfg"
+        },
+        {
+          "id": "io.github.imryiuk.workspace-profiles"
         },
         {
           "id": "io.github.patrickfanella.shelfish.group.extras",
@@ -109,9 +114,6 @@
         },
         {
           "id": "njpatel.omapager"
-        },
-        {
-          "id": "io.github.letsfg.flights"
         }
       ]
     },

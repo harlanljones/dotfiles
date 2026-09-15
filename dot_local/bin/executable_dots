@@ -4,6 +4,14 @@
 
 set -euo pipefail
 
+for _p in "$HOME/.local/share/mise/shims" "$HOME/.local/bin" "$HOME/.cache/.bun/bin"; do
+  case ":${PATH}:" in
+    *":$_p:"*) ;;
+    *) PATH="$_p:$PATH" ;;
+  esac
+done
+export PATH
+
 # ANSI color styling
 BOLD=$'\033[1m'
 DIM=$'\033[2m'
@@ -72,6 +80,9 @@ capture_templates() {
   # (-n/--dry-run, --prune, --commit supported).
   if command -v omarchy-dotfiles-sync >/dev/null 2>&1; then
     omarchy-dotfiles-sync "$@" || return $?
+  elif [[ ! -d "$HOME/.config/omarchy" ]]; then
+    # Not an Omarchy host (Hadrian, Vespasian): nothing to capture.
+    return 0
   else
     echo -e "${YELLOW}warning:${NC} omarchy-dotfiles-sync not found; template capture skipped." >&2
     return 1
@@ -96,6 +107,9 @@ ${BOLD}COMMANDS:${NC}
   ${CYAN}update, pull${NC}      Pull latest dotfiles from git remote and apply
   ${CYAN}push, pp${NC}          Capture templates, commit & push with Ollama-generated message
   ${CYAN}doctor${NC}            Run diagnostics on tools, age keys, agent links, template drift
+  ${CYAN}theme${NC}             Pick, list, show, or switch this machine's color theme
+  ${CYAN}age, key${NC}          Manage age encryption key & 1Password backup/restore
+  ${CYAN}setup${NC}             Run interactive system onboarding & setup wizard
   ${CYAN}help${NC}              Show this help message
 
 ${BOLD}OPTIONS FOR SYNC:${NC}
@@ -105,6 +119,13 @@ ${BOLD}OPTIONS FOR SYNC:${NC}
 
 ${BOLD}OPTIONS FOR DIFF:${NC}
   -a, --all          Include generated script contents in the diff output
+
+${BOLD}OPTIONS FOR THEME:${NC}
+  dots theme                   Open the interactive picker in a terminal
+  dots theme menu              Open the picker explicitly
+  dots theme list              Print all available coordinated themes
+  dots theme set <name>        Select a theme by name
+  --no-sync                    Update the machine selection without applying it
 
 ${BOLD}OPTIONS FOR PUSH:${NC}
   Captures `create_` templates (shell.json) + plugin manifest via
@@ -134,6 +155,26 @@ ${BOLD}OPTIONS FOR ABSORB:${NC}
   --prune            Also drop plugin manifest entries no longer installed
   --omarchy          Capture omarchy templates/manifest only (skip generic re-add)
 
+${BOLD}OPTIONS FOR THEME:${NC}
+  Themes are listed in .chezmoidata/themes.yaml; each machine picks one with
+  machines.<machine>.theme.name. "set" edits that value in the source repo and
+  re-applies, so the choice syncs to other checkouts on the next dots push.
+  list, ls           List available themes (current one marked with *)
+  current            Print the current theme key
+  set <name>         Switch theme and run dots sync
+    --no-sync        Only edit the source repo; apply later with dots sync
+  inspect <name>     Show a theme's registry entry and snapshot manifest
+  import-aether      Import an Omarchy v4 colors.toml (from Aether, or a
+                     public Omarchy theme) as a new immutable theme snapshot.
+                     See docs/aether-theming-integration-proposal.md.
+      --from-colors-toml PATH --id <slug> --label <text>  [--source-name ..]
+                     [--source-repo URL] [--replace]
+      --from-aether [BLUEPRINT]  (Augustus only; requires the aether CLI)
+${BOLD}OPTIONS FOR AGE / KEY:${NC}
+  status             Show key file path, derived public key, and 1Password status
+  backup [vault]     Save age private key to 1Password vault (default: Personal)
+  restore [uri]      Restore age private key from 1Password URI
+
 ${BOLD}EXAMPLES:${NC}
   dots sync                # Fast apply managed dotfiles
   dots diff                # View clean config diff (incl. create_ template drift)
@@ -148,7 +189,232 @@ ${BOLD}EXAMPLES:${NC}
   dots update              # Pull remote changes and apply
   dots push                # Capture templates, commit with AI message, push
   dots doctor              # Verify keys, toolchains, links & template drift
+  dots theme               # List themes, current one marked
+  dots theme set tokyonight-storm  # Switch theme everywhere on this machine
 EOF
+}
+
+# ------------------------------------------------------------------- theme ---
+# A theme is data, not files: .chezmoidata/themes.yaml registers it, the
+# per-tool palettes live in .chezmoitemplates/themes/<name>/, and templates
+# render whichever name machines.<machine>.theme.name selects. Switching only
+# rewrites that one value, so run_onchange scripts (Windows Terminal fragment,
+# bat cache, Claude theme) re-run on their own during the following sync.
+
+theme_current() {
+  chezmoi execute-template \
+    '{{ with (index .machines .machine).theme }}{{ if hasKey . "name" }}{{ .name }}{{ end }}{{ end }}' 2>/dev/null
+}
+
+theme_names() {
+  chezmoi execute-template '{{ range $name, $t := .themes }}{{ $name }}{{ "\t" }}{{ $t.label }}{{ "\n" }}{{ end }}'
+}
+
+cmd_theme() {
+  ensure_chezmoi
+  local sub
+  if [[ $# -eq 0 ]]; then
+    if [[ -t 0 && -t 1 ]]; then
+      sub="menu"
+    else
+      sub="list"
+    fi
+  else
+    sub="$1"
+    shift
+  fi
+
+  case "$sub" in
+    menu|pick|select)
+      cmd_theme_menu "$@"
+      ;;
+    list|ls)
+      local current name label
+      current="$(theme_current)"
+      while IFS=$'\t' read -r name label; do
+        [[ -n "$name" ]] || continue
+        if [[ "$name" == "$current" ]]; then
+          echo -e " ${GREEN}*${NC} ${BOLD}${name}${NC}  ${DIM}${label}${NC}"
+        else
+          echo -e "   ${name}  ${DIM}${label}${NC}"
+        fi
+      done < <(theme_names)
+      [[ -n "$current" ]] || echo -e "${YELLOW}note:${NC} this machine has no theme.name in .chezmoidata/machines.yaml"
+      ;;
+    current)
+      theme_current
+      ;;
+    set)
+      cmd_theme_set "$@"
+      ;;
+    inspect)
+      cmd_theme_inspect "$@"
+      ;;
+    import-aether)
+      if ! command -v dots-theme-import-aether >/dev/null 2>&1; then
+        echo -e "${RED}error:${NC} dots-theme-import-aether is not installed or not in PATH." >&2
+        exit 1
+      fi
+      exec dots-theme-import-aether "$@"
+      ;;
+    *)
+      echo -e "${RED}error:${NC} Unknown theme command '$sub'. Use: dots theme [menu|list|current|set <name>|inspect <name>|import-aether ...]" >&2
+      exit 1
+      ;;
+  esac
+}
+
+cmd_theme_inspect() {
+  local name="${1:-}"
+  if [[ -z "$name" ]]; then
+    echo "Usage: dots theme inspect <name>" >&2
+    exit 1
+  fi
+  if ! theme_names | cut -f1 | grep -qxF "$name"; then
+    echo -e "${RED}error:${NC} unknown theme '$name'." >&2
+    exit 1
+  fi
+  chezmoi execute-template "{{ toJson (index .themes \"$name\") }}" | jq . 2>/dev/null || \
+    chezmoi execute-template "{{ toJson (index .themes \"$name\") }}"
+  local snapshot_dir manifest
+  snapshot_dir="$(get_source_dir)/.chezmoitemplates/themes/$name"
+  manifest="$snapshot_dir/manifest.yaml"
+  if [[ -f "$manifest" ]]; then
+    echo -e "\n${DIM}snapshot manifest ($manifest):${NC}"
+    cat "$manifest"
+  fi
+}
+
+cmd_theme_menu() {
+  local no_sync=0
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --no-sync) no_sync=1 ;;
+      -*) echo -e "${RED}error:${NC} Unknown option '$1'." >&2; exit 1 ;;
+      *) echo -e "${RED}error:${NC} Unexpected argument '$1'." >&2; exit 1 ;;
+    esac
+    shift
+  done
+
+  local current selection name
+  current="$(theme_current)"
+
+  if command -v fzf >/dev/null 2>&1; then
+    selection="$(
+      theme_names |
+        fzf \
+          --delimiter=$'\t' \
+          --with-nth=2 \
+          --height=60% \
+          --layout=reverse \
+          --border=rounded \
+          --prompt='Theme › ' \
+          --header="Current: ${current:-none}  •  Enter applies  •  Esc cancels"
+    )" || return 0
+    name="${selection%%$'\t'*}"
+  else
+    local -a names labels
+    local theme_name label
+    while IFS=$'\t' read -r theme_name label; do
+      [[ -n "$theme_name" ]] || continue
+      names+=("$theme_name")
+      labels+=("$label [$theme_name]")
+    done < <(theme_names)
+
+    echo -e "${BOLD}Choose a theme for this machine${NC} (current: ${current:-none})"
+    PS3="Theme number (or Ctrl-C to cancel): "
+    select selection in "${labels[@]}"; do
+      [[ -n "$selection" ]] || {
+        echo -e "${YELLOW}Choose one of the numbered themes.${NC}" >&2
+        continue
+      }
+      name="${names[REPLY - 1]}"
+      break
+    done
+  fi
+
+  [[ -n "${name:-}" ]] || return 0
+  if [[ $no_sync -eq 1 ]]; then
+    cmd_theme_set "$name" --no-sync
+  else
+    cmd_theme_set "$name"
+  fi
+}
+
+cmd_theme_set() {
+  local name="" no_sync=0
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --no-sync) no_sync=1 ;;
+      -*) echo -e "${RED}error:${NC} Unknown option '$1'." >&2; exit 1 ;;
+      *) name="$1" ;;
+    esac
+    shift
+  done
+
+  if [[ -z "$name" ]]; then
+    echo "Usage: dots theme set <name> [--no-sync]   (see: dots theme list)" >&2
+    exit 1
+  fi
+
+  local machine current src
+  machine="$(chezmoi execute-template '{{ .machine }}')"
+  current="$(theme_current)"
+  src="$(get_source_dir)"
+
+  if [[ -z "$current" ]]; then
+    echo -e "${RED}error:${NC} machine '$machine' has no theme.name in .chezmoidata/machines.yaml; theme switching is not wired up there." >&2
+    exit 1
+  fi
+  if ! theme_names | cut -f1 | grep -qxF "$name"; then
+    echo -e "${RED}error:${NC} unknown theme '$name'. Available:" >&2
+    theme_names | cut -f1 | sed 's/^/  /' >&2
+    exit 1
+  fi
+  if [[ "$name" == "$current" ]]; then
+    echo -e "${GREEN}✓${NC} $machine already uses ${BOLD}$name${NC}"
+    return 0
+  fi
+
+  # Rewrite only machines.<machine>.theme.name, preserving comments and layout
+  # (a YAML round-trip would drop the registry's comments).
+  python3 - "$src/.chezmoidata/machines.yaml" "$machine" "$name" <<'PY'
+import re
+import sys
+
+path, machine, name = sys.argv[1:]
+lines = open(path, encoding="utf-8").read().split("\n")
+try:
+    start = lines.index(f"  {machine}:")
+except ValueError:
+    sys.exit(f"machine {machine} not found in {path}")
+
+in_theme = False
+for i in range(start + 1, len(lines)):
+    line = lines[i]
+    if re.match(r"^ {0,2}\S", line):
+        break  # next machine or top-level key
+    if re.match(r"^    theme:\s*$", line):
+        in_theme = True
+        continue
+    if in_theme and re.match(r"^    \S", line):
+        break  # left the theme block
+    match = re.match(r"^(      name:\s*)\S+(.*)$", line)
+    if in_theme and match:
+        lines[i] = match.group(1) + name + match.group(2)
+        open(path, "w", encoding="utf-8").write("\n".join(lines))
+        sys.exit(0)
+sys.exit(f"theme.name not found for {machine} in {path}")
+PY
+
+  echo -e "${GREEN}✓${NC} $machine theme: ${DIM}$current${NC} -> ${BOLD}$name${NC} (source: .chezmoidata/machines.yaml)"
+
+  if [[ $no_sync -eq 1 ]]; then
+    echo -e "  ${DIM}apply with: dots sync${NC}"
+  else
+    cmd_sync
+  fi
+  echo -e "  ${DIM}Restart Windows Terminal and reopen nvim to see it; dots push syncs the choice.${NC}"
 }
 
 cmd_sync() {
@@ -293,13 +559,13 @@ cmd_capture() {
 
 cmd_absorb() {
   ensure_chezmoi
-  local dry_run=0 prune=0 omarchy_only=0
+  local dry_run=0 omarchy_only=0
   local sync_args=() targets=()
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
       -n|--dry-run) dry_run=1; sync_args+=("-n") ;;
-      --prune) prune=1; sync_args+=("--prune") ;;
+      --prune) sync_args+=("--prune") ;;
       --omarchy) omarchy_only=1 ;;
       -h|--help)
         echo "Usage: dots absorb [-n|--dry-run] [--prune] [--omarchy] [<file-path ...>]"
@@ -449,7 +715,7 @@ cmd_doctor() {
     echo -e " ${RED}✗${NC} ${BOLD}source repo:${NC} $src is not a git repository"
   fi
 
-  # 3. Age encryption key
+  # 3. Age encryption key & 1Password
   local age_key="${HOME}/.config/chezmoi/key.txt"
   if [[ -f "$age_key" ]]; then
     echo -e " ${GREEN}✓${NC} ${BOLD}age key:${NC} found at $age_key"
@@ -458,12 +724,63 @@ cmd_doctor() {
   else
     echo -e " ${YELLOW}!${NC} ${BOLD}age:${NC} age binary not found in PATH"
   fi
+  local op_bin
+  op_bin="$(get_op_cmd)"
+  if [[ -n "$op_bin" ]]; then
+    local op_ver
+    op_ver=$("$op_bin" --version 2>/dev/null || echo "installed")
+    if "$op_bin" whoami >/dev/null 2>&1; then
+      echo -e " ${GREEN}✓${NC} ${BOLD}1password:${NC} $op_bin v$op_ver (authenticated)"
+    else
+      echo -e " ${DIM}–${NC} ${BOLD}1password:${NC} $op_bin v$op_ver (installed; authenticate via desktop app or 'eval \$($op_bin signin)')"
+    fi
+  fi
+
+  # 3b. SSH Agent & Git Commit Signing
+  local ssh_sock="${SSH_AUTH_SOCK:-${HOME}/.1password/agent.sock}"
+  if [[ ! -S "$ssh_sock" ]] || ! SSH_AUTH_SOCK="$ssh_sock" ssh-add -l >/dev/null 2>&1; then
+    if ! pgrep -x wsl-ssh-bridge >/dev/null 2>&1 && command -v wsl-ssh-bridge >/dev/null 2>&1; then
+      rm -f "$ssh_sock"
+      (wsl-ssh-bridge >/dev/null 2>&1 &)
+      sleep 0.5
+    fi
+  fi
+
+  if [[ -S "$ssh_sock" ]]; then
+    local key_count
+    key_count=$(SSH_AUTH_SOCK="$ssh_sock" ssh-add -l 2>/dev/null | grep -E -c '^[0-9]+' || true)
+    key_count="${key_count:-0}"
+    if [[ "$key_count" -gt 0 ]]; then
+      echo -e " ${GREEN}✓${NC} ${BOLD}ssh agent:${NC} active at $ssh_sock ($key_count key(s) loaded)"
+    elif SSH_AUTH_SOCK="$ssh_sock" ssh-add -l 2>&1 | grep -qi 'no identities'; then
+      echo -e " ${YELLOW}!${NC} ${BOLD}ssh agent:${NC} connected but no keys loaded (enable SSH agent in 1Password)"
+    else
+      echo -e " ${YELLOW}!${NC} ${BOLD}ssh agent:${NC} socket present but not responding"
+    fi
+  else
+    echo -e " ${DIM}–${NC} ${BOLD}ssh agent:${NC} socket not active ($ssh_sock)"
+  fi
+
+  local git_signing
+  git_signing=$(git config --get commit.gpgsign 2>/dev/null || echo "false")
+  if [[ "$git_signing" == "true" ]]; then
+    local sign_key
+    sign_key=$(git config --get user.signingkey 2>/dev/null || echo "unset")
+    echo -e " ${GREEN}✓${NC} ${BOLD}git signing:${NC} enabled (key: ${sign_key:0:24}...)"
+  else
+    echo -e " ${DIM}–${NC} ${BOLD}git signing:${NC} not enabled"
+  fi
 
   # 4. Runtime managers (Mise / Bun)
   if command -v mise >/dev/null 2>&1; then
     local mise_ver
     mise_ver=$(mise --version 2>/dev/null | head -n 1)
     echo -e " ${GREEN}✓${NC} ${BOLD}mise:${NC} $mise_ver"
+    local missing_tools
+    missing_tools=$(mise ls --missing 2>/dev/null | wc -l || echo 0)
+    if [[ "$missing_tools" -gt 0 ]]; then
+      echo -e "   ${YELLOW}!${NC} ${DIM}$missing_tools requested mise tool(s) missing; run: mise install${NC}"
+    fi
   fi
   if command -v bun >/dev/null 2>&1; then
     local bun_ver
@@ -528,6 +845,135 @@ cmd_doctor() {
   echo -e "${GREEN}Diagnostics complete.${NC}"
 }
 
+get_op_cmd() {
+  if command -v op.exe >/dev/null 2>&1; then
+    echo "op.exe"
+  elif command -v op >/dev/null 2>&1; then
+    echo "op"
+  else
+    echo ""
+  fi
+}
+
+cmd_age() {
+  local subcmd="${1:-status}"
+  shift || true
+  local key_file="${HOME}/.config/chezmoi/key.txt"
+  local op_bin
+  op_bin="$(get_op_cmd)"
+
+  case "$subcmd" in
+    status)
+      echo -e "${BOLD}=== Age Encryption & 1Password Status ===${NC}"
+      if [[ -f "$key_file" ]]; then
+        local perm
+        perm=$(stat -c '%a' "$key_file" 2>/dev/null || stat -f '%Lp' "$key_file" 2>/dev/null || echo "ok")
+        echo -e " ${GREEN}✓${NC} ${BOLD}age key file:${NC} $key_file (permissions: $perm)"
+        if command -v age-keygen >/dev/null 2>&1; then
+          local pub
+          pub=$(age-keygen -y "$key_file" 2>/dev/null || echo "unable to derive")
+          echo -e "   ${CYAN}Public recipient:${NC} $pub"
+        fi
+      else
+        echo -e " ${YELLOW}!${NC} ${BOLD}age key file:${NC} not found at $key_file"
+      fi
+
+      if [[ -n "$op_bin" ]]; then
+        local op_ver
+        op_ver=$("$op_bin" --version 2>/dev/null || echo "installed")
+        echo -e " ${GREEN}✓${NC} ${BOLD}1Password CLI ($op_bin):${NC} v$op_ver"
+        if "$op_bin" whoami >/dev/null 2>&1; then
+          echo -e "   ${GREEN}✓${NC} 1Password session active"
+        else
+          echo -e "   ${YELLOW}!${NC} 1Password session not authenticated (authenticate via desktop app or 'eval \$($op_bin signin)')"
+        fi
+      else
+        echo -e " ${YELLOW}!${NC} ${BOLD}1Password CLI:${NC} neither op nor op.exe found in PATH"
+      fi
+      ;;
+    backup)
+      if [[ ! -f "$key_file" ]]; then
+        echo -e "${RED}error:${NC} No age key found at $key_file to backup." >&2
+        return 1
+      fi
+      if [[ -z "$op_bin" ]]; then
+        echo -e "${RED}error:${NC} 1Password CLI (op / op.exe) not found in PATH." >&2
+        return 1
+      fi
+      local vault="${1:-}"
+      local vault_args=()
+      local vault_display="default vault"
+      if [[ -n "$vault" ]]; then
+        vault_args=("--vault=$vault")
+        vault_display="vault '$vault'"
+      fi
+      echo -e "${CYAN}Backing up $key_file to 1Password $vault_display via $op_bin...${NC}"
+      if "$op_bin" item get "chezmoi-age-key" ${vault_args[@]+"${vault_args[@]}"} >/dev/null 2>&1; then
+        if "$op_bin" item edit "chezmoi-age-key" notesPlain="$(cat "$key_file")" ${vault_args[@]+"${vault_args[@]}"}; then
+          echo -e "${GREEN}✓ Updated existing 'chezmoi-age-key' item in $vault_display.${NC}"
+        else
+          echo -e "${RED}error:${NC} Failed to update 1Password item. Ensure 1Password is unlocked." >&2
+          return 1
+        fi
+      else
+        if "$op_bin" item create --category="Secure Note" --title="chezmoi-age-key" notesPlain="$(cat "$key_file")" ${vault_args[@]+"${vault_args[@]}"}; then
+          echo -e "${GREEN}✓ Created 'chezmoi-age-key' secure note in $vault_display.${NC}"
+        else
+          echo -e "${RED}error:${NC} Failed to create 1Password item. Ensure 1Password is unlocked." >&2
+          return 1
+        fi
+      fi
+      ;;
+    restore)
+      local uri="${1:-}"
+      if [[ -z "$op_bin" ]]; then
+        echo -e "${RED}error:${NC} 1Password CLI (op / op.exe) not found in PATH." >&2
+        return 1
+      fi
+      mkdir -p "$(dirname "$key_file")"
+      local tmp
+      tmp="$(mktemp)"
+      if [[ -n "$uri" ]]; then
+        echo -e "${CYAN}Restoring age key from 1Password ($uri) via $op_bin...${NC}"
+        if "$op_bin" read "$uri" > "$tmp" 2>/dev/null && [[ -s "$tmp" ]]; then
+          mv "$tmp" "$key_file"
+          chmod 600 "$key_file"
+          echo -e "${GREEN}✓ Age key restored to $key_file (0600).${NC}"
+          return 0
+        fi
+      else
+        echo -e "${CYAN}Retrieving 'chezmoi-age-key' from 1Password via $op_bin...${NC}"
+        if "$op_bin" item get "chezmoi-age-key" --fields notesPlain > "$tmp" 2>/dev/null && [[ -s "$tmp" ]]; then
+          mv "$tmp" "$key_file"
+          chmod 600 "$key_file"
+          echo -e "${GREEN}✓ Age key restored to $key_file (0600).${NC}"
+          return 0
+        fi
+      fi
+      rm -f "$tmp"
+      echo -e "${RED}error:${NC} Failed to read secret from 1Password. Ensure 1Password is unlocked and item exists." >&2
+      return 1
+      ;;
+    *)
+      echo "Usage: dots age [status|backup <vault>|restore <uri>]"
+      return 1
+      ;;
+  esac
+}
+
+cmd_setup() {
+  local src
+  src="$(get_source_dir)"
+  if [[ -x "$src/setup.sh" ]]; then
+    exec "$src/setup.sh" "$@"
+  elif [[ -f "$src/setup.sh" ]]; then
+    exec bash "$src/setup.sh" "$@"
+  else
+    echo -e "${RED}error:${NC} setup.sh not found in $src" >&2
+    exit 1
+  fi
+}
+
 # Subcommand dispatch
 main() {
   local cmd="${1:-help}"
@@ -544,6 +990,9 @@ main() {
     update|pull)    cmd_update "$@" ;;
     push|pp)        cmd_push "$@" ;;
     doctor)         cmd_doctor "$@" ;;
+    theme)          cmd_theme "$@" ;;
+    age|key)        cmd_age "$@" ;;
+    setup)          cmd_setup "$@" ;;
     help|-h|--help) usage ;;
     *)
       echo -e "${RED}error:${NC} Unknown command '$cmd'." >&2
