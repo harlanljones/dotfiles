@@ -69,9 +69,14 @@
 # delta pager (only wired up when the binary is installed)
 
 {{- end }}
+# The gitleaks pre-push hook ships from the dotfiles (dot_config/git/hooks/), so
+# core.hooksPath is set here in the managed template rather than via a
+# machine-local `git config --global` call: one source of truth, applied
+# identically on all three machines.
 [core]
 	fsmonitor = true
 	untrackedCache = true
+	hooksPath = ~/.config/git/hooks
 {{- if lookPath "delta" }}
 	pager = delta
 {{- end }}

@@ -1,5 +1,9 @@
 [tools]
 "1password-cli" = "latest"
+# gitleaks: secret scanner, also used by the pre-push git hook
+# (dot_config/git/hooks/executable_pre-push). mise owns it on every machine so
+# the hook has the binary everywhere; pacman/brew/apt never duplicate it.
+"github:gitleaks/gitleaks" = "latest"
 bun = "latest"
 chezmoi = "latest"
 gemini = { version = "latest", allow_builds = ["@github/keytar", "node-pty"] }

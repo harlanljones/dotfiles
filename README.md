@@ -115,6 +115,20 @@ Shared agent skills live in `~/.agents/skills/`.
 A unified status line displays active models and token costs across Claude Code, Cursor, and Codex.
 Safety rules prevent automated agents from pushing or committing to git directly.
 
+### Secret Scanning
+
+Gitleaks scans commits for secrets. CI runs a full-history scan, and a
+pre-push hook (`~/.config/git/hooks/pre-push`, wired via `core.hooksPath` in
+`~/.config/git/config`) scans outgoing commits with `--redact` on every
+machine before a push leaves it. Gitleaks itself is installed by mise
+(`~/.config/mise/config.toml`); if it is missing, the hook warns and lets the
+push through.
+
+Side effect of the machine-global `core.hooksPath = ~/.config/git/hooks`:
+plain `.git/hooks/` scripts in other repos on this machine are bypassed and
+will not run. Repo-local `core.hooksPath` settings (e.g. Husky in a JS
+project) still win over the global one.
+
 ### Tool Management
 
 Tool versions are managed declaratively with [mise](https://mise.jdx.dev/).
@@ -414,6 +428,8 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   └── config.tmpl
 │   ├── git
 │   │   ├── config.tmpl
+│   │   ├── hooks
+│   │   │   └── executable_pre-push
 │   │   └── ignore
 │   ├── herdr
 │   │   ├── config.toml.tmpl
