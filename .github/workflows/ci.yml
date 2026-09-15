@@ -25,9 +25,21 @@ env:
   GITLEAKS_VERSION: 8.21.2
 
 jobs:
+  # Matrix legs exercise each resolved machine on a plain ubuntu runner:
+  #   augustus  — the template's Linux fallback (no hostname match), asserted
+  #               rather than trusted;
+  #   vespasian — pinned via sed on the rendered config, exercising WSL-only
+  #               ignore/template paths;
+  #   unknown   — an unrecognized host, pinned via sed, asserting that the
+  #               Omarchy-only files are NOT in the apply plan (the fallback
+  #               must not leak desktop config onto an unregistered machine).
   validate-linux:
-    name: Validate (Linux)
+    name: Validate (Linux, ${{ matrix.machine }})
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        machine: [augustus, vespasian, unknown]
     steps:
       - uses: actions/checkout@v4
 
@@ -37,27 +49,64 @@ jobs:
       - name: Install age
         run: sudo apt-get update && sudo apt-get install -y age
 
-      - name: Dry-run apply (encrypted entries excluded -- no age key in CI)
+      - name: Render config and pin machine=${{ matrix.machine }}
         run: |
           export PATH="$HOME/.local/bin:$PATH"
           chezmoi execute-template --source "$GITHUB_WORKSPACE" -f .chezmoi.toml.tmpl > "$RUNNER_TEMP/chezmoi.toml"
-          chezmoi apply --config "$RUNNER_TEMP/chezmoi.toml" --source "$GITHUB_WORKSPACE" --dry-run --exclude encrypted
+          if [ "${{ matrix.machine }}" = augustus ]; then
+            # The runner is not a registered hostname and not WSL, so the
+            # Linux fallback must already resolve to augustus. Assert it.
+            grep -q "^machine = 'augustus'$" "$RUNNER_TEMP/chezmoi.toml"
+          else
+            sed -E "s/^machine = '.*'$/machine = '${{ matrix.machine }}'/" \
+              "$RUNNER_TEMP/chezmoi.toml" > "$RUNNER_TEMP/chezmoi-pinned.toml"
+            grep -q "^machine = '${{ matrix.machine }}'$" "$RUNNER_TEMP/chezmoi-pinned.toml"
+            mv "$RUNNER_TEMP/chezmoi-pinned.toml" "$RUNNER_TEMP/chezmoi.toml"
+          fi
 
-      # The runner is neither a WSL kernel nor DESKTOP-UTOJEVB, so pin the
-      # rendered machine to exercise Vespasian's ignore and template paths.
-      - name: Dry-run apply as Vespasian (WSL)
+      - name: Dry-run apply as ${{ matrix.machine }} (encrypted entries excluded -- no age key in CI)
+        # The unknown leg skips the full dry-run: many templates index
+        # .machines by .machine (ghostty font size, theme names, ...), which
+        # nil-pointers for machine=unknown. That latent gap is tracked
+        # separately; here we cover what the fallback must already guarantee
+        # (the ignore plan), which does not render those templates.
+        if: matrix.machine != 'unknown'
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          chezmoi execute-template --source "$GITHUB_WORKSPACE" -f .chezmoi.toml.tmpl \
-            | sed -E "s/^machine = '.*'$/machine = 'vespasian'/" > "$RUNNER_TEMP/chezmoi-vespasian.toml"
-          grep -q "^machine = 'vespasian'$" "$RUNNER_TEMP/chezmoi-vespasian.toml"
-          chezmoi apply --config "$RUNNER_TEMP/chezmoi-vespasian.toml" --source "$GITHUB_WORKSPACE" --dry-run --exclude encrypted
+          chezmoi apply --config "$RUNNER_TEMP/chezmoi.toml" --source "$GITHUB_WORKSPACE" --dry-run --exclude encrypted
+
+      # 2.6 unknown-machine fallback: with machine=unknown the Omarchy-only
+      # config must be chezmoi-ignored, so the apply plan (`chezmoi managed`)
+      # must not contain any of it, and .chezmoiignore.tmpl must still render
+      # with the Omarchy-only trees listed (listing == excluded).
+      - name: Assert unknown machine excludes Omarchy-only targets
+        if: matrix.machine == 'unknown'
+        run: |
+          export PATH="$HOME/.local/bin:$PATH"
+          set -euo pipefail
+          managed=$(chezmoi managed --config "$RUNNER_TEMP/chezmoi.toml" --source "$GITHUB_WORKSPACE" --exclude encrypted)
+          leaked=$(printf '%s\n' "$managed" | grep -E '^\.config/(omarchy|pacman|btop)(/|$)' || true)
+          if [ -n "$leaked" ]; then
+            echo "::error::machine=unknown leaked Omarchy-only targets into the apply plan:"
+            printf '%s\n' "$leaked"
+            exit 1
+          fi
+          printf '%s\n' "$managed" | grep -q '^\.bashrc$' \
+            || { echo "::error::machine=unknown did not apply .bashrc"; exit 1; }
+          chezmoi execute-template --config "$RUNNER_TEMP/chezmoi.toml" \
+            --source "$GITHUB_WORKSPACE" -f .chezmoiignore.tmpl > "$RUNNER_TEMP/ignore.txt"
+          for tree in .config/omarchy .config/pacman .config/btop; do
+            grep -qx "$tree" "$RUNNER_TEMP/ignore.txt" \
+              || { echo "::error::.chezmoiignore does not exclude $tree under machine=unknown"; exit 1; }
+          done
+          echo "ok: machine=unknown excludes Omarchy-only targets and keeps .bashrc"
 
       - name: Verify dependency gate script renders and runs
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          # Reuse the config from the dry-run step so [data].machine is present;
-          # bare execute-template has no .machine and fails after the gating refactor.
+          # Reuse the pinned config from the render step so [data].machine is
+          # present; bare execute-template has no .machine and fails after the
+          # gating refactor.
           chezmoi execute-template --config "$RUNNER_TEMP/chezmoi.toml" --source "$GITHUB_WORKSPACE" < run_once_before_00-verify-deps.sh.tmpl > /tmp/verify-deps.sh
           sh -n /tmp/verify-deps.sh && sh /tmp/verify-deps.sh
 
@@ -70,10 +119,35 @@ jobs:
       - name: Install chezmoi
         run: brew install chezmoi
 
-      - name: Dry-run apply (encrypted entries excluded -- no age key in CI)
+      - name: Install shellcheck
+        run: brew install shellcheck
+
+      - name: Render config and pin machine=hadrian
         run: |
+          # The darwin fallback already resolves to hadrian, but pin it via sed
+          # so the job keeps exercising Hadrian's paths even if the fallback
+          # order in .chezmoi.toml.tmpl changes.
           chezmoi execute-template --source "$GITHUB_WORKSPACE" -f .chezmoi.toml.tmpl > "$RUNNER_TEMP/chezmoi.toml"
+          sed -E "s/^machine = '.*'$/machine = 'hadrian'/" "$RUNNER_TEMP/chezmoi.toml" > "$RUNNER_TEMP/chezmoi-pinned.toml"
+          grep -q "^machine = 'hadrian'$" "$RUNNER_TEMP/chezmoi-pinned.toml"
+          mv "$RUNNER_TEMP/chezmoi-pinned.toml" "$RUNNER_TEMP/chezmoi.toml"
+
+      - name: Dry-run apply as hadrian (encrypted entries excluded -- no age key in CI)
+        run: |
           chezmoi apply --config "$RUNNER_TEMP/chezmoi.toml" --source "$GITHUB_WORKSPACE" --dry-run --exclude encrypted
+
+      # Hadrian-scoped templates are invisible to the Linux lint job (which
+      # renders with an omarchy override), so macOS-only template errors would
+      # otherwise only surface on the real machine. Render the macOS-defaults
+      # hook with the hadrian pin and shellcheck it.
+      - name: Shellcheck hadrian-scoped script
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/sc_hadrian_defaults.sh"
+          chezmoi execute-template --config "$RUNNER_TEMP/chezmoi.toml" --source "$GITHUB_WORKSPACE" \
+            < run_onchange_after_30-hadrian-macos-defaults.sh.tmpl > "$out"
+          [ -s "$out" ] || { echo "::error::hadrian defaults script rendered empty"; exit 1; }
+          shellcheck -S warning "$out"
 
   secrets:
     name: Secret scan (gitleaks)
