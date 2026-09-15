@@ -189,6 +189,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   ├── claude_mcp.yaml
 │   ├── claude_settings.yaml
 │   ├── codex_projects.yaml
+│   ├── hermes_skills.yaml
 │   ├── machines.yaml
 │   ├── omarchy_plugins.yaml
 │   └── themes.yaml
@@ -532,7 +533,609 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │       ├── executable_herdr-agent-state.sh
 │       └── herdr.json
 ├── dot_hermes
-│   └── config.yaml.tmpl
+│   ├── SOUL.md
+│   ├── config.yaml.tmpl
+│   └── skills
+│       ├── apple
+│       │   ├── DESCRIPTION.md
+│       │   ├── apple-notes
+│       │   │   └── SKILL.md
+│       │   ├── apple-reminders
+│       │   │   └── SKILL.md
+│       │   ├── findmy
+│       │   │   └── SKILL.md
+│       │   └── imessage
+│       │       └── SKILL.md
+│       ├── autonomous-ai-agents
+│       │   ├── DESCRIPTION.md
+│       │   ├── claude-code
+│       │   │   └── SKILL.md
+│       │   ├── codex
+│       │   │   └── SKILL.md
+│       │   ├── computer-use
+│       │   │   └── SKILL.md
+│       │   ├── hermes-agent
+│       │   │   ├── SKILL.md
+│       │   │   ├── references
+│       │   │   │   ├── background-systems.md
+│       │   │   │   ├── cli-reference.md
+│       │   │   │   ├── configuration.md
+│       │   │   │   ├── contributor-guide.md
+│       │   │   │   ├── delegate-task-concurrency-diagnosis.md
+│       │   │   │   ├── desktop-plugins.md
+│       │   │   │   ├── native-mcp.md
+│       │   │   │   ├── petdex.md
+│       │   │   │   ├── portal-auth-for-third-party-apps.md
+│       │   │   │   ├── project-context-files.md
+│       │   │   │   ├── providers-and-models.md
+│       │   │   │   ├── security-privacy.md
+│       │   │   │   ├── slash-commands.md
+│       │   │   │   ├── themes.md
+│       │   │   │   ├── troubleshooting.md
+│       │   │   │   ├── tui-widgets.md
+│       │   │   │   ├── webhooks.md
+│       │   │   │   └── windows-quirks.md
+│       │   │   └── templates
+│       │   │       ├── clock.mjs
+│       │   │       ├── plugin.js
+│       │   │       └── skin.yaml
+│       │   └── opencode
+│       │       └── SKILL.md
+│       ├── creative
+│       │   ├── DESCRIPTION.md
+│       │   ├── architecture-diagram
+│       │   │   ├── SKILL.md
+│       │   │   └── templates
+│       │   │       └── template.html
+│       │   ├── ascii-video
+│       │   │   ├── README.md
+│       │   │   ├── SKILL.md
+│       │   │   └── references
+│       │   │       ├── architecture.md
+│       │   │       ├── composition.md
+│       │   │       ├── effects.md
+│       │   │       ├── inputs.md
+│       │   │       ├── optimization.md
+│       │   │       ├── scenes.md
+│       │   │       ├── shaders.md
+│       │   │       └── troubleshooting.md
+│       │   ├── baoyu-infographic
+│       │   │   ├── PORT_NOTES.md
+│       │   │   ├── SKILL.md
+│       │   │   └── references
+│       │   │       ├── analysis-framework.md
+│       │   │       ├── base-prompt.md
+│       │   │       ├── layouts
+│       │   │       │   ├── bento-grid.md
+│       │   │       │   ├── binary-comparison.md
+│       │   │       │   ├── bridge.md
+│       │   │       │   ├── circular-flow.md
+│       │   │       │   ├── comic-strip.md
+│       │   │       │   ├── comparison-matrix.md
+│       │   │       │   ├── dashboard.md
+│       │   │       │   ├── dense-modules.md
+│       │   │       │   ├── funnel.md
+│       │   │       │   ├── hierarchical-layers.md
+│       │   │       │   ├── hub-spoke.md
+│       │   │       │   ├── iceberg.md
+│       │   │       │   ├── isometric-map.md
+│       │   │       │   ├── jigsaw.md
+│       │   │       │   ├── linear-progression.md
+│       │   │       │   ├── periodic-table.md
+│       │   │       │   ├── story-mountain.md
+│       │   │       │   ├── structural-breakdown.md
+│       │   │       │   ├── tree-branching.md
+│       │   │       │   ├── venn-diagram.md
+│       │   │       │   └── winding-roadmap.md
+│       │   │       ├── structured-content-template.md
+│       │   │       └── styles
+│       │   │           ├── aged-academia.md
+│       │   │           ├── bold-graphic.md
+│       │   │           ├── chalkboard.md
+│       │   │           ├── claymation.md
+│       │   │           ├── corporate-memphis.md
+│       │   │           ├── craft-handmade.md
+│       │   │           ├── cyberpunk-neon.md
+│       │   │           ├── hand-drawn-edu.md
+│       │   │           ├── ikea-manual.md
+│       │   │           ├── kawaii.md
+│       │   │           ├── knolling.md
+│       │   │           ├── lego-brick.md
+│       │   │           ├── morandi-journal.md
+│       │   │           ├── origami.md
+│       │   │           ├── pixel-art.md
+│       │   │           ├── pop-laboratory.md
+│       │   │           ├── retro-pop-grid.md
+│       │   │           ├── storybook-watercolor.md
+│       │   │           ├── subway-map.md
+│       │   │           ├── technical-schematic.md
+│       │   │           └── ui-wireframe.md
+│       │   ├── claude-design
+│       │   │   └── SKILL.md
+│       │   ├── design-md
+│       │   │   ├── SKILL.md
+│       │   │   └── templates
+│       │   │       └── starter.md
+│       │   ├── humanizer
+│       │   │   ├── LICENSE
+│       │   │   └── SKILL.md
+│       │   ├── impeccable
+│       │   │   ├── SKILL.md
+│       │   │   ├── reference
+│       │   │   │   ├── adapt.md
+│       │   │   │   ├── adapt.native.md
+│       │   │   │   ├── android.md
+│       │   │   │   ├── animate.md
+│       │   │   │   ├── audit.md
+│       │   │   │   ├── audit.native.md
+│       │   │   │   ├── bolder.md
+│       │   │   │   ├── clarify.md
+│       │   │   │   ├── colorize.md
+│       │   │   │   ├── craft-floor.md
+│       │   │   │   ├── craft.md
+│       │   │   │   ├── critique.md
+│       │   │   │   ├── degraded
+│       │   │   │   │   ├── asset-producer.md
+│       │   │   │   │   ├── documenter.md
+│       │   │   │   │   ├── finish-reviewer.md
+│       │   │   │   │   └── manual-edit-applier.md
+│       │   │   │   ├── delight.md
+│       │   │   │   ├── distill.md
+│       │   │   │   ├── doctor.md
+│       │   │   │   ├── document.md
+│       │   │   │   ├── extract.md
+│       │   │   │   ├── generate.md
+│       │   │   │   ├── harden.md
+│       │   │   │   ├── hooks.md
+│       │   │   │   ├── init.md
+│       │   │   │   ├── ios.md
+│       │   │   │   ├── layout.md
+│       │   │   │   ├── live-setup.md
+│       │   │   │   ├── live.md
+│       │   │   │   ├── new-work.md
+│       │   │   │   ├── onboard.md
+│       │   │   │   ├── operate.md
+│       │   │   │   ├── optimize.md
+│       │   │   │   ├── overdrive.md
+│       │   │   │   ├── polish.md
+│       │   │   │   ├── quieter.md
+│       │   │   │   ├── routing.md
+│       │   │   │   ├── shape.md
+│       │   │   │   ├── typeset.md
+│       │   │   │   └── visualize.md
+│       │   │   └── scripts
+│       │   │       ├── VERSION
+│       │   │       ├── command-metadata.json
+│       │   │       ├── data
+│       │   │       │   ├── font-index-failures.json
+│       │   │       │   └── font-index.json
+│       │   │       ├── impeccable
+│       │   │       ├── impeccable.cmd
+│       │   │       ├── live-browser-dom.js
+│       │   │       ├── live-browser-ignores.js
+│       │   │       ├── live-browser-session.js
+│       │   │       ├── live-browser.js
+│       │   │       └── modern-screenshot.umd.js
+│       │   ├── manim-video
+│       │   │   ├── README.md
+│       │   │   ├── SKILL.md
+│       │   │   ├── references
+│       │   │   │   ├── animation-design-thinking.md
+│       │   │   │   ├── animations.md
+│       │   │   │   ├── camera-and-3d.md
+│       │   │   │   ├── decorations.md
+│       │   │   │   ├── equations.md
+│       │   │   │   ├── graphs-and-data.md
+│       │   │   │   ├── mobjects.md
+│       │   │   │   ├── paper-explainer.md
+│       │   │   │   ├── production-quality.md
+│       │   │   │   ├── rendering.md
+│       │   │   │   ├── scene-planning.md
+│       │   │   │   ├── troubleshooting.md
+│       │   │   │   ├── updaters-and-trackers.md
+│       │   │   │   └── visual-design.md
+│       │   │   └── scripts
+│       │   │       └── executable_setup.sh
+│       │   ├── p5js
+│       │   │   ├── README.md
+│       │   │   ├── SKILL.md
+│       │   │   ├── references
+│       │   │   │   ├── animation.md
+│       │   │   │   ├── color-systems.md
+│       │   │   │   ├── core-api.md
+│       │   │   │   ├── export-pipeline.md
+│       │   │   │   ├── interaction.md
+│       │   │   │   ├── shapes-and-geometry.md
+│       │   │   │   ├── troubleshooting.md
+│       │   │   │   ├── typography.md
+│       │   │   │   ├── visual-effects.md
+│       │   │   │   └── webgl-and-3d.md
+│       │   │   ├── scripts
+│       │   │   │   ├── executable_export-frames.js
+│       │   │   │   ├── executable_render.sh
+│       │   │   │   ├── executable_serve.sh
+│       │   │   │   └── executable_setup.sh
+│       │   │   └── templates
+│       │   │       └── viewer.html
+│       │   ├── popular-web-designs
+│       │   │   ├── SKILL.md
+│       │   │   └── templates
+│       │   │       ├── airbnb.md
+│       │   │       ├── airtable.md
+│       │   │       ├── apple.md
+│       │   │       ├── bmw.md
+│       │   │       ├── cal.md
+│       │   │       ├── claude.md
+│       │   │       ├── clay.md
+│       │   │       ├── clickhouse.md
+│       │   │       ├── cohere.md
+│       │   │       ├── coinbase.md
+│       │   │       ├── composio.md
+│       │   │       ├── cursor.md
+│       │   │       ├── elevenlabs.md
+│       │   │       ├── expo.md
+│       │   │       ├── figma.md
+│       │   │       ├── framer.md
+│       │   │       ├── hashicorp.md
+│       │   │       ├── ibm.md
+│       │   │       ├── intercom.md
+│       │   │       ├── kraken.md
+│       │   │       ├── linear.app.md
+│       │   │       ├── lovable.md
+│       │   │       ├── minimax.md
+│       │   │       ├── mintlify.md
+│       │   │       ├── miro.md
+│       │   │       ├── mistral.ai.md
+│       │   │       ├── mongodb.md
+│       │   │       ├── notion.md
+│       │   │       ├── nvidia.md
+│       │   │       ├── ollama.md
+│       │   │       ├── opencode.ai.md
+│       │   │       ├── pinterest.md
+│       │   │       ├── posthog.md
+│       │   │       ├── raycast.md
+│       │   │       ├── replicate.md
+│       │   │       ├── resend.md
+│       │   │       ├── revolut.md
+│       │   │       ├── runwayml.md
+│       │   │       ├── sanity.md
+│       │   │       ├── sentry.md
+│       │   │       ├── spacex.md
+│       │   │       ├── spotify.md
+│       │   │       ├── stripe.md
+│       │   │       ├── supabase.md
+│       │   │       ├── superhuman.md
+│       │   │       ├── together.ai.md
+│       │   │       ├── uber.md
+│       │   │       ├── vercel.md
+│       │   │       ├── voltagent.md
+│       │   │       ├── warp.md
+│       │   │       ├── webflow.md
+│       │   │       ├── wise.md
+│       │   │       ├── x.ai.md
+│       │   │       └── zapier.md
+│       │   └── songwriting-and-ai-music
+│       │       └── SKILL.md
+│       ├── devops
+│       │   ├── chezmoi-dotfiles
+│       │   │   └── SKILL.md
+│       │   ├── hermes-repo-devsetup
+│       │   │   └── SKILL.md
+│       │   └── sdlc-review
+│       │       └── SKILL.md
+│       ├── email
+│       │   ├── DESCRIPTION.md
+│       │   ├── email-inbox-triage
+│       │   │   └── SKILL.md
+│       │   └── himalaya
+│       │       ├── SKILL.md
+│       │       └── references
+│       │           ├── configuration.md
+│       │           └── message-composition.md
+│       ├── market-competitor-research
+│       │   └── SKILL.md
+│       ├── media
+│       │   ├── DESCRIPTION.md
+│       │   ├── gif-search
+│       │   │   └── SKILL.md
+│       │   ├── songsee
+│       │   │   └── SKILL.md
+│       │   └── youtube-content
+│       │       ├── SKILL.md
+│       │       ├── references
+│       │       │   └── output-formats.md
+│       │       └── scripts
+│       │           └── fetch_transcript.py
+│       ├── note-taking
+│       │   ├── DESCRIPTION.md
+│       │   └── obsidian
+│       │       └── SKILL.md
+│       ├── productivity
+│       │   ├── DESCRIPTION.md
+│       │   ├── airtable
+│       │   │   └── SKILL.md
+│       │   ├── box
+│       │   │   ├── SKILL.md
+│       │   │   └── references
+│       │   │       ├── bulk-operations.md
+│       │   │       ├── cli-guide.md
+│       │   │       ├── content-workflows.md
+│       │   │       ├── hubs.md
+│       │   │       ├── oauth-setup.md
+│       │   │       ├── rest-api.md
+│       │   │       ├── sdk-development.md
+│       │   │       ├── search-and-ai.md
+│       │   │       ├── troubleshooting.md
+│       │   │       └── webhooks-and-events.md
+│       │   ├── document-to-action-items
+│       │   │   └── SKILL.md
+│       │   ├── docx
+│       │   │   ├── LICENSE
+│       │   │   ├── SKILL.md
+│       │   │   ├── references
+│       │   │   │   └── revisions-and-comments.md
+│       │   │   ├── scripts
+│       │   │   │   ├── docx_comments.py
+│       │   │   │   ├── docx_common.py
+│       │   │   │   ├── docx_create.py
+│       │   │   │   ├── docx_edit.py
+│       │   │   │   ├── docx_read.py
+│       │   │   │   ├── docx_revisions.py
+│       │   │   │   ├── docx_template.py
+│       │   │   │   └── docx_validate.py
+│       │   │   └── tests
+│       │   │       └── test_docx_skill.py
+│       │   ├── google-workspace
+│       │   │   ├── SKILL.md
+│       │   │   ├── references
+│       │   │   │   ├── daily-brief.md
+│       │   │   │   └── gmail-search-syntax.md
+│       │   │   └── scripts
+│       │   │       ├── _hermes_home.py
+│       │   │       ├── executable_gws_bridge.py
+│       │   │       ├── google_api.py
+│       │   │       └── setup.py
+│       │   ├── maps
+│       │   │   ├── SKILL.md
+│       │   │   └── scripts
+│       │   │       └── maps_client.py
+│       │   ├── meeting-action-items
+│       │   │   └── SKILL.md
+│       │   ├── notion
+│       │   │   ├── SKILL.md
+│       │   │   └── references
+│       │   │       └── block-types.md
+│       │   ├── pdf
+│       │   │   ├── LICENSE
+│       │   │   ├── SKILL.md
+│       │   │   ├── references
+│       │   │   │   ├── forms.md
+│       │   │   │   ├── nano-pdf-editing.md
+│       │   │   │   └── ocr-extraction.md
+│       │   │   ├── scripts
+│       │   │   │   ├── _raster.py
+│       │   │   │   ├── extract_marker.py
+│       │   │   │   ├── extract_pymupdf.py
+│       │   │   │   ├── pdf_create.py
+│       │   │   │   ├── pdf_fill_form.py
+│       │   │   │   ├── pdf_form_layout.py
+│       │   │   │   ├── pdf_make_form.py
+│       │   │   │   ├── pdf_merge.py
+│       │   │   │   ├── pdf_meta.py
+│       │   │   │   ├── pdf_page_image.py
+│       │   │   │   ├── pdf_read.py
+│       │   │   │   ├── pdf_secure.py
+│       │   │   │   ├── pdf_split.py
+│       │   │   │   ├── pdf_stamp.py
+│       │   │   │   └── pdf_watermark.py
+│       │   │   └── tests
+│       │   │       └── test_pdf_skill.py
+│       │   ├── powerpoint
+│       │   │   ├── LICENSE
+│       │   │   ├── SKILL.md
+│       │   │   ├── scripts
+│       │   │   │   ├── pptx_create.py
+│       │   │   │   ├── pptx_edit.py
+│       │   │   │   ├── pptx_from_template.py
+│       │   │   │   ├── pptx_read.py
+│       │   │   │   └── pptx_render.py
+│       │   │   └── tests
+│       │   │       └── test_powerpoint_skill.py
+│       │   ├── product-price-monitor
+│       │   │   └── SKILL.md
+│       │   ├── teams-meeting-pipeline
+│       │   │   └── SKILL.md
+│       │   ├── weekly-review-planning
+│       │   │   └── SKILL.md
+│       │   └── xlsx
+│       │       ├── LICENSE
+│       │       ├── SKILL.md
+│       │       ├── references
+│       │       │   └── restructuring.md
+│       │       ├── scripts
+│       │       │   ├── csv_to_xlsx.py
+│       │       │   ├── xlsx_create.py
+│       │       │   ├── xlsx_edit.py
+│       │       │   ├── xlsx_read.py
+│       │       │   ├── xlsx_recalc.py
+│       │       │   ├── xlsx_restructure.py
+│       │       │   └── xlsx_to_csv.py
+│       │       └── tests
+│       │           └── test_xlsx_skill.py
+│       ├── ratatui-tui
+│       │   ├── SKILL.md
+│       │   ├── assets
+│       │   │   └── templates
+│       │   │       ├── async-app
+│       │   │       │   ├── Cargo.toml
+│       │   │       │   └── src
+│       │   │       │       └── main.rs
+│       │   │       ├── component-app
+│       │   │       │   ├── Cargo.toml
+│       │   │       │   └── src
+│       │   │       │       ├── action.rs
+│       │   │       │       ├── app.rs
+│       │   │       │       ├── config.rs
+│       │   │       │       ├── event.rs
+│       │   │       │       ├── logging.rs
+│       │   │       │       ├── main.rs
+│       │   │       │       ├── tui.rs
+│       │   │       │       └── ui.rs
+│       │   │       ├── hello-world
+│       │   │       │   ├── Cargo.toml
+│       │   │       │   └── src
+│       │   │       │       └── main.rs
+│       │   │       └── simple-app
+│       │   │           ├── Cargo.toml
+│       │   │           └── src
+│       │   │               └── main.rs
+│       │   ├── references
+│       │   │   ├── architecture-patterns.md
+│       │   │   ├── async-patterns.md
+│       │   │   ├── image-integration.md
+│       │   │   └── style-guide.md
+│       │   └── workflows
+│       │       └── tui-review.js
+│       ├── repo-scaffold
+│       │   └── SKILL.md
+│       ├── research
+│       │   ├── DESCRIPTION.md
+│       │   ├── arxiv
+│       │   │   ├── SKILL.md
+│       │   │   └── scripts
+│       │   │       └── search_arxiv.py
+│       │   ├── competitor-news-monitor
+│       │   │   └── SKILL.md
+│       │   ├── grounded-citations
+│       │   │   ├── SKILL.md
+│       │   │   ├── references
+│       │   │   │   ├── citation-formats.md
+│       │   │   │   └── grounding-rationale.md
+│       │   │   └── scripts
+│       │   │       ├── _hermes_home.py
+│       │   │       └── sources.py
+│       │   └── llm-wiki
+│       │       └── SKILL.md
+│       ├── social-media
+│       │   ├── DESCRIPTION.md
+│       │   └── xurl
+│       │       └── SKILL.md
+│       ├── software-development
+│       │   ├── codebase-inspection
+│       │   │   └── SKILL.md
+│       │   ├── dogfood
+│       │   │   ├── SKILL.md
+│       │   │   ├── references
+│       │   │   │   └── issue-taxonomy.md
+│       │   │   └── templates
+│       │   │       └── dogfood-report-template.md
+│       │   ├── github
+│       │   │   ├── SKILL.md
+│       │   │   ├── references
+│       │   │   │   ├── auth.md
+│       │   │   │   ├── ci-troubleshooting.md
+│       │   │   │   ├── code-review.md
+│       │   │   │   ├── conventional-commits.md
+│       │   │   │   ├── github-api-cheatsheet.md
+│       │   │   │   ├── issue-to-pr.md
+│       │   │   │   ├── issues.md
+│       │   │   │   ├── pr-workflow.md
+│       │   │   │   ├── repo-management.md
+│       │   │   │   └── review-output-template.md
+│       │   │   ├── scripts
+│       │   │   │   ├── executable_gh-env.sh
+│       │   │   │   └── git-credential-token.py
+│       │   │   └── templates
+│       │   │       ├── bug-report.md
+│       │   │       ├── feature-request.md
+│       │   │       ├── pr-body-bugfix.md
+│       │   │       └── pr-body-feature.md
+│       │   ├── grill-me
+│       │   │   └── SKILL.md
+│       │   ├── hermes-agent-skill-authoring
+│       │   │   └── SKILL.md
+│       │   ├── hermes-repo-profiles
+│       │   │   └── SKILL.md
+│       │   ├── inspecting-hermes-desktop-dom
+│       │   │   └── SKILL.md
+│       │   ├── node-inspect-debugger
+│       │   │   └── SKILL.md
+│       │   ├── python-debugpy
+│       │   │   └── SKILL.md
+│       │   ├── requesting-code-review
+│       │   │   └── SKILL.md
+│       │   ├── rust
+│       │   │   └── SKILL.md
+│       │   ├── simplify-code
+│       │   │   └── SKILL.md
+│       │   ├── spike
+│       │   │   └── SKILL.md
+│       │   ├── subagent-driven-development
+│       │   │   ├── SKILL.md
+│       │   │   └── references
+│       │   │       ├── context-budget-discipline.md
+│       │   │       └── gates-taxonomy.md
+│       │   ├── systematic-debugging
+│       │   │   └── SKILL.md
+│       │   └── test-driven-development
+│       │       └── SKILL.md
+│       ├── sqlite
+│       │   ├── SKILL.md
+│       │   ├── _meta.json
+│       │   └── skill-card.md
+│       ├── symlink_agent-reach
+│       ├── symlink_ai-image-generation
+│       ├── symlink_animate
+│       ├── symlink_animate-expo
+│       ├── symlink_animation-vocabulary
+│       ├── symlink_apple-design
+│       ├── symlink_ask-sonner
+│       ├── symlink_editor
+│       ├── symlink_emil-design-eng
+│       ├── symlink_find-animation-opportunities
+│       ├── symlink_flyai
+│       ├── symlink_improve-animations
+│       ├── symlink_pick-ui-library
+│       ├── symlink_review-animations
+│       ├── symlink_supabase
+│       ├── symlink_supabase-postgres-best-practices
+│       ├── symlink_unlazy
+│       ├── symlink_watch
+│       ├── symlink_write-swift
+│       ├── web
+│       │   ├── DESCRIPTION.md
+│       │   └── blocked-page-recovery
+│       │       ├── SKILL.md
+│       │       └── scripts
+│       │           └── recover_page.py
+│       └── web-development
+│           └── scrollcraft
+│               ├── LICENSE.txt
+│               ├── SKILL.md
+│               ├── engine
+│               │   ├── scrollcraft.css
+│               │   └── scrollcraft.js
+│               ├── references
+│               │   ├── assets.md
+│               │   ├── device-diag.html
+│               │   ├── devices.md
+│               │   ├── feel.md
+│               │   ├── taste.md
+│               │   ├── template.html
+│               │   ├── uniqueness.md
+│               │   ├── verify.md
+│               │   ├── worldflight.md
+│               │   └── worlds.md
+│               ├── scripts
+│               │   ├── doctor.mjs
+│               │   ├── encode.sh
+│               │   ├── kie.mjs
+│               │   ├── serve.mjs
+│               │   ├── shoot.mjs
+│               │   ├── workspace.mjs
+│               │   └── worldflight-assert.mjs
+│               └── templates
+│                   └── FINGERPRINTS.md
 ├── dot_local
 │   ├── bin
 │   │   ├── cline-safety
