@@ -25,7 +25,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Background services](#background-services) | 17 |
 | [Custom executables](#custom-executables) | 35 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Other configuration](#other-configuration) | 150 |
+| [Other configuration](#other-configuration) | 151 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 24 |
 | [Chezmoi control files](#chezmoi-control-files) | 10 |
 | [Repository material (not applied)](#repository-material-not-applied) | 4383 |
@@ -853,6 +853,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/fzf/theme.sh` | `dot_config/fzf/theme.sh.tmpl` | — | template |
 | `~/.local/share/omarchy-patches/esemczak.theme-modes-profiles.patch` | `dot_local/share/omarchy-patches/esemczak.theme-modes-profiles.patch` | — | — |
 | `~/.local/share/wsl-ssh-bridge/main.go` | `dot_local/share/wsl-ssh-bridge/main.go` | — | — |
+| `~/install.sh` | `install.sh` | — | — |
 | `~/theme-assets/omarchy-catppuccin-latte/wallpaper.png` | `theme-assets/omarchy-catppuccin-latte/wallpaper.png` | — | — |
 | `~/theme-assets/omarchy-catppuccin/wallpaper.png` | `theme-assets/omarchy-catppuccin/wallpaper.png` | — | — |
 | `~/theme-assets/omarchy-everforest/wallpaper.png` | `theme-assets/omarchy-everforest/wallpaper.png` | — | — |

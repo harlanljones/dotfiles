@@ -9,10 +9,20 @@ It keeps tools, editors, and shells aligned across multiple workstations.
 
 ### New Machine Setup
 
-Run the interactive setup wizard to inspect system information, clarify machine profiles, and configure all tools and dotfiles:
+One line on a bare machine (installs chezmoi if needed, then applies the dotfiles):
 
 ```bash
-# Clone and run the interactive setup wizard:
+curl -fsLS https://raw.githubusercontent.com/harlanljones/dotfiles/main/install.sh -o /tmp/dotfiles-install.sh \
+    && sh /tmp/dotfiles-install.sh
+```
+
+Downloading to a file (rather than piping into `sh`) means a failed download errors out instead of silently doing nothing.
+
+An interactive TTY is expected on first apply (the encrypted opencode entry prompts for the age identity). The script refuses to run as root, checks for git/curl with a per-OS install hint (pacman / dnf / apt based on the OS family), and is safe to re-run. If it finds pre-existing dotfiles that chezmoi does not yet manage (e.g. an existing `~/.zshrc` on a machine with no `~/.config/chezmoi` state), it warns prominently that they will be overwritten: with a TTY it asks for confirmation, non-interactively it proceeds but prints the same warning (set `CHEZMOI_INSTALL_ASSUME_YES=0` to abort instead). To inspect before overwriting, run `chezmoi init` without `--apply`, or use the guided `setup.sh` below.
+
+For a guided interactive onboarding (machine role, theme, age key from 1Password), clone and run the setup wizard instead:
+
+```bash
 git clone https://github.com/harlanljones/dotfiles.git ~/.local/share/chezmoi
 ~/.local/share/chezmoi/setup.sh
 
@@ -1216,6 +1226,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │       └── skills
 │           └── symlink_project-doc-planner
 ├── dot_zshrc
+├── install.sh
 ├── private_dot_grokbot
 │   └── settings.json
 ├── private_dot_ssh

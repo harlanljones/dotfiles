@@ -1,5 +1,14 @@
 #!/usr/bin/env bash
 # setup.sh — Interactive onboarding and setup wizard for new machines.
+#
+# DEPRECATED as the bootstrap entry point: use ./install.sh (or the one-liner in
+# README.md) on a bare machine — it installs chezmoi if needed and runs
+# `chezmoi init --apply`, whose run_* hooks own the heavy setup. This wizard
+# remains as an optional interactive supplement (machine/theme choice, age key
+# retrieval from 1Password, per-package prompts) for machines where the
+# defaults need hand-holding. Its interactive toolchain installs were folded
+# conceptually into install.sh + run_* hooks; nothing here is required for
+# bootstrap.
 # Inspects system hardware, OS, and environment, clarifies configuration
 # with the user, and orchestrates toolchains, dotfiles, and secrets.
 

@@ -17,7 +17,7 @@
       "services": 17,
       "scripts": 35,
       "security": 2,
-      "other": 150,
+      "other": 151,
       "hooks": 24,
       "chezmoi": 10,
       "repo": 4383
@@ -9942,6 +9942,13 @@
     {
       "source": "dot_local/share/wsl-ssh-bridge/main.go",
       "target": "~/.local/share/wsl-ssh-bridge/main.go",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "install.sh",
+      "target": "~/install.sh",
       "kind": "dotfile",
       "category": "other",
       "attributes": []
