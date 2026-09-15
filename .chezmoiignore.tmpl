@@ -46,9 +46,15 @@ bun/**
 .unlazy
 .unlazy/**
 # Hermes runtime regenerates its skills index cache under ~/.hermes/skills/.hub;
-# it is machine-local, huge (~47M) and never a skill itself.
+# it is machine-local, huge (~47M) and never a skill itself. Same for the
+# curator/usage ledger files Hermes writes into the skills dir.
 .hermes/skills/.hub
 .hermes/skills/.hub/**
+.hermes/skills/.bundled_manifest
+.hermes/skills/.curator_ledger.jsonl
+.hermes/skills/.curator_state
+.hermes/skills/.usage.json
+.hermes/skills/.usage.json.lock
 .unlazy-hook-state.json
 **/__pycache__
 **/__pycache__/**
