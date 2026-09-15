@@ -750,8 +750,10 @@ cat <<'ZBAR_HTML' > "$zebar_conf_dir/dots/index.html"
     <div id="root"></div>
 
     <script type="text/babel" data-type="module">
-      import React, { useState, useEffect } from 'https://esm.sh/react@18?dev';
-      import { createRoot } from 'https://esm.sh/react-dom@18/client?dev';
+      // Pinned production builds: the ?dev builds are several times larger
+      // and add runtime checks, slowing every bar start on all three monitors.
+      import React, { useState, useEffect } from 'https://esm.sh/react@18.3.1';
+      import { createRoot } from 'https://esm.sh/react-dom@18.3.1/client';
       import * as zebar from 'https://esm.sh/zebar@3.0';
 
       const providers = zebar.createProviderGroup({
@@ -1093,6 +1095,11 @@ config.default_domain = 'WSL:Ubuntu-24.04'
 config.font = wezterm.font('JetBrainsMono Nerd Font')
 config.font_size = 12.0
 
+-- Steady cursor everywhere. Apps such as Claude Code request a blinking
+-- cursor via DECSCUSR; a zero blink rate makes WezTerm draw those steady too.
+config.default_cursor_style = 'SteadyBlock'
+config.cursor_blink_rate = 0
+
 config.colors = {
   foreground = '{{ $scheme.foreground }}',
   background = '{{ $scheme.background }}',
@@ -1138,9 +1145,13 @@ return config
 WEZTERM_LUA
 
 # 9d. Deploy a Flow Launcher theme (Dots.xaml) themed from the active dots
-# theme. Flow Launcher reads user themes from UserData/Themes and picks up
-# BorderThickness/CornerRadius to match GlazeWM's border_size/corner_style.
-flow_themes_dir="$flow_dir/UserData/Themes"
+# theme. Flow Launcher is a Squirrel install (not portable), so it reads user
+# themes and settings from %APPDATA%\FlowLauncher, not $flow_dir/UserData. It
+# picks up BorderThickness/CornerRadius to match GlazeWM's border_size/corner_style.
+flow_data_dir="$wsl_userprofile/AppData/Roaming/FlowLauncher"
+flow_themes_dir="$flow_data_dir/Themes"
+# Drop the stale portable-mode copy an earlier version of this script wrote.
+rm -rf "$flow_dir/UserData"
 mkdir -p "$flow_themes_dir"
 
 cat <<'EOF_FLOW_THEME' > "$flow_themes_dir/Dots.xaml"
@@ -1290,71 +1301,158 @@ cat <<'EOF_FLOW_THEME' > "$flow_themes_dir/Dots.xaml"
 </ResourceDictionary>
 EOF_FLOW_THEME
 
-# Set Flow Launcher's active theme to Dots, preserving any other settings
-# that already exist (Flow Launcher only writes Settings.json after first
-# launch, so it may not exist yet on a fresh install).
-flow_settings_dir="$flow_dir/UserData/Settings"
+# Set Flow Launcher's active theme to Dots and hand its autostart to the dots
+# desktop launcher (step 10), preserving any other settings (Flow Launcher only
+# writes Settings.json after first launch, so it may not exist yet on a fresh
+# install). Flow rewrites Settings.json on exit and re-registers its HKCU Run
+# key on launch while StartFlowLauncherOnSystemStartup is true, so stop it
+# before writing; the launcher starts it again.
+flow_settings_dir="$flow_data_dir/Settings"
 mkdir -p "$flow_settings_dir"
-python3 - "$flow_settings_dir/Settings.json" <<'PY_EOF'
+# Dialog Jump defaults to Alt+G, which another app already registers, so Flow
+# raised "Hot key is already registered" on every launch.
+flow_desired='{"Theme": "Dots", "StartFlowLauncherOnSystemStartup": false, "UseLogonTaskForStartup": false, "DialogJumpHotkey": "Ctrl + Alt + G"}'
+if ! python3 - "$flow_settings_dir/Settings.json" "$flow_desired" <<'PY_EOF'
 import json
 import sys
 
-path = sys.argv[1]
+path, desired = sys.argv[1], json.loads(sys.argv[2])
 try:
-    with open(path) as f:
+    with open(path, encoding="utf-8-sig") as f:
         settings = json.load(f)
 except (FileNotFoundError, json.JSONDecodeError):
     settings = {}
-
-settings["Theme"] = "Dots"
-
-with open(path, "w") as f:
-    json.dump(settings, f, indent=4)
+sys.exit(0 if all(settings.get(k) == v for k, v in desired.items()) else 1)
 PY_EOF
-
-# 10. Setup user startup shortcuts so tools auto-start on Windows login
-startup_dir="$wsl_userprofile/AppData/Roaming/Microsoft/Windows/Start Menu/Programs/Startup"
-mkdir -p "$startup_dir"
-
-python3 - "$win_userprofile" "$win_localappdata" "$powershell_exe" <<'PY_EOF'
-import subprocess
+then
+  "$powershell_exe" -NoProfile -NonInteractive -Command \
+    'Get-Process Flow.Launcher -ErrorAction SilentlyContinue | Stop-Process -Force; Start-Sleep -Milliseconds 500' < /dev/null
+  python3 - "$flow_settings_dir/Settings.json" "$flow_desired" <<'PY_EOF'
+import json
 import sys
 
-win_userprofile, win_appdata, powershell_exe = sys.argv[1:4]
-targets = {
-    "GlazeWM.lnk": (rf"{win_appdata}\Programs\glazewm\glazewm.exe", ""),
-    "GlazeWM Super Key Mask.lnk": (
-        rf"{win_appdata}\Programs\AutoHotkey\v2\AutoHotkey64.exe",
-        rf'"{win_appdata}\Programs\glazewm\super-mask.ahk"',
-    ),
-    "Zebar.lnk": (rf"{win_appdata}\Programs\zebar\zebar.exe", ""),
-    "FlowLauncher.lnk": (rf"{win_appdata}\FlowLauncher\Flow.Launcher.exe", ""),
-    "QuickLook.lnk": (rf"{win_appdata}\Programs\QuickLook\QuickLook.exe", ""),
+path, desired = sys.argv[1], json.loads(sys.argv[2])
+try:
+    with open(path, encoding="utf-8-sig") as f:
+        settings = json.load(f)
+except (FileNotFoundError, json.JSONDecodeError):
+    settings = {}
+settings.update(desired)
+with open(path, "w", encoding="utf-8") as f:
+    json.dump(settings, f, indent=4)
+PY_EOF
+  echo "desktop-tools: Flow Launcher theme set to Dots, autostart handed to dots launcher"
+fi
+# Guarded: Remove-ItemProperty on a missing value still exits 1 under
+# -ErrorAction SilentlyContinue, which set -e turns into a failed apply.
+"$powershell_exe" -NoProfile -NonInteractive -Command '
+  $run = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
+  if (Get-ItemProperty -Path $run -Name Flow.Launcher -ErrorAction SilentlyContinue) {
+    Remove-ItemProperty -Path $run -Name Flow.Launcher
+  }
+  exit 0
+' < /dev/null
+
+# 10. One ordered logon launcher instead of per-tool Startup-folder shortcuts.
+# Startup-folder items start in no particular order after Explorer's startup
+# delay, and Zebar was launched twice (its own shortcut plus GlazeWM's
+# startup_commands). The launcher runs from a logon scheduled task (no Explorer
+# delay), waits for every attached monitor to join the desktop (re-extending
+# when Windows drops one, which strands GlazeWM's bind_to_monitor indexes),
+# then starts the Super-key mask, GlazeWM (which starts Zebar), Flow Launcher
+# and QuickLook, each only when not already running. Log:
+# %LOCALAPPDATA%\Temp\dots-desktop-start.log
+cat > "$glazewm_dir/dots-desktop-start.ps1" <<'DESKTOP_START'
+# Generated by chezmoi (run_onchange_after_45-vespasian-desktop-tools); do not edit.
+$ErrorActionPreference = 'Continue'
+$programs = Join-Path $env:LOCALAPPDATA 'Programs'
+$log = Join-Path $env:TEMP 'dots-desktop-start.log'
+$clock = [System.Diagnostics.Stopwatch]::StartNew()
+Set-Content -Path $log -Value "dots-desktop-start $(Get-Date -Format s)"
+function Write-Log([string]$message) {
+  Add-Content -Path $log -Value ('{0,6}ms {1}' -f $clock.ElapsedMilliseconds, $message)
 }
 
-for name, (target, arguments) in targets.items():
-    link_path = rf"{win_userprofile}\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\Startup\{name}"
-    ps = rf'''
-    $ws = New-Object -ComObject WScript.Shell
-    $s = $ws.CreateShortcut("{link_path}")
-    $s.TargetPath = "{target}"
-    $s.Arguments = '{arguments}'
-    $s.WorkingDirectory = [System.IO.Path]::GetDirectoryName("{target}")
-    $s.Save()
-    '''
-    subprocess.run([powershell_exe, "-NoProfile", "-Command", ps], check=True)
-PY_EOF
+function Start-Tool([string]$process, [string]$path, [string]$arguments) {
+  if (Get-Process $process -ErrorAction SilentlyContinue) { Write-Log "$process already running"; return $false }
+  if (-not (Test-Path $path)) { Write-Log "$process missing at $path"; return $false }
+  $params = @{ FilePath = $path; WorkingDirectory = (Split-Path $path) }
+  if ($arguments) { $params.ArgumentList = $arguments }
+  Start-Process @params
+  Write-Log "started $process"
+  return $true
+}
 
-# 11. Ensure desktop tools are running as detached Windows processes, then reload GlazeWM
-if [[ -f "$autohotkey_exe" ]]; then
-  ahk_win_exe="$(wslpath -w "$autohotkey_exe")"
-  ahk_win_script="$(wslpath -w "$glazewm_dir/super-mask.ahk")"
-  "$powershell_exe" -NoProfile -NonInteractive -Command "
-    if (-not (Get-Process AutoHotkey64 -ErrorAction SilentlyContinue)) {
-      Start-Process -FilePath '$ahk_win_exe' -ArgumentList '\"$ahk_win_script\"'
-    }
-  " < /dev/null
+function Wait-ForProcess([string]$process, [int]$timeoutMs) {
+  $deadline = $clock.ElapsedMilliseconds + $timeoutMs
+  while ($clock.ElapsedMilliseconds -lt $deadline) {
+    if (Get-Process $process -ErrorAction SilentlyContinue) { return $true }
+    Start-Sleep -Milliseconds 250
+  }
+  return $false
+}
+
+# 1. Monitors. GetSystemMetrics(SM_CMONITORS) is the live desktop count
+# (Screen.AllScreens caches); WmiMonitorBasicDisplayParams lists monitors that
+# are attached and powered even when they are not part of the desktop.
+Add-Type -Namespace Dots -Name Display -MemberDefinition '[DllImport("user32.dll")] public static extern int GetSystemMetrics(int index);'
+$extended = $false
+$deadline = $clock.ElapsedMilliseconds + 20000
+while ($true) {
+  $attached = @(Get-CimInstance -Namespace root\wmi -ClassName WmiMonitorBasicDisplayParams -ErrorAction SilentlyContinue | Where-Object Active).Count
+  $desktop = [Dots.Display]::GetSystemMetrics(80)
+  if ($attached -gt 0 -and $desktop -ge $attached) { Write-Log "monitors ready: $desktop/$attached"; break }
+  if ($clock.ElapsedMilliseconds -ge $deadline) { Write-Log "monitors not ready after 20s: $desktop/$attached"; break }
+  # Give a slow panel a few seconds to join by itself before forcing the saved
+  # extended topology back.
+  if (-not $extended -and $clock.ElapsedMilliseconds -ge 4000 -and $attached -gt $desktop) {
+    Write-Log "monitor dropped from desktop ($desktop/$attached); DisplaySwitch /extend"
+    Start-Process -FilePath "$env:WINDIR\System32\DisplaySwitch.exe" -ArgumentList '/extend' -Wait
+    $extended = $true
+  }
+  Start-Sleep -Milliseconds 500
+}
+
+# 2. Super-key mask first so Start never opens on the first Super chord.
+Start-Tool 'AutoHotkey64' (Join-Path $programs 'AutoHotkey\v2\AutoHotkey64.exe') ('"{0}"' -f (Join-Path $programs 'glazewm\super-mask.ahk')) | Out-Null
+
+# 3. GlazeWM starts Zebar through startup_commands; only start Zebar directly
+# when GlazeWM was already running or did not bring it up.
+$glazeStarted = Start-Tool 'glazewm' (Join-Path $programs 'glazewm\glazewm.exe')
+if (-not (Wait-ForProcess 'zebar' ($(if ($glazeStarted) { 8000 } else { 0 })))) {
+  Start-Tool 'zebar' (Join-Path $programs 'zebar\zebar.exe') | Out-Null
+}
+
+# 4. Everything else.
+Start-Tool 'Flow.Launcher' (Join-Path $env:LOCALAPPDATA 'FlowLauncher\Flow.Launcher.exe') | Out-Null
+Start-Tool 'QuickLook' (Join-Path $programs 'QuickLook\QuickLook.exe') | Out-Null
+Write-Log 'done'
+DESKTOP_START
+
+launcher_win="$(wslpath -w "$glazewm_dir/dots-desktop-start.ps1")"
+"$powershell_exe" -NoProfile -NonInteractive -Command '
+  $startup = [Environment]::GetFolderPath("Startup")
+  foreach ($name in "GlazeWM.lnk", "GlazeWM Super Key Mask.lnk", "Zebar.lnk", "FlowLauncher.lnk", "QuickLook.lnk") {
+    Remove-Item -LiteralPath (Join-Path $startup $name) -ErrorAction SilentlyContinue
+  }
+  # conhost --headless keeps the PowerShell console from flashing at logon. It
+  # lingers after the launcher exits, so the time limit ends the task; stopping
+  # the task leaves the tools it started running (verified).
+  $action = New-ScheduledTaskAction -Execute "$env:WINDIR\System32\conhost.exe" -Argument ("--headless powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File ""{0}""" -f "'"$launcher_win"'")
+  $trigger = New-ScheduledTaskTrigger -AtLogOn -User "$env:USERDOMAIN\$env:USERNAME"
+  $settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries -StartWhenAvailable -ExecutionTimeLimit (New-TimeSpan -Minutes 2) -Priority 4
+  $principal = New-ScheduledTaskPrincipal -UserId "$env:USERDOMAIN\$env:USERNAME" -LogonType Interactive -RunLevel Limited
+  Register-ScheduledTask -TaskName "Dots Desktop Tools" -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Force | Out-Null
+' < /dev/null
+
+# 11. Reload GlazeWM, then run the same launcher now so apply and logon share
+# one code path.
+if [[ -f "$glazewm_dir/cli/glazewm.exe" ]]; then
+  "$glazewm_dir/cli/glazewm.exe" command wm-reload-config </dev/null >/dev/null 2>&1 || true
 fi
+
+"$powershell_exe" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$launcher_win" < /dev/null
+sed 's/^/desktop-tools: launcher: /' "$wsl_localappdata/Temp/dots-desktop-start.log" 2>/dev/null | tr -d '\r' || true
 
 "$powershell_exe" -NoProfile -Command '
   if (-not (Get-Process TranslucentTB -ErrorAction SilentlyContinue)) {
@@ -1364,27 +1462,7 @@ fi
     }
   }' < /dev/null
 
-if [[ -f "$glazewm_dir/cli/glazewm.exe" ]]; then
-  "$glazewm_dir/cli/glazewm.exe" command wm-reload-config </dev/null 2>&1 || true
-fi
-
-glazewm_win_exe="$(wslpath -w "$glazewm_dir/glazewm.exe")"
-"$powershell_exe" -NoProfile -NonInteractive -Command "
-  if (-not (Get-Process glazewm -ErrorAction SilentlyContinue)) {
-    Start-Process -FilePath '$glazewm_win_exe'
-  }
-" < /dev/null
-
-if [[ -f "$zebar_dir/zebar.exe" ]]; then
-  zebar_win_exe="$(wslpath -w "$zebar_dir/zebar.exe")"
-  "$powershell_exe" -NoProfile -NonInteractive -Command "
-    if (-not (Get-Process zebar -ErrorAction SilentlyContinue)) {
-      Start-Process -FilePath '$zebar_win_exe'
-    }
-  " < /dev/null
-fi
-
-# 11. Hide desktop icons so the themed wallpaper is the whole desktop surface
+# 12. Hide desktop icons so the themed wallpaper is the whole desktop surface
 # and apps are launched via Flow Launcher instead. There is no plain registry
 # setting for this - "Show desktop icons" is a Progman WM_COMMAND toggle - so
 # send the same message the context-menu item sends, but only when icons
@@ -1395,36 +1473,52 @@ fi
 # just fine, but FindWindow can't resolve it, seemingly a window-station quirk
 # specific to how the interop spawns the process), so this walks EnumWindows
 # and matches by title instead.
+#
+# HideIcons is not a reliable guard: it read 0 while the icons were hidden, so
+# every apply re-sent the toggle and flipped the icons back on. Read the live
+# state instead - the desktop's SysListView32 (a child of Program Manager) is
+# visible exactly when icons are shown.
 "$powershell_exe" -NoProfile -NonInteractive -Command '
-  $hideIcons = (Get-ItemProperty -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name HideIcons -ErrorAction SilentlyContinue).HideIcons
-  if ($hideIcons -ne 1) {
-    Add-Type -Name Win32Toggle -Namespace DesktopIcons -MemberDefinition @"
-      [DllImport("user32.dll")]
-      public static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, System.IntPtr lParam);
-      [DllImport("user32.dll")]
-      public static extern int GetWindowText(System.IntPtr hWnd, System.Text.StringBuilder lpString, int nMaxCount);
-      [DllImport("user32.dll")]
-      public static extern System.IntPtr SendMessage(System.IntPtr hWnd, uint Msg, System.IntPtr wParam, System.IntPtr lParam);
-      public delegate bool EnumWindowsProc(System.IntPtr hWnd, System.IntPtr lParam);
+  Add-Type -Name Win32Toggle -Namespace DesktopIcons -MemberDefinition @"
+    public delegate bool EnumWindowsProc(System.IntPtr hWnd, System.IntPtr lParam);
+    [DllImport("user32.dll")]
+    public static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, System.IntPtr lParam);
+    [DllImport("user32.dll")]
+    public static extern bool EnumChildWindows(System.IntPtr hWndParent, EnumWindowsProc lpEnumFunc, System.IntPtr lParam);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    public static extern int GetWindowText(System.IntPtr hWnd, System.Text.StringBuilder lpString, int nMaxCount);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)]
+    public static extern int GetClassName(System.IntPtr hWnd, System.Text.StringBuilder lpClassName, int nMaxCount);
+    [DllImport("user32.dll")]
+    public static extern bool IsWindowVisible(System.IntPtr hWnd);
+    [DllImport("user32.dll")]
+    public static extern System.IntPtr SendMessage(System.IntPtr hWnd, uint Msg, System.IntPtr wParam, System.IntPtr lParam);
 "@
-    $progman = [System.IntPtr]::Zero
-    $callback = {
-      param($hWnd, $lParam)
-      $sb = New-Object System.Text.StringBuilder 256
-      [DesktopIcons.Win32Toggle]::GetWindowText($hWnd, $sb, 256) | Out-Null
-      if ($sb.ToString() -eq "Program Manager") {
-        $script:progman = $hWnd
-        return $false
-      }
-      return $true
-    }
-    [DesktopIcons.Win32Toggle]::EnumWindows($callback, [System.IntPtr]::Zero) | Out-Null
-    if ($progman -ne [System.IntPtr]::Zero) {
-      [DesktopIcons.Win32Toggle]::SendMessage($progman, 0x111, [System.IntPtr]0x7402, [System.IntPtr]::Zero) | Out-Null
-      Write-Output "desktop-tools: hid desktop icons"
-    } else {
-      Write-Output "desktop-tools: could not find Program Manager window, skipping desktop icon hide"
-    }
+  $script:progman = [System.IntPtr]::Zero
+  [DesktopIcons.Win32Toggle]::EnumWindows({
+    param($hWnd, $lParam)
+    $sb = New-Object System.Text.StringBuilder 256
+    [DesktopIcons.Win32Toggle]::GetWindowText($hWnd, $sb, 256) | Out-Null
+    if ($sb.ToString() -eq "Program Manager") { $script:progman = $hWnd; return $false }
+    return $true
+  }, [System.IntPtr]::Zero) | Out-Null
+  if ($script:progman -eq [System.IntPtr]::Zero) {
+    Write-Output "desktop-tools: could not find Program Manager window, skipping desktop icon hide"
+    return
+  }
+  $script:iconsVisible = $null
+  [DesktopIcons.Win32Toggle]::EnumChildWindows($script:progman, {
+    param($hWnd, $lParam)
+    $sb = New-Object System.Text.StringBuilder 256
+    [DesktopIcons.Win32Toggle]::GetClassName($hWnd, $sb, 256) | Out-Null
+    if ($sb.ToString() -eq "SysListView32") { $script:iconsVisible = [DesktopIcons.Win32Toggle]::IsWindowVisible($hWnd); return $false }
+    return $true
+  }, [System.IntPtr]::Zero) | Out-Null
+  if ($null -eq $script:iconsVisible) {
+    Write-Output "desktop-tools: desktop icon view not found, skipping desktop icon hide"
+  } elseif ($script:iconsVisible) {
+    [DesktopIcons.Win32Toggle]::SendMessage($script:progman, 0x111, [System.IntPtr]0x7402, [System.IntPtr]::Zero) | Out-Null
+    Write-Output "desktop-tools: hid desktop icons"
   } else {
     Write-Output "desktop-tools: desktop icons already hidden"
   }
