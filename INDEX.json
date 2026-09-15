@@ -17,10 +17,10 @@
       "services": 17,
       "scripts": 35,
       "security": 2,
-      "other": 149,
+      "other": 150,
       "hooks": 24,
       "chezmoi": 10,
-      "repo": 4382
+      "repo": 4383
     }
   },
   "categories": [
@@ -9876,6 +9876,13 @@
       "attributes": []
     },
     {
+      "source": ".yamllint.yml",
+      "target": "~/.yamllint.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
       "source": "dot_config/apt/pkglist.txt",
       "target": "~/.config/apt/pkglist.txt",
       "kind": "dotfile",
@@ -10447,6 +10454,12 @@
     },
     {
       "source": "docs/agents/issue-tracker.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/check-shell-modules.sh",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"

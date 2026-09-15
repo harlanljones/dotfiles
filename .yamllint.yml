@@ -1,0 +1,13 @@
+# yamllint config for the chezmoidata files (see .github/workflows/ci.yml).
+# Relaxed but real: these are chezmoi data files, so long description strings
+# and template-ish values are normal; structure and duplicate-key errors are
+# what we want to catch.
+extends: default
+
+rules:
+  line-length: disable
+  truthy:
+    level: warning   # chezmoi data frequently uses yes/no style toggles
+  comments:
+    min-spaces-from-content: 1
+  document-start: disable

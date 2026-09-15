@@ -369,6 +369,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │           ├── lazygit.yml
 │           ├── wallpaper.png
 │           └── windows_terminal.json
+├── .yamllint.yml
 ├── dot_Brewfile
 ├── dot_agents
 │   └── skills

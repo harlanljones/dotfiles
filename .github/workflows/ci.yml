@@ -188,7 +188,7 @@ jobs:
 
       - name: Install tools
         run: |
-          sudo apt-get update && sudo apt-get install -y shellcheck
+          sudo apt-get update && sudo apt-get install -y shellcheck yamllint zsh
           curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash -s -- latest /tmp
           sudo mv /tmp/actionlint /usr/local/bin/actionlint
 
@@ -221,11 +221,31 @@ jobs:
 
             if head -n 1 "$target" | grep -qE '^#!.*\b(sh|bash|dash|ksh)\b'; then
               echo "::group::shellcheck $file"
+              # TODO: raise to -S style once the ~16 remaining style findings
+              # (mostly SC2015/SC2016 in run_* hooks and vendored Hermes skill
+              # scripts) are dispositioned; fixing hook scripts re-triggers
+              # run_onchange_* applies, so it needs a deliberate pass.
               shellcheck -S warning "$target" || status=1
               echo "::endgroup::"
             fi
           done < <(git ls-files -z)
           exit $status
+
+      - name: yamllint .chezmoidata
+        run: yamllint -c .yamllint.yml .chezmoidata/
+
+      - name: TOML parses (mise configs)
+        run: |
+          status=0
+          for f in dot_config/mise/config.toml dot_config/mise/conf.d/*.toml; do
+            [ -e "$f" ] || continue
+            python3 -c "import tomllib,sys; tomllib.load(open(sys.argv[1],'rb'))" "$f" \
+              || { echo "::error::invalid TOML: $f"; status=1; }
+          done
+          exit $status
+
+      - name: Dual-shell module checks (bash + zsh)
+        run: docs/check-shell-modules.sh
 
       - name: actionlint
         run: actionlint -color

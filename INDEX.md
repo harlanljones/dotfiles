@@ -25,10 +25,10 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Background services](#background-services) | 17 |
 | [Custom executables](#custom-executables) | 35 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Other configuration](#other-configuration) | 149 |
+| [Other configuration](#other-configuration) | 150 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 24 |
 | [Chezmoi control files](#chezmoi-control-files) | 10 |
-| [Repository material (not applied)](#repository-material-not-applied) | 4382 |
+| [Repository material (not applied)](#repository-material-not-applied) | 4383 |
 
 ---
 
@@ -844,6 +844,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.chezmoitemplates/themes/tokyonight-storm/lazygit.yml` | `.chezmoitemplates/themes/tokyonight-storm/lazygit.yml` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-storm/wallpaper.png` | `.chezmoitemplates/themes/tokyonight-storm/wallpaper.png` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-storm/windows_terminal.json` | `.chezmoitemplates/themes/tokyonight-storm/windows_terminal.json` | — | — |
+| `~/.yamllint.yml` | `.yamllint.yml` | — | — |
 | `~/.config/apt/pkglist.txt` | `dot_config/apt/pkglist.txt` | — | — |
 | `~/.config/bat/config` | `dot_config/bat/config` | — | — |
 | `~/.config/bat/themes/dots.tmTheme` | `dot_config/bat/themes/dots.tmTheme.tmpl` | — | template |
@@ -923,6 +924,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `bun.lock` | Lockfile for the above |
 | `docs/aether-theming-integration-proposal.md` | Recovery guide and repository maintenance scripts |
 | `docs/agents/issue-tracker.md` | Recovery guide and repository maintenance scripts |
+| `docs/check-shell-modules.sh` | Recovery guide and repository maintenance scripts |
 | `docs/generate_index.py` | Recovery guide and repository maintenance scripts |
 | `docs/generate_readme_tree.py` | Recovery guide and repository maintenance scripts |
 | `docs/optional-agent-skill-packs-implementation-plan.md` | Recovery guide and repository maintenance scripts |

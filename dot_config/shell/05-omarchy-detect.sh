@@ -9,6 +9,7 @@
 
 if [ "$SHELL_KIND" = bash ]; then
   if [[ -f /etc/omarchy.conf ]]; then
+    # shellcheck disable=SC1091  # system file, may not exist on all machines
     source /etc/omarchy.conf
     export OMARCHY_PATH="${OMARCHY_PATH:-/usr/share/omarchy}"
   else
@@ -17,6 +18,7 @@ if [ "$SHELL_KIND" = bash ]; then
   # Guarded so Linux boxes without Omarchy (Vespasian, WSL) still get a working
   # shell; ~/.config/shell/15-base-bash.sh supplies the base layer there.
   if [[ -r "$OMARCHY_PATH/default/bash/rc" ]]; then
+    # shellcheck disable=SC1091  # omarchy-managed file
     source "$OMARCHY_PATH/default/bash/rc"
     # shellcheck disable=SC2034  # consumed by 15-base-bash.sh in the same shell session.
     OMARCHY_BASE_LOADED=1

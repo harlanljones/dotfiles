@@ -70,6 +70,7 @@ opr() {
 }
 
 # Aliases managed by the Omarchy Alias Manager plugin (leoom.aliases)
+# shellcheck disable=SC1091  # omarchy-managed file
 [ -r "$HOME/.config/omarchy/aliases" ] && source "$HOME/.config/omarchy/aliases"
 
 # `n` with no argument opens the current directory in nvim.

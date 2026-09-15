@@ -67,7 +67,7 @@ if [ "$SHELL_KIND" = zsh ] && command -v starship >/dev/null 2>&1; then
     print -rn -- "$rendered_prompt"
   }
 
-  # shellcheck disable=SC2034  # PROMPT is zsh's prompt variable.
+  # shellcheck disable=SC2034,SC2016  # PROMPT is zsh's prompt variable; single quotes are intentional (evaluated per-prompt).
   PROMPT='$(starship_status_prompt)'
 
 elif declare -F starship_precmd >/dev/null 2>&1; then

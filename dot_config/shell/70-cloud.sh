@@ -11,8 +11,10 @@ fi
 # Google Cloud SDK. The vendored completion script is bash-specific, so it is
 # only sourced under bash; the PATH entry applies to any shell.
 if [ -f "$HOME/dev/harlan-web/google-cloud-sdk/path.bash.inc" ]; then
+  # shellcheck disable=SC1091  # gcloud SDK files, machine-local
   . "$HOME/dev/harlan-web/google-cloud-sdk/path.bash.inc"
 fi
 if [ "$SHELL_KIND" = bash ] && [ -f "$HOME/dev/harlan-web/google-cloud-sdk/completion.bash.inc" ]; then
+  # shellcheck disable=SC1091  # gcloud SDK files, machine-local
   . "$HOME/dev/harlan-web/google-cloud-sdk/completion.bash.inc"
 fi
