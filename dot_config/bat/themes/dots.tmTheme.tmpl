@@ -1,1 +1,1 @@
-{{- include (printf ".chezmoitemplates/themes/%s/bat.tmTheme" (index .machines .machine).theme.name) -}}
+{{- include (printf ".chezmoitemplates/themes/%s/bat.tmTheme" (includeTemplate ".chezmoitemplates/machine-theme-name.tmpl" .)) -}}

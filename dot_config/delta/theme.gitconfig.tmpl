@@ -1,4 +1,4 @@
-{{- $name := (index .machines .machine).theme.name -}}
+{{- $name := includeTemplate ".chezmoitemplates/machine-theme-name.tmpl" . -}}
 # delta colors for the {{ (index .themes $name).label }} theme, selected with `dots theme`.
 # Included from ~/.config/git/config on Vespasian. syntax-theme points at bat's
 # compiled "dots" theme (~/.config/bat/themes/dots.tmTheme); delta reads bat's

@@ -20,13 +20,88 @@ recipient = "age1hf4200nhdqg0l3xs68v4gef6mn0nuvmh72573m3nfj8kqpcs7pnsmfkuw6"
      would source Omarchy's missing base rc and land Hyprland/systemd config
      on Windows. */ -}}
 {{- $machine := "" -}}
-{{- if eq .chezmoi.hostname "omarchy" }}{{ $machine = "augustus" -}}
+{{- /* Valid machine names: lowercase alnum + dash, non-empty, no whitespace.
+       Anything else (apostrophes, spaces, capitals) would either break the
+       TOML string literal or fail the machines.yaml lookups. */ -}}
+{{- $validMachineName := `^[a-z0-9][a-z0-9-]*$` -}}
+{{/* Resolution order:
+       1. A previously stored [data].machine, if present and valid -- the
+          stored name wins over the heuristics so a persisted freeform
+          wizard answer survives re-runs (that is what prompt-once means).
+          An invalid stored value is ignored, not trusted.
+       2. Hostname heuristics (below): deterministic pinning for the three
+          registered machines, including the WSL check before the generic
+          Linux fallback.
+       3. The wizard, ONLY when the heuristics missed: on linux/darwin the
+          OS fallback always matches, so interactively the wizard can only
+          appear on non-Unix hosts or after a hostname branch was added for
+          another box and the stored name is absent/invalid. */ -}}
+{{- if and (hasKey . "machine") (kindIs "string" .machine) (regexMatch $validMachineName (trim .machine)) -}}
+{{-   $machine = trim .machine -}}
+{{- else if eq .chezmoi.hostname "omarchy" }}{{ $machine = "augustus" -}}
 {{- else if eq .chezmoi.hostname "MacBookPro" }}{{ $machine = "hadrian" -}}
 {{- else if eq .chezmoi.hostname "DESKTOP-UTOJEVB" }}{{ $machine = "vespasian" -}}
 {{- else if and (eq .chezmoi.os "linux") (contains "microsoft" (lower .chezmoi.kernel.osrelease)) }}{{ $machine = "vespasian" -}}
 {{- else if eq .chezmoi.os "linux" }}{{ $machine = "augustus" -}}
 {{- else if eq .chezmoi.os "darwin" }}{{ $machine = "hadrian" -}}
 {{- else }}{{ $machine = "unknown" }}{{ end -}}
+
+{{/* 3.2 Prompt-once machine wizard. Reaches the wizard only when BOTH the
+     stored name (checked first, above) and the heuristics fail to resolve a
+     valid machine: since the OS fallback matches on every linux/darwin host,
+     that means non-Unix hosts, or a Unix host whose stored name is absent
+     or invalid. If the host is unidentified AND stdin is a TTY, ask once
+     which machine this is.
+     Implemented with an `output` bash prompt reading /dev/tty rather than
+     promptStringOnce: chezmoi only registers the prompt* functions when
+     rendering via `chezmoi init`, so a promptStringOnce call would fail to
+     PARSE in every `chezmoi execute-template` context (CI, dots, tests)
+     even when the branch is never taken. Persistence uses the same
+     mechanism promptStringOnce relies on: on a re-init, the previous
+     config's [data] section is template data, so a stored non-unknown
+     .machine is reused and the user is not re-asked. The answer lands in
+     [data].machine below, so ordinary applies and re-renders keep it.
+     Non-interactive contexts (CI, scripts) skip this entirely and fall
+     through to machine=unknown, which the `unknown` entry in
+     .chezmoidata/machines.yaml makes safe to render. */ -}}
+{{- if eq $machine "unknown" -}}
+{{/* .chezmoi.stdinIsATTY is absent from execute-template's data map and
+     output's child does not inherit a TTY stdin, so probe for a writable
+     controlling terminal instead -- false in CI/pipes, true interactively. */}}
+{{- $isTTY := eq (trim (output "bash" "-c" "(exec 3</dev/tty) 2>/dev/null && echo yes || echo no")) "yes" -}}
+{{- if $isTTY -}}
+{{/* No stored-name branch here: a valid stored name already resolved in
+     step 1 above, and an invalid one must not be reused -- re-prompt. */}}
+{{-   $answer := trim (output "bash" "-c" "printf 'Unrecognized host: which machine is this? (augustus / hadrian / vespasian, or a new name) [unknown] ' >&2; read -r m </dev/tty || true; printf '%s' \"${m:-unknown}\"") -}}
+{{-     if regexMatch $validMachineName $answer -}}
+{{-       $machine = $answer -}}
+{{-     else -}}
+{{-       $machine = "unknown" -}}
+{{-     end -}}
+{{- end -}}
+{{- end -}}
+
+{{/* 3.3 Machine-role feature booleans, exposed to templates alongside
+     .machine. Resolution:
+       .machine  — resolved machine key, always one of augustus / hadrian /
+                   vespasian / unknown (or a freeform wizard answer).
+       .role     — "work" or "personal", from the `type` field in
+                   .chezmoidata/machines.yaml; personal for unregistered hosts.
+       .headless — true when there is no local Linux/macOS desktop session to
+                   configure (WSL hosts, unregistered hosts). Gate GUI-only
+                   config on this rather than inferring from .machine.
+       .isCI     — running in a CI environment (env CI=true).
+       .isSSH    — connected over SSH (env SSH_CONNECTION set).
+       .isWSL    — running under WSL (kernel reports "microsoft").
+     The `unknown` entry in .chezmoidata/machines.yaml also guarantees every
+     `index .machines .machine` in templates resolves to a dict. */ -}}
+{{- $mach := "" -}}
+{{- if hasKey .machines $machine }}{{ $mach = index .machines $machine }}{{ else }}{{ $mach = index .machines "unknown" }}{{ end -}}
+{{- $role := "personal" -}}
+{{- if hasKey $mach "type" }}{{ $role = index $mach "type" }}{{ end -}}
+{{- $headless := false -}}
+{{- if hasKey $mach "headless" }}{{ $headless = index $mach "headless" }}{{ end -}}
+{{- $isWSL := contains "microsoft" (lower .chezmoi.kernel.osrelease) -}}
 
 [onepassword]
 prompt = true
@@ -36,3 +111,8 @@ command = "op.exe"
 
 [data]
 machine = '{{ $machine }}'
+role = '{{ $role }}'
+headless = {{ $headless }}
+isCI = {{ (env "CI" | not | not) }}
+isSSH = {{ (env "SSH_CONNECTION" | not | not) }}
+isWSL = {{ $isWSL }}

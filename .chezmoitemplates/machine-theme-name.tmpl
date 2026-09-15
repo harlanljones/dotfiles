@@ -1,0 +1,16 @@
+{{- /* Theme name for the resolved machine, with fallbacks so ANY .machine
+       value renders: a registered machines.yaml key uses its own theme.name,
+       while a freeform wizard answer or "unknown" falls back to the
+       "unknown" entry (and a registered machine without a theme.name, such
+       as augustus or hadrian, falls back too rather than nil-pointer
+       indexing .themes). Replaces the unguarded
+       (index .machines .machine).theme.name that bricked `chezmoi apply`
+       on any host whose stored name was not a machines.yaml key. */ -}}
+{{- $mach := index .machines "unknown" -}}
+{{- if hasKey .machines .machine }}{{ $mach = index .machines .machine }}{{ end -}}
+{{- $name := "" -}}
+{{- if hasKey $mach "theme" }}{{ $theme := index $mach "theme" -}}
+{{-   if hasKey $theme "name" }}{{ $name = index $theme "name" }}{{ end -}}
+{{- end -}}
+{{- if eq $name "" }}{{ $name = index (index .machines "unknown").theme "name" }}{{ end -}}
+{{- $name -}}

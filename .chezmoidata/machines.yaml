@@ -7,6 +7,7 @@ machines:
     backstory: "You built this machine from the ground up to establish order over the bare metal, making it the supreme ruler of your local network."
     theme:
       accent: "bold dimmed cyan"
+    type: personal
     # Ghostty font size. Augustus drives a 4K panel at 1.6x scale, where 9pt
     # JetBrainsMono is already large; Hadrian is a 14" Retina laptop.
     ghostty:
@@ -19,6 +20,7 @@ machines:
     backstory: "Hadrian spent most of his reign traveling the empire inspecting borders, making it a fitting title for a mobile, highly engineered Unix daily driver."
     theme:
       accent: "bold purple"
+    type: work
     ghostty:
       fontSize: 14
   vespasian:
@@ -31,6 +33,7 @@ machines:
     # may host Linux GUI apps such as Ghostty, and systemd owns portable Linux
     # daemons.
     backstory: "Vespasian restored order after a year of chaos and raised the Colosseum, making him the natural name for the box that hosts both the games and the work between them."
+    type: personal
     theme:
       accent: "bold yellow"
       # Key into .chezmoidata/themes.yaml. Change with `dots theme set <name>`
@@ -47,5 +50,24 @@ machines:
       nerdFontsVersion: v3.5.1
     # Ghostty is rendered on Vespasian through WSLg; this value also keeps
     # template indexing .ghostty.fontSize total on every machine.
+    ghostty:
+      fontSize: 12
+  unknown:
+    displayName: Unknown
+    platform: unknown
+    hostname: ""
+    role: "The unregistered host"
+    # Fallback entry so templates can safely index .machines.<machine> when
+    # the host is not one of the three registered machines (CI runners, a new
+    # box before `chezmoi init` names it, etc.). Sane conservative defaults:
+    # neutral starship accent, a theme name that exists in
+    # .chezmoidata/themes.yaml (theme templates are vespasian-gated, so this
+    # is only a guard against nil-pointer indexing), and a mid-size Ghostty
+    # font that is readable on any panel until the machine is registered.
+    type: personal
+    headless: true
+    theme:
+      accent: "bold white"
+      name: omarchy-tokyo-night
     ghostty:
       fontSize: 12

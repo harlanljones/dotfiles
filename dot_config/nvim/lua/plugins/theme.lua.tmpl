@@ -1,4 +1,4 @@
-{{- $name := (index .machines .machine).theme.name -}}
+{{- $name := includeTemplate ".chezmoitemplates/machine-theme-name.tmpl" . -}}
 {{- $theme := index .themes $name -}}
 -- Vespasian only (ignored on other machines, where Omarchy links its own
 -- theme.lua here). {{ $theme.label }}, selected with `dots theme set`, matching

@@ -98,6 +98,33 @@ Machine definitions live in `.chezmoidata/machines.yaml`.
 Platform ignore rules live in `.chezmoiignore.tmpl`.
 Templates render only the files needed for the current operating system.
 
+### Machine identity, role, and unknown hosts
+
+`.chezmoi.toml.tmpl` resolves the machine once and exposes it to every
+template, together with derived feature booleans:
+
+| Variable | Meaning |
+| :--- | :--- |
+| `.machine` | Resolved machine key: `augustus`, `hadrian`, `vespasian`, `unknown`, or a validated freeform wizard answer (lowercase letters, digits and dashes only). |
+| `.role` | `work` or `personal`, from the `type` field in `machines.yaml`. |
+| `.headless` | True when there is no local desktop session to configure (WSL, unregistered hosts). |
+| `.isCI` | Running in CI (`CI=true` in the environment). |
+| `.isSSH` | Connected over SSH (`SSH_CONNECTION` set). |
+| `.isWSL` | Running under WSL (kernel reports `microsoft`). |
+
+On an unrecognized host, templates consult the `unknown` entry in
+`machines.yaml` (through the `.chezmoitemplates/machine-theme-name` partial
+and guarded lookups), so ANY machine name — registered key, freeform wizard
+answer, or `unknown` — resolves to sane defaults instead of failing. If no
+valid machine is resolved, a prompt-once wizard asks which machine this is
+and stores the answer in the chezmoi config (validated as lowercase letters,
+digits and dashes; anything else falls back to `unknown`), so re-runs never
+re-ask: the stored name takes precedence over the hostname/OS heuristics on
+every later run. Because the OS fallback resolves every linux/darwin host,
+the wizard can only actually appear on non-Unix hosts, or on a Unix host
+whose stored name is missing or invalid. Non-interactive contexts (CI,
+scripts) skip the prompt and render with `machine = unknown`.
+
 ## Core Subsystems
 
 ### Shell and Terminal

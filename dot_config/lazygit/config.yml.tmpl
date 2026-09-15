@@ -12,7 +12,7 @@ customCommands:
     loadingText: 'Generating commit message with Ollama...'
     output: terminal
 {{ if eq .machine "vespasian" -}}
-{{- $name := (index .machines .machine).theme.name -}}
+{{- $name := includeTemplate ".chezmoitemplates/machine-theme-name.tmpl" . -}}
 # Theme selected with `dots theme`: .chezmoitemplates/themes/{{ $name }}/lazygit.yml
 {{ include (printf ".chezmoitemplates/themes/%s/lazygit.yml" $name) | trim }}
 {{ end -}}

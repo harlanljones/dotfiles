@@ -65,12 +65,8 @@ jobs:
           fi
 
       - name: Dry-run apply as ${{ matrix.machine }} (encrypted entries excluded -- no age key in CI)
-        # The unknown leg skips the full dry-run: many templates index
-        # .machines by .machine (ghostty font size, theme names, ...), which
-        # nil-pointers for machine=unknown. That latent gap is tracked
-        # separately; here we cover what the fallback must already guarantee
-        # (the ignore plan), which does not render those templates.
-        if: matrix.machine != 'unknown'
+        # machine=unknown is safe to render end-to-end: the `unknown` entry in
+        # .chezmoidata/machines.yaml backs every `index .machines .machine`.
         run: |
           export PATH="$HOME/.local/bin:$PATH"
           chezmoi apply --config "$RUNNER_TEMP/chezmoi.toml" --source "$GITHUB_WORKSPACE" --dry-run --exclude encrypted

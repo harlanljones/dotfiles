@@ -48,4 +48,9 @@ style_root = "bold cyan"
 
 [hostname]
 ssh_only = true
-format = "[{{ index .machines .machine "displayName" }}]({{ index .machines .machine "theme" "accent" }}) "
+{{- /* Fall back to the `unknown` entry in .chezmoidata/machines.yaml for
+       machine keys without their own entry (e.g. a freeform wizard answer
+       before the box is registered in machines.yaml). */ -}}
+{{- $mach := index .machines "unknown" -}}
+{{- if hasKey .machines .machine }}{{ $mach = index .machines .machine }}{{ end -}}
+format = "[{{ $mach.displayName }}]({{ $mach.theme.accent }}) "

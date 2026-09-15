@@ -7,7 +7,12 @@ config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"
 # Font
 font-family = "JetBrainsMono Nerd Font"
 font-style = Regular
-font-size = {{ (index .machines .machine).ghostty.fontSize }}
+{{- /* Fall back to the `unknown` entry in .chezmoidata/machines.yaml for
+       machine keys without their own entry (e.g. a freeform wizard answer
+       before the box is registered in machines.yaml). */ -}}
+{{- $mach := index .machines "unknown" -}}
+{{- if hasKey .machines .machine }}{{ $mach = index .machines .machine }}{{ end -}}
+font-size = {{ $mach.ghostty.fontSize }}
 
 # Window
 window-theme = ghostty
