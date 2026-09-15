@@ -66,7 +66,7 @@ It wraps common chezmoi commands to simplify daily tasks.
 | `dots update` | Pulls the latest changes from git and applies them. |
 | `dots push` | Adds modified files, generates a commit message, and pushes to git. |
 | `dots theme` | Lists available color themes or switches the active theme. |
-| `dots doctor` | Runs health checks on tools, encryption keys, and agent skills. |
+| `dots doctor` | Runs health checks on tools, agent skills, template drift, and age-key safety (presence, 0600 mode, rotation age, documented 1Password backup). |
 | `dots setup` | Runs the interactive system onboarding and setup wizard. |
 | `dots cd` | Opens a shell inside the chezmoi source directory. |
 

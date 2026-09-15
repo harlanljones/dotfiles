@@ -122,6 +122,14 @@ ${BOLD}OPTIONS FOR SYNC:${NC}
 ${BOLD}OPTIONS FOR DIFF:${NC}
   -a, --all          Include generated script contents in the diff output
 
+${BOLD}OPTIONS FOR DOCTOR:${NC}
+  Read-only diagnostics. Age-key safety checks report key presence, file mode
+  (expected 0600), mtime-based rotation age, and whether the documented 1Password
+  backup item ('chezmoi-age-key', see docs/recovery.md) exists. Never reads or
+  prints key contents — metadata only.
+    DOTS_AGE_ROTATE_DAYS   Warn when the key file is older than this (default: 365)
+    DOTS_AGE_KEY           Explicit path to the age identity file
+
 ${BOLD}OPTIONS FOR THEME:${NC}
   dots theme                   Open the interactive picker in a terminal
   dots theme menu              Open the picker explicitly
@@ -753,6 +761,9 @@ cmd_doctor() {
     fi
   fi
 
+  # 3a. Age key safety: presence, permissions, backup, rotation age
+  doctor_age_key_safety
+
   # 3b. SSH Agent & Git Commit Signing
   local ssh_sock="${SSH_AUTH_SOCK:-${HOME}/.1password/agent.sock}"
   if [[ ! -S "$ssh_sock" ]] || ! SSH_AUTH_SOCK="$ssh_sock" ssh-add -l >/dev/null 2>&1; then
@@ -879,6 +890,101 @@ cmd_doctor() {
   echo -e "${GREEN}Diagnostics complete.${NC}"
 }
 
+# ------------------------------------------- age key safety (doctor) --------
+# Threshold (days) after which doctor suggests reviewing key rotation.
+DOTS_AGE_ROTATE_DAYS="${DOTS_AGE_ROTATE_DAYS:-365}"
+if [[ ! "$DOTS_AGE_ROTATE_DAYS" =~ ^[0-9]+$ ]]; then
+  echo "dots: invalid DOTS_AGE_ROTATE_DAYS '$DOTS_AGE_ROTATE_DAYS' — falling back to 365" >&2
+  DOTS_AGE_ROTATE_DAYS=365
+fi
+
+# Print candidate age identity paths, most authoritative first. Never prints
+# key material — paths only. DOTS_AGE_KEY overrides everything.
+age_key_paths() {
+  [[ -n "${DOTS_AGE_KEY:-}" ]] && printf '%s\n' "$DOTS_AGE_KEY"
+  printf '%s/.config/chezmoi/key.txt\n' "$HOME"
+  # chezmoi config's age.identity, if set (best-effort; jq if available)
+  local identity
+  if command -v chezmoi >/dev/null 2>&1 && command -v jq >/dev/null 2>&1; then
+    identity=$(chezmoi dump-config 2>/dev/null | jq -r '.age.identity // empty' 2>/dev/null) || true
+    [[ -n "$identity" ]] && printf '%s\n' "${identity/#\~/$HOME}"
+  fi
+}
+
+# doctor_age_key_safety: presence / permissions / mtime, backup verification,
+# and rotation-age review hint for the age identity. Read-only: never reads or
+# prints key contents, only existence, mode, size, and mtime metadata.
+doctor_age_key_safety() {
+  local key_file="" p found=0
+  # Explicit DOTS_AGE_KEY is authoritative: report it as missing rather than
+  # silently falling through to the default candidate paths.
+  if [[ -n "${DOTS_AGE_KEY:-}" ]]; then
+    if [[ -f "$DOTS_AGE_KEY" ]]; then
+      key_file="$DOTS_AGE_KEY"
+      found=1
+    else
+      echo -e " ${RED}✗${NC} ${BOLD}age key safety:${NC} DOTS_AGE_KEY set but not found: $DOTS_AGE_KEY"
+      return 0
+    fi
+  else
+  while IFS= read -r p; do
+    [[ -n "$p" ]] || continue
+    if [[ -f "$p" ]]; then
+      key_file="$p"
+      found=1
+      break
+    fi
+  done < <(age_key_paths)
+  fi
+
+  if [[ $found -eq 0 ]]; then
+    echo -e " ${RED}✗${NC} ${BOLD}age key safety:${NC} no identity file found (checked \$DOTS_AGE_KEY, ~/.config/chezmoi/key.txt, chezmoi config age.identity)"
+    echo -e "   ${DIM}encrypted entries are skipped until the key is restored: dots age restore${NC}"
+    return 0
+  fi
+
+  # Permissions (expect 0600)
+  local perm
+  perm=$(stat -Lc '%a' "$key_file" 2>/dev/null || stat -f '%Lp' "$key_file" 2>/dev/null || echo "unknown")
+  if [[ "$perm" == "600" ]]; then
+    echo -e " ${GREEN}✓${NC} ${BOLD}age key safety:${NC} $key_file present (mode 600)"
+  else
+    echo -e " ${YELLOW}!${NC} ${BOLD}age key safety:${NC} $key_file has mode $perm (expected 600) — fix with: chmod 600 $key_file"
+  fi
+
+  # Age of the key file (mtime) -> rotation hint
+  local mtime days key_epoch size
+  mtime=$(stat -Lc '%y' "$key_file" 2>/dev/null | cut -d' ' -f1 || stat -f '%Sm' -t '%Y-%m-%d' "$key_file" 2>/dev/null || echo "unknown")
+  key_epoch=$(stat -Lc '%Y' "$key_file" 2>/dev/null || stat -f '%m' "$key_file" 2>/dev/null || echo "")
+  size=$(stat -Lc '%s' "$key_file" 2>/dev/null || stat -f '%z' "$key_file" 2>/dev/null || echo "?")
+  if [[ -n "$key_epoch" ]]; then
+    days=$(( ($(date +%s) - key_epoch) / 86400 ))
+    if [[ "$days" -ge "$DOTS_AGE_ROTATE_DAYS" ]]; then
+      echo -e " ${YELLOW}!${NC} ${DIM}key file last modified $days days ago (>= $DOTS_AGE_ROTATE_DAYS) — review rotation per docs/recovery.md (informational)${NC}"
+    else
+      echo -e "   ${DIM}key file: $mtime (${days}d old, ${size} bytes; rotation review at ${DOTS_AGE_ROTATE_DAYS}d)${NC}"
+    fi
+  fi
+
+  # Backup verification: docs/recovery.md documents the 1Password item
+  # 'chezmoi-age-key' as the primary backup. Existence only — never fetch or
+  # compare contents.
+  local op_bin out rc=0
+  op_bin="$(get_op_cmd)"
+  if [[ -z "$op_bin" ]]; then
+    echo -e " ${YELLOW}!${NC} ${DIM}key backup: 1Password CLI not found; cannot verify 'chezmoi-age-key' item (docs/recovery.md)${NC}"
+    return 0
+  fi
+  out=$("$op_bin" item get "chezmoi-age-key" --fields label 2>&1) || rc=1
+  if [[ $rc -eq 0 ]]; then
+    echo -e " ${GREEN}✓${NC} ${DIM}key backup: 1Password item 'chezmoi-age-key' found${NC}"
+  elif grep -qiE 'not signed in|authorization|locked|account locked| biometric ' <<<"$out"; then
+    echo -e " ${DIM}–${NC} ${DIM}key backup: 1Password locked/unauthenticated — unlock to verify 'chezmoi-age-key'${NC}"
+  else
+    echo -e " ${YELLOW}!${NC} ${DIM}key backup: no 1Password item 'chezmoi-age-key' — run: dots age backup${NC}"
+  fi
+}
+
 get_op_cmd() {
   if command -v op.exe >/dev/null 2>&1; then
     echo "op.exe"
@@ -901,7 +1007,7 @@ cmd_age() {
       echo -e "${BOLD}=== Age Encryption & 1Password Status ===${NC}"
       if [[ -f "$key_file" ]]; then
         local perm
-        perm=$(stat -c '%a' "$key_file" 2>/dev/null || stat -f '%Lp' "$key_file" 2>/dev/null || echo "ok")
+        perm=$(stat -Lc '%a' "$key_file" 2>/dev/null || stat -f '%Lp' "$key_file" 2>/dev/null || echo "ok")
         echo -e " ${GREEN}✓${NC} ${BOLD}age key file:${NC} $key_file (permissions: $perm)"
         if command -v age-keygen >/dev/null 2>&1; then
           local pub
