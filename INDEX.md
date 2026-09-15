@@ -18,7 +18,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Terminal & multiplexer](#terminal--multiplexer) | 4 |
 | [Editors](#editors) | 17 |
 | [Desktop & window manager](#desktop--window-manager) | 10 |
-| [Version control](#version-control) | 5 |
+| [Version control](#version-control) | 6 |
 | [Navigation & search](#navigation--search) | 3 |
 | [Toolchain & packages](#toolchain--packages) | 5 |
 | [AI agent harnesses](#ai-agent-harnesses) | 497 |
@@ -113,6 +113,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | --- | --- | --- | --- |
 | `~/.config/gh/config.yml` | `dot_config/gh/config.yml` | github cli | — |
 | `~/.config/git/config` | `dot_config/git/config.tmpl` | git | template |
+| `~/.config/git/hooks/commit-msg` | `dot_config/git/hooks/executable_commit-msg` | git | executable |
 | `~/.config/git/hooks/pre-push` | `dot_config/git/hooks/executable_pre-push` | git | executable |
 | `~/.config/git/ignore` | `dot_config/git/ignore` | git | — |
 | `~/.config/lazygit/config.yml` | `dot_config/lazygit/config.yml.tmpl` | lazygit | template |

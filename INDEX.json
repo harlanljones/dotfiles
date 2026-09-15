@@ -10,7 +10,7 @@
       "terminal": 4,
       "editor": 17,
       "desktop": 10,
-      "vcs": 5,
+      "vcs": 6,
       "navigation": 3,
       "toolchain": 5,
       "agents": 497,
@@ -525,6 +525,16 @@
       "category": "vcs",
       "attributes": [
         "template"
+      ],
+      "subsystem": "git"
+    },
+    {
+      "source": "dot_config/git/hooks/executable_commit-msg",
+      "target": "~/.config/git/hooks/commit-msg",
+      "kind": "dotfile",
+      "category": "vcs",
+      "attributes": [
+        "executable"
       ],
       "subsystem": "git"
     },

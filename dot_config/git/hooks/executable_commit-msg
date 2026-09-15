@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# commit-msg hook: guard against corrupted/non-conventional commit messages.
+# Wired via core.hooksPath in ~/.config/git/config (see dot_config/git/config.tmpl),
+# so the hook applies to every repo on every machine managed by the dotfiles.
+# The `dots push` Ollama-generated-message path reuses this hook as its
+# validator (see dot_local/bin/executable_dots-push) so the rules stay single-sourced.
+#
+# Rules:
+#   - Subject (first non-comment line) must be a Conventional Commit:
+#     type(scope)?: subject  (types: build chore ci docs feat fix perf
+#     refactor revert style test; optional ! for breaking changes)
+#   - Non-empty subject, <= 100 chars, no control characters/NUL/garbled bytes.
+#   - Default git-generated messages are allowed (merge commits, revert, fixup!/
+#     squash!/amend!), since users don't author those by hand.
+# Exit 1 with a one-line reason on violation.
+set -euo pipefail
+
+msg_file="${1:?usage: commit-msg <message-file>}"
+
+# Allow git's own generated messages: merges, reverts, fixup/squash/amend.
+# Checked on the first line before any other rule.
+if IFS= read -r first_line < "$msg_file" || [[ -n "$first_line" ]]; then
+	case "$first_line" in
+		"Merge "*|Revert\ \"*|"fixup! "*|"squash! "*|"amend! "*|"On branch "*)
+			exit 0
+			;;
+	esac
+else
+	echo "commit-msg: empty message file" >&2
+	exit 1
+fi
+
+# Strip comment lines (git commit template noise like the diff/scissors block)
+# and leading blank lines; what's left starts with the subject.
+subject="$(sed '/^#/d' "$msg_file" | sed '/./,$!d')"
+if [[ -z "$subject" ]]; then
+	echo "commit-msg: empty commit message" >&2
+	exit 1
+fi
+
+# Reject control characters anywhere in the message: NUL bytes, escape
+# sequences, carriage returns and other binary/garbled output. Tab and LF
+# (line structure) are the only controls allowed.
+#
+# Portable check: no `grep -P` (GNU-only; errors under macOS/BSD grep, which
+# inside an `if` would silently disable the rule). NUL can't be matched by a
+# POSIX regex argument, so detect it via a hex dump; everything else via
+# LC_ALL=C [[:cntrl:]] after stripping the allowed controls (tab/CR/LF).
+nul_hit="$(LC_ALL=C od -An -v -t x1 "$msg_file" | LC_ALL=C grep -m1 ' 00' || true)"
+if [[ -n "$nul_hit" ]] \
+	|| LC_ALL=C tr -d '	\n\r' < "$msg_file" | LC_ALL=C grep -q '[[:cntrl:]]'; then
+	echo "commit-msg: message contains control/garbled characters" >&2
+	exit 1
+fi
+
+# Conventional Commit subject: type(scope)?: subject, optionally ! for breaking.
+subject="${subject%%$'\n'*}"
+cc_re='^(build|chore|ci|docs|feat|fix|perf|refactor|revert|style|test)(\([A-Za-z0-9._/-]+\))?!?: .+'
+if [[ ${#subject} -gt 100 ]]; then
+	echo "commit-msg: subject exceeds 100 chars (${#subject}); keep it short" >&2
+	exit 1
+fi
+if ! [[ "$subject" =~ $cc_re ]]; then
+	echo "commit-msg: not a Conventional Commit: '$subject' (want: type(scope)?: subject)" >&2
+	exit 1
+fi

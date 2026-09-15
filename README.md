@@ -124,6 +124,16 @@ machine before a push leaves it. Gitleaks itself is installed by mise
 (`~/.config/mise/config.toml`); if it is missing, the hook warns and lets the
 push through.
 
+### Commit Message Guard
+
+A commit-msg hook (`~/.config/git/hooks/commit-msg`, wired via the same
+`core.hooksPath`) validates every commit message as a Conventional Commit —
+`type(scope)?: subject`, non-empty subject, ≤ 100 chars, no control/garbled
+characters — while allowing git's own default merge/revert/fixup messages.
+`dots push` reuses the same hook to validate its Ollama-generated message and
+falls back to a safe `chore: dots sync` default if generation produces
+empty, garbled, or non-conventional output.
+
 Side effect of the machine-global `core.hooksPath = ~/.config/git/hooks`:
 plain `.git/hooks/` scripts in other repos on this machine are bypassed and
 will not run. Repo-local `core.hooksPath` settings (e.g. Husky in a JS
@@ -429,6 +439,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   ├── git
 │   │   ├── config.tmpl
 │   │   ├── hooks
+│   │   │   ├── executable_commit-msg
 │   │   │   └── executable_pre-push
 │   │   └── ignore
 │   ├── herdr

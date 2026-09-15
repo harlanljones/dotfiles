@@ -50,7 +50,37 @@ if [[ -x "$MSG_GENERATOR" ]]; then
   msg="$("$MSG_GENERATOR" 2>/dev/null || true)"
 fi
 msg="$(printf '%s\n' "$msg" | sed '/./,$!d')"
-[ -z "$msg" ] && msg="chore: update dotfiles $(date +%Y-%m-%d)"
+
+# Generator failure (missing binary, Ollama down, stderr discarded above)
+# shows up as empty output — distinct from a generator that ran but produced
+# a bad message, which the hook validation below catches.
+if [[ -z "$msg" ]]; then
+  echo "warning: generator produced no message; using safe default" >&2
+  msg="chore: dots sync"
+fi
+
+# Validate the generated message with the same rules the commit-msg hook
+# enforces (dot_config/git/hooks/executable_commit-msg), so a garbled or
+# non-conventional Ollama output can never be committed (cf. ba99c33).
+# Fail closed: fall back to a safe plain default rather than a corrupt message.
+msg_hook="$HOME/.config/git/hooks/commit-msg"
+[[ -x "$msg_hook" ]] || msg_hook="$DOTFILES/dot_config/git/hooks/executable_commit-msg"
+if [[ -x "$msg_hook" ]]; then
+  msg_tmp="$(mktemp)"
+  trap 'rm -f "$msg_tmp"' EXIT
+  printf '%s\n' "$msg" > "$msg_tmp"
+  if ! "$msg_hook" "$msg_tmp" >/dev/null; then
+    echo "warning: generated commit message invalid; using safe default" >&2
+    msg="chore: dots sync"
+  fi
+  rm -f "$msg_tmp"
+  trap - EXIT
+else
+  echo "warning: commit-msg hook not found or not executable; skipping message validation" >&2
+fi
+
+# Fixed literal, always valid; belt-and-braces check in case the hook is absent.
+[[ -z "$msg" ]] && msg="chore: dots sync"
 
 git commit -m "$msg"
 git push
