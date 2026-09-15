@@ -8,7 +8,6 @@ gh = "latest"
 go = "1.26.5"
 node = "latest"
 "npm:playwright" = "latest"
-"pipx:hermes-agent" = { version = "latest", extras = "all" }
 pnpm = "latest"
 python = "3.12.13"
 ruby = "latest"
