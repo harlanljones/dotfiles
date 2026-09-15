@@ -5,6 +5,12 @@
 # the shell, and each takes the shell name from SHELL_KIND rather than being
 # written out twice.
 
+# Initialize zsh completion before tools and navigation register completions.
+if [ "$SHELL_KIND" = zsh ]; then
+  autoload -Uz compinit
+  compinit
+fi
+
 command -v zoxide >/dev/null 2>&1 && eval "$(zoxide init "$SHELL_KIND" --hook pwd)"
 command -v atuin  >/dev/null 2>&1 && eval "$(atuin init "$SHELL_KIND")"
 command -v direnv >/dev/null 2>&1 && eval "$(direnv hook "$SHELL_KIND")"
