@@ -96,7 +96,7 @@ Script `run_onchange_after_45-vespasian-desktop-tools.sh.tmpl` configures the ti
 1. Reads the Windows Terminal color scheme to extract the active theme's palette.
 2. Generates `zebar.css` with CSS custom properties for all palette colors and opacity variants.
 3. Configures Zebar's widget pack and GlazeWM window borders using theme `accent` (focused) and `muted` (unfocused).
-4. Registers GlazeWM, Zebar (`Zebar.lnk`), AutoHotkey, Flow Launcher, and QuickLook in the Windows Startup folder so they launch on logon as detached native Windows processes.
+4. Registers the `Dots Desktop Tools` logon task, which runs one ordered launcher (`dots-desktop-start.ps1`) that starts the AutoHotkey Super-key mask, GlazeWM (which starts Zebar), Flow Launcher, and QuickLook as detached native Windows processes; see [`docs/vespasian-boot.md`](vespasian-boot.md#desktop-tools-lifecycle).
 5. Configures GlazeWM keybindings matching Omarchy (Hyprland) defaults from Augustus (terminal, Chrome browser with incognito, Explorer, VS Code, 1Password, calculator, and webapps); see [`docs/vespasian-boot.md`](vespasian-boot.md) for the full keymap.
 6. Moves stale theme directories to prevent configuration cruft.
 
@@ -206,9 +206,14 @@ If `AppsUseLightTheme` and `SystemUsesLightTheme` are correct but apps don't cha
 ### Flow Launcher
 
 Script `run_onchange_after_45-vespasian-desktop-tools.sh.tmpl` generates a custom
-Flow Launcher theme (`UserData/Themes/Dots.xaml`) from the same `$scheme` palette
-as WezTerm and Zebar, and sets it active in `UserData/Settings/Settings.json`
-(merged in, preserving any other settings Flow Launcher has already written).
+Flow Launcher theme (`%APPDATA%\FlowLauncher\Themes\Dots.xaml`) from the same
+`$scheme` palette as WezTerm and Zebar, and sets it active in
+`%APPDATA%\FlowLauncher\Settings\Settings.json` (merged in, preserving any other
+settings Flow Launcher has already written). Flow Launcher is a Squirrel install,
+so it does not read the portable `UserData` folder next to its executable. The
+same merge turns off Flow's own autostart; the dots desktop launcher starts it.
+It also moves Dialog Jump from `Alt + G` to `Ctrl + Alt + G`, because another
+app already holds `Alt + G` and Flow raised a hotkey error on every launch.
 `BorderThickness`/`CornerRadius` on the launcher window match GlazeWM's
 `border_size`/`corner_style` so the two feel like the same system.
 

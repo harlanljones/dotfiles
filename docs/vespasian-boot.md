@@ -28,14 +28,30 @@ native Windows processes. They are never spawned as WSL bash background jobs (`&
 which would tie their lifecycle to a WSL subshell and terminate them when a
 terminal closes.
 
-Instead:
-1. They are registered in the Windows user Startup folder
-   (`%APPDATA%\Microsoft\Windows\Start Menu\Programs\Startup\`) via
-   `run_onchange_after_45-vespasian-desktop-tools.sh.tmpl`.
-2. Apply hooks launch them through PowerShell `Start-Process`, fully detached
-   from the WSL session.
-3. GlazeWM leaves Zebar running across config reloads (`shutdown_commands: []`),
-   allowing Zebar to reconnect seamlessly without restarting.
+Instead, `run_onchange_after_45-vespasian-desktop-tools.sh.tmpl` writes one
+ordered launcher, `%LOCALAPPDATA%\Programs\glazewm\dots-desktop-start.ps1`, and
+registers the `Dots Desktop Tools` logon scheduled task to run it hidden
+(`conhost --headless`). A logon task is not subject to Explorer's Startup-folder
+delay, and it replaces the old per-tool Startup shortcuts, which started in no
+particular order and launched Zebar twice. The launcher:
+
+1. Waits (up to 20s) until every attached monitor is part of the desktop. If
+   Windows leaves one out for more than 4s, it runs `DisplaySwitch /extend` to
+   restore the saved extended layout. GlazeWM's `bind_to_monitor` indexes
+   (1 = LG, 2 = Lenovo, 0 = Acer) only hold with all three monitors present.
+2. Starts the AutoHotkey Super-key mask, then GlazeWM, which starts Zebar via
+   `startup_commands` (Zebar is started directly only if it does not appear).
+3. Starts Flow Launcher and QuickLook. Flow Launcher's own autostart is turned
+   off so it launches only once.
+
+Every tool is skipped when already running, so `dots sync` runs the same
+launcher after reloading GlazeWM. GlazeWM leaves Zebar running across config
+reloads (`shutdown_commands: []`). Timings for the last run are in
+`%TEMP%\dots-desktop-start.log`:
+
+```bash
+powershell.exe -NoProfile -Command 'Get-Content $env:TEMP\dots-desktop-start.log; Get-ScheduledTask "Dots Desktop Tools"'
+```
 
 ## Systemd and User Services
 
