@@ -73,11 +73,14 @@ EXCLUDE_PATTERNS=(
   ":(exclude)*.svg"
 )
 
-FULL_DIFF="$(git diff --cached --no-color -- "${EXCLUDE_PATTERNS[@]}" 2>/dev/null || true)"
+# tr -d '\000': a diff can contain raw NULs (e.g. a removed line had one in
+# HEAD); command substitution warns "ignored null byte" on them. They're
+# dropped anyway, so drop them explicitly and quietly.
+FULL_DIFF="$(git diff --cached --no-color -- "${EXCLUDE_PATTERNS[@]}" 2>/dev/null | LC_ALL=C tr -d '\000' || true)"
 
 # Fall back to full diff if excluding generated files left diff empty (e.g. only lockfiles staged)
 if [[ -z "$FULL_DIFF" ]]; then
-  FULL_DIFF="$(git diff --cached --no-color)"
+  FULL_DIFF="$(git diff --cached --no-color | LC_ALL=C tr -d '\000')"
 fi
 
 # build_prompt DIFF MAX_CHARS: truncates DIFF to MAX_CHARS on a clean line

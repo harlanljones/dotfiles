@@ -17,6 +17,18 @@ set -euo pipefail
 
 msg_file="${1:?usage: commit-msg <message-file>}"
 
+# git's verbose commit template appends the staged diff below the scissors
+# line ("# ------------------------ >8 ------------------------"); git ignores
+# that region when committing, so the guard must scan only the message above
+# it. Diff content can legitimately contain NUL/control bytes (e.g. a diff
+# removing a line that had one in HEAD), which tripped false rejections.
+# Filtered copy goes through a temp file because command substitution
+# silently drops NULs, which would blind the NUL check below.
+work_file="$(mktemp "${TMPDIR:-/tmp}/commit-msg-region.XXXXXX")"
+trap 'rm -f "$work_file"' EXIT
+sed '/^# ------------------------ >8 ------------------------$/,$d' "$msg_file" > "$work_file"
+msg_file="$work_file"
+
 # Allow git's own generated messages: merges, reverts, fixup/squash/amend.
 # Checked on the first line before any other rule.
 if IFS= read -r first_line < "$msg_file" || [[ -n "$first_line" ]]; then
@@ -32,7 +44,7 @@ fi
 
 # Strip comment lines (git commit template noise like the diff/scissors block)
 # and leading blank lines; what's left starts with the subject.
-subject="$(sed '/^#/d' "$msg_file" | sed '/./,$!d')"
+subject="$(sed '/^#/d' "$msg_file" | LC_ALL=C tr -d '\000' | sed '/./,$!d')"
 if [[ -z "$subject" ]]; then
 	echo "commit-msg: empty commit message" >&2
 	exit 1
