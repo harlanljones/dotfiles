@@ -73,3 +73,5 @@ omarchyPlugins:
     enabled: true
   - url: https://github.com/tmn73/omarchy-calendar.git
     enabled: true
+  - url: https://github.com/crmne/omatasks.git
+    enabled: true

@@ -222,6 +222,177 @@ Legend: effort S ≤1h, M ≤ half a day, L ≥ a day. Priority = recommended or
 - [ ] **6.3 Reassess `dots` vs Justfile** — research validates task runners, but
   `dots` is strictly better-scoped. No action; keep documenting it as the interface.
 
+## Phase 7 — Fun & fresh features (research pass 2, generated 2026-09-16)
+
+Second research pass, explicitly *not* a devops/security sweep. Sources: GitHub
+trending/new dotfile repos (gh), HN Algolia + Lobsters RSS + web search, indexed
+Reddit/X/r-unixporn threads + 4 YouTube transcripts. Raw evidence: `/tmp/dotfiles-research2/`
+(github.md, forums.md, community.md, local-audit.md) — not tracked. Reddit/X APIs were
+unavailable (no login state); Reddit/X evidence arrived via search indexes only.
+
+Quality bar for every item below: no stock copy-paste configs, no aesthetic cargo-cult
+(anime-fetch, RGB clutter, ascii art). Each candidate names the "everyone does this"
+default and diverges by hooking into THIS stack: the `.chezmoidata/themes` engine,
+`dots` CLI, the per-agent usage collectors, or the 3-machine spread.
+
+- [ ] **7.1 Wallpaper → palette, wired into the theme engine** — Priority 1, effort M
+  - The 2026 trend is matugen (InioX/matugen ★2k) regenerating every config from a
+    wallpaper; skwd-wall extends it to video sources. Stock adoption = a parallel
+    theming system bolted next to chezmoi — rejected.
+  - Divergence: generate matugen output INTO `.chezmoidata/themes/` as a new theme
+    family so `dots theme set <wallpaper>` makes ghostty, starship, fzf, delta, eza,
+    lazygit, bat, Windows Terminal and the waybar/Quickshell shell all follow — one
+    palette pushed identically to hadrian + vespasian by the existing templates.
+  - Files: new `dots theme import` path (or extend `dots-theme-import-aether`),
+    `.chezmoidata/themes.yaml`, `.chezmoitemplates/themes/` consumers.
+  - Accept: applying a new wallpaper produces a commit-sized diff across tools on all
+    3 machines with no hand-tuned colors anywhere.
+
+- [ ] **7.2 One agent-usage widget in the shell (augustus)** — Priority 1, effort M
+  - Everyone copies generic waybar modules; 2026 trend is Claude-Code-usage waybar
+    modules (AUR). Omarchy 4.0 "Quattro" moved its shell to Quickshell, which lands
+    on augustus for free.
+  - Divergence: the repo already owns six per-agent usage collectors
+    (`omarchy-agent-usage-*`, `cursor-usage-*`, leaderboard scrape). Feed ONE widget
+    (waybar or a custom Quickshell QML) from a single collector output — all agents'
+    tokens/costs/daily counts in one place, colored from the theme engine. A personal
+    instrument panel, not a stock bar module.
+  - Files: `dot_local/bin/` collector aggregation script, `dot_config/omarchy/` or
+    waybar/Quickshell config template gated `omarchy-`.
+  - Accept: widget shows aggregated usage for ≥3 harnesses and survives `dots theme set`.
+
+- [ ] **7.3 Prompt + shell chrome rendered from the theme** — Priority 2, effort S
+  - Everyone pastes a starship preset (r/unixporn prompt spam — downranked).
+  - Divergence: `starship.toml` is already a template; extend it (plus ghostty, eza,
+    bat — done — and add waybar/btop) to render from `.chezmoidata/themes` so the
+    prompt follows the desktop theme like everything else, declaratively, no theme
+    manager binary.
+  - Files: `dot_config/starship.toml.tmpl`, consumers as touched.
+  - Accept: `dots theme set` changes the prompt palette in the same apply.
+
+- [ ] **7.4 `dots what` (witr) — "why is this running?"** — Priority 2, effort S
+  - pranshuparmar/witr (★22k, 2025-12) traces a port/process to its origin; everyone
+    types `ss -tlnp` and squints. Genuinely fun and useful on WSL2 where port
+    provenance is murkiest.
+  - Files: add `witr` to the appropriate manifest (mise/npm per §5), `dots what`
+    wrapper or alias in `55-apps.sh`.
+  - Accept: `dots what <port>` on vespasian names the process and its origin.
+
+- [ ] **7.5 Screenshot → annotate → URL pipeline (augustus)** — Priority 2, effort S
+  - grim+slurp+satty is the 2026 Wayland standard; most people stop at a PNG in
+    ~/Pictures.
+  - Divergence: one script — capture, satty annotate, upload to a self-hosted
+    Zipline, URL in clipboard, notify via the notification daemon. Optional drift:
+    log captures next to `dots` artifacts. augustus-only.
+  - Files: `dot_local/bin/executable_omarchy-shot`, hypr bindings template.
+  - Accept: single keypress ends with an annotated screenshot URL in clipboard.
+
+- [ ] **7.6 Hyprland 0.55+ Lua configs + scrolling layout** — Priority 3, effort M
+  - Hyprland moved configs to Lua with a Layout API; Omarchy 4.0 already ported its
+    configs, so augustus is on the frontier. The official hyprscrolling plugin is the
+    interesting new layout.
+  - Divergence: gate per-machine via existing templates; mirror the scrolling feel on
+    WSL2 through GlazeWM's scrolling mode (run_45); expose a `dots layout` toggle
+    rather than hardcoding one layout.
+  - Files: `dot_config/hypr/`, `run_*` hook for the plugin, `dots` subcommand.
+
+- [ ] **7.7 Drift-aware fastfetch (restrained)** — Priority 3, effort S
+  - Everyone does ASCII/waifu fetch — anti-pattern, kept off the menu.
+  - Divergence: quiet 6-line fetch, colors from the current theme, one distinguishing
+    line per machine: codename + live `dots status` drift count ("3 unapplied changes")
+    + agent count. Information, not decoration.
+  - Files: manifest + `dot_config/fastfetch/`, theming entry.
+  - Accept: no ascii art; the drift line matches `dots status` output.
+
+- [ ] **7.8 Atuin as a `dots` data source** — Priority 4, effort S
+  - Atuin's v18.x AI/stats features are the 2026 hype (572-pt HN thread); everyone
+    just runs the history server.
+  - Divergence: read per-machine atuin stats into `dots` — a monthly history digest
+    or command suggestions. augustus vs hadrian vs vespasian usage patterns differ
+    naturally; comparing them is the fun part. No AI features unless they prove out.
+  - Files: `dot_local/bin/executable_dots` (new `dots stats`), atuin config.
+
+- [ ] **7.9 Structural diff tooling for nvim** — Priority 4, effort S
+  - difftastic.nvim complements delta (semantic diffs for templates/Python); fun
+    bonus for auditing `run_*` hooks.
+  - Files: `dot_config/nvim/` plugin + lazy-lock re-add on augustus.
+
+- [ ] **7.10 swaync/notifications as infrastructure** — Priority 5, effort M
+  - 2026 default is mako or swaync with stock CSS. Divergence: generate the
+    notification-center CSS from the theme palette like every other surface, and
+    route agent events through it (`run_*` apply finished, agent sessions idle,
+    `dots` long-running jobs) — notifications as a subsystem, not eye candy. augustus.
+  - Files: `dot_config/` swaync template, hooks emitting notifications.
+
+- [x] **7.12 Machine-identity splash set: snacks dashboard + splash screens + btop** — Priority 2, effort L
+  - Done 2026-09-16 (grill-me interviewed, built via subagent-driven-development, integration-reviewed READY):
+    `dots-identity` generator (dot_local/bin/, Roman FIGlet wordmark w/ vendored .flf + mini-font
+    fallback, timeout-1s drift chip, index-guarded template); 61-splash.sh first-shell-per-window
+    module; snacks.nvim quiet-ops dashboard; dot_config/btop/themes/dots.theme.tmpl palette mapping
+    (regenerates on `dots theme set`); run_onchange_after_33-augustus-machine-branding.sh.tmpl
+    (screensaver/about art). All three packages installed 2026-09-16; hyprshell
+    service enabled+active (filter_by fixed to snake_case `current_monitor` per
+    hyprshell 4.10 schema); Roman branding written to both files; figlet upgrade
+    confirmed live. Remaining: visual check of the snacks dashboard on next nvim
+    open; AGENTS.md §3 row for hook 33 (manual).
+  - Requested by Harlan. One generated identity surface per machine, driven by
+    (a) the machine's hardware (augustus/hadrian/vespasian), (b) the current theme
+    palette from the theme engine, (c) the machine's name. Inspired by Omarchy's
+    branding manual (https://omarchy.org/manual/branding/): plymouth + SDDM colors/logo
+    via `omarchy plymouth set`, ASCII screensaver/about art via `omarchy transcode ascii`
+    / `omarchy ascii "TEXT"` into `~/.config/omarchy/branding/`.
+  - Surfaces, all rendered from ONE generator script + one per-machine identity block
+    in `.chezmoidata/machines.yaml` (name, CPU/GPU, role, FIGlet wordmark):
+    DESIGN LOCKED via grill-me interview 2026-09-16:
+    * Terminal splash = instrument panel (wordmark + 4-6 dense theme-colored stat
+      lines), shown FIRST SHELL PER TERMINAL WINDOW only (new tabs/panes stay clean).
+    * Wordmark font = FIGlet "Roman", rendered by the `figlet` binary (added per
+      machine to the ownership manifests: pacman/apt/Brewfile) + vendored Roman .flf
+      in-repo (dot_local/share/figlet/, provenance in figlet/README.md); identical
+      output on all 3 machines; fallback chain = figlet+Roman -> embedded mini-font
+      (approved spec amendment — plain-bold judged too bare) -> plain bold.
+    * Chips: kernel/uptime/memory/date always (<10ms); chezmoi drift count only if
+      a fast `dots status` path resolves <1s, silently omitted otherwise.
+    * Shared skeleton on all machines; only wordmark, accent color, role line differ.
+    * btop = theme generated from shared palette ONLY (btop has no custom header
+      support; replacement rejected).
+    * augustus boot: generator writes Roman-rendered art into
+      ~/.config/omarchy/branding/screensaver.txt + about.txt; plymouth set with
+      theme colors + default logo (NOT `omarchy ascii` DCP1 — consistency with
+      terminals won).
+    * snacks.nvim dashboard = quiet ops: wordmark header (theme colors), recent
+      projects, git status, drift footer line.
+  - Divergence from the default: everyone hand-pastes one fetch config; here the art,
+    colors and stats are GENERATED from the theme engine + hardware, regenerate on
+    `dots theme set` and hardware change, and stay consistent across nvim, three
+    terminal emulators, btop and the boot screen.
+  - Files: `dot_local/bin/executable_dots-identity` (or `dots identity render`),
+    `.chezmoidata/machines.yaml`, `dot_config/nvim/` (snacks), ghostty/herdr/WezTerm
+    templates, `dot_config/btop/`, augustus plymouth hook.
+
+- [x] **7.13 yt-x** — Priority 5, effort S
+  - Done 2026-09-16: shell-module integration (55-apps.sh, binary-guarded `ytx` alias), yt-x in
+    aurlist.txt. Installed (yt-x 0.8.6-1, /usr/bin/yt-x).
+  - Terminal YouTube browser; fits the existing yt-dlp/ghostty stack. Promoted from
+    the watch list.
+  - Files: manifest entry + `dot_config/yt-x/` or shell alias.
+
+- [x] **7.14 hyprshell thumbnail alt-tab** — Priority 5, effort S
+  - Done 2026-09-16: dot_config/hyprshell/{config.ron,styles.css} (switch-only, variable-only CSS),
+    augustus-gated via .chezmoiignore; hyprshell in aurlist.txt. Installed (4.10.8-1), service
+    enabled+active, config check rc=0 (needed snake_case `current_monitor`).
+  - Restrained thumbnail-grid window switcher for augustus. Promoted from the watch
+    list; do after 7.6 (Lua/scrolling) so it doesn't fight the layout change.
+  - Files: `dot_config/hypr/` binding + hyprshell config, `omarchy-` gated.
+
+- [ ] **7.15 Watch list (fun)** — no action now
+  - Crush as config-pattern source only; SDDM/lockscreen themes (qylock/SilentSDDM)
+    only if theme-selector-integrated; omacosy for hadrian watch-only. (yt-x and
+    hyprshell promoted to 7.13/7.14; snacks.nvim dashboard folded into 7.12.)
+  - Dropped as tacky/dead: waifufetch & all ascii fetchers, cava-in-waybar (most
+    copied r/unixporn element — zero function), blur-everything rice, pywal,
+    rice-cooker, vibecoded shell distributions, generic ghostty config generators.
+
 ## Deliberately not adopted
 
 - Per-OS git branches (mitxela warns they rot; we template instead). Bare-git-repo

@@ -1,0 +1,55 @@
+{{- if eq .machine "augustus" -}}
+#!/bin/bash
+# Augustus machine branding (phase 7.12 task 5).
+#
+# Writes the FIGlet "Roman" wordmark of the machine displayName into Omarchy's
+# branding text files. Colors for these files are not needed (plain text art):
+#   ~/.config/omarchy/branding/screensaver.txt  (lockscreen/screensaver art)
+#   ~/.config/omarchy/branding/about.txt        (rendered smaller by omarchy)
+#
+# Theme-change trigger: the generated "identity:" line below embeds values
+# from .chezmoidata/machines.yaml, so editing the machine's theme (or name)
+# changes this script's content and re-triggers the run_onchange hook.
+#
+# Plymouth is deliberately NOT touched here: `omarchy plymouth set <bg> <fg>
+# <logo.png>` requires a logo file argument and we ship no logo asset. Use
+# `omarchy plymouth reset` to restore defaults; add logo handling here only
+# once a real logo png exists.
+#
+# identity: machine=augustus displayName={{ index (.machines.augustus).displayName | default "Augustus" }} theme.accent={{ (.machines.augustus).theme.accent | default "" }}
+
+set -euo pipefail
+
+NAME="{{ index (.machines.augustus).displayName | default "Augustus" }}"
+BRAND_DIR="$HOME/.config/omarchy/branding"
+FONT="$HOME/.local/share/figlet/Roman.flf"
+
+mkdir -p "$BRAND_DIR"
+
+art=""
+if command -v figlet >/dev/null 2>&1 && [[ -r "$FONT" ]]; then
+  # Design lock: Roman font, consistent with dots-identity's wordmark.
+  art="$(figlet -w 200 -f "$FONT" "$NAME")"
+else
+  # Fallback: omarchy's DCP1 renderer. The font will differ from Roman until
+  # figlet (in dot_config/pacman/pkglist.txt) and the vendored Roman.flf are
+  # present. This is a degraded path, not the intended look.
+  art="$(omarchy ascii "$NAME")"
+fi
+
+if [[ -z "$art" ]]; then
+  echo "machine-branding: could not render wordmark for '$NAME', skipping"
+  exit 0
+fi
+
+# Atomic writes keep repeated applies byte-identical and readers never see a
+# partial file.
+for f in screensaver.txt about.txt; do
+  tmp="$BRAND_DIR/.${f}.tmp"
+  printf '%s\n' "$art" > "$tmp"
+  mv "$tmp" "$BRAND_DIR/$f"
+done
+{{- else -}}
+#!/bin/bash
+# No-op: augustus-only machine branding hook (rendered empty on this machine).
+{{- end -}}

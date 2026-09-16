@@ -3,22 +3,22 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 831,
+    "total": 843,
     "by_category": {
-      "shell": 19,
+      "shell": 20,
       "prompt": 1,
-      "terminal": 4,
-      "editor": 17,
-      "desktop": 10,
+      "terminal": 5,
+      "editor": 18,
+      "desktop": 11,
       "vcs": 6,
       "navigation": 3,
       "toolchain": 5,
       "agents": 497,
       "services": 17,
-      "scripts": 35,
+      "scripts": 37,
       "security": 2,
-      "other": 152,
-      "hooks": 22,
+      "other": 156,
+      "hooks": 24,
       "chezmoi": 11,
       "repo": 30
     }
@@ -195,6 +195,14 @@
       "subsystem": "shared shell modules"
     },
     {
+      "source": "dot_config/shell/61-splash.sh",
+      "target": "~/.config/shell/61-splash.sh",
+      "kind": "dotfile",
+      "category": "shell",
+      "attributes": [],
+      "subsystem": "shared shell modules"
+    },
+    {
       "source": "dot_config/shell/65-theme.sh",
       "target": "~/.config/shell/65-theme.sh",
       "kind": "dotfile",
@@ -253,11 +261,23 @@
       "subsystem": "starship"
     },
     {
-      "source": "dot_config/btop/btop.conf",
+      "source": "dot_config/btop/btop.conf.tmpl",
       "target": "~/.config/btop/btop.conf",
       "kind": "dotfile",
       "category": "terminal",
-      "attributes": [],
+      "attributes": [
+        "template"
+      ],
+      "subsystem": "btop"
+    },
+    {
+      "source": "dot_config/btop/themes/dots.theme.tmpl",
+      "target": "~/.config/btop/themes/dots.theme",
+      "kind": "dotfile",
+      "category": "terminal",
+      "attributes": [
+        "template"
+      ],
       "subsystem": "btop"
     },
     {
@@ -365,6 +385,14 @@
     {
       "source": "dot_config/nvim/lua/plugins/copilot.lua",
       "target": "~/.config/nvim/lua/plugins/copilot.lua",
+      "kind": "dotfile",
+      "category": "editor",
+      "attributes": [],
+      "subsystem": "neovim / LazyVim"
+    },
+    {
+      "source": "dot_config/nvim/lua/plugins/dashboard-dots-identity.lua",
+      "target": "~/.config/nvim/lua/plugins/dashboard-dots-identity.lua",
       "kind": "dotfile",
       "category": "editor",
       "attributes": [],
@@ -507,6 +535,16 @@
       "category": "desktop",
       "attributes": [
         "template"
+      ],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/hooks/theme-set.d/executable_backdrop-split",
+      "target": "~/.config/omarchy/hooks/theme-set.d/backdrop-split",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [
+        "executable"
       ],
       "subsystem": "omarchy"
     },
@@ -4861,6 +4899,16 @@
       "subsystem": "cline git interceptor"
     },
     {
+      "source": "dot_local/bin/executable_backdrop-split",
+      "target": "~/.local/bin/backdrop-split",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
       "source": "dot_local/bin/executable_chrome-profile",
       "target": "~/.local/bin/chrome-profile",
       "kind": "dotfile",
@@ -4883,6 +4931,16 @@
     {
       "source": "dot_local/bin/executable_dots",
       "target": "~/.local/bin/dots",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_dots-identity",
+      "target": "~/.local/bin/dots-identity",
       "kind": "dotfile",
       "category": "scripts",
       "attributes": [
@@ -6256,6 +6314,34 @@
       ]
     },
     {
+      "source": "dot_config/hyprshell/config.ron",
+      "target": "~/.config/hyprshell/config.ron",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "dot_config/hyprshell/styles.css",
+      "target": "~/.config/hyprshell/styles.css",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "dot_local/share/figlet/README.md",
+      "target": "~/.local/share/figlet/README.md",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "dot_local/share/figlet/Roman.flf",
+      "target": "~/.local/share/figlet/Roman.flf",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
       "source": "dot_local/share/omarchy-patches/esemczak.theme-modes-profiles.patch",
       "target": "~/.local/share/omarchy-patches/esemczak.theme-modes-profiles.patch",
       "kind": "dotfile",
@@ -6342,6 +6428,19 @@
         "phase": "after",
         "order": 23,
         "name": "sync-agent-skills",
+        "template": true
+      }
+    },
+    {
+      "source": "run_after_34-augustus-backdrop-split.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "always",
+        "trigger_description": "runs after every apply",
+        "phase": "after",
+        "order": 34,
+        "name": "augustus-backdrop-split",
         "template": true
       }
     },
@@ -6498,6 +6597,19 @@
         "phase": "after",
         "order": 32,
         "name": "setup-omarchy-agent-registrations",
+        "template": true
+      }
+    },
+    {
+      "source": "run_onchange_after_33-augustus-machine-branding.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "onchange",
+        "trigger_description": "runs when this script's contents change",
+        "phase": "after",
+        "order": 33,
+        "name": "augustus-machine-branding",
         "template": true
       }
     },

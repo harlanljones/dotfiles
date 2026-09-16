@@ -500,7 +500,9 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   └── themes
 │   │       └── dots.tmTheme.tmpl
 │   ├── btop
-│   │   └── btop.conf
+│   │   ├── btop.conf.tmpl
+│   │   └── themes
+│   │       └── dots.theme.tmpl
 │   ├── chrome-flags.conf
 │   ├── delta
 │   │   └── theme.gitconfig.tmpl
@@ -531,6 +533,9 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   ├── input.lua
 │   │   ├── looknfeel.lua
 │   │   └── monitors.lua
+│   ├── hyprshell
+│   │   ├── config.ron
+│   │   └── styles.css
 │   ├── lazygit
 │   │   └── config.yml.tmpl
 │   ├── mise
@@ -551,6 +556,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │           ├── blink-cmp.lua
 │   │           ├── copilot-lualine.lua
 │   │           ├── copilot.lua
+│   │           ├── dashboard-dots-identity.lua
 │   │           ├── empty_html-preview.lua
 │   │           ├── example.lua
 │   │           ├── faster-smear-cursor.lua
@@ -559,8 +565,11 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │           └── vim-be-good.lua
 │   ├── omarchy
 │   │   ├── create_private_shell.json.tmpl
-│   │   └── defaults
-│   │       └── agent.tmpl
+│   │   ├── defaults
+│   │   │   └── agent.tmpl
+│   │   └── hooks
+│   │       └── theme-set.d
+│   │           └── executable_backdrop-split
 │   ├── opencode
 │   │   ├── agents
 │   │   │   ├── private_codebase-memory-auditor.md
@@ -595,6 +604,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   ├── 50-agents.sh
 │   │   ├── 55-apps.sh
 │   │   ├── 60-prompt.sh
+│   │   ├── 61-splash.sh
 │   │   ├── 65-theme.sh
 │   │   ├── 70-cloud.sh
 │   │   ├── 75-tool-paths.sh
@@ -647,9 +657,11 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   ├── bin
 │   │   ├── cline-safety
 │   │   │   └── executable_git
+│   │   ├── executable_backdrop-split
 │   │   ├── executable_chrome-profile
 │   │   ├── executable_cursor
 │   │   ├── executable_dots
+│   │   ├── executable_dots-identity
 │   │   ├── executable_dots-push
 │   │   ├── executable_dots-theme-import-aether
 │   │   ├── executable_herdr-agent-lifecycle
@@ -684,6 +696,9 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   └── share
 │       ├── applications
 │       │   └── cursor-desktop.desktop
+│       ├── figlet
+│       │   ├── README.md
+│       │   └── Roman.flf
 │       ├── omarchy-patches
 │       │   └── esemczak.theme-modes-profiles.patch
 │       └── wsl-ssh-bridge
@@ -699,6 +714,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 ├── private_dot_ssh
 │   └── config.tmpl
 ├── run_after_23-sync-agent-skills.sh.tmpl
+├── run_after_34-augustus-backdrop-split.sh.tmpl
 ├── run_once_after_24-setup-omarchy-agents.sh.tmpl
 ├── run_once_before_00-verify-deps.sh.tmpl
 ├── run_onchange_after_10-install-omarchy-plugins.sh.tmpl
@@ -711,6 +727,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 ├── run_onchange_after_30-hadrian-macos-defaults.sh.tmpl
 ├── run_onchange_after_31-augustus-mouse-dpi.sh.tmpl
 ├── run_onchange_after_32-setup-omarchy-agent-registrations.sh.tmpl
+├── run_onchange_after_33-augustus-machine-branding.sh.tmpl
 ├── run_onchange_after_40-vespasian-windows-terminal.sh.tmpl
 ├── run_onchange_after_41-vespasian-nerd-font.sh.tmpl
 ├── run_onchange_after_42-vespasian-theme-state.sh.tmpl

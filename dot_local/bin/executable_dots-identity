@@ -1,0 +1,217 @@
+#!/usr/bin/env bash
+# dots-identity - Render the per-machine identity banner (phase 7.12).
+#
+# Single source of truth for machine-identity art/info consumed by later
+# tasks (snacks.nvim dashboard, terminal splash, btop header, plymouth).
+# Wordmark + role line + theme-colored chips (kernel, uptime, memory, drift).
+#
+# Data: .chezmoidata/machines.yaml (identity.chips, theme.accent) via chezmoi
+# templates — the same data files every other managed template reads. The
+# machine key comes from `chezmoi execute-template '{{ .machine }}'`, the same
+# resolution path `dots` uses. Hardware stats (kernel, uptime, memory) and the
+# chezmoi drift count are gathered live at render time.
+#
+# Wordmark: FIGlet "Roman" (vendored at ~/.local/share/figlet/Roman.flf) via
+# the `figlet` binary when available. Fallback chain: figlet + Roman.flf ->
+# embedded mini-font -> plain bold. Neither figlet nor the font is a hard
+# dependency.
+# Degrades gracefully: non-tty or NO_COLOR -> plain uncolored output.
+
+set -euo pipefail
+
+for _p in "$HOME/.local/share/mise/shims" "$HOME/.local/bin" "$HOME/.cache/.bun/bin"; do
+  case ":${PATH}:" in
+    *":$_p:"*) ;;
+    *) PATH="$_p:$PATH" ;;
+  esac
+done
+export PATH
+
+# ------------------------------------------------------------- color setup ---
+if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
+  COLOR_ON=1
+  DIM=$'\033[2m'
+  NC=$'\033[0m'
+else
+  DIM='' NC=''
+  COLOR_ON=0
+fi
+
+# Map a starship-style style string (machines.<machine>.theme.accent, e.g.
+# "bold dimmed cyan") to an SGR prefix. Unknown tokens are ignored.
+style_to_ansi() {
+  local sgr="" token code
+  for token in $1; do
+    case "$token" in
+      bold) code='1' ;;
+      dim|dimmed) code='2' ;;
+      italic) code='3' ;;
+      underline) code='4' ;;
+      black) code='30' ;;
+      red) code='31' ;;
+      green) code='32' ;;
+      yellow) code='33' ;;
+      blue) code='34' ;;
+      purple|magenta) code='35' ;;
+      cyan) code='36' ;;
+      white) code='37' ;;
+      *) code='' ;;
+    esac
+    [[ -n "$code" ]] && sgr+="${sgr:+;}$code"
+  done
+  # COLOR_ON is decided once up front (a command substitution here would not
+  # have a tty on stdout), so styling survives being called via $(...)).
+  if [[ -n "$sgr" && "$COLOR_ON" == 1 ]]; then
+    printf '\033[%sm' "$sgr"
+  fi
+}
+
+# ------------------------------------------------------- identity data fetch ---
+if ! command -v chezmoi >/dev/null 2>&1; then
+  echo "dots-identity: chezmoi is not installed or not in PATH." >&2
+  exit 1
+fi
+
+# machine|displayName|accent|role|chips (space separated) — one round trip.
+# shellcheck disable=SC2016  # single quotes intentional: chezmoi template
+info=$(chezmoi execute-template \
+  '{{ $m := index .machines .machine | default dict -}}
+{{ .machine }}|{{ index $m "displayName" | default "" }}|{{ index (index $m "theme" | default dict) "accent" | default "" }}|{{ index $m "role" | default "" }}|{{ range $c := (index (index $m "identity" | default dict) "chips" | default (list)) }}{{ $c }}|{{ end }}' 2>/dev/null) || {
+  echo "dots-identity: could not resolve machine identity via chezmoi." >&2
+  exit 1
+}
+machine=${info%%|*}
+rest=${info#*|}
+displayName=${rest%%|*}
+rest=${rest#*|}
+accent=${rest%%|*}
+rest=${rest#*|}
+role=${rest%%|*}
+chips_raw=${rest#*|}
+
+# ------------------------------------------------------- wordmark art ---
+# Embedded FIGlet-style mini-font (3 rows, block glyphs). Hand-authored —
+# regenerate by hand if the wordmark style changes; maps A-Z (and space) only.
+_mini_font() {
+  local ch=$1
+  case "$ch" in
+    A) printf '%s\n%s\n%s' '▄▀▀▄' '█▄▄█' '▀  ▀' ;;
+    B) printf '%s\n%s\n%s' '█▀▀▄' '█▄▄▀' '▀▄▄▀' ;;
+    C) printf '%s\n%s\n%s' '▄▀▀▀' '█   ' '▀▄▄▀' ;;
+    D) printf '%s\n%s\n%s' '█▀▀▄' '█  █' '▀▄▄▀' ;;
+    E) printf '%s\n%s\n%s' '████' '█▄▄ ' '▀▀▀▀' ;;
+    F) printf '%s\n%s\n%s' '████' '█▄▄ ' '▀   ' ;;
+    G) printf '%s\n%s\n%s' '▄▀▀▄' '█ ▄█' '▀▄▄▀' ;;
+    H) printf '%s\n%s\n%s' '█  █' '████' '▀  ▀' ;;
+    I) printf '%s\n%s\n%s' '▄' '█' '▀' ;;
+    J) printf '%s\n%s\n%s' '  ▄█' '   █' '▀▄▄ ' ;;
+    K) printf '%s\n%s\n%s' '█  █' '█▄█ ' '▀ ▀ ' ;;
+    L) printf '%s\n%s\n%s' '█   ' '█   ' '▀▀▀▀' ;;
+    M) printf '%s\n%s\n%s' '█▄ ▄█' '█ ▀ █' '▀   ▀' ;;
+    N) printf '%s\n%s\n%s' '█▄ ▄█' '█ ▄ █' '▀   ▀' ;;
+    O) printf '%s\n%s\n%s' '▄▀▀▄' '█  █' '▀▄▄▀' ;;
+    P) printf '%s\n%s\n%s' '█▀▀▄' '█▄▄█' '▀   ' ;;
+    Q) printf '%s\n%s\n%s' '▄▀▀▄' '█ ▄█' '▀▄▄▀' ;;
+    R) printf '%s\n%s\n%s' '█▀▀▄' '█▄▄▀' '▀  ▀' ;;
+    S) printf '%s\n%s\n%s' '▄▀▀▀' '▀▀▀█' '▄▄▄▀' ;;
+    T) printf '%s\n%s\n%s' '████' '  █ ' '  ▀ ' ;;
+    U) printf '%s\n%s\n%s' '█  █' '█  █' '▀▄▄▀' ;;
+    V) printf '%s\n%s\n%s' '█  █' '█  █' ' ▀▀ ' ;;
+    W) printf '%s\n%s\n%s' '█   █' '█ ▄ █' '▀▄▄▄▀' ;;
+    X) printf '%s\n%s\n%s' '█  █' ' ▄▄ ' '▀  ▀' ;;
+    Y) printf '%s\n%s\n%s' '█  █' ' ▄█ ' '  ▀ ' ;;
+    Z) printf '%s\n%s\n%s' '▄▄▄█' ' ▄▀ ' '▀▄▄▄' ;;
+    ' ') printf '%s\n%s\n%s' '   ' '   ' '   ' ;;
+    *) printf '%s\n%s\n%s' '    ' ' █  ' '    ' ;;
+  esac
+}
+
+render_wordmark() {
+  local name=$1 wordmark
+  # Prefer a real FIGlet with the vendored Roman font; otherwise embedded font.
+  # The font path must be the RENDERED target (~/.local/share/figlet/), since
+  # chezmoi never deploys this script into the source tree's directory layout.
+  if command -v figlet >/dev/null 2>&1; then
+    wordmark=$(figlet -w 200 -f "$HOME/.local/share/figlet/Roman.flf" "$name" 2>/dev/null) || true
+  fi
+  if [[ -n "${wordmark:-}" ]]; then
+    printf '%s\n' "$wordmark"
+    return
+  fi
+  local upper row1='' row2='' row3='' ch art
+  upper=$(printf '%s' "$name" | tr '[:lower:]' '[:upper:]')
+  for ch in $(printf '%s' "$upper" | fold -w1); do
+    art=$(_mini_font "$ch")
+    row1+="${art%%$'\n'*} "
+    row2+="$(printf '%s' "$art" | sed -n 2p) "
+    row3+="$(printf '%s' "$art" | sed -n 3p) "
+  done
+  printf '%s\n%s\n%s\n' "$row1" "$row2" "$row3"
+}
+
+# ------------------------------------------------------------ live hardware ---
+# All chips read /proc (or uname) and must stay <10ms. macOS has no /proc:
+# any chip whose backing file is missing is omitted silently, never errored.
+kernel=$(uname -r 2>/dev/null || echo 'unknown')
+
+uptime_s=''
+if [[ -r /proc/uptime ]]; then
+  read -r up_secs _ < /proc/uptime
+  up_secs=${up_secs%%.*}
+  if (( up_secs >= 86400 )); then
+    # multi-word values must stay a single assignment word — build via printf
+    printf -v uptime_s '%dd %dh' $(( up_secs / 86400 )) $(( (up_secs % 86400) / 3600 ))
+  elif (( up_secs >= 3600 )); then
+    printf -v uptime_s '%dh %dm' $(( up_secs / 3600 )) $(( (up_secs % 3600) / 60 ))
+  else
+    uptime_s=$(( up_secs / 60 ))m
+  fi
+fi
+
+mem_s=''
+if [[ -r /proc/meminfo ]]; then
+  read -r _ mem_total _ < <(grep '^MemTotal:' /proc/meminfo) || mem_total=''
+  read -r _ mem_avail _ < <(grep '^MemAvailable:' /proc/meminfo) || mem_avail=''
+  # Skip the chip silently if either metric is missing (set -u safety).
+  if [[ -n "${mem_total:-}" && -n "${mem_avail:-}" ]]; then
+    mem_s=$(( (mem_total - mem_avail) / 1048576 ))G/$(( mem_total / 1048576 ))G
+  fi
+fi
+
+date_s=$(LC_ALL=C date '+%a %d %b' 2>/dev/null || true)
+
+# Drift: same chezmoi-status data `dots status` reports on, wrapped in
+# `timeout 1` so a slow dry-run can never stall the banner — if it doesn't
+# answer in time, the chip is omitted silently. The dry-run is kept only
+# because it is timeout-guarded.
+drift_s='n/a'
+# timeout may not exist (hadrian/macOS): skip the chip silently rather than
+# leaking "command not found" to stderr on every render.
+if command -v timeout >/dev/null 2>&1 && command -v dots >/dev/null 2>&1; then
+  # Parse `dots status`'s report: chezmoi state codes (" MM path") and the
+  # human-labeled lines (create_ template drift) that chezmoi status hides.
+  # The inner `|| true` matters: grep -c exits 1 on count 0, so a CLEAN tree
+  # must still render "0" — only an empty capture (timeout/failure) is n/a.
+  drift_n=$(timeout 1 dots status 2>/dev/null |
+    grep -cE '^[[:space:]]*[MADRU?]{1,2}[[:space:]]|^[[:space:]]*(modified|added|removed|deleted|renamed):' || true)
+  drift_s=${drift_n:-n/a}
+elif command -v timeout >/dev/null 2>&1 && timeout 1 chezmoi status >/dev/null 2>&1; then
+  drift_s=$(timeout 1 chezmoi status 2>/dev/null | grep -cE '^[MADRU?]' || true)
+fi
+
+# ------------------------------------------------------------------ render ---
+accent_ansi=$(style_to_ansi "$accent")
+
+printf '%s%s%s\n' "$accent_ansi" "$(render_wordmark "$displayName")" "$NC"
+# machine | role | identity chips (accent); role may be empty on `unknown`
+printf '%s%s%s' "$DIM" "$machine" "$NC"
+[[ -n "$role" ]] && printf '  %s%s%s' "$accent_ansi" "$role" "$NC"
+# Chips are joined with '|': no chip value or displayName may contain '|'.
+chips_s=$(printf '%s' "$chips_raw" | sed 's/|$//;s/|/, /g')
+[[ -n "$chips_s" ]] && printf '  %schips: %s%s' "$accent_ansi" "$chips_s" "$NC"
+printf '\n'
+printf '%skernel:%s %s' "$DIM" "$NC" "$kernel"
+[[ -n "$uptime_s" ]] && printf '  %sup:%s %s' "$DIM" "$NC" "$uptime_s"
+[[ -n "$mem_s" ]] && printf '  %smem:%s %s' "$DIM" "$NC" "$mem_s"
+[[ -n "$date_s" ]] && printf '  %sdate:%s %s' "$DIM" "$NC" "$date_s"
+printf '  %sdrift:%s %s\n' "$DIM" "$NC" "$drift_s"

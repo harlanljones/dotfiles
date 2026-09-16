@@ -1,0 +1,53 @@
+# btop theme generated from the shared dots theme palette.
+# Source: .chezmoitemplates/themes/<name>/windows_terminal.json (full 16-color
+# palette + background/foreground), rendered by chezmoi so `dots theme set`
+# + `chezmoi apply` regenerates it alongside the other themed tools.
+{{- $name := includeTemplate ".chezmoitemplates/machine-theme-name.tmpl" . -}}
+{{- /* The windows_terminal.json snapshot carries leading `#` comment lines;
+       rebuild the JSON without them so fromJson can parse it. */ -}}
+{{- $buf := "" -}}
+{{- range $line := splitList "\n" (include (printf ".chezmoitemplates/themes/%s/windows_terminal.json" $name)) -}}
+{{-   if not (hasPrefix "#" (trim $line)) }}{{ $buf = printf "%s%s" $buf $line }}{{ end -}}
+{{- end -}}
+{{- $p := $buf | fromJson -}}
+theme[main_fg] = "{{ $p.foreground }}"
+theme[main_bg] = "{{ $p.background }}"
+theme[hi_fg] = "{{ $p.red }}"
+theme[medium_fg] = "{{ $p.white }}"
+theme[low_fg] = "{{ $p.brightBlack }}"
+theme[bg] = "{{ $p.background }}"
+theme[inactive_fg] = "{{ $p.brightBlack }}"
+theme[text] = "{{ $p.foreground }}"
+theme[graph_line] = "{{ $p.cyan }}"
+theme[proc_start] = "{{ $p.green }}"
+theme[proc_mid] = "{{ $p.yellow }}"
+theme[proc_end] = "{{ $p.red }}"
+theme[proc_main] = "{{ $p.foreground }}"
+theme[proc_misc] = "{{ $p.brightBlack }}"
+theme[proc_idle] = "{{ $p.brightBlack }}"
+theme[proc_dead] = "{{ $p.red }}"
+theme[proc_symbol] = "{{ $p.green }}"
+theme[cpu_start] = "{{ $p.green }}"
+theme[cpu_mid] = "{{ $p.yellow }}"
+theme[cpu_end] = "{{ $p.red }}"
+theme[free_start] = "{{ $p.green }}"
+theme[free_mid] = "{{ $p.yellow }}"
+theme[free_end] = "{{ $p.red }}"
+theme[cached_start] = "{{ $p.cyan }}"
+theme[cached_mid] = "{{ $p.blue }}"
+theme[cached_end] = "{{ $p.purple }}"
+theme[available_start] = "{{ $p.green }}"
+theme[available_mid] = "{{ $p.white }}"
+theme[available_end] = "{{ $p.brightBlack }}"
+theme[used_start] = "{{ $p.cyan }}"
+theme[used_mid] = "{{ $p.blue }}"
+theme[used_end] = "{{ $p.purple }}"
+theme[downloads_start] = "{{ $p.cyan }}"
+theme[downloads_mid] = "{{ $p.blue }}"
+theme[downloads_end] = "{{ $p.purple }}"
+theme[uploads_start] = "{{ $p.blue }}"
+theme[uploads_mid] = "{{ $p.purple }}"
+theme[uploads_end] = "{{ $p.brightPurple }}"
+theme[temp_start] = "{{ $p.green }}"
+theme[temp_mid] = "{{ $p.yellow }}"
+theme[temp_end] = "{{ $p.red }}"

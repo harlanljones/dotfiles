@@ -1,0 +1,20 @@
+// hyprshell — Phase 7.14, restrained thumbnail-grid alt-tab for augustus.
+// Schema: https://github.com/H3rmt/hyprshell (config-lib v4). Validate with
+// `hyprshell config check`; edit interactively with `hyprshell config edit`.
+// Only the Switch window is enabled — no overview, no launcher. Everything
+// else inherits upstream defaults.
+(
+    version: 4,
+    windows: (
+        // Switch = Alt+Tab thumbnail grid, held-modifier style: releasing
+        // Alt closes it. Current monitor only, windows only (no workspace
+        // switching) to stay restrained. Filter enum variants are snake_case
+        // in hyprshell >= 4.10 (verified against the installed binary's
+        // deserializer: same_class | current_workspace | current_monitor).
+        switch: (
+            modifier: "Alt",
+            filter_by: [current_monitor],
+            switch_workspaces: false,
+        ),
+    ),
+)

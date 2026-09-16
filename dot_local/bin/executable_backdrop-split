@@ -1,0 +1,104 @@
+#!/usr/bin/env bash
+# backdrop-split — split the current Omarchy theme background across every
+# connected monitor and assign one segment per display via the Backdrop
+# plugin IPC, so a single artwork spans the whole monitor array.
+#
+# Invoked from:
+#   - ~/.config/omarchy/hooks/theme-set.d/backdrop-split  (omarchy theme set)
+#   - run_after_34-augustus-backdrop-split                (every dots sync)
+#
+# Geometry is computed from the live Hyprland monitor layout: the image is
+# cover-fitted over the full logical desktop bounding box, rendered at the
+# highest monitor scale, and each display gets its logical rect cropped out
+# and resampled to its native resolution.
+set -euo pipefail
+
+for cmd in omarchy-shell omarchy hyprctl magick python3; do
+	command -v "$cmd" >/dev/null 2>&1 || {
+		echo "backdrop-split: missing '$cmd' — not an Omarchy+Backdrop machine, skipping" >&2
+		exit 0
+	}
+done
+
+# The Backdrop plugin must own the background target, or assignments would
+# silently no-op.
+if ! omarchy-shell background assignments >/dev/null 2>&1; then
+	echo "backdrop-split: Backdrop IPC unavailable (plugin disabled or shell down), skipping" >&2
+	exit 0
+fi
+
+# Resolve the current theme background file from its hash.
+hash="$(omarchy theme bg current 2>/dev/null | tr -d '[:space:]' || true)"
+if [[ -z "$hash" ]]; then
+	echo "backdrop-split: no current background set, skipping" >&2
+	exit 0
+fi
+src="$(find "$HOME/.config/omarchy/themes" -maxdepth 3 -type f -name "${hash}.*" 2>/dev/null | head -1)"
+if [[ -z "$src" ]]; then
+	echo "backdrop-split: no file for background hash $hash, skipping" >&2
+	exit 0
+fi
+
+out_dir="$HOME/.config/omarchy/backdrop/segments"
+mkdir -p "$out_dir"
+rm -f "$out_dir"/*.png
+
+# Plan the crops. Fields per monitor: name|cropX|cropY|cropW|cropH|nativeW|nativeH
+plan="$(python3 <<'PY'
+import json, math, subprocess
+
+mons = json.loads(subprocess.check_output(["hyprctl", "monitors", "-j"]))
+mons = [m for m in mons if m.get("active", True) and not m.get("disabled", False)]
+if not mons:
+    sys.exit("no active monitors")
+
+for m in mons:
+    s = m["scale"]
+    m["_lw"], m["_lh"] = m["width"] / s, m["height"] / s
+
+min_x = min(m["x"] for m in mons)
+min_y = min(m["y"] for m in mons)
+max_x = max(m["x"] + m["_lw"] for m in mons)
+max_y = max(m["y"] + m["_lh"] for m in mons)
+density = max(m["scale"] for m in mons)
+
+canvas_w = math.ceil((max_x - min_x) * density)
+canvas_h = math.ceil((max_y - min_y) * density)
+
+for m in mons:
+    ox = round((m["x"] - min_x) * density)
+    oy = round((m["y"] - min_y) * density)
+    ow = round(m["_lw"] * density)
+    oh = round(m["_lh"] * density)
+    print(f"{m['name']}|{ox}|{oy}|{ow}|{oh}|{m['width']}|{m['height']}")
+
+print(f"CANVAS|{canvas_w}|{canvas_h}")
+PY
+)"
+
+canvas="$(grep '^CANVAS|' <<<"$plan" | cut -d'|' -f2,3 | tr '|' 'x')"
+cw="${canvas%x*}" ch="${canvas#*x}"
+
+# Idempotent: same background + same layout -> byte-identical outputs.
+status=0
+while IFS='|' read -r name ox oy ow oh mw mh; do
+	[[ "$name" == "CANVAS" ]] && continue
+	seg="$out_dir/${name}.png"
+	if ! magick "$src" \
+		-resize "${cw}x${ch}^" -gravity center -extent "${cw}x${ch}" \
+		-crop "${ow}x${oh}+${ox}+${oy}" +repage \
+		-resize "${mw}x${mh}!" \
+		-strip \
+		"$seg"; then
+		echo "backdrop-split: magick failed for $name" >&2
+		status=1
+		continue
+	fi
+	# Deliberately without -q: -q fakes success when the IPC target is gone.
+	if ! omarchy-shell background setForScreen "$name" "$seg"; then
+		echo "backdrop-split: setForScreen $name failed" >&2
+		status=1
+	fi
+done <<<"$plan"
+
+exit "$status"

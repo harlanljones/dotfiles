@@ -79,6 +79,8 @@ hook that runs on every machine (gated internally on `.machine`). Gaps in the
 | 30 | `run_onchange_after_30-hadrian-macos-defaults.sh.tmpl` | onchange (hadrian) | Declarative `defaults write` preferences |
 | 31 | `run_onchange_after_31-augustus-mouse-dpi.sh.tmpl` | onchange (augustus) | Pin Logitech mice to 400 DPI |
 | 32 | `run_onchange_after_32-setup-omarchy-agent-registrations.sh.tmpl` | onchange (augustus) | Register configured agents and collect initial Omarchy leaderboard usage |
+| 33 | `run_onchange_after_33-augustus-machine-branding.sh.tmpl` | onchange (augustus) | Write Omarchy screensaver/about branding art from the machine identity |
+| 34 | `run_after_34-augustus-backdrop-split.sh.tmpl` | after (augustus) | Re-split current theme background across monitors via Backdrop |
 | 40 | `run_onchange_after_40-vespasian-windows-terminal.sh.tmpl` | onchange (vespasian) | Write the Tokyo Night Windows Terminal fragment (scheme + Ubuntu profile update) |
 | 41 | `run_onchange_after_41-vespasian-nerd-font.sh.tmpl` | onchange (vespasian) | Per-user install of the pinned JetBrainsMono Nerd Font on Windows |
 | 42 | `run_onchange_after_42-vespasian-theme-state.sh.tmpl` | onchange (vespasian) | Rebuild bat's theme cache; set Claude Code theme to `dark-ansi`/`light-ansi` per the selected theme |

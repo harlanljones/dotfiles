@@ -9,24 +9,24 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**831 tracked entries** across 16 categories.
+**843 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
-| [Shell](#shell) | 19 |
+| [Shell](#shell) | 20 |
 | [Prompt](#prompt) | 1 |
-| [Terminal & multiplexer](#terminal--multiplexer) | 4 |
-| [Editors](#editors) | 17 |
-| [Desktop & window manager](#desktop--window-manager) | 10 |
+| [Terminal & multiplexer](#terminal--multiplexer) | 5 |
+| [Editors](#editors) | 18 |
+| [Desktop & window manager](#desktop--window-manager) | 11 |
 | [Version control](#version-control) | 6 |
 | [Navigation & search](#navigation--search) | 3 |
 | [Toolchain & packages](#toolchain--packages) | 5 |
 | [AI agent harnesses](#ai-agent-harnesses) | 497 |
 | [Background services](#background-services) | 17 |
-| [Custom executables](#custom-executables) | 35 |
+| [Custom executables](#custom-executables) | 37 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Other configuration](#other-configuration) | 152 |
-| [Apply hooks (`run_*`)](#apply-hooks-run) | 22 |
+| [Other configuration](#other-configuration) | 156 |
+| [Apply hooks (`run_*`)](#apply-hooks-run) | 24 |
 | [Chezmoi control files](#chezmoi-control-files) | 11 |
 | [Repository material (not applied)](#repository-material-not-applied) | 30 |
 
@@ -49,6 +49,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/shell/50-agents.sh` | `dot_config/shell/50-agents.sh` | shared shell modules | — |
 | `~/.config/shell/55-apps.sh` | `dot_config/shell/55-apps.sh` | shared shell modules | — |
 | `~/.config/shell/60-prompt.sh` | `dot_config/shell/60-prompt.sh` | shared shell modules | — |
+| `~/.config/shell/61-splash.sh` | `dot_config/shell/61-splash.sh` | shared shell modules | — |
 | `~/.config/shell/65-theme.sh` | `dot_config/shell/65-theme.sh` | shared shell modules | — |
 | `~/.config/shell/70-cloud.sh` | `dot_config/shell/70-cloud.sh` | shared shell modules | — |
 | `~/.config/shell/75-tool-paths.sh` | `dot_config/shell/75-tool-paths.sh` | shared shell modules | — |
@@ -66,7 +67,8 @@ agents and the showcase app should read. This page is the same data for humans.
 
 | Target | Source | Subsystem | Attributes |
 | --- | --- | --- | --- |
-| `~/.config/btop/btop.conf` | `dot_config/btop/btop.conf` | btop | — |
+| `~/.config/btop/btop.conf` | `dot_config/btop/btop.conf.tmpl` | btop | template |
+| `~/.config/btop/themes/dots.theme` | `dot_config/btop/themes/dots.theme.tmpl` | btop | template |
 | `~/.config/ghostty/config` | `dot_config/ghostty/config.tmpl` | ghostty | template |
 | `~/.config/herdr/config.toml` | `dot_config/herdr/config.toml.tmpl` | herdr multiplexer | template |
 | `~/.config/herdr/plugins.json` | `dot_config/herdr/plugins.json.tmpl` | herdr multiplexer | template |
@@ -85,6 +87,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/nvim/lua/plugins/blink-cmp.lua` | `dot_config/nvim/lua/plugins/blink-cmp.lua` | neovim / LazyVim | — |
 | `~/.config/nvim/lua/plugins/copilot-lualine.lua` | `dot_config/nvim/lua/plugins/copilot-lualine.lua` | neovim / LazyVim | — |
 | `~/.config/nvim/lua/plugins/copilot.lua` | `dot_config/nvim/lua/plugins/copilot.lua` | neovim / LazyVim | — |
+| `~/.config/nvim/lua/plugins/dashboard-dots-identity.lua` | `dot_config/nvim/lua/plugins/dashboard-dots-identity.lua` | neovim / LazyVim | — |
 | `~/.config/nvim/lua/plugins/html-preview.lua` | `dot_config/nvim/lua/plugins/empty_html-preview.lua` | neovim / LazyVim | empty |
 | `~/.config/nvim/lua/plugins/example.lua` | `dot_config/nvim/lua/plugins/example.lua` | neovim / LazyVim | — |
 | `~/.config/nvim/lua/plugins/faster-smear-cursor.lua` | `dot_config/nvim/lua/plugins/faster-smear-cursor.lua` | neovim / LazyVim | — |
@@ -106,6 +109,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/hypr/monitors.lua` | `dot_config/hypr/monitors.lua` | hyprland | — |
 | `~/.config/omarchy/shell.json` | `dot_config/omarchy/create_private_shell.json.tmpl` | omarchy | create, private, template |
 | `~/.config/omarchy/defaults/agent` | `dot_config/omarchy/defaults/agent.tmpl` | omarchy | template |
+| `~/.config/omarchy/hooks/theme-set.d/backdrop-split` | `dot_config/omarchy/hooks/theme-set.d/executable_backdrop-split` | omarchy | executable |
 | `~/.local/share/applications/cursor-desktop.desktop` | `dot_local/share/applications/cursor-desktop.desktop` | desktop entries | — |
 
 ## Version control
@@ -666,9 +670,11 @@ agents and the showcase app should read. This page is the same data for humans.
 | Target | Source | Subsystem | Attributes |
 | --- | --- | --- | --- |
 | `~/.local/bin/cline-safety/git` | `dot_local/bin/cline-safety/executable_git` | cline git interceptor | executable |
+| `~/.local/bin/backdrop-split` | `dot_local/bin/executable_backdrop-split` | custom executables | executable |
 | `~/.local/bin/chrome-profile` | `dot_local/bin/executable_chrome-profile` | custom executables | executable |
 | `~/.local/bin/cursor` | `dot_local/bin/executable_cursor` | custom executables | executable |
 | `~/.local/bin/dots` | `dot_local/bin/executable_dots` | custom executables | executable |
+| `~/.local/bin/dots-identity` | `dot_local/bin/executable_dots-identity` | custom executables | executable |
 | `~/.local/bin/dots-push` | `dot_local/bin/executable_dots-push` | custom executables | executable |
 | `~/.local/bin/dots-theme-import-aether` | `dot_local/bin/executable_dots-theme-import-aether` | custom executables | executable |
 | `~/.local/bin/herdr-agent-lifecycle` | `dot_local/bin/executable_herdr-agent-lifecycle` | custom executables | executable |
@@ -853,6 +859,10 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/delta/theme.gitconfig` | `dot_config/delta/theme.gitconfig.tmpl` | — | template |
 | `~/.config/eza/theme.yml` | `dot_config/eza/theme.yml.tmpl` | — | template |
 | `~/.config/fzf/theme.sh` | `dot_config/fzf/theme.sh.tmpl` | — | template |
+| `~/.config/hyprshell/config.ron` | `dot_config/hyprshell/config.ron` | — | — |
+| `~/.config/hyprshell/styles.css` | `dot_config/hyprshell/styles.css` | — | — |
+| `~/.local/share/figlet/README.md` | `dot_local/share/figlet/README.md` | — | — |
+| `~/.local/share/figlet/Roman.flf` | `dot_local/share/figlet/Roman.flf` | — | — |
 | `~/.local/share/omarchy-patches/esemczak.theme-modes-profiles.patch` | `dot_local/share/omarchy-patches/esemczak.theme-modes-profiles.patch` | — | — |
 | `~/.local/share/wsl-ssh-bridge/main.go` | `dot_local/share/wsl-ssh-bridge/main.go` | — | — |
 | `~/install.sh` | `install.sh` | — | — |
@@ -883,6 +893,8 @@ agents and the showcase app should read. This page is the same data for humans.
 | 30 | `run_onchange_after_30-hadrian-macos-defaults.sh.tmpl` | runs when this script's contents change | after |
 | 31 | `run_onchange_after_31-augustus-mouse-dpi.sh.tmpl` | runs when this script's contents change | after |
 | 32 | `run_onchange_after_32-setup-omarchy-agent-registrations.sh.tmpl` | runs when this script's contents change | after |
+| 33 | `run_onchange_after_33-augustus-machine-branding.sh.tmpl` | runs when this script's contents change | after |
+| 34 | `run_after_34-augustus-backdrop-split.sh.tmpl` | runs after every apply | after |
 | 40 | `run_onchange_after_40-vespasian-windows-terminal.sh.tmpl` | runs when this script's contents change | after |
 | 41 | `run_onchange_after_41-vespasian-nerd-font.sh.tmpl` | runs when this script's contents change | after |
 | 42 | `run_onchange_after_42-vespasian-theme-state.sh.tmpl` | runs when this script's contents change | after |

@@ -54,12 +54,16 @@ hl.config({
 -- every time it opens, and only ever rewrites what's between the fences.
 hl.config({
   decoration = {
-    rounding = 20,
+    rounding = 16,
+
+    blur = {
+      enabled = false,
+    },
 
     glow = {
-      enabled = false,
-      range = 8,
-      render_power = 1,
+      enabled = true,
+      range = 10,
+      render_power = 3,
     },
 
     shadow = {
@@ -68,7 +72,7 @@ hl.config({
   },
 
   general = {
-    border_size = 3,
+    border_size = 0,
     gaps_out = 4,
   },
 })

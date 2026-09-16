@@ -1,0 +1,15 @@
+{{ if eq .machine "augustus" -}}
+#!/usr/bin/env bash
+# Re-split the current Omarchy theme background across the monitors after
+# every apply, so `dots sync` (theme changes, layout changes) always leaves
+# Backdrop assignments matching the live monitor layout. Runs on every apply
+# (run_after, not run_onchange) because the omarchy-side theme can change
+# outside chezmoi's knowledge; the script is a cheap no-op when nothing moved.
+# The theme-set.d hook covers switches made through `omarchy theme set`.
+set -euo pipefail
+
+echo "run_after_34: refreshing backdrop segments"
+if ! "$HOME/.local/bin/backdrop-split"; then
+	echo "run_after_34: backdrop-split reported failures (non-fatal)" >&2
+fi
+{{- end }}

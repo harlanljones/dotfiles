@@ -42,3 +42,9 @@ export PATH=/home/harlan/.opencode/bin:$PATH
 export PATH="$HOME/.grok/bin:$PATH"
 [[ -r "$HOME/.grok/completions/bash/grok.bash" ]] && source "$HOME/.grok/completions/bash/grok.bash"
 # <<< grok installer <<<
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/home/harlan/google-cloud-sdk/path.bash.inc' ]; then . '/home/harlan/google-cloud-sdk/path.bash.inc'; fi
+
+# The next line enables shell command completion for gcloud.
+if [ -f '/home/harlan/google-cloud-sdk/completion.bash.inc' ]; then . '/home/harlan/google-cloud-sdk/completion.bash.inc'; fi

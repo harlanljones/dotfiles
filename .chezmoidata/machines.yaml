@@ -8,6 +8,13 @@ machines:
     theme:
       accent: "bold dimmed cyan"
     type: personal
+    # Machine-identity banner data (phase 7.12). The wordmark is the
+    # displayName itself, rendered by `dots-identity` via `figlet` using the
+    # vendored Roman font (dot_local/share/figlet/Roman.flf). figlet is NOT a
+    # hard dependency: without it the embedded mini-font wordmark is used.
+    # Hardware stats are gathered live at render time, never stored here.
+    identity:
+      chips: ["foundational", "bare metal", "omarchy"]
     # Ghostty font size. Augustus drives a 4K panel at 1.6x scale, where 9pt
     # JetBrainsMono is already large; Hadrian is a 14" Retina laptop.
     ghostty:
@@ -21,6 +28,8 @@ machines:
     theme:
       accent: "bold purple"
     type: work
+    identity:
+      chips: ["roaming", "mobile", "macos"]
     ghostty:
       fontSize: 14
   vespasian:
@@ -34,6 +43,8 @@ machines:
     # daemons.
     backstory: "Vespasian restored order after a year of chaos and raised the Colosseum, making him the natural name for the box that hosts both the games and the work between them."
     type: personal
+    identity:
+      chips: ["builder", "WSL2", "dual-use"]
     theme:
       accent: "bold yellow"
       # Key into .chezmoidata/themes.yaml. Change with `dots theme set <name>`
@@ -66,6 +77,8 @@ machines:
     # font that is readable on any panel until the machine is registered.
     type: personal
     headless: true
+    identity:
+      chips: ["unregistered"]
     theme:
       accent: "bold white"
       name: omarchy-tokyo-night
