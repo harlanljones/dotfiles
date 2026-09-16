@@ -28,6 +28,7 @@ agent:
   fast_auto_seconds: 60
   verbose: false
   reasoning_effort: medium
+  verify_on_stop: auto
   personalities: {}
 terminal:
   backend: local
@@ -68,7 +69,7 @@ compression:
   protect_last_n: 20
   min_tail_user_messages: 1
   max_attempts: 3
-  proactive_prune_tokens: 0
+  proactive_prune_tokens: 48000
   proactive_prune_min_result_chars: 8000
   proactive_prune_min_reclaim_tokens: 4096
   hygiene_max_turn_hold_seconds: 10
@@ -81,7 +82,7 @@ prompt_caching:
   cache_ttl: 5m
 display:
   compact: false
-  personality: technical
+  personality: none
   busy_input_mode: interrupt
   bell_on_complete: false
   bell_on_prompt: false
@@ -117,14 +118,6 @@ skills:
   creation_nudge_interval: 15
 approvals:
   destructive_slash_confirm: false
-hooks:
-  post_tool_call:
-    - matcher: write_file|patch
-      command: ~/.hermes/agent-hooks/verdict-cargo-fmt.sh
-      timeout: 15
-  pre_llm_call:
-    - command: ~/.hermes/agent-hooks/inject-git-status.sh
-      timeout: 5
 cron:
   catch_up_missed: true
 kanban:
@@ -236,24 +229,8 @@ mcp_servers:
 #   tirith_timeout: 5
 #   tirith_fail_open: true
 
-# ── Fallback Model ────────────────────────────────────────────────────
-# Automatic provider failover when primary is unavailable.
-# Uncomment and configure to enable. Triggers on rate limits (429),
-# overload (529), service errors (503), or connection failures.
-#
-# Supported providers:
-#   openrouter   (OPENROUTER_API_KEY)  — routes to any model
-#   openai-codex (OAuth — hermes auth) — OpenAI Codex
-#   nous         (OAuth — hermes auth) — Nous Portal
-#   zai          (ZAI_API_KEY)         — Z.AI / GLM
-#   kimi-coding  (KIMI_API_KEY)        — Kimi / Moonshot
-#   kimi-coding-cn (KIMI_CN_API_KEY)   — Kimi / Moonshot (China)
-#   minimax      (MINIMAX_API_KEY)     — MiniMax
-#   minimax-cn   (MINIMAX_CN_API_KEY)  — MiniMax (China)
-#   bedrock      (AWS IAM / boto3)     — AWS Bedrock (Converse API)
-#
-# For custom OpenAI-compatible endpoints, add base_url and key_env.
-#
-# fallback_model:
-#   provider: openrouter
-#   model: anthropic/claude-sonnet-4
+# Same-provider failover when glm-5.3-flash is rate-limited or down.
+# Stays on Nous so a blip does not bill another account.
+fallback_providers:
+  - provider: nous
+    model: z-ai/glm-5.3

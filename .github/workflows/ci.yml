@@ -265,17 +265,6 @@ jobs:
       - name: Dotfiles index is up to date
         run: python3 docs/generate_index.py --check
 
-      - name: Install review test dependencies
-        run: sudo apt-get install -y python3-yaml
-
-      - name: Review tooling fixtures (never execute copied skill workflows)
-        env:
-          PYTHONDONTWRITEBYTECODE: '1'
-        run: |
-          python3 docs/skill-review/test_inventory.py -v
-          python3 docs/skill-review/test_review.py -v
-          python3 docs/skill-review/evaluations/test_local.py -v
-
   # 2.1 Real (non-dry-run) apply on Linux. Unlike the validate jobs, this
   # executes run_* hook scripts. Those do network installs, pacman operations
   # and Omarchy/desktop setup that cannot succeed on a bare ubuntu runner, so

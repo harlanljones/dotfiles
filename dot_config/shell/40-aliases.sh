@@ -26,6 +26,7 @@ alias codex="codex --approve-for-me"
 alias cx="codex"
 alias cr="codex -m gpt-reserve"
 alias oc="opencode"
+command -v hermes >/dev/null 2>&1 && alias hr="HERMES_TUI_RESUME=1 hermes"
 command -v agent >/dev/null 2>&1 && alias cursor="agent"
 
 # Git and dotfile workflows.

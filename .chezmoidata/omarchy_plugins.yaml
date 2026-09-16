@@ -67,3 +67,9 @@ omarchyPlugins:
     enabled: true
   - url: https://github.com/Camstraps/omatree.git
     enabled: true
+  - url: https://github.com/fross100/omaplug.git
+    enabled: true
+  - url: https://github.com/grichard99/omaproton-vpn.git
+    enabled: true
+  - url: https://github.com/tmn73/omarchy-calendar.git
+    enabled: true

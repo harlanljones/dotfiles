@@ -114,7 +114,7 @@ The table below is the orienting summary; the index is the detail.
 | `.chezmoidata/` | YAML data sources read by `.tmpl`s (`machines`, `agent_skills`, `omarchy_plugins`, `claude_mcp`, `claude_settings`, `codex_projects`, `themes`) |
 | `.chezmoitemplates/themes/<name>/` | Verbatim upstream per-tool theme ports (Windows Terminal, lazygit, delta, fzf, eza, bat, Gemini) included by the themed templates; never applied. Select with `dots theme set <name>` (edits `machines.<machine>.theme.name`), never by editing rendered targets |
 | `docs/` | Recovery guide, Vespasian boot & theming guides, reorganization proposal, and generator scripts (chezmoi-ignored, git-tracked) |
-| `docs/agents/`, `docs/skill-review/` | Cross-agent tracking guide and candidate-only skill review evidence; never deploy or execute copied workflows as repo automation |
+| `docs/agents/` | Cross-agent tracking guide (Skills Review retired 2026-09-16 — evidence recoverable from git history); never deploy or execute copied workflows as repo automation |
 | `INDEX.json` / `INDEX.md` | **Generated** file index (see above); never hand-edit |
 | `Documents/` | Non-config content (Cline workflow docs) |
 | `.github/workflows/ci.yml` | CI: dry-run apply on Linux (Augustus + Vespasian) and macOS, gitleaks, shellcheck with chezmoi config, actionlint |
@@ -155,10 +155,8 @@ Each CLI/runtime is owned by exactly one manager. Do not spread a tool across tw
   new secrets (`encrypted_*.age`).
 - **Keep repo-level `.gitignore` and `.chezmoiignore` in sync** with what is
   intentionally git-tracked vs applied.
-- **Review artifacts are repository material.** Track `docs/skill-review/` trees,
-  licenses, inventory and evidence; keep `.unlazy/` coordination local via the
-  shared ignore rules, not only `.git/info/exclude`. CI runs review-tool fixtures,
-  not copied candidate scripts. Regenerate the root index after publishing files.
+- **Keep `.unlazy/` coordination local** via the shared ignore rules, not only
+  `.git/info/exclude`. Regenerate the root index after publishing files.
 - **Add new dotfiles with the correct prefix** (§2) and register them in
   `README.md` + this file if they add a tool or hook.
 - **`dot_config/nvim/lazy-lock.json` was seeded from a snapshot, not from a

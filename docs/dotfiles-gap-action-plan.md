@@ -162,12 +162,18 @@ Legend: effort S ≤1h, M ≤ half a day, L ≥ a day. Priority = recommended or
 
 ## Phase 5 — Repo weight & maintenance debt
 
-- [ ] **5.1 Slim docs/ (71M) and theme-assets (15M)** — Priority 6, effort L
-  - 93% of INDEX entries are non-deployed material. Vendored skill-review libraries
-    (with binaries) duplicate upstream → license-refresh and drift burden.
-  - Options: move vendored libraries to a separate branch/repo or submodule pin;
-    `git filter-repo` only if history weight becomes painful (breaking change —
-    coordinate across machines).
+- [x] **5.1 Slim docs/ (71M) and theme-assets (15M)** — Priority 6, effort L
+  - 2026-09-16: RESOLVED differently — the skills review was retired outright
+    (agent skills migrating to a Hermes-inspired setup; new models need less
+    instruction). `docs/skill-review/` pruned (git rm; recoverable from history,
+    index entries 5187 → 831). Remaining finding: `theme-assets/` (15M) is
+    load-bearing (wallpapers read by run_onchange_after_46; must live outside
+    .chezmoitemplates per docs/vespasian-theming.md) and stays. `.gitleaks.toml`
+    allowlist entries for docs/skill-review/* paths stay: flagged bytes persist
+    in git history and CI scans full history (docs/test_gitleaks.py passes,
+    creates its own fixtures). Original options: move vendored libraries to a
+    separate branch/repo or submodule pin; `git filter-repo` only if history
+    weight becomes painful (breaking change — coordinate across machines).
   - Files: `docs/skill-review/`, `.gitignore`, licenses.
 
 - [x] **5.2 CI check: AGENTS.md §3 hook table vs actual run_* filenames** — Priority 6, effort S
@@ -178,7 +184,7 @@ Legend: effort S ≤1h, M ≤ half a day, L ≥ a day. Priority = recommended or
   - Files: `docs/generate_index.py`, `AGENTS.md`.
 
 - [x] **5.3 Fold structurally identical omarchy collector hooks** — Priority 7, effort M
-  - Done: 2026-09-15: folded 21+32 into run_onchange_after_32-setup-omarchy-agent-registrations.sh.tmpl (data-driven from new .chezmoidata/omarchy_agents.yaml) and 22+29 into run_onchange_after_29-enable-omarchy-user-units.sh.tmpl. Hooks 20 (599-line Python collector deployer) and 26 (cross-machine statusline) deliberately kept separate — they are not collector-shaped. Verified live on augustus: first run completed pi's missing registration, second run byte-identical (idempotent). PENDING: AGENTS.md §3 table rows must be updated by hand (agent-edited AGENTS.md is policy-blocked); generate_index --check fails until then.
+  - Done: 2026-09-15: folded 21+32 into run_onchange_after_32-setup-omarchy-agent-registrations.sh.tmpl (data-driven from new .chezmoidata/omarchy_agents.yaml) and 22+29 into run_onchange_after_29-enable-omarchy-user-units.sh.tmpl. Hooks 20 (599-line Python collector deployer) and 26 (cross-machine statusline) deliberately kept separate — they are not collector-shaped. Verified live on augustus: first run completed pi's missing registration, second run byte-identical (idempotent). AGENTS.md §3 table updated by hand; generate_index --check passes.
   - Hooks 20, 21, 22, 26, 29, 32 are all "usage-collector setup". Refactor into one
     data-driven hook iterating a `.chezmoidata/` collector definition list.
     Caution: run_onchange_* re-triggers on content change — a merged script will

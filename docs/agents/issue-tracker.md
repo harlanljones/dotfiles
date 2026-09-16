@@ -15,9 +15,16 @@ independent showcase submodule.
 - [Issue/dependency map](https://linear.app/harlanljones/document/skills-review-agent-routing-and-dependency-map-612fad0757da), document ID `101d5c3b-1391-43f6-bf2a-43993f37e933`.
 
 Linear holds current task state, decisions and ownership. The map is an initial
-scope snapshot, not live readiness. Candidate evidence lives in
-[`../skill-review/`](../skill-review/README.md). Read its README, RUBRIC and
-VERIFICATION plus the complete assigned issue before touching candidates.
+scope snapshot, not live readiness.
+
+RETIRED 2026-09-16: the skills review was pruned — the candidate evidence tree
+`docs/skill-review/` (library, inventory, evaluations) is removed from the
+working tree and the agent skills approach is migrating to a Hermes-inspired
+setup. This tracker and its Linear project remain as historical record only;
+do not dispatch new skills-review work through it. Evidence remains recoverable
+from git history (pre-prune commits), and the `.gitleaks.toml` allowlist
+entries for `docs/skill-review/*` paths must stay because those bytes persist
+in history.
 
 ## Access
 
