@@ -57,3 +57,7 @@ hl.window_rule({ match = { workspace = "special:reprieve" }, no_anim = true })
 hl.layer_rule({ match = { namespace = "reprieve" }, no_anim = true, animation = "none" })
 hl.layer_rule({ match = { namespace = "reprieve-toast" }, no_anim = true, animation = "none" })
 -- END tech.greyforge.reprieve
+
+-- omaplug-shortcut-start: bobbynicholas.omaland
+o.bind("SUPER + SHIFT + L", "Omaplug: bobbynicholas.omaland", "omarchy-shell shell toggle bobbynicholas.omaland")
+-- omaplug-shortcut-end: bobbynicholas.omaland
