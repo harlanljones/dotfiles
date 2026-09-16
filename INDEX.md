@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**5177 tracked entries** across 16 categories.
+**5187 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -26,9 +26,9 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Custom executables](#custom-executables) | 35 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
 | [Other configuration](#other-configuration) | 152 |
-| [Apply hooks (`run_*`)](#apply-hooks-run) | 20 |
-| [Chezmoi control files](#chezmoi-control-files) | 10 |
-| [Repository material (not applied)](#repository-material-not-applied) | 4384 |
+| [Apply hooks (`run_*`)](#apply-hooks-run) | 22 |
+| [Chezmoi control files](#chezmoi-control-files) | 11 |
+| [Repository material (not applied)](#repository-material-not-applied) | 4386 |
 
 ---
 
@@ -879,8 +879,10 @@ agents and the showcase app should read. This page is the same data for humans.
 | 26 | `run_onchange_after_26-setup-omarchy-cursor.sh.tmpl` | runs when this script's contents change | after |
 | 27 | `run_onchange_after_27-sync-claude-mcp.sh.tmpl` | runs when this script's contents change | after |
 | 28 | `run_onchange_after_28-sync-claude-settings.sh.tmpl` | runs when this script's contents change | after |
+| 29 | `run_onchange_after_29-enable-omarchy-user-units.sh.tmpl` | runs when this script's contents change | after |
 | 30 | `run_onchange_after_30-hadrian-macos-defaults.sh.tmpl` | runs when this script's contents change | after |
 | 31 | `run_onchange_after_31-augustus-mouse-dpi.sh.tmpl` | runs when this script's contents change | after |
+| 32 | `run_onchange_after_32-setup-omarchy-agent-registrations.sh.tmpl` | runs when this script's contents change | after |
 | 40 | `run_onchange_after_40-vespasian-windows-terminal.sh.tmpl` | runs when this script's contents change | after |
 | 41 | `run_onchange_after_41-vespasian-nerd-font.sh.tmpl` | runs when this script's contents change | after |
 | 42 | `run_onchange_after_42-vespasian-theme-state.sh.tmpl` | runs when this script's contents change | after |
@@ -901,6 +903,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `.chezmoidata/codex_projects.yaml` | Controls how chezmoi renders and applies this tree |
 | `.chezmoidata/hermes_skills.yaml` | Controls how chezmoi renders and applies this tree |
 | `.chezmoidata/machines.yaml` | Controls how chezmoi renders and applies this tree |
+| `.chezmoidata/omarchy_agents.yaml` | Controls how chezmoi renders and applies this tree |
 | `.chezmoidata/omarchy_plugins.yaml` | Controls how chezmoi renders and applies this tree |
 | `.chezmoidata/themes.yaml` | Controls how chezmoi renders and applies this tree |
 | `.chezmoiignore.tmpl` | Controls how chezmoi renders and applies this tree |
@@ -924,6 +927,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/aether-theming-integration-proposal.md` | Recovery guide and repository maintenance scripts |
 | `docs/agents/issue-tracker.md` | Recovery guide and repository maintenance scripts |
 | `docs/check-shell-modules.sh` | Recovery guide and repository maintenance scripts |
+| `docs/check_ignore_consistency.py` | Recovery guide and repository maintenance scripts |
 | `docs/dotfiles-gap-action-plan.md` | Recovery guide and repository maintenance scripts |
 | `docs/generate_index.py` | Recovery guide and repository maintenance scripts |
 | `docs/generate_readme_tree.py` | Recovery guide and repository maintenance scripts |
@@ -5288,6 +5292,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/skill-review/test_inventory.py` | Recovery guide and repository maintenance scripts |
 | `docs/skill-review/test_review.py` | Recovery guide and repository maintenance scripts |
 | `docs/test_gitleaks.py` | Recovery guide and repository maintenance scripts |
+| `docs/test_shell_modules.py` | Recovery guide and repository maintenance scripts |
 | `docs/vespasian-boot.md` | Recovery guide and repository maintenance scripts |
 | `docs/vespasian-theming.md` | Recovery guide and repository maintenance scripts |
 | `dotfiles-showcase` | Submodule — the showcase web app; never applied |

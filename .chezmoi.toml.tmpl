@@ -101,7 +101,9 @@ recipient = "age1hf4200nhdqg0l3xs68v4gef6mn0nuvmh72573m3nfj8kqpcs7pnsmfkuw6"
 {{- if hasKey $mach "type" }}{{ $role = index $mach "type" }}{{ end -}}
 {{- $headless := false -}}
 {{- if hasKey $mach "headless" }}{{ $headless = index $mach "headless" }}{{ end -}}
-{{- $isWSL := contains "microsoft" (lower .chezmoi.kernel.osrelease) -}}
+{{/* .chezmoi.kernel is populated from /proc only on Linux; on darwin it is
+     an empty map, so guard the lookup or the whole config fails to render. */ -}}
+{{- $isWSL := and (eq .chezmoi.os "linux") (hasKey .chezmoi.kernel "osrelease") (contains "microsoft" (lower .chezmoi.kernel.osrelease)) -}}
 
 [onepassword]
 prompt = true

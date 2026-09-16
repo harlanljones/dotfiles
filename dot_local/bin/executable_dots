@@ -107,8 +107,6 @@ ${BOLD}COMMANDS:${NC}
   ${CYAN}update, pull${NC}      Pull latest dotfiles from git remote and apply
   ${CYAN}push, pp${NC}          Capture templates, commit & push with Ollama-generated message
   ${CYAN}doctor${NC}            Run diagnostics on tools, age keys, agent links, template drift
-  ${CYAN}diagnose${NC}          Dump a full machine snapshot (versions, units, manifests) to a file
-  ${CYAN}codex-sync${NC}        Reconcile live Codex trust entries back into codex_projects.yaml
   ${CYAN}theme${NC}             Pick, list, show, or switch this machine's color theme
   ${CYAN}age, key${NC}          Manage age encryption key & 1Password backup/restore
   ${CYAN}setup${NC}             Run interactive system onboarding & setup wizard
@@ -130,7 +128,7 @@ ${BOLD}OPTIONS FOR THEME:${NC}
   --no-sync                    Update the machine selection without applying it
 
 ${BOLD}OPTIONS FOR PUSH:${NC}
-  Captures \`create_\` templates (shell.json) + plugin manifest via
+  Captures `create_` templates (shell.json) + plugin manifest via
   omarchy-dotfiles-sync, then delegates to dots-push: re-adds locally
   modified targets, stages all changes, generates a one-line conventional
   commit message with local Ollama, commits, and pushes to origin.
@@ -143,16 +141,16 @@ ${BOLD}OPTIONS FOR PUSH:${NC}
                           (default: ~/.local/share/chezmoi)
 
 ${BOLD}OPTIONS FOR CAPTURE:${NC}
-  Standalone live -> repo capture for drift chezmoi cannot see: \`create_\`
+  Standalone live -> repo capture for drift chezmoi cannot see: `create_`
   templates (omarchy shell.json) + plugin manifest. Never writes to $HOME.
   -n, --dry-run      Preview what would be captured without writing
   --prune            Also drop plugin manifest entries no longer installed
   --commit           Commit just the captured paths (same as sync script flag)
 
 ${BOLD}OPTIONS FOR ABSORB:${NC}
-  No args: capture \`create_\` templates (shell.json) + plugin manifest, then
+  No args: capture `create_` templates (shell.json) + plugin manifest, then
   re-add all modified managed files. File args: re-add those targets; shell.json
-  is intercepted to template capture since \`chezmoi re-add\` refuses templates.
+  is intercepted to template capture since `chezmoi re-add` refuses templates.
   -n, --dry-run      Preview template capture + re-add without writing
   --prune            Also drop plugin manifest entries no longer installed
   --omarchy          Capture omarchy templates/manifest only (skip generic re-add)
@@ -209,7 +207,6 @@ theme_current() {
 }
 
 theme_names() {
-  # shellcheck disable=SC2016  # single quotes intentional: Go template, not shell
   chezmoi execute-template '{{ range $name, $t := .themes }}{{ $name }}{{ "\t" }}{{ $t.label }}{{ "\n" }}{{ end }}'
 }
 
@@ -861,246 +858,8 @@ cmd_doctor() {
     fi
   fi
 
-  # 10. Package manifest drift (installed vs declared): the classic "installed
-  # it manually and forgot the manifest" rot, per machine:
-  #   hadrian    — brew bundle check against ~/.Brewfile
-  #   augustus   — pacman -Qqen vs pkglist.txt, -Qqem vs aurlist.txt
-  #   vespasian  — apt-mark showmanual vs apt/pkglist.txt
-  # Tolerant by design: a missing manifest or package manager just skips.
-  local pkg_drift=()
-  case "$(uname -s)" in
-    Darwin)
-      if [[ -f "$HOME/.Brewfile" ]] && command -v brew >/dev/null 2>&1; then
-        if brew bundle check --file="$HOME/.Brewfile" >/dev/null 2>&1; then
-          echo -e " ${GREEN}✓${NC} ${BOLD}brew manifest:${NC} Brewfile satisfied"
-        else
-          echo -e " ${YELLOW}!${NC} ${BOLD}brew manifest:${NC} Brewfile NOT satisfied — run 'brew bundle --file=~/.Brewfile'"
-          pkg_drift+=("brew")
-        fi
-      fi
-      ;;
-    Linux)
-      local src_pkg="$src/dot_config/pacman"
-      if command -v pacman >/dev/null 2>&1 && [[ -r "$src_pkg/pkglist.txt" ]]; then
-        local declared_native declared_aur inst_native inst_aur
-        declared_native=$(grep -v '^#' "$src_pkg/pkglist.txt" | grep -c . || true)
-        declared_aur=$(grep -v '^#' "$src_pkg/aurlist.txt" 2>/dev/null | grep -c . || true)
-        inst_native=$(pacman -Qqen 2>/dev/null | grep -c . || echo 0)
-        inst_aur=$(pacman -Qqem 2>/dev/null | grep -c . || echo 0)
-        local missing_native extra_native
-        missing_native=$(comm -23 <(grep -v '^#' "$src_pkg/pkglist.txt" | sort -u) <(pacman -Qqen 2>/dev/null | sort -u))
-        extra_native=$(comm -13 <(grep -v '^#' "$src_pkg/pkglist.txt" | sort -u) <(pacman -Qqen 2>/dev/null | sort -u))
-        if [[ -z "$missing_native" && -z "$extra_native" ]]; then
-          echo -e " ${GREEN}✓${NC} ${BOLD}pacman manifest:${NC} native explicit installs match pkglist.txt ($declared_native)"
-        else
-          echo -e " ${YELLOW}!${NC} ${BOLD}pacman manifest:${NC} native drift (declared $declared_native, explicit installed $inst_native)"
-          [[ -n "$missing_native" ]] && echo -e "   ${DIM}declared but not installed:${NC} $(echo "$missing_native" | tr '\n' ' ')"
-          [[ -n "$extra_native" ]] && echo -e "   ${DIM}installed but not declared (add to pkglist.txt):${NC} $(echo "$extra_native" | tr '\n' ' ')"
-          pkg_drift+=("pacman")
-        fi
-        if [[ -n "${declared_aur:-}" && -r "$src_pkg/aurlist.txt" ]]; then
-          local missing_aur extra_aur
-          missing_aur=$(comm -23 <(grep -v '^#' "$src_pkg/aurlist.txt" | sort -u) <(pacman -Qqem 2>/dev/null | sort -u))
-          extra_aur=$(comm -13 <(grep -v '^#' "$src_pkg/aurlist.txt" | sort -u) <(pacman -Qqem 2>/dev/null | sort -u))
-          if [[ -z "$missing_aur" && -z "$extra_aur" ]]; then
-            echo -e " ${GREEN}✓${NC} ${BOLD}AUR manifest:${NC} foreign explicit installs match aurlist.txt ($declared_aur)"
-          else
-            echo -e " ${YELLOW}!${NC} ${BOLD}AUR manifest:${NC} foreign-package drift (declared $declared_aur, installed $inst_aur)"
-            [[ -n "$missing_aur" ]] && echo -e "   ${DIM}declared but not installed:${NC} $(echo "$missing_aur" | tr '\n' ' ')"
-            [[ -n "$extra_aur" ]] && echo -e "   ${DIM}installed but not declared (add to aurlist.txt):${NC} $(echo "$extra_aur" | tr '\n' ' ')"
-            pkg_drift+=("aur")
-          fi
-        fi
-      fi
-      if command -v apt-mark >/dev/null 2>&1 && [[ -r "$src/dot_config/apt/pkglist.txt" ]]; then
-        local missing_apt extra_apt declared_apt
-        declared_apt=$(grep -v '^#' "$src/dot_config/apt/pkglist.txt" | grep -c . || true)
-        missing_apt=$(comm -23 <(grep -v '^#' "$src/dot_config/apt/pkglist.txt" | sort -u) <(apt-mark showmanual 2>/dev/null | sort -u))
-        extra_apt=$(comm -13 <(grep -v '^#' "$src/dot_config/apt/pkglist.txt" | sort -u) <(apt-mark showmanual 2>/dev/null | sort -u))
-        if [[ -z "$missing_apt" && -z "$extra_apt" ]]; then
-          echo -e " ${GREEN}✓${NC} ${BOLD}apt manifest:${NC} manual installs match pkglist.txt ($declared_apt)"
-        else
-          echo -e " ${YELLOW}!${NC} ${BOLD}apt manifest:${NC} drift vs manual installs (declared $declared_apt)"
-          [[ -n "$missing_apt" ]] && echo -e "   ${DIM}declared but not installed:${NC} $(echo "$missing_apt" | tr '\n' ' ')"
-          [[ -n "$extra_apt" ]] && echo -e "   ${DIM}installed but not declared (add to pkglist.txt):${NC} $(echo "$extra_apt" | tr '\n' ' ')"
-          pkg_drift+=("apt")
-        fi
-      fi
-      ;;
-  esac
-
   echo
   echo -e "${GREEN}Diagnostics complete.${NC}"
-  if [[ ${#pkg_drift[@]} -gt 0 ]]; then
-    return 1  # drift found; exit code is scriptable
-  fi
-}
-
-cmd_diagnose() {
-  # Self-contained machine snapshot for cross-machine debugging: written to a
-  # file (never stdout spam) — os-release, kernel, versions, systemd user
-  # units/services, package manifests, and chezmoi/git state.
-  ensure_chezmoi
-  local src out host
-  src="$(get_source_dir)"
-  host="$(hostname 2>/dev/null || echo unknown)"
-  out="${1:-${TMPDIR:-/tmp}/dots-diagnose-${host}-$(date +%Y%m%d-%H%M%S).txt}"
-
-  {
-    echo "# dots diagnose — $(date -Is)"
-    echo "host: $host"
-    uname -a
-    echo
-    echo "## OS release"
-    if [[ -r /etc/os-release ]]; then cat /etc/os-release; else echo "(no /etc/os-release)"; fi
-    echo
-    echo "## Versions"
-    local bin
-    for bin in chezmoi git age age-keygen mise bun zsh bash jq; do
-      if command -v "$bin" >/dev/null 2>&1; then
-        printf '%-12s %s\n' "$bin" "$("$bin" --version 2>/dev/null | head -n1)"
-      else
-        printf '%-12s missing\n' "$bin"
-      fi
-    done
-    echo
-    echo "## Shell environment"
-    echo "SHELL=${SHELL:-}"
-    echo
-    echo "## Chezmoi state"
-    echo "source: $src"
-    chezmoi status 2>/dev/null | sed 's/^/  status: /' || echo "  status: (failed)"
-    echo
-    echo "## Package manifests"
-    local mf
-    for mf in "$HOME/.Brewfile" "$src/dot_config/pacman/pkglist.txt" \
-              "$src/dot_config/pacman/aurlist.txt" "$src/dot_config/apt/pkglist.txt" \
-              "$src/dot_config/mise/config.toml" "$src/dot_config/mise/conf.d/vespasian.toml"; do
-      [[ -f "$mf" ]] && echo "  $(wc -l < "$mf") lines  $mf"
-    done
-    echo
-    echo "## Systemd user units (enabled)"
-    if command -v systemctl >/dev/null 2>&1 && systemctl --user list-unit-files >/dev/null 2>&1; then
-      systemctl --user list-unit-files --state=enabled 2>/dev/null | sed 's/^/  /'
-      echo
-      echo "## Systemd user services (active)"
-      systemctl --user list-units --type=service --state=active --no-legend 2>/dev/null | sed 's/^/  /'
-    else
-      echo "  (systemd user session unavailable)"
-    fi
-    echo
-    echo "## Git"
-    git -C "$src" branch --show-current 2>/dev/null | sed 's/^/  branch: /'
-    git -C "$src" rev-parse --short HEAD 2>/dev/null | sed 's/^/  head: /'
-    git -C "$src" status --porcelain 2>/dev/null | wc -l | sed 's/^/  uncommitted entries: /'
-  } > "$out" 2>&1
-
-  echo -e "${GREEN}✓${NC} Diagnostics written to ${BOLD}$out${NC}"
-  echo -e "  ${DIM}Attach this file when reporting a machine-specific issue.${NC}"
-}
-
-cmd_codex_sync() {
-  # Codex appends [projects."path"] trust entries to ~/.codex/config.toml as
-  # you trust directories. The modify_ template unions those into the applied
-  # config at apply time, but they never flow back into the tracked manifest
-  # (.chezmoidata/codex_projects.yaml) — so a fresh machine misses every trust
-  # granted interactively since the last manual YAML edit. This reconciles
-  # live -> YAML under the current machine's key, preserving comments.
-  ensure_chezmoi
-  local dry_run=0
-  case "${1:-}" in
-    -n|--dry-run) dry_run=1 ;;
-    "") ;;
-    *) echo -e "${RED}error:${NC} Unknown option '$1'. Usage: dots codex-sync [-n|--dry-run]" >&2; return 1 ;;
-  esac
-
-  local src live_config manifest machine
-  src="$(get_source_dir)"
-  live_config="$HOME/.codex/config.toml"
-  manifest="$src/.chezmoidata/codex_projects.yaml"
-  machine="$(chezmoi execute-template '{{ .machine }}')"
-  [[ -f "$live_config" ]] || { echo -e "${YELLOW}note:${NC} no live $live_config; nothing to reconcile." >&2; return 0; }
-  [[ -f "$manifest" ]] || { echo -e "${RED}error:${NC} $manifest missing." >&2; return 1; }
-
-  # Declared entries for every machine (common + this machine): match by
-  # literal string; a declared "~" or "~/.local/…" covers its home-relative
-  # expansions only when the live path starts with the expanded prefix.
-  local -A declared=()
-  while IFS= read -r entry; do
-    entry="${entry//\~/$HOME}"
-    declared["$entry"]=1
-  done < <(awk -v m="  ${machine}:" '
-    /^[^ #]/ && /^[a-zA-Z]/ { inblock = ($0 ~ m) }
-    inblock && /^    - / { sub(/^    - /, ""); gsub(/^"|"$/, ""); print }
-    /^  common:/ { common = 1; next }
-    /^[a-zA-Z]/ && !/common:/ { common = 0 }
-    common && /^    - / { sub(/^    - /, ""); gsub(/^"|"$/, ""); print }
-  ' "$manifest")
-
-  # Live trust entries; skip Codex scratch dirs (Documents/Codex/<date>/...)
-  # — ephemeral plugin sandboxes, never portable paths.
-  local -a missing=()
-  local p
-  while IFS= read -r p; do
-    [[ -n "$p" ]] || continue
-    [[ "$p" == */Documents/Codex/* ]] && continue
-    [[ -n "${declared[$p]:-}" ]] && continue
-    missing+=("$p")
-  done < <(sed -nE 's/^\s*\[projects\."(.+)"\]\s*$/\1/p' "$live_config" | sort -u)
-
-  if [[ ${#missing[@]} -eq 0 ]]; then
-    echo -e "${GREEN}✓${NC} codex_projects.yaml already covers every live trust entry."
-    return 0
-  fi
-
-  echo -e "${CYAN}Live trust entries missing from codex_projects.yaml ($machine):${NC}"
-  printf '  %s\n' "${missing[@]}"
-
-  if [[ $dry_run -eq 1 ]]; then
-    echo -e "${DIM}Dry run: nothing written. Re-run without -n to append.${NC}"
-    return 0
-  fi
-
-  python3 - "$manifest" "$machine" "${missing[@]}" <<'PY'
-import sys
-
-path, machine, *missing = sys.argv[1:]
-lines = open(path, encoding="utf-8").read().split("\n")
-
-# Find this machine's block; create it after `common:` if absent.
-start = None
-try:
-    start = next(i for i, l in enumerate(lines) if l.rstrip() == f"  {machine}:")
-except StopIteration:
-    ci = next(i for i, l in enumerate(lines) if l.rstrip() == "  common:")
-    # skip common's list items
-    j = ci + 1
-    while j < len(lines) and lines[j].startswith("    - "):
-        j += 1
-    lines[j:j] = [f"  {machine}:"]
-    start = j
-
-# Find the end of the machine's list.
-end = start + 1
-while end < len(lines) and (lines[end].startswith("    - ") or lines[end].strip() == ""):
-    if lines[end].strip() == "" and end + 1 < len(lines) and not lines[end + 1].startswith("    - "):
-        break
-    end += 1
-
-# Keep existing order, append missing sorted.
-new = sorted(missing)
-insert_at = end
-for entry in new:
-    lines.insert(insert_at, f"    - {entry}")
-    insert_at += 1
-
-open(path, "w", encoding="utf-8").write("\n".join(lines))
-print(f"appended {len(new)} entr{'y' if len(new) == 1 else 'ies'} under {machine}:")
-for entry in new:
-    print(f"  - {entry}")
-PY
-
-  echo -e "${GREEN}✓${NC} Manifest updated. Run ${BOLD}dots sync${NC} to re-render ~/.codex/config.toml, then commit with dots push."
 }
 
 get_op_cmd() {
@@ -1248,8 +1007,6 @@ main() {
     update|pull)    cmd_update "$@" ;;
     push|pp)        cmd_push "$@" ;;
     doctor)         cmd_doctor "$@" ;;
-    diagnose)       cmd_diagnose "$@" ;;
-    codex-sync)     cmd_codex_sync "$@" ;;
     theme)          cmd_theme "$@" ;;
     age|key)        cmd_age "$@" ;;
     setup)          cmd_setup "$@" ;;

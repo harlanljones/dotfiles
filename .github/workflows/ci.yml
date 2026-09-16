@@ -188,7 +188,7 @@ jobs:
       - name: Install tools
         run: |
           sudo apt-get update && sudo apt-get install -y yamllint zsh
-          # shellcheck from the upstream release, not apt, so SHELLCHECK_VERSION
+          # Install shellcheck from the upstream release, not apt, so SHELLCHECK_VERSION
           # above is the actual gate (ubuntu apt still ships 0.9.0).
           curl -fsSL "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz" | tar xJ -C /tmp
           sudo mv "/tmp/shellcheck-v${SHELLCHECK_VERSION}/shellcheck" /usr/local/bin/shellcheck
@@ -358,16 +358,29 @@ jobs:
             echo "ok: $f"
           done <<< "$sh_files"
 
-      # 2.7 Scan the RENDERED output, not just the git repo. After apply, the
-      # runner's $HOME holds exactly what a real machine would hold (minus
-      # encrypted entries, which are excluded -- no age key here). --no-git
-      # mode scans plain files; --redact keeps any finding out of the log.
-      # Allowlist: .github/gitleaks-smoke.toml excludes runner noise dirs AND
-      # the runner checkout itself (GITHUB_WORKSPACE sits under $HOME at
-      # /home/runner/work/...), and is the single documented place to allow
-      # known-benign rendered findings. The checkout is scanned separately by
-      # the `secrets` job with .gitleaksignore.
-      - name: Gitleaks scan of rendered output (~/.config/shell, ~/.zshrc, all of $HOME)
+      # 2.7 Scan the RENDERED output, not just the git repo. Stage every regular
+      # file reported by chezmoi managed after apply, preserving its target-
+      # relative path; this avoids scanning runner state and the checkout while
+      # still covering all non-encrypted files that would land in $HOME.
+      # --no-git scans plain files; --redact keeps any finding out of the log.
+      # .github/gitleaks-smoke.toml is the single documented place to allow
+      # known-benign findings in rendered output. The checkout itself is scanned
+      # separately by the `secrets` job with .gitleaksignore.
+      - name: Gitleaks scan of rendered managed targets
         run: |
-          gitleaks detect --source "$HOME" --no-git --no-banner --redact \
+          set -euo pipefail
+          rendered="$RUNNER_TEMP/rendered-output"
+          mkdir -p "$rendered"
+          while IFS= read -r target; do
+            source_path="$HOME/$target"
+            destination_path="$rendered/$target"
+            if [ -f "$source_path" ] && [ ! -L "$source_path" ]; then
+              mkdir -p "$(dirname "$destination_path")"
+              cp -- "$source_path" "$destination_path"
+            fi
+          done < <(
+            chezmoi managed --config "$RUNNER_TEMP/chezmoi.toml" \
+              --source "$GITHUB_WORKSPACE" --exclude encrypted
+          )
+          gitleaks detect --source "$rendered" --no-git --no-banner --redact \
             --exit-code 1 --config "$GITHUB_WORKSPACE/.github/gitleaks-smoke.toml"

@@ -291,6 +291,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   ├── codex_projects.yaml
 │   ├── hermes_skills.yaml
 │   ├── machines.yaml
+│   ├── omarchy_agents.yaml
 │   ├── omarchy_plugins.yaml
 │   └── themes.yaml
 ├── .chezmoiignore.tmpl
@@ -706,8 +707,10 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 ├── run_onchange_after_26-setup-omarchy-cursor.sh.tmpl
 ├── run_onchange_after_27-sync-claude-mcp.sh.tmpl
 ├── run_onchange_after_28-sync-claude-settings.sh.tmpl
+├── run_onchange_after_29-enable-omarchy-user-units.sh.tmpl
 ├── run_onchange_after_30-hadrian-macos-defaults.sh.tmpl
 ├── run_onchange_after_31-augustus-mouse-dpi.sh.tmpl
+├── run_onchange_after_32-setup-omarchy-agent-registrations.sh.tmpl
 ├── run_onchange_after_40-vespasian-windows-terminal.sh.tmpl
 ├── run_onchange_after_41-vespasian-nerd-font.sh.tmpl
 ├── run_onchange_after_42-vespasian-theme-state.sh.tmpl

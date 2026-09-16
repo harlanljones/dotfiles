@@ -65,3 +65,5 @@ omarchyPlugins:
     enabled: true
   - url: https://github.com/bobby-nicholas/omaland.git
     enabled: true
+  - url: https://github.com/Camstraps/omatree.git
+    enabled: true

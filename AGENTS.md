@@ -69,18 +69,16 @@ hook that runs on every machine (gated internally on `.machine`). Gaps in the
 | 09 | `run_onchange_before_09-install-agent-skills.sh.tmpl` | onchange | Install missing cross-harness agent skills (retries without incompatible providers, non-fatal on download error) |
 | 10 | `run_onchange_after_10-install-omarchy-plugins.sh.tmpl` | onchange | Install/update Omarchy desktop plugins |
 | 20 | `run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl` | onchange | Antigravity token/usage collector setup |
-| 21 | `run_onchange_after_21-setup-omarchy-cline.sh.tmpl` | onchange | Cline usage collector setup |
-| 22 | `run_onchange_after_22-setup-omarchy-cline-usage-scrape.sh.tmpl` | onchange | Cline rate-limit headless scraper |
 | 23 | `run_after_23-sync-agent-skills.sh.tmpl` | every apply | Reconcile shared `~/.agents/skills` into harnesses |
 | 24 | `run_once_after_24-setup-omarchy-agents.sh.tmpl` | once (augustus) | Local state dirs + user systemd daemon |
 | 25 | `run_onchange_after_25-sync-omarchy-agents-workspace.sh.tmpl` | onchange | Validate/deploy `omarchy-agents` plugin builds |
 | 26 | `run_onchange_after_26-setup-omarchy-cursor.sh.tmpl` | onchange | Cursor usage collector setup |
 | 27 | `run_onchange_after_27-sync-claude-mcp.sh.tmpl` | onchange | Sync Claude Code MCP config |
 | 28 | `run_onchange_after_28-sync-claude-settings.sh.tmpl` | onchange | Sync Claude Code permissions/hooks |
-| 29 | `run_onchange_after_29-setup-omarchy-drift-capture.sh.tmpl` | onchange | Set up Omarchy shell drift capture |
+| 29 | `run_onchange_after_29-enable-omarchy-user-units.sh.tmpl` | onchange (augustus) | Enable Omarchy drift-capture and Cline-scrape user units |
 | 30 | `run_onchange_after_30-hadrian-macos-defaults.sh.tmpl` | onchange (hadrian) | Declarative `defaults write` preferences |
 | 31 | `run_onchange_after_31-augustus-mouse-dpi.sh.tmpl` | onchange (augustus) | Pin Logitech mice to 400 DPI |
-| 32 | `run_onchange_after_32-setup-omarchy-pi.sh.tmpl` | onchange | Pi (local Ollama) usage collector setup |
+| 32 | `run_onchange_after_32-setup-omarchy-agent-registrations.sh.tmpl` | onchange (augustus) | Register configured agents and collect initial Omarchy leaderboard usage |
 | 40 | `run_onchange_after_40-vespasian-windows-terminal.sh.tmpl` | onchange (vespasian) | Write the Tokyo Night Windows Terminal fragment (scheme + Ubuntu profile update) |
 | 41 | `run_onchange_after_41-vespasian-nerd-font.sh.tmpl` | onchange (vespasian) | Per-user install of the pinned JetBrainsMono Nerd Font on Windows |
 | 42 | `run_onchange_after_42-vespasian-theme-state.sh.tmpl` | onchange (vespasian) | Rebuild bat's theme cache; set Claude Code theme to `dark-ansi`/`light-ansi` per the selected theme |
