@@ -14,6 +14,9 @@
 set -euo pipefail
 
 SETTINGS_FILE="${HOME}/.claude/settings.json"
+# Intentional single quotes: these are literal JSON payloads for jq, and the
+# Go template inside must NOT be expanded by the shell.
+# shellcheck disable=SC2016
 BASELINE='{{ .claudeSettings | toJson }}'
 DEFAULTS='{{ .claudeSettingsDefaults | toJson }}'
 

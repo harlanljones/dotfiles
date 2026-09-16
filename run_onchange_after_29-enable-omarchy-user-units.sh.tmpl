@@ -1,0 +1,36 @@
+{{- if eq .machine "augustus" -}}
+#!/bin/bash
+# Enables the omarchy user units that automate repo maintenance:
+#   omarchy-cline-usage-scrape.timer — keeps the agent monitor's Cline Pass
+#                                      limits current (no manual /usage runs)
+#   omarchy-drift-capture.path       — auto-captures omarchy live drift
+#                                      (shell.json template + plugin manifest)
+#                                      into the chezmoi source tree
+# Managed by chezmoi.
+#
+# Watched-unit hashes (re-runs enablement when the unit files change):
+#   cline-usage-scrape.timer={{ include "dot_config/systemd/user/omarchy-cline-usage-scrape.timer" | sha256sum }}
+#   cline-usage-scrape.service={{ include "dot_config/systemd/user/omarchy-cline-usage-scrape.service" | sha256sum }}
+#   drift-capture.path={{ include "dot_config/systemd/user/omarchy-drift-capture.path" | sha256sum }}
+#   drift-capture.service={{ include "dot_config/systemd/user/omarchy-drift-capture.service" | sha256sum }}
+
+set -euo pipefail
+
+if [[ ! -d "$HOME/.config/omarchy" ]]; then
+  exit 0
+fi
+
+systemctl --user daemon-reload
+
+# Drift capture: unconditional on omarchy hosts.
+systemctl --user enable --now omarchy-drift-capture.path
+
+# Cline scrape: only meaningful when Cline is in use.
+if [[ -d "$HOME/.cline" ]]; then
+  systemctl --user enable --now omarchy-cline-usage-scrape.timer
+  if [[ ! -d "$HOME/.local/state/omarchy/agents/cline-scraper-profile" ]]; then
+    echo "omarchy-cline-usage-scrape.timer is enabled but has nothing to scrape yet."
+    echo "Run 'omarchy-cline-usage-login' once to sign the scraper's dedicated Chrome profile into Cline."
+  fi
+fi
+{{- end -}}

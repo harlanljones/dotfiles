@@ -18,9 +18,9 @@
       "scripts": 35,
       "security": 2,
       "other": 152,
-      "hooks": 24,
+      "hooks": 20,
       "chezmoi": 10,
-      "repo": 4383
+      "repo": 4384
     }
   },
   "categories": [
@@ -10092,32 +10092,6 @@
       }
     },
     {
-      "source": "run_onchange_after_21-setup-omarchy-cline.sh.tmpl",
-      "kind": "hook",
-      "category": "hooks",
-      "hook": {
-        "trigger": "onchange",
-        "trigger_description": "runs when this script's contents change",
-        "phase": "after",
-        "order": 21,
-        "name": "setup-omarchy-cline",
-        "template": true
-      }
-    },
-    {
-      "source": "run_onchange_after_22-setup-omarchy-cline-usage-scrape.sh.tmpl",
-      "kind": "hook",
-      "category": "hooks",
-      "hook": {
-        "trigger": "onchange",
-        "trigger_description": "runs when this script's contents change",
-        "phase": "after",
-        "order": 22,
-        "name": "setup-omarchy-cline-usage-scrape",
-        "template": true
-      }
-    },
-    {
       "source": "run_onchange_after_25-sync-omarchy-agents-workspace.sh.tmpl",
       "kind": "hook",
       "category": "hooks",
@@ -10170,19 +10144,6 @@
       }
     },
     {
-      "source": "run_onchange_after_29-setup-omarchy-drift-capture.sh.tmpl",
-      "kind": "hook",
-      "category": "hooks",
-      "hook": {
-        "trigger": "onchange",
-        "trigger_description": "runs when this script's contents change",
-        "phase": "after",
-        "order": 29,
-        "name": "setup-omarchy-drift-capture",
-        "template": true
-      }
-    },
-    {
       "source": "run_onchange_after_30-hadrian-macos-defaults.sh.tmpl",
       "kind": "hook",
       "category": "hooks",
@@ -10205,19 +10166,6 @@
         "phase": "after",
         "order": 31,
         "name": "augustus-mouse-dpi",
-        "template": true
-      }
-    },
-    {
-      "source": "run_onchange_after_32-setup-omarchy-pi.sh.tmpl",
-      "kind": "hook",
-      "category": "hooks",
-      "hook": {
-        "trigger": "onchange",
-        "trigger_description": "runs when this script's contents change",
-        "phase": "after",
-        "order": 32,
-        "name": "setup-omarchy-pi",
         "template": true
       }
     },
@@ -10484,6 +10432,12 @@
     },
     {
       "source": "docs/check-shell-modules.sh",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/dotfiles-gap-action-plan.md",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"

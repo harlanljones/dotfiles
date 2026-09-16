@@ -51,6 +51,7 @@ repro procedure and its gotchas.
   interpolate them through `$(...)` shell expansion of a file extract;
   multiline expansion corrupts the profile config.yaml (script text lands
   inside a key value) and silently drops the setting.
+- The working `config set` invocation is `hermes -p <name> config set <key> '<literal JSON>' --force` — `--force` must come AFTER the value and `-p` before the subcommand. `hermes --profile <name> config set key --force '<value>'` fails with "unrecognized arguments".
 - `skills trust` does not resolve the enclosing checkout from cwd — always
   pass the explicit path argument (`skills trust .`), otherwise it reports
   'Not inside a git checkout' and doctor's project-skill count reads 0.
@@ -62,6 +63,13 @@ repro procedure and its gotchas.
   still applies; verify with `config get` rather than re-running with
   --force blindly. If config looks polluted, fix by overwriting the single
   affected key with a clean literal, never by hand-editing config.yaml.
+- `hermes skills list` has no summary line; verify the prune by grepping table rows for `disabled` instead of parsing a tail line in doctor.
+- Shell hooks docs: `~/.hermes/agent-hooks/` scripts receive a JSON payload on stdin (`hook_event_name`, `tool_name`, `tool_input`, `cwd`, `profile`); `pre_tool_call` blocks via exit 2 or `{"action":"block","message":...}`; `pre_llm_call` injects via `{"context": ...}`; always `{}` on no-op.
 - After any config repair, delete the stale auto-backup under
   `~/.hermes/profiles/<name>/backups/` — its presence re-triggers stale
   warnings on every command.
+- The hook scripts are near-identical across repos: create the new set by
+  `sed 's/<old>/<new>/g'` from the latest exemplar's scripts (check
+  `~/.hermes/agent-hooks/` for the current naming — it may have moved past
+  the reference repo), then add only genuinely repo-specific hooks (e.g. a
+  formatter matched to the new toolchain) as fresh files.

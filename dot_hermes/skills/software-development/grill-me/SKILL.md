@@ -60,6 +60,20 @@ Each answer reshapes the tree: settled decisions push the frontier outward
 and unblock dependent questions. Recompute the frontier and ask the next
 round.
 
+## Ask via the interactive question tool
+
+Always deliver frontier rounds through the `clarify` tool, not as prose in
+chat. Rules:
+
+- Ask the whole current frontier in ONE `clarify` call (max 5 questions per
+  call; if the frontier is larger, ask the 5 highest-priority first, then
+  recompute and ask the rest in the next call).
+- Put the recommended answer FIRST in `choices` so it renders as
+  "(Recommended)"; keep option details in the question text, not in the
+  choices array.
+- If the call times out partway, keep the answers that came back, recompute
+  the frontier, and re-ask only the unanswered questions.
+
 **Facts are your job; decisions are the user's.** When a frontier question
 needs a fact from the environment (codebase, filesystem, config, docs), find
 it yourself with `search_files` / `read_file` / `terminal` — or dispatch a

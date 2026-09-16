@@ -30,8 +30,7 @@ here is shellchecked.
 | `60-prompt.sh` | Starship init and the failure recolor |
 | `65-theme.sh` | Terminal palette export for fzf (`~/.config/fzf/theme.sh` on Vespasian) |
 | `70-cloud.sh` | flyctl, Google Cloud SDK |
-| `75-tool-paths.sh` | Machine-specific PATH corrections |
-| `80-local.sh` | Loads `~/.config/shell/local.sh` (unmanaged) — see below |
+| `99-local.sh` | **Untracked.** Machine-local additions; sourced last |
 
 `00-env.sh` runs first so later modules can rely on `SHELL_KIND` and
 `_path_prepend`. Renumber rather than reorder if something needs to move.
@@ -50,21 +49,10 @@ here is shellchecked.
 - **Iterate arrays as `"${arr[@]}"`.** zsh drops empty elements from an
   unquoted array expansion, which silently broke the recolor's unstyled case.
 
-## `80-local.sh` — the sanctioned local-override layer
+## `99-local.sh`
 
-`80-local.sh` is managed; the file it sources is not. It loads
-`~/.config/shell/local.sh` when that file exists, and chezmoi never touches
-`local.sh`: chezmoi only creates, updates or removes files that have an entry
-in the source tree, so anything you put in `local.sh` survives every
-`chezmoi apply` untouched (pattern: thoughtbot's `dotfiles-local`, holman's
-`gitconfig.local.symlink`).
-
-Put machine-local aliases, functions and exports there instead of editing
-`~/.bashrc` or `~/.zshrc` — those are managed, so an edit there is lost on the
-next `chezmoi apply`, and a short loader makes the stray append obvious in
-`chezmoi diff`. The git config has the mirror-image escape hatch:
-`~/.gitconfig.local`, included from `dot_config/git/config.tmpl` and likewise
-unmanaged.
-
-Local files are also the right home for anything an installer appends to an
-rc file: move the block into `~/.config/shell/local.sh` and delete the append.
+Untracked and sourced last, so it can hold anything machine-specific without
+fighting chezmoi. If an installer appends to `~/.bashrc` or `~/.zshrc`, move
+the block here — those files are managed, so an edit there is lost on the next
+`chezmoi apply`, and a short loader makes the stray append obvious in
+`chezmoi diff`.

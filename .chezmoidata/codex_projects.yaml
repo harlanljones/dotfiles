@@ -45,6 +45,9 @@ codexProjects:
     - /home/harlan/dev/bootstrap
     - /home/harlan/dev/xbsr
     - /home/harlan/dev/the-tango
+    - /home/harlan/dev/baseball-rag
+    - /home/harlan/dev/brain
+    - /home/harlan/dev/the-well
   hadrian: []
   vespasian:
     - /home/harlan/the-well

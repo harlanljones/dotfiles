@@ -1,0 +1,47 @@
+{{- if eq .machine "augustus" -}}
+#!/bin/bash
+# Registers agents (see .chezmoidata/omarchy_agents.yaml) with the Omarchy
+# Agents leaderboard plugin: deploys SVG marks, patches shippedMarks, accent
+# and colorLuminance branches into Panel.qml, then runs one initial usage
+# collection. Managed by chezmoi.
+#
+# Numbered after 25-sync-omarchy-agents-workspace on purpose: that script
+# redeploys the plugin from ~/dev/omarchy-agents and would wipe any earlier
+# patch, so registration must reapply after it on every sync.
+
+set -euo pipefail
+
+PLUGIN_DIR="$HOME/.config/omarchy/plugins/harlan.agent-leaderboard"
+if [[ ! -d "$PLUGIN_DIR" ]]; then
+  exit 0
+fi
+mkdir -p "$PLUGIN_DIR/assets"
+
+{{- range $agent := .omarchyAgents.agents }}
+
+# --- {{ $agent.id }} ---
+cat << 'SVG_EOF' > "$PLUGIN_DIR/assets/{{ $agent.id }}.svg"
+{{ trimSuffix "\n" $agent.svg }}
+SVG_EOF
+
+cat << 'SVG_EOF' > "$PLUGIN_DIR/assets/{{ $agent.id }}-light.svg"
+{{ trimSuffix "\n" $agent.svg_light }}
+SVG_EOF
+
+# Patch Panel.qml if the agent isn't registered yet. Both agentAccent
+# signatures are patched; exactly one exists in any given Panel.qml and the
+# no-match sed is a no-op.
+if ! grep -q "^ *{{ $agent.id }}: true," "$PLUGIN_DIR/Panel.qml"; then
+  sed -i 's/readonly property var shippedMarks: ({/&\n    {{ $agent.id }}: true,/' "$PLUGIN_DIR/Panel.qml"
+  sed -i 's/function agentAccent(id, index) {/&\n    if (id === "{{ $agent.id }}") return "{{ $agent.accent }}"/' "$PLUGIN_DIR/Panel.qml"
+  sed -i 's/function agentAccent(id) {/&\n    if (id === "{{ $agent.id }}") return "{{ $agent.accent }}"/' "$PLUGIN_DIR/Panel.qml"
+  sed -i 's/|| id === "{{ $agent.luminance_anchor }}") \&\& colorLuminance/|| id === "{{ $agent.luminance_anchor }}" || id === "{{ $agent.id }}") \&\& colorLuminance/' "$PLUGIN_DIR/Panel.qml"
+fi
+{{- end }}
+
+# Initial usage collection. Collection itself needs no plugin-side helper:
+# omarchy-agent-usage-update (the user wrapper in ~/.local/bin) auto-discovers
+# omarchy-agent-usage-<id> and the leaderboard rescans the usage directory
+# after every update run.
+omarchy-agent-usage-update || true
+{{- end -}}

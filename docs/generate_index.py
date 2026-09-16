@@ -346,6 +346,81 @@ def classify_hook(path):
     }
 
 
+AGENTS_HOOK_ROW_RE = re.compile(
+    r"^\|\s*(\d+)\s*\|\s*`?([\w.*-]+)`?\s*\|\s*([^|]+)\|"
+)
+
+
+def parse_agents_hook_table():
+    """Parse the §3 `run_*` table out of AGENTS.md.
+
+    Returns a list of (order, filename, trigger_text) rows. Only table rows
+    whose second column names a `run_` script are returned; prose mentions of
+    the naming grammar are ignored.
+    """
+    text = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
+    if "## 3." not in text:
+        return []
+    section = text.split("## 3.", 1)[1].split("\n## ", 1)[0]
+    rows = []
+    for line in section.splitlines():
+        match = AGENTS_HOOK_ROW_RE.match(line)
+        if match and match.group(2).startswith("run_"):
+            rows.append((int(match.group(1)), match.group(2), match.group(3).strip()))
+    return rows
+
+
+def audit_agents_hook_table(entries):
+    """Cross-check AGENTS.md §3's hand-maintained hook table against reality.
+
+    The table is the only hook documentation NOT generated from filenames
+    (INDEX/README are), so it can silently drift when a hook is added,
+    removed, renumbered or renamed. Returns a list of drift descriptions.
+    """
+    hooks = {e["source"]: e["hook"] for e in entries if e["kind"] == "hook"}
+    errors = []
+    listed = set()
+    for order, script, trigger_text in parse_agents_hook_table():
+        listed.add(script)
+        if script not in hooks:
+            errors.append(f"AGENTS.md §3 lists `{script}`, but it is not a tracked hook")
+            continue
+        actual = hooks[script]
+        if actual["order"] != order:
+            errors.append(
+                f"{script}: §3 order column says {order:02d} but the filename "
+                f"encodes {actual['order']}"
+            )
+        # Trigger column: 'once', 'onchange', 'every apply', optionally
+        # suffixed with ' (<machine>)' for machine-scoped hooks.
+        kind = {"once": "once", "onchange": "onchange"}.get(
+            trigger_text.split()[0], "always"
+        )
+        if actual["trigger"] != kind:
+            errors.append(
+                f"{script}: §3 trigger '{trigger_text}' but the filename "
+                f"encodes trigger '{actual['trigger']}'"
+            )
+        machine = re.search(r"\((augustus|hadrian|vespasian)\)", trigger_text)
+        if machine:
+            machine = machine.group(1)
+            # Machine scoping is legitimate either as a filename token (the
+            # `vespasian-*` convention) or as an internal `.machine` template
+            # gate on a token-less name; accept only evidence of one or the
+            # other, so the annotation cannot drift into fiction.
+            if machine not in script:
+                template = (ROOT / script).read_text(encoding="utf-8")
+                if f'.machine "{machine}"' not in template:
+                    errors.append(
+                        f"{script}: §3 marks it machine-scoped ({machine}) but "
+                        "the filename carries no machine token and the template "
+                        f"never gates on .machine \"{machine}\""
+                    )
+    for unlisted in sorted(set(hooks) - listed):
+        errors.append(f"hook `{unlisted}` is tracked but missing from AGENTS.md §3")
+    return errors
+
+
 def repo_role(path):
     for prefix, role in REPO_MATERIAL:
         if path == prefix or path.startswith(prefix):
@@ -604,6 +679,23 @@ def main():
     args = parser.parse_args()
 
     entries = build(git_files())
+
+    # The §3 table is hand-maintained and cannot be regenerated, so drift is
+    # an error in --check (CI) mode. In write mode it is a loud warning so a
+    # local regenerate can still produce artifacts while the AGENTS.md edit
+    # (user-owned) is pending; --check will still fail until the table is fixed.
+    agents_errors = audit_agents_hook_table(entries)
+    if agents_errors:
+        for error in agents_errors:
+            print("AGENTS.md §3 hook table drift: " + error, file=sys.stderr)
+        print(
+            "Fix AGENTS.md §3 (or the run_* filenames) to match; "
+            "the index does not regenerate this table.",
+            file=sys.stderr,
+        )
+        if args.check:
+            return 1
+        print("(continuing: --check will still fail until AGENTS.md is fixed)", file=sys.stderr)
 
     if args.audit_showcase is not None:
         return audit_showcase(entries, args.audit_showcase)

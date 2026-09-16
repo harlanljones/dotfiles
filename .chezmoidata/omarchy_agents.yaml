@@ -1,0 +1,47 @@
+# Agent registrations for the Omarchy agent-leaderboard plugin
+# (~/.config/omarchy/plugins/harlan.agent-leaderboard).
+#
+# Consumed by run_onchange_after_32-setup-omarchy-agent-registrations.sh.tmpl,
+# which deploys each agent's SVG marks, patches its shippedMarks entry, accent
+# and luminance branch into Panel.qml, and runs one initial usage collection.
+# Add an agent HERE rather than writing another run_* hook.
+#
+# Fields:
+#   id              agent identifier, must match the wrapper
+#                   omarchy-agent-usage-<id> in ~/.local/bin
+#   accent          accent color used by Panel.qml's agentAccent()
+#   accent_light    accent color for the light theme variant
+#   luminance_anchor
+#                   the id whose "|| id === \"…\") && colorLuminance" branch
+#                   this agent's id is appended after in Panel.qml
+#   svg / svg_light panel mark (dark / light theme)
+omarchyAgents:
+  agents:
+    - id: cline
+      accent: "#6BCB77"
+      accent_light: "#2E7D43"
+      luminance_anchor: agy
+      svg: |
+        <svg fill="#6BCB77" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <title>Cline</title>
+          <path d="M12 1.5a1 1 0 0 1 1 1V5h3.5A4.5 4.5 0 0 1 21 9.5v7a4.5 4.5 0 0 1-4.5 4.5h-9A4.5 4.5 0 0 1 3 16.5v-7A4.5 4.5 0 0 1 7.5 5H11V2.5a1 1 0 0 1 1-1ZM8.25 10a1.75 1.75 0 1 0 0 3.5 1.75 1.75 0 0 0 0-3.5Zm7.5 0a1.75 1.75 0 1 0 0 3.5 1.75 1.75 0 0 0 0-3.5Z"/>
+        </svg>
+      svg_light: |
+        <svg fill="#2E7D43" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <title>Cline</title>
+          <path d="M12 1.5a1 1 0 0 1 1 1V5h3.5A4.5 4.5 0 0 1 21 9.5v7a4.5 4.5 0 0 1-4.5 4.5h-9A4.5 4.5 0 0 1 3 16.5v-7A4.5 4.5 0 0 1 7.5 5H11V2.5a1 1 0 0 1 1-1ZM8.25 10a1.75 1.75 0 1 0 0 3.5 1.75 1.75 0 0 0 0-3.5Zm7.5 0a1.75 1.75 0 1 0 0 3.5 1.75 1.75 0 0 0 0-3.5Z"/>
+        </svg>
+    - id: pi
+      accent: "#38BDF8"
+      accent_light: "#0284C5"
+      luminance_anchor: opencode
+      svg: |
+        <svg fill="#38BDF8" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <title>Pi</title>
+          <path d="M4 5.5h16V8H4z M7.5 8h2.5v11H7.5z M14 8h2.5v11H14z"/>
+        </svg>
+      svg_light: |
+        <svg fill="#0284C5" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <title>Pi</title>
+          <path d="M4 5.5h16V8H4z M7.5 8h2.5v11H7.5z M14 8h2.5v11H14z"/>
+        </svg>

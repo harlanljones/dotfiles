@@ -1,3 +1,27 @@
+# Ignore-matrix interaction with .gitignore (AGENTS.md §6):
+#
+#   .gitignore                -> what git TRACKS
+#   .chezmoiignore (this)     -> what chezmoi APPLIES to the home directory
+#
+# They are separate decisions, kept in sync manually. Four cases:
+#
+#   git:ignore + chezmoi:ignore  repo material (docs/, README, node_modules)
+#   git:track  + chezmoi:track   real dotfiles (the default; no pattern needed)
+#   git:track  + chezmoi:ignore  applied-from-source material that never deploys
+#                                here (machine-conditional blocks below)
+#   git:ignore + chezmoi:track   FORBIDDEN — chezmoi could not commit the source
+#
+# docs/check_ignore_consistency.py (CI lint) flags:
+#   - a path ignored by one file but negated by the other;
+#   - a path both ignored and negated in this file, unless annotated with a
+#     `# lint-ok: <family> (<reason>)` comment (used for the gitignore
+#     parent-dir un-ignore idiom, e.g. the systemd relay service below).
+#
+# Machine-conditional entries live inside template if-blocks; the CI
+# smoke-apply matrix (augustus/vespasian/unknown/hadrian) validates those
+# guards render correctly, so this lint strips the directives and checks the
+# pattern set.
+#
 # One-line bootstrap entry point — repository material, never applied.
 install.sh
 README.md
@@ -125,6 +149,7 @@ settings.local.json
 .config/hypr/**
 .config/systemd
 .config/systemd/**
+# lint-ok: .config/systemd (parent-dir un-ignore idiom so the herdr relay service negation below can match)
 !.config/systemd/
 !.config/systemd/user/
 !.config/systemd/user/herdr-outpost-relay.service

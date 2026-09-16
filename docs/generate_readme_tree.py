@@ -45,19 +45,39 @@ SKIP = (
     "to-questionnaire-",
 )
 
+# Subtrees rendered as a single annotated line instead of being expanded.
+# They are real managed dotfiles (so not SKIPped), but enumerate hundreds of
+# homogeneous files (e.g. every skill's SKILL.md/references) that drown the
+# tree. The line notes the file count and points at the YAML manifest.
+COLLAPSED = {
+    "dot_hermes/skills": "skills/ ({n} files across {groups} skill groups — see .chezmoidata/hermes_skills.yaml)",
+}
+
 
 def tracked(limit):
     out = subprocess.check_output(["git", "ls-files"]).decode().splitlines()
     files = []
+    collapsed = {}
     for path in out:
         if any(path == s or path.startswith(s) for s in SKIP):
             continue
-        parts = path.split("/")
-        if limit and len(parts) > limit:
-            parts = parts[:limit]
-            # collapse deeper nesting under its parent directory
-            path = "/".join(parts) + "/…"
-        files.append(parts)
+        for prefix, note in COLLAPSED.items():
+            if path.startswith(prefix + "/") or path == prefix:
+                n, g = collapsed.get(prefix, (0, set()))
+                collapsed[prefix] = (n + 1, g | {path[len(prefix) + 1:].split("/")[0]})
+                break
+        else:
+            parts = path.split("/")
+            if limit and len(parts) > limit:
+                parts = parts[:limit]
+                # collapse deeper nesting under its parent directory
+                path = "/".join(parts) + "/…"
+            files.append(parts)
+    for prefix, (n, groups) in collapsed.items():
+        note = COLLAPSED[prefix].format(n=n, groups=len(groups))
+        # anchor the summary under the prefix's parent (e.g. dot_hermes/)
+        head, _, tail = prefix.rpartition("/")
+        files.append((*(head.split("/") if head else []), note))
     return files
 
 

@@ -88,7 +88,7 @@ if [ -n "$missing_opt" ]; then
                 fi
                 {{- else }}
                 if [ -r ~/.config/pacman/pkglist.txt ]; then
-                    sudo pacman -S --needed - < ~/.config/pacman/pkglist.txt || true
+                    sudo sh -c 'exec pacman -S --needed - < "$1"' sh "$HOME/.config/pacman/pkglist.txt" || true
                 fi
                 {{- end }}
                 ;;

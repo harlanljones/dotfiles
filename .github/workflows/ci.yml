@@ -23,6 +23,9 @@ env:
   # Shared by the `secrets` and `smoke-apply` jobs so their gitleaks
   # installs cannot drift apart.
   GITLEAKS_VERSION: 8.21.2
+  # Pinned so a runner-side shellcheck upgrade can never fail the gate with
+  # new checks overnight; bump deliberately alongside local `shellcheck -V`.
+  SHELLCHECK_VERSION: 0.10.0
 
 jobs:
   # Matrix legs exercise each resolved machine on a plain ubuntu runner:
@@ -143,7 +146,7 @@ jobs:
           chezmoi execute-template --config "$RUNNER_TEMP/chezmoi.toml" --source "$GITHUB_WORKSPACE" \
             < run_onchange_after_30-hadrian-macos-defaults.sh.tmpl > "$out"
           [ -s "$out" ] || { echo "::error::hadrian defaults script rendered empty"; exit 1; }
-          shellcheck -S warning "$out"
+          shellcheck -S style "$out"
 
   secrets:
     name: Secret scan (gitleaks)
@@ -184,7 +187,12 @@ jobs:
 
       - name: Install tools
         run: |
-          sudo apt-get update && sudo apt-get install -y shellcheck yamllint zsh
+          sudo apt-get update && sudo apt-get install -y yamllint zsh
+          # shellcheck from the upstream release, not apt, so SHELLCHECK_VERSION
+          # above is the actual gate (ubuntu apt still ships 0.9.0).
+          curl -fsSL "https://github.com/koalaman/shellcheck/releases/download/v${SHELLCHECK_VERSION}/shellcheck-v${SHELLCHECK_VERSION}.linux.x86_64.tar.xz" | tar xJ -C /tmp
+          sudo mv "/tmp/shellcheck-v${SHELLCHECK_VERSION}/shellcheck" /usr/local/bin/shellcheck
+          shellcheck --version | grep -q "version: ${SHELLCHECK_VERSION}$" || { echo "::error::shellcheck version mismatch"; exit 1; }
           curl -fsSL https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash -s -- latest /tmp
           sudo mv /tmp/actionlint /usr/local/bin/actionlint
 
@@ -217,15 +225,20 @@ jobs:
 
             if head -n 1 "$target" | grep -qE '^#!.*\b(sh|bash|dash|ksh)\b'; then
               echo "::group::shellcheck $file"
-              # TODO: raise to -S style once the ~16 remaining style findings
-              # (mostly SC2015/SC2016 in run_* hooks and vendored Hermes skill
-              # scripts) are dispositioned; fixing hook scripts re-triggers
-              # run_onchange_* applies, so it needs a deliberate pass.
-              shellcheck -S warning "$target" || status=1
+              shellcheck -S style "$target" || status=1
               echo "::endgroup::"
             fi
           done < <(git ls-files -z)
           exit $status
+
+      # Loader-order invariants: numeric prefixes unique and zero-padded
+      # (glob order == numeric order), both rc loaders glob the same dir,
+      # every module parses under bash -n and zsh -n.
+      - name: Shell module loader-order smoke test
+        run: python3 docs/test_shell_modules.py -v
+
+      - name: Ignore-file consistency lint
+        run: python3 docs/check_ignore_consistency.py
 
       - name: yamllint .chezmoidata
         run: yamllint -c .yamllint.yml .chezmoidata/

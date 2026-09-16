@@ -26,9 +26,9 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Custom executables](#custom-executables) | 35 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
 | [Other configuration](#other-configuration) | 152 |
-| [Apply hooks (`run_*`)](#apply-hooks-run) | 24 |
+| [Apply hooks (`run_*`)](#apply-hooks-run) | 20 |
 | [Chezmoi control files](#chezmoi-control-files) | 10 |
-| [Repository material (not applied)](#repository-material-not-applied) | 4383 |
+| [Repository material (not applied)](#repository-material-not-applied) | 4384 |
 
 ---
 
@@ -873,18 +873,14 @@ agents and the showcase app should read. This page is the same data for humans.
 | 09 | `run_onchange_before_09-install-agent-skills.sh.tmpl` | runs when this script's contents change | before |
 | 10 | `run_onchange_after_10-install-omarchy-plugins.sh.tmpl` | runs when this script's contents change | after |
 | 20 | `run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl` | runs when this script's contents change | after |
-| 21 | `run_onchange_after_21-setup-omarchy-cline.sh.tmpl` | runs when this script's contents change | after |
-| 22 | `run_onchange_after_22-setup-omarchy-cline-usage-scrape.sh.tmpl` | runs when this script's contents change | after |
 | 23 | `run_after_23-sync-agent-skills.sh.tmpl` | runs after every apply | after |
 | 24 | `run_once_after_24-setup-omarchy-agents.sh.tmpl` | runs once ever | after |
 | 25 | `run_onchange_after_25-sync-omarchy-agents-workspace.sh.tmpl` | runs when this script's contents change | after |
 | 26 | `run_onchange_after_26-setup-omarchy-cursor.sh.tmpl` | runs when this script's contents change | after |
 | 27 | `run_onchange_after_27-sync-claude-mcp.sh.tmpl` | runs when this script's contents change | after |
 | 28 | `run_onchange_after_28-sync-claude-settings.sh.tmpl` | runs when this script's contents change | after |
-| 29 | `run_onchange_after_29-setup-omarchy-drift-capture.sh.tmpl` | runs when this script's contents change | after |
 | 30 | `run_onchange_after_30-hadrian-macos-defaults.sh.tmpl` | runs when this script's contents change | after |
 | 31 | `run_onchange_after_31-augustus-mouse-dpi.sh.tmpl` | runs when this script's contents change | after |
-| 32 | `run_onchange_after_32-setup-omarchy-pi.sh.tmpl` | runs when this script's contents change | after |
 | 40 | `run_onchange_after_40-vespasian-windows-terminal.sh.tmpl` | runs when this script's contents change | after |
 | 41 | `run_onchange_after_41-vespasian-nerd-font.sh.tmpl` | runs when this script's contents change | after |
 | 42 | `run_onchange_after_42-vespasian-theme-state.sh.tmpl` | runs when this script's contents change | after |
@@ -928,6 +924,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/aether-theming-integration-proposal.md` | Recovery guide and repository maintenance scripts |
 | `docs/agents/issue-tracker.md` | Recovery guide and repository maintenance scripts |
 | `docs/check-shell-modules.sh` | Recovery guide and repository maintenance scripts |
+| `docs/dotfiles-gap-action-plan.md` | Recovery guide and repository maintenance scripts |
 | `docs/generate_index.py` | Recovery guide and repository maintenance scripts |
 | `docs/generate_readme_tree.py` | Recovery guide and repository maintenance scripts |
 | `docs/optional-agent-skill-packs-implementation-plan.md` | Recovery guide and repository maintenance scripts |

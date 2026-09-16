@@ -27,9 +27,6 @@ omarchyPlugins:
     enabled: true
   - url: https://github.com/crmne/omarchy-hyprmoncfg.git
     enabled: true
-  # Superseded by the harlanljones fork below (same plugin id esemczak.theme-modes,
-  # which carries the custom multi-profile support); keeping the upstream enabled
-  # here collides on install, so it is disabled.
   - url: https://github.com/esemczak/omarchy-theme-modes.git
     enabled: false
   - url: https://github.com/hzerrad/hzerrad.bottleneck.git
@@ -57,4 +54,14 @@ omarchyPlugins:
   - url: https://github.com/GreyforgeLabs/reprieve.git
     enabled: true
   - url: https://github.com/harlanljones/omarchy-theme-modes.git
+    enabled: true
+  - url: https://github.com/rolfkoenders/umarchy.git
+    enabled: true
+  - url: https://github.com/ax1g/quickshell-screentime-plugin.git
+    enabled: true
+  - url: https://github.com/glasschan/appimage-for-omarchy.git
+    enabled: true
+  - url: https://github.com/rbmrs/omarchy-smart-enter.git
+    enabled: true
+  - url: https://github.com/bobby-nicholas/omaland.git
     enabled: true
