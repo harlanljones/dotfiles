@@ -259,6 +259,12 @@ jobs:
       - name: actionlint
         run: actionlint -color
 
+      # Tree-condensing invariants: COLLAPSED/FAMILY_COLLAPSE prefixes match
+      # tracked files, summary counts are accurate, collapsed members render
+      # as one line instead of hundreds of near-identical rows.
+      - name: README tree condensing tests
+        run: python3 docs/test_readme_tree.py -v
+
       - name: README structure tree is up to date
         run: python3 docs/generate_readme_tree.py --check
 

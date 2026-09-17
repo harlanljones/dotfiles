@@ -299,158 +299,14 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   └── themes.yaml
 ├── .chezmoiignore.tmpl
 ├── .chezmoitemplates
-│   ├── aether-adapters
-│   │   ├── bat.tmTheme.tmpl
-│   │   ├── delta.gitconfig.tmpl
-│   │   ├── eza.yml.tmpl
-│   │   ├── fzf.sh.tmpl
-│   │   ├── gemini.json.tmpl
-│   │   ├── lazygit.yml.tmpl
-│   │   ├── manifest.yaml.tmpl
-│   │   ├── nvim.lua.tmpl
-│   │   ├── windows_terminal.json.tmpl
-│   │   └── zebar.css.tmpl
+│   ├── aether-adapters/ (10 files — per-tool theme adapters)
 │   ├── codex-config.toml
 │   ├── gemini-settings.json
 │   ├── gen-palette.tmpl
 │   ├── littlebigmouse
 │   │   └── Current.xml
 │   ├── machine-theme-name.tmpl
-│   └── themes
-│       ├── gen-6bd5de2cd3e4
-│       │   └── windows_terminal.json
-│       ├── omarchy-catppuccin
-│       │   ├── bat.tmTheme
-│       │   ├── colors.toml
-│       │   ├── delta.gitconfig
-│       │   ├── eza.yml
-│       │   ├── fzf.sh
-│       │   ├── gemini.json
-│       │   ├── lazygit.yml
-│       │   ├── manifest.yaml
-│       │   ├── nvim.lua
-│       │   ├── windows_terminal.json
-│       │   └── zebar.css
-│       ├── omarchy-catppuccin-latte
-│       │   ├── bat.tmTheme
-│       │   ├── colors.toml
-│       │   ├── delta.gitconfig
-│       │   ├── eza.yml
-│       │   ├── fzf.sh
-│       │   ├── gemini.json
-│       │   ├── lazygit.yml
-│       │   ├── manifest.yaml
-│       │   ├── nvim.lua
-│       │   ├── windows_terminal.json
-│       │   └── zebar.css
-│       ├── omarchy-everforest
-│       │   ├── bat.tmTheme
-│       │   ├── colors.toml
-│       │   ├── delta.gitconfig
-│       │   ├── eza.yml
-│       │   ├── fzf.sh
-│       │   ├── gemini.json
-│       │   ├── lazygit.yml
-│       │   ├── manifest.yaml
-│       │   ├── nvim.lua
-│       │   ├── windows_terminal.json
-│       │   └── zebar.css
-│       ├── omarchy-gruvbox
-│       │   ├── bat.tmTheme
-│       │   ├── colors.toml
-│       │   ├── delta.gitconfig
-│       │   ├── eza.yml
-│       │   ├── fzf.sh
-│       │   ├── gemini.json
-│       │   ├── lazygit.yml
-│       │   ├── manifest.yaml
-│       │   ├── nvim.lua
-│       │   ├── windows_terminal.json
-│       │   └── zebar.css
-│       ├── omarchy-kanagawa
-│       │   ├── bat.tmTheme
-│       │   ├── colors.toml
-│       │   ├── delta.gitconfig
-│       │   ├── eza.yml
-│       │   ├── fzf.sh
-│       │   ├── gemini.json
-│       │   ├── lazygit.yml
-│       │   ├── manifest.yaml
-│       │   ├── nvim.lua
-│       │   ├── windows_terminal.json
-│       │   └── zebar.css
-│       ├── omarchy-nord
-│       │   ├── bat.tmTheme
-│       │   ├── colors.toml
-│       │   ├── delta.gitconfig
-│       │   ├── eza.yml
-│       │   ├── fzf.sh
-│       │   ├── gemini.json
-│       │   ├── lazygit.yml
-│       │   ├── manifest.yaml
-│       │   ├── nvim.lua
-│       │   ├── windows_terminal.json
-│       │   └── zebar.css
-│       ├── omarchy-rose-pine
-│       │   ├── bat.tmTheme
-│       │   ├── colors.toml
-│       │   ├── delta.gitconfig
-│       │   ├── eza.yml
-│       │   ├── fzf.sh
-│       │   ├── gemini.json
-│       │   ├── lazygit.yml
-│       │   ├── manifest.yaml
-│       │   ├── nvim.lua
-│       │   ├── windows_terminal.json
-│       │   └── zebar.css
-│       ├── omarchy-tokyo-night
-│       │   ├── bat.tmTheme
-│       │   ├── colors.toml
-│       │   ├── delta.gitconfig
-│       │   ├── eza.yml
-│       │   ├── fzf.sh
-│       │   ├── gemini.json
-│       │   ├── lazygit.yml
-│       │   ├── manifest.yaml
-│       │   ├── nvim.lua
-│       │   ├── windows_terminal.json
-│       │   └── zebar.css
-│       ├── tokyonight-day
-│       │   ├── bat.tmTheme
-│       │   ├── delta.gitconfig
-│       │   ├── eza.yml
-│       │   ├── fzf.sh
-│       │   ├── gemini.json
-│       │   ├── lazygit.yml
-│       │   ├── wallpaper.png
-│       │   └── windows_terminal.json
-│       ├── tokyonight-moon
-│       │   ├── bat.tmTheme
-│       │   ├── delta.gitconfig
-│       │   ├── eza.yml
-│       │   ├── fzf.sh
-│       │   ├── gemini.json
-│       │   ├── lazygit.yml
-│       │   ├── wallpaper.png
-│       │   └── windows_terminal.json
-│       ├── tokyonight-night
-│       │   ├── bat.tmTheme
-│       │   ├── delta.gitconfig
-│       │   ├── eza.yml
-│       │   ├── fzf.sh
-│       │   ├── gemini.json
-│       │   ├── lazygit.yml
-│       │   ├── wallpaper.png
-│       │   └── windows_terminal.json
-│       └── tokyonight-storm
-│           ├── bat.tmTheme
-│           ├── delta.gitconfig
-│           ├── eza.yml
-│           ├── fzf.sh
-│           ├── gemini.json
-│           ├── lazygit.yml
-│           ├── wallpaper.png
-│           └── windows_terminal.json
+│   └── themes/ (121 files across 13 themes — see .chezmoidata/themes.yaml)
 ├── .yamllint.yml
 ├── dot_Brewfile
 ├── dot_agents
@@ -624,19 +480,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   └── user
 │   │       ├── herdr-outpost-relay.service
 │   │       ├── ollama-omarchy-agents.service
-│   │       ├── omarchy-agents-analysis.service
-│   │       ├── omarchy-agents-analysis.timer
-│   │       ├── omarchy-agents-dashboard.service
-│   │       ├── omarchy-agents-tunnel.service
-│   │       ├── omarchy-camera-reset.service
-│   │       ├── omarchy-cline-usage-scrape.service
-│   │       ├── omarchy-cline-usage-scrape.timer
-│   │       ├── omarchy-cursor-usage-scrape.service
-│   │       ├── omarchy-cursor-usage-scrape.timer
-│   │       ├── omarchy-drift-capture.path
-│   │       ├── omarchy-drift-capture.service
-│   │       ├── omarchy-opencode-go-usage-scrape.service
-│   │       └── omarchy-opencode-go-usage-scrape.timer
+│   │       └── omarchy-* units (13 — scrapers, relays, daemons)
 │   └── zoxide
 │       └── config.toml
 ├── dot_evotai
@@ -677,13 +521,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   ├── executable_herdr-agent-lifecycle
 │   │   ├── executable_lazygit-ollama-commit.sh
 │   │   ├── executable_ollama-commit-msg.sh
-│   │   ├── executable_omarchy-agent-usage-antigravity.tmpl
-│   │   ├── executable_omarchy-agent-usage-cline.tmpl
-│   │   ├── executable_omarchy-agent-usage-codex.tmpl
-│   │   ├── executable_omarchy-agent-usage-cursor.tmpl
-│   │   ├── executable_omarchy-agent-usage-opencode.tmpl
-│   │   ├── executable_omarchy-agent-usage-pi.tmpl
-│   │   ├── executable_omarchy-agent-usage-update.tmpl
+│   │   ├── executable_omarchy-agent-usage-<agent>.tmpl (7 agents)
 │   │   ├── executable_omarchy-agent.tmpl
 │   │   ├── executable_omarchy-camera-reset
 │   │   ├── executable_omarchy-cline-usage-login.tmpl
@@ -724,46 +562,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   └── settings.json
 ├── private_dot_ssh
 │   └── config.tmpl
-├── run_after_23-sync-agent-skills.sh.tmpl
-├── run_after_34-augustus-backdrop-split.sh.tmpl
-├── run_once_after_24-setup-omarchy-agents.sh.tmpl
-├── run_once_before_00-verify-deps.sh.tmpl
-├── run_onchange_after_10-install-omarchy-plugins.sh.tmpl
-├── run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl
-├── run_onchange_after_25-sync-omarchy-agents-workspace.sh.tmpl
-├── run_onchange_after_26-setup-omarchy-cursor.sh.tmpl
-├── run_onchange_after_27-sync-claude-mcp.sh.tmpl
-├── run_onchange_after_28-sync-claude-settings.sh.tmpl
-├── run_onchange_after_29-enable-omarchy-user-units.sh.tmpl
-├── run_onchange_after_30-hadrian-macos-defaults.sh.tmpl
-├── run_onchange_after_31-augustus-mouse-dpi.sh.tmpl
-├── run_onchange_after_32-setup-omarchy-agent-registrations.sh.tmpl
-├── run_onchange_after_33-augustus-machine-branding.sh.tmpl
-├── run_onchange_after_40-vespasian-windows-terminal.sh.tmpl
-├── run_onchange_after_41-vespasian-nerd-font.sh.tmpl
-├── run_onchange_after_42-vespasian-theme-state.sh.tmpl
-├── run_onchange_after_43-vespasian-1password-ssh-bridge.sh.tmpl
-├── run_onchange_after_44-vespasian-windows-debloat.sh.tmpl
-├── run_onchange_after_45-vespasian-desktop-tools.sh.tmpl
-├── run_onchange_after_46-vespasian-wallpaper.sh.tmpl
-├── run_onchange_after_47-vespasian-wsl-boot.sh.tmpl
-├── run_onchange_before_09-install-agent-skills.sh.tmpl
-└── theme-assets
-    ├── omarchy-catppuccin
-    │   └── wallpaper.png
-    ├── omarchy-catppuccin-latte
-    │   └── wallpaper.png
-    ├── omarchy-everforest
-    │   └── wallpaper.png
-    ├── omarchy-gruvbox
-    │   └── wallpaper.png
-    ├── omarchy-kanagawa
-    │   └── wallpaper.png
-    ├── omarchy-nord
-    │   └── wallpaper.png
-    ├── omarchy-rose-pine
-    │   └── wallpaper.png
-    └── omarchy-tokyo-night
-        └── wallpaper.png
+├── run_* apply hooks (24 — see INDEX.md § Apply hooks for trigger/phase)
+└── theme-assets/ (8 files across 8 wallpaper sets)
 ```
 <!-- END REPO TREE -->

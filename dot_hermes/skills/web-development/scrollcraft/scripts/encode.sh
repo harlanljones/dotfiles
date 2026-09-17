@@ -37,7 +37,9 @@ pick_ffmpeg() {
     "${HOME:-/nonexistent}"/AppData/Local/Microsoft/WinGet/Packages/Gyan.FFmpeg_*/ffmpeg-*-full_build/bin/ffmpeg.exe \
     /usr/local/bin/ffmpeg /opt/homebrew/bin/ffmpeg /usr/bin/ffmpeg /snap/bin/ffmpeg
   do
-    [ -n "$cand" ] && [ -x "$cand" ] || continue
+    if [ -z "$cand" ] || [ ! -x "$cand" ]; then
+      continue
+    fi
     if [ "$("$cand" -hide_banner -filters 2>/dev/null | wc -l)" -gt 200 ]; then
       echo "$cand"; return 0
     fi

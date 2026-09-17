@@ -46,11 +46,34 @@ SKIP = (
 )
 
 # Subtrees rendered as a single annotated line instead of being expanded.
-# They are real managed dotfiles (so not SKIPped), but enumerate hundreds of
-# homogeneous files (e.g. every skill's SKILL.md/references) that drown the
-# tree. The line notes the file count and points at the YAML manifest.
+# They are real managed dotfiles (so not SKIPped), but enumerate homogeneous
+# families that drown the tree at full depth. The line notes the file count
+# and (where helpful) points at the manifest that owns the family.
 COLLAPSED = {
     "dot_hermes/skills": "skills/ ({n} files across {groups} skill groups — see .chezmoidata/hermes_skills.yaml)",
+    ".chezmoitemplates/themes": "themes/ ({n} files across {groups} themes — see .chezmoidata/themes.yaml)",
+    ".chezmoitemplates/aether-adapters": "aether-adapters/ ({n} files — per-tool theme adapters)",
+    "theme-assets": "theme-assets/ ({n} files across {groups} wallpaper sets)",
+}
+
+
+# Top-level `run_*` apply hooks share one naming grammar
+# (trigger_phase_NN-name) and INDEX.md already tabulates their trigger/phase
+# semantics, so the tree lists them as one summary line with a pointer.
+RUN_HOOKS_NOTE = "run_* apply hooks ({n} — see INDEX.md § Apply hooks for trigger/phase)"
+
+# Leaf-name families collapsed to one summary line when the whole family
+# lives in the same directory: per-agent usage collectors differ only by
+# agent name, so the tree keeps a representative count instead of N rows.
+FAMILY_COLLAPSE = {
+    "dot_local/bin": (
+        "executable_omarchy-agent-usage-",
+        "executable_omarchy-agent-usage-<agent>.tmpl ({n} agents)",
+    ),
+    "dot_config/systemd/user": (
+        "omarchy-",
+        "omarchy-* units ({n} — scrapers, relays, daemons)",
+    ),
 }
 
 
@@ -58,6 +81,7 @@ def tracked(limit):
     out = subprocess.check_output(["git", "ls-files"]).decode().splitlines()
     files = []
     collapsed = {}
+    families = {}
     for path in out:
         if any(path == s or path.startswith(s) for s in SKIP):
             continue
@@ -67,6 +91,20 @@ def tracked(limit):
                 collapsed[prefix] = (n + 1, g | {path[len(prefix) + 1:].split("/")[0]})
                 break
         else:
+            # run_* hooks: all top-level .sh.tmpl, counted and summarized.
+            if "/" not in path and path.startswith("run_") and path.endswith(".sh.tmpl"):
+                n = families.get("run_*", 0) + 1
+                families["run_*"] = n
+                continue
+            head, _, leaf = path.rpartition("/")
+            fam = FAMILY_COLLAPSE.get(head)
+            if fam and leaf.startswith(fam[0]):
+                entry = families.get(head)
+                if entry is None:
+                    families[head] = [1, fam[1]]
+                else:
+                    entry[0] += 1
+                continue
             parts = path.split("/")
             if limit and len(parts) > limit:
                 parts = parts[:limit]
@@ -78,6 +116,13 @@ def tracked(limit):
         # anchor the summary under the prefix's parent (e.g. dot_hermes/)
         head, _, tail = prefix.rpartition("/")
         files.append((*(head.split("/") if head else []), note))
+    if "run_*" in families:
+        files.append((RUN_HOOKS_NOTE.format(n=families["run_*"]),))
+    for head, value in families.items():
+        if head == "run_*":
+            continue
+        n, note = value
+        files.append((*(head.split("/") if head else []), note.format(n=n)))
     return files
 
 

@@ -101,7 +101,7 @@ ffmpeg -y \
 rm -rf "$FRAME_DIR"
 
 # Report
-FILE_SIZE=$(ls -lh "$OUTPUT" | awk '{print $5}')
+FILE_SIZE=$(du -h "$OUTPUT" | cut -f1)
 echo ""
 echo "=== Done ==="
 echo "Output: $OUTPUT ($FILE_SIZE)"

@@ -29,12 +29,15 @@ mkdir -p "$BRAND_DIR"
 art=""
 if command -v figlet >/dev/null 2>&1 && [[ -r "$FONT" ]]; then
   # Design lock: Roman font, consistent with dots-identity's wordmark.
-  art="$(figlet -w 200 -f "$FONT" "$NAME")"
-else
+  art="$(figlet -w 200 -f "$FONT" "$NAME" || true)"
+elif command -v omarchy >/dev/null 2>&1; then
   # Fallback: omarchy's DCP1 renderer. The font will differ from Roman until
   # figlet (in dot_config/pacman/pkglist.txt) and the vendored Roman.flf are
   # present. This is a degraded path, not the intended look.
-  art="$(omarchy ascii "$NAME")"
+  art="$(omarchy ascii "$NAME" || true)"
+else
+  echo "machine-branding: neither figlet nor omarchy found, skipping"
+  exit 0
 fi
 
 if [[ -z "$art" ]]; then
