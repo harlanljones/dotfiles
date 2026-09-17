@@ -78,6 +78,16 @@ capture_templates() {
   # Best-effort live -> repo capture for `create_` templates + plugin
   # manifest. Never writes to $HOME. Pass-through args to the sync script
   # (-n/--dry-run, --prune, --commit supported).
+  #
+  # Guard: a crashed plugin gets auto-disabled and its bar placement stripped
+  # from the live shell.json. Capturing in that state would persist the broken
+  # placement, so restore the known-good enable first.
+  if command -v omarchy-plugin-list >/dev/null 2>&1 \
+     && omarchy-plugin-list 2>/dev/null | grep 'lgse.backdrop' | grep -q disabled; then
+    echo -e "${YELLOW}warning:${NC} lgse.backdrop was auto-disabled; re-enabling before capture." >&2
+    omarchy-plugin-enable lgse.backdrop >/dev/null 2>&1 || true
+    sleep 2
+  fi
   if command -v omarchy-dotfiles-sync >/dev/null 2>&1; then
     omarchy-dotfiles-sync "$@" || return $?
   elif [[ ! -d "$HOME/.config/omarchy" ]]; then

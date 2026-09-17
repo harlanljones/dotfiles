@@ -6,7 +6,17 @@
 # (run_after, not run_onchange) because the omarchy-side theme can change
 # outside chezmoi's knowledge; the script is a cheap no-op when nothing moved.
 # The theme-set.d hook covers switches made through `omarchy theme set`.
+#
+# Also self-heals: if the backdrop plugin was auto-disabled (e.g. it crashed
+# mid-reload and Omarchy stripped it), re-enable it before re-splitting.
 set -euo pipefail
+
+if command -v omarchy-plugin-list >/dev/null 2>&1 \
+   && omarchy-plugin-list 2>/dev/null | grep 'lgse.backdrop' | grep -q disabled; then
+	echo "run_after_34: lgse.backdrop was auto-disabled — re-enabling"
+	omarchy-plugin-enable lgse.backdrop >/dev/null 2>&1 || true
+	sleep 3
+fi
 
 echo "run_after_34: refreshing backdrop segments"
 if ! "$HOME/.local/bin/backdrop-split"; then

@@ -27,6 +27,11 @@ detach = "prefix+d"
 # Copy mode
 copy_mode = "prefix+["
 
+# herdr's default edit_scrollback is prefix+e; keep that key free for the
+# herdr-nvim sidebar plugin ([[keys.command]] below). Builtin named keys win
+# over plugin command keys unless reassigned explicitly.
+edit_scrollback = "prefix+shift+e"
+
 # Panes
 split_horizontal = ["prefix+h", "alt+enter"]
 split_vertical = ["prefix+v", "alt+shift+enter"]
@@ -90,6 +95,18 @@ key = "prefix+="
 type = "plugin_action"
 command = "ponko2.equalize-panes.equalize"
 description = "Equalize panes"
+
+[[keys.command]]
+key = "prefix+e"
+type = "plugin_action"
+command = "chmarax.herdr-nvim.toggle"
+description = "nvim sidebar"
+
+[[keys.command]]
+key = "prefix+o"
+type = "plugin_action"
+command = "chmarax.herdr-nvim.pick-file"
+description = "open file from agent output"
 
 [ui]
 accent = "blue"

@@ -52,5 +52,5 @@ ssh_only = true
        machine keys without their own entry (e.g. a freeform wizard answer
        before the box is registered in machines.yaml). */ -}}
 {{- $mach := index .machines "unknown" -}}
-{{- if hasKey .machines .machine }}{{ $mach = index .machines .machine }}{{ end -}}
+{{- if hasKey .machines .machine }}{{ $mach = index .machines .machine }}{{ end }}
 format = "[{{ $mach.displayName }}]({{ $mach.theme.accent }}) "

@@ -41,11 +41,39 @@ fi
 
 out_dir="$HOME/.config/omarchy/backdrop/segments"
 mkdir -p "$out_dir"
-rm -f "$out_dir"/*.png
+
+# Optional framing, read from ~/.config/omarchy/backdrop/settings (KEY=VALUE):
+#   ZOOM   >=1, how hard to zoom into the image before mapping (1 = cover-fit)
+#   FOCUSX/FOCUSY  0..1, the image point kept at the zoom center
+# A painting whose interesting content sits off-center needs zoom+focus so
+# every monitor gets meaningful art instead of a near-black region.
+zoom=1; focus_x=0.5; focus_y=0.5
+settings="$HOME/.config/omarchy/backdrop/settings"
+if [[ -r "$settings" ]]; then
+	# shellcheck disable=SC1090
+	source "$settings"
+	zoom="${ZOOM:-1}"; focus_x="${FOCUSX:-0.5}"; focus_y="${FOCUSY:-0.5}"
+fi
+
+# Zoom into the image around the focal point before mapping: crop a
+# (1/zoom)-sized window centered on FOCUSX/FOCUSY (clamped to the image).
+pre="$src"
+if awk -v z="$zoom" 'BEGIN{exit !(z > 1.001)}'; then
+	read -r sw sh <<<"$(identify -format '%w %h' "$src")"
+	cw=$(( sw / zoom )); ch=$(( sh / zoom ))
+	cx=$(awk -v sw="$sw" -v cw="$cw" -v f="$focus_x" 'BEGIN{c=int(f*sw-cw/2); print c<0?0:(c>sw-cw?sw-cw:c)}')
+	cy=$(awk -v sh="$sh" -v ch="$ch" -v f="$focus_y" 'BEGIN{c=int(f*sh-ch/2); print c<0?0:(c>sh-ch?sh-ch:c)}')
+	pre="$out_dir/.pre-crop.png"
+	magick "$src" -crop "${cw}x${ch}+${cx}+${cy}" +repage "$pre"
+fi
 
 # Plan the crops. Fields per monitor: name|cropX|cropY|cropW|cropH|nativeW|nativeH
-plan="$(python3 <<'PY'
-import json, math, subprocess
+plan="$(ZOOM="$zoom" FOCUSX="$focus_x" FOCUSY="$focus_y" python3 <<'PY'
+import json, math, os, subprocess
+
+zoom = float(os.environ.get("ZOOM", "1"))
+fx = min(max(float(os.environ.get("FOCUSX", "0.5")), 0), 1)
+fy = min(max(float(os.environ.get("FOCUSY", "0.5")), 0), 1)
 
 mons = json.loads(subprocess.check_output(["hyprctl", "monitors", "-j"]))
 mons = [m for m in mons if m.get("active", True) and not m.get("disabled", False)]
@@ -80,20 +108,27 @@ canvas="$(grep '^CANVAS|' <<<"$plan" | cut -d'|' -f2,3 | tr '|' 'x')"
 cw="${canvas%x*}" ch="${canvas#*x}"
 
 # Idempotent: same background + same layout -> byte-identical outputs.
+# Writes are atomic (tmp + mv): the shell may reload the QML plugin at any
+# moment (e.g. during a concurrent `chezmoi apply`), and a half-written or
+# missing segment file crashes the backdrop plugin and gets it auto-disabled.
 status=0
 while IFS='|' read -r name ox oy ow oh mw mh; do
 	[[ "$name" == "CANVAS" ]] && continue
 	seg="$out_dir/${name}.png"
-	if ! magick "$src" \
+	tmp="$(mktemp "$out_dir/.${name}.XXXXXX.png")"
+	if ! magick "$pre" \
 		-resize "${cw}x${ch}^" -gravity center -extent "${cw}x${ch}" \
 		-crop "${ow}x${oh}+${ox}+${oy}" +repage \
 		-resize "${mw}x${mh}!" \
 		-strip \
-		"$seg"; then
+		"$tmp"; then
 		echo "backdrop-split: magick failed for $name" >&2
+		rm -f "$tmp"
 		status=1
 		continue
 	fi
+	chmod 644 "$tmp"
+	mv -f "$tmp" "$seg"
 	# Deliberately without -q: -q fakes success when the IPC target is gone.
 	if ! omarchy-shell background setForScreen "$name" "$seg"; then
 		echo "backdrop-split: setForScreen $name failed" >&2

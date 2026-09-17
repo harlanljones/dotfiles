@@ -215,3 +215,50 @@ printf '%skernel:%s %s' "$DIM" "$NC" "$kernel"
 [[ -n "$mem_s" ]] && printf '  %smem:%s %s' "$DIM" "$NC" "$mem_s"
 [[ -n "$date_s" ]] && printf '  %sdate:%s %s' "$DIM" "$NC" "$date_s"
 printf '  %sdrift:%s %s\n' "$DIM" "$NC" "$drift_s"
+
+# ------------------------------------------------- project context (git) ---
+# When the shell's cwd is a git work tree, show a compact repo profile:
+# branch + dirty count, tracked-file count, top languages by tracked-file
+# extension, and detected frameworks from manifest files. Everything is
+# timeout-guarded where timeout exists; failures omit silently. Keeps the
+# banner instrument-grade: no tree graphs, no ascii logos.
+if command -v git >/dev/null 2>&1 \
+   && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  t=''; command -v timeout >/dev/null 2>&1 && t='timeout 2'
+
+  branch=$($t git symbolic-ref --short HEAD 2>/dev/null \
+    || $t git rev-parse --short HEAD 2>/dev/null \
+    || echo detached)
+  dirty=$($t git status --porcelain 2>/dev/null | wc -l || echo '?')
+  nfiles=$($t git ls-files 2>/dev/null | wc -l || echo '?')
+
+  # Top two languages by tracked-file extension (fallback: ls-files top dirs).
+  langs=$($t git ls-files 2>/dev/null | awk -F. '
+    NF > 1 { ext[tolower($NF)]++ }
+    END { for (e in ext) printf "%s:%d\n", e, ext[e] }' \
+    | sort -t: -k2 -rn | head -2 | cut -d: -f1 | tr '\n' ' ')
+
+  # Frameworks from the manifest files nearest this directory.
+  fw=''
+  if [[ -f package.json ]]; then
+    grep -q '"bun"' package.json 2>/dev/null && fw+='bun '
+    for f in react next vue svelte astro express fastify; do
+      grep -q "\"$f\"" package.json 2>/dev/null && fw+="$f "
+    done
+  fi
+  if [[ -f pyproject.toml ]]; then
+    grep -qE 'fastapi' pyproject.toml 2>/dev/null && fw+='fastapi '
+    grep -qE 'django' pyproject.toml 2>/dev/null && fw+='django '
+    grep -qE 'flask' pyproject.toml 2>/dev/null && fw+='flask '
+  fi
+  [[ -f go.mod ]] && grep -qE 'gin-gonic' go.mod 2>/dev/null && fw+='gin '
+  [[ -f Cargo.toml ]] && grep -qE '^tokio' Cargo.toml 2>/dev/null && fw+='tokio '
+
+  proj_line="$branch"
+  [[ "$dirty" =~ ^[0-9]+$ && "$dirty" -gt 0 ]] && proj_line+=" (+$dirty)"
+  [[ "$nfiles" =~ ^[0-9]+$ ]] && proj_line+="  $nfiles files"
+  [[ -n "${langs// /}" ]] && proj_line+="  $langs"
+  [[ -n "$fw" ]] && proj_line+=" fw: $(printf '%s' "$fw" | sed 's/ $//')"
+
+  printf '%sproj:%s %s\n' "$DIM" "$NC" "$proj_line"
+fi

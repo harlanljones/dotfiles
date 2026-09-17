@@ -11,7 +11,7 @@ font-style = Regular
        machine keys without their own entry (e.g. a freeform wizard answer
        before the box is registered in machines.yaml). */ -}}
 {{- $mach := index .machines "unknown" -}}
-{{- if hasKey .machines .machine }}{{ $mach = index .machines .machine }}{{ end -}}
+{{- if hasKey .machines .machine }}{{ $mach = index .machines .machine }}{{ end }}
 font-size = {{ $mach.ghostty.fontSize }}
 
 # Window
@@ -20,6 +20,9 @@ window-padding-x = 14
 window-padding-y = 14
 confirm-close-surface=false
 resize-overlay = never
+# Each window is an independent process: the single-instance handoff was
+# dropping new surfaces (and a primary crash killed every terminal at once).
+gtk-single-instance = false
 {{- if eq .machine "augustus" }}
 gtk-toolbar-style = flat
 {{- end }}

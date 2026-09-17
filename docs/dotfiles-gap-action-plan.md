@@ -334,7 +334,11 @@ default and diverges by hooking into THIS stack: the `.chezmoidata/themes` engin
     service enabled+active (filter_by fixed to snake_case `current_monitor` per
     hyprshell 4.10 schema); Roman branding written to both files; figlet upgrade
     confirmed live. Remaining: visual check of the snacks dashboard on next nvim
-    open; AGENTS.md §3 row for hook 33 (manual).
+    open; AGENTS.md §3 row for hook 33 (manual). 2026-09-16 later: dots-identity
+    gained a runtime project-context line (branch+dirty, file count, top
+    languages by tracked extension, manifest-detected frameworks) when cwd is a
+    git repo — the nvim dashboard inherits it for free (it shells
+    dots-identity in the project cwd).
   - Requested by Harlan. One generated identity surface per machine, driven by
     (a) the machine's hardware (augustus/hadrian/vespasian), (b) the current theme
     palette from the theme engine, (c) the machine's name. Inspired by Omarchy's

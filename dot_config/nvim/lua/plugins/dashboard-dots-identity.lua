@@ -75,6 +75,75 @@ local function drift_footer()
   return ("dots: %d file%s drifted"):format(n, n == 1 and "" or "s")
 end
 
+--- Discover local git repos as selectable projects. Roots are scanned once
+--- per dashboard open: ~/dev/* (repo dirs) plus the dots repo. Deterministic
+--- and personal — replaces snacks' `projects` section, which depends on
+--- shada oldfiles and rendered empty/broken here.
+---@return { [1]: string, [2]: string }[]
+local function discover_projects()
+  local projects = {}
+  local seen = {}
+  local roots = { vim.fn.expand("~/dev"), vim.fn.expand("~/src") }
+  for _, root in ipairs(roots) do
+    local dirs = vim.fn.readdir(root) or {}
+    for _, name in ipairs(dirs) do
+      local dir = root .. "/" .. name
+      if vim.fn.isdirectory(dir .. "/.git") == 1 and not seen[dir] then
+        seen[dir] = true
+        projects[#projects + 1] = { name, dir }
+      end
+    end
+  end
+  local dots = vim.fn.expand("~/.local/share/chezmoi")
+  if vim.fn.isdirectory(dots) == 1 and not seen[dots] then
+    projects[#projects + 1] = { "dots", dots }
+  end
+  -- Most-recently-active first (activity = .git/HEAD mtime), capped at 8 so
+  -- the selector stays a quick-pick, not a wall of 80+ repos.
+  table.sort(projects, function(a, b)
+    local ma = vim.fn.getftime(a[2] .. "/.git/HEAD") or 0
+    local mb = vim.fn.getftime(b[2] .. "/.git/HEAD") or 0
+    return ma > mb
+  end)
+  local cap = {}
+  for i, p in ipairs(projects) do
+    if i > 8 then break end
+    cap[#cap + 1] = p
+  end
+  return cap
+end
+
+--- Build the Projects dashboard section: selecting a project chdirs into it
+--- and re-renders the dashboard, so the identity header picks up that
+--- project's context (dots-identity runs in the new cwd).
+local function projects_section()
+  local projects = discover_projects()
+  if #projects == 0 then
+    return nil
+  end
+  local items = {}
+  for i, proj in ipairs(projects) do
+    items[#items + 1] = {
+      key = tostring(i),
+      label = proj[1],
+      desc = proj[2],
+      action = function()
+        vim.fn.chdir(proj[2])
+        Snacks.dashboard.open()
+      end,
+    }
+  end
+  return {
+    icon = " ",
+    title = "Projects",
+    indent = 2,
+    padding = 1,
+    section = function()
+      return items
+    end,
+  }
+end
+
 return {
   {
     "folke/snacks.nvim",
@@ -92,13 +161,8 @@ return {
             indent = 2,
             padding = 1,
           },
-          {
-            icon = " ",
-            title = "Projects",
-            section = "projects",
-            indent = 2,
-            padding = 1,
-          },
+          -- Curated Projects selector (custom, deterministic): chdir + re-render.
+          projects_section,
           { section = "startup", padding = 1 },
           -- Dots drift footer; silently omitted on failure/timeout.
           function()
