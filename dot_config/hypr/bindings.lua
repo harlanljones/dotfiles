@@ -43,6 +43,24 @@ o.bind("SUPER + CTRL + ALT + P", "Theme modes: next profile", "omarchy-shell ese
 hl.unbind("SUPER + SHIFT + X")
 o.bind("SUPER + SHIFT + X", "X Native", "qml-runtime " .. (os.getenv("HOME") or "") .. "/.config/omarchy/plugins/community.omarchy-x-native-bundle/native-app/main.qml --toggle")
 
+-- Alt+Tab window switcher: omalt-tab (Omarchy Quickshell plugin) owns these
+-- bindings. Its hypr/bindings.lua defines an "omalt-tab" submap (Tab cycle,
+-- home-row workspace jump, Enter commit, Esc cancel) and unbinds the plain
+-- Alt+Tab defaults itself. Load it when installed; otherwise the Omarchy
+-- defaults (tiling.lua cycle_next/bring_to_top) stay in effect. The order
+-- matters: omalt-tab's binds must register AFTER the Omarchy defaults it
+-- overrides, and hypr/bindings.lua loads after default.hypr.omarchy.
+hl.unbind("ALT + TAB")
+hl.unbind("ALT + SHIFT + TAB")
+do
+  local omalt = os.getenv("HOME") .. "/.config/omarchy/plugins/io.github.codesmith28.omalt-tab/hypr/bindings.lua"
+  local f = io.open(omalt, "r")
+  if f then
+    f:close()
+    dofile(omalt)
+  end
+end
+
 require("default.hypr.require_optional").module("hypr.omachord") -- Oma Chord managed loader
 
 -- BEGIN tech.greyforge.reprieve

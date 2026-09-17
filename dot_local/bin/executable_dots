@@ -118,6 +118,7 @@ ${BOLD}COMMANDS:${NC}
   ${CYAN}push, pp${NC}          Capture templates, commit & push with Ollama-generated message
   ${CYAN}doctor${NC}            Run diagnostics on tools, age keys, agent links, template drift
   ${CYAN}theme${NC}             Pick, list, show, or switch this machine's color theme
+  ${CYAN}wallpaper${NC}        Generate a theme palette from an image (matugen) and select it
   ${CYAN}age, key${NC}          Manage age encryption key & 1Password backup/restore
   ${CYAN}setup${NC}             Run interactive system onboarding & setup wizard
   ${CYAN}help${NC}              Show this help message
@@ -138,7 +139,7 @@ ${BOLD}OPTIONS FOR THEME:${NC}
   --no-sync                    Update the machine selection without applying it
 
 ${BOLD}OPTIONS FOR PUSH:${NC}
-  Captures `create_` templates (shell.json) + plugin manifest via
+  Captures 'create_' templates (shell.json) + plugin manifest via
   omarchy-dotfiles-sync, then delegates to dots-push: re-adds locally
   modified targets, stages all changes, generates a one-line conventional
   commit message with local Ollama, commits, and pushes to origin.
@@ -151,16 +152,16 @@ ${BOLD}OPTIONS FOR PUSH:${NC}
                           (default: ~/.local/share/chezmoi)
 
 ${BOLD}OPTIONS FOR CAPTURE:${NC}
-  Standalone live -> repo capture for drift chezmoi cannot see: `create_`
+  Standalone live -> repo capture for drift chezmoi cannot see: 'create_'
   templates (omarchy shell.json) + plugin manifest. Never writes to $HOME.
   -n, --dry-run      Preview what would be captured without writing
   --prune            Also drop plugin manifest entries no longer installed
   --commit           Commit just the captured paths (same as sync script flag)
 
 ${BOLD}OPTIONS FOR ABSORB:${NC}
-  No args: capture `create_` templates (shell.json) + plugin manifest, then
+  No args: capture 'create_' templates (shell.json) + plugin manifest, then
   re-add all modified managed files. File args: re-add those targets; shell.json
-  is intercepted to template capture since `chezmoi re-add` refuses templates.
+  is intercepted to template capture since 'chezmoi re-add' refuses templates.
   -n, --dry-run      Preview template capture + re-add without writing
   --prune            Also drop plugin manifest entries no longer installed
   --omarchy          Capture omarchy templates/manifest only (skip generic re-add)
@@ -180,6 +181,14 @@ ${BOLD}OPTIONS FOR THEME:${NC}
       --from-colors-toml PATH --id <slug> --label <text>  [--source-name ..]
                      [--source-repo URL] [--replace]
       --from-aether [BLUEPRINT]  (Augustus only; requires the aether CLI)
+${BOLD}OPTIONS FOR WALLPAPER:${NC}
+  set <image-path>   Generate a matugen palette from an image, register it as
+                     a generated theme 'gen-<hash>' in .chezmoidata/themes.yaml
+                     (source path + sha256 only; the image never enters the
+                     repo), select it for this machine, and re-apply.
+    --no-sync        Update the source repo without applying
+  list               Show per-machine theme + each generated theme's source image
+
 ${BOLD}OPTIONS FOR AGE / KEY:${NC}
   status             Show key file path, derived public key, and 1Password status
   backup [vault]     Save age private key to 1Password vault (default: Personal)
@@ -201,6 +210,8 @@ ${BOLD}EXAMPLES:${NC}
   dots doctor              # Verify keys, toolchains, links & template drift
   dots theme               # List themes, current one marked
   dots theme set tokyonight-storm  # Switch theme everywhere on this machine
+  dots wallpaper set ~/Pictures/wall.png  # Theme this machine from an image
+  dots wallpaper list       # Show per-machine theme + generated themes
 EOF
 }
 
@@ -217,6 +228,7 @@ theme_current() {
 }
 
 theme_names() {
+  # shellcheck disable=SC2016  # chezmoi template, intentionally single-quoted
   chezmoi execute-template '{{ range $name, $t := .themes }}{{ $name }}{{ "\t" }}{{ $t.label }}{{ "\n" }}{{ end }}'
 }
 
@@ -372,10 +384,6 @@ cmd_theme_set() {
   current="$(theme_current)"
   src="$(get_source_dir)"
 
-  if [[ -z "$current" ]]; then
-    echo -e "${RED}error:${NC} machine '$machine' has no theme.name in .chezmoidata/machines.yaml; theme switching is not wired up there." >&2
-    exit 1
-  fi
   if ! theme_names | cut -f1 | grep -qxF "$name"; then
     echo -e "${RED}error:${NC} unknown theme '$name'. Available:" >&2
     theme_names | cut -f1 | sed 's/^/  /' >&2
@@ -388,7 +396,25 @@ cmd_theme_set() {
 
   # Rewrite only machines.<machine>.theme.name, preserving comments and layout
   # (a YAML round-trip would drop the registry's comments).
-  python3 - "$src/.chezmoidata/machines.yaml" "$machine" "$name" <<'PY'
+  theme_write_machine_name "$src/.chezmoidata/machines.yaml" "$machine" "$name"
+
+  echo -e "${GREEN}✓${NC} $machine theme: ${DIM}$current${NC} -> ${BOLD}$name${NC} (source: .chezmoidata/machines.yaml)"
+
+  if [[ $no_sync -eq 1 ]]; then
+    echo -e "  ${DIM}apply with: dots sync${NC}"
+  else
+    cmd_sync
+  fi
+  echo -e "  ${DIM}Restart Windows Terminal and reopen nvim to see it; dots push syncs the choice.${NC}"
+}
+
+theme_write_machine_name() {
+  # Rewrite machines.<machine>.theme.name in machines.yaml, preserving
+  # comments and layout (a YAML round-trip would drop them). If the machine
+  # has a theme: block without a name key (augustus, hadrian, unknown), one
+  # is inserted instead of failing.
+  local file="$1" machine="$2" name="$3"
+  python3 - "$file" "$machine" "$name" <<'PY'
 import re
 import sys
 
@@ -400,12 +426,14 @@ except ValueError:
     sys.exit(f"machine {machine} not found in {path}")
 
 in_theme = False
+theme_line = None
 for i in range(start + 1, len(lines)):
     line = lines[i]
     if re.match(r"^ {0,2}\S", line):
         break  # next machine or top-level key
     if re.match(r"^    theme:\s*$", line):
         in_theme = True
+        theme_line = i
         continue
     if in_theme and re.match(r"^    \S", line):
         break  # left the theme block
@@ -414,17 +442,482 @@ for i in range(start + 1, len(lines)):
         lines[i] = match.group(1) + name + match.group(2)
         open(path, "w", encoding="utf-8").write("\n".join(lines))
         sys.exit(0)
-sys.exit(f"theme.name not found for {machine} in {path}")
+
+if theme_line is None:
+    sys.exit(f"theme block not found for {machine} in {path}")
+lines.insert(theme_line + 1, f"      name: {name}")
+open(path, "w", encoding="utf-8").write("\n".join(lines))
 PY
+}
 
-  echo -e "${GREEN}✓${NC} $machine theme: ${DIM}$current${NC} -> ${BOLD}$name${NC} (source: .chezmoidata/machines.yaml)"
+# -------------------------------------------------------------- wallpaper ---
+# `dots wallpaper set <path>` generates a palette from an image with matugen
+# and registers it as a generated theme (`gen-<hash>`), then selects it for
+# this machine. The image itself never enters the repo: only its path +
+# sha256 are recorded, and the palette JSON is self-contained so renders
+# never need the source image.
+#
+# The palette is written twice, byte-identical:
+#   .chezmoidata/generated/gen-<hash>/windows_terminal.json  (record of truth)
+#   .chezmoitemplates/themes/gen-<hash>/windows_terminal.json
+# The second copy exists because every themed template resolves its palette
+# with `include .chezmoitemplates/themes/<name>/windows_terminal.json` and
+# chezmoi has no "file exists" test to branch on; keeping the generated copy
+# in the same include location means zero consumer-template changes.
 
-  if [[ $no_sync -eq 1 ]]; then
-    echo -e "  ${DIM}apply with: dots sync${NC}"
+sha256_of() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum "$1" | cut -d' ' -f1
   else
-    cmd_sync
+    shasum -a 256 "$1" | cut -d' ' -f1
   fi
-  echo -e "  ${DIM}Restart Windows Terminal and reopen nvim to see it; dots push syncs the choice.${NC}"
+}
+
+# Copy src -> dst atomically (temp file in dst's dir + rename), so an
+# interrupted run can never leave a truncated file that a later -f check
+# mistakes for a complete palette.
+atomic_copy() {
+  local src="$1" dst="$2"
+  python3 - "$src" "$dst" <<'PY'
+import os
+import shutil
+import sys
+import tempfile
+
+src, dst = sys.argv[1:]
+fd, tmp = tempfile.mkstemp(dir=os.path.dirname(dst) or ".", prefix=".palette-", suffix=".tmp")
+os.close(fd)
+try:
+    shutil.copyfile(src, tmp)
+    os.replace(tmp, dst)
+except BaseException:
+    try:
+        os.unlink(tmp)
+    except OSError:
+        pass
+    raise
+PY
+}
+
+matugen_install_hint() {
+  cat <<'EOF'
+matugen is a hard dependency of `dots wallpaper set` and is not installed.
+Install it with the manager that owns it on this machine (one per machine):
+  augustus:   pacman -S matugen            (dot_config/pacman/pkglist.txt)
+  hadrian:    brew install matugen       (dot_Brewfile)
+  vespasian:  mise install cargo:matugen (dot_config/mise/conf.d/vespasian.toml)
+EOF
+}
+
+cmd_wallpaper() {
+  ensure_chezmoi
+  local sub="${1:-list}"
+  [[ $# -gt 0 ]] && shift
+
+  case "$sub" in
+    set)     cmd_wallpaper_set "$@" ;;
+    list|ls) cmd_wallpaper_list ;;
+    -h|--help|help)
+      # BSD head has no `head -n -1`; use awk to stop before the AGE header.
+      awk '/OPTIONS FOR WALLPAPER:/{f=1} /OPTIONS FOR AGE /{f=0} f' "$(get_source_dir)/dot_local/bin/executable_dots" 2>/dev/null || true
+      ;;
+    *)
+      echo -e "${RED}error:${NC} Unknown wallpaper command '$sub'. Use: dots wallpaper [set <path>|list]" >&2
+      exit 1
+      ;;
+  esac
+}
+
+cmd_wallpaper_set() {
+  local no_sync=0 img=""
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --no-sync) no_sync=1 ;;
+      -h|--help) echo "Usage: dots wallpaper set <image-path> [--no-sync]"; return 0 ;;
+      -*) echo -e "${RED}error:${NC} Unknown option '$1'." >&2; exit 1 ;;
+      *)
+        if [[ -n "$img" ]]; then
+          echo -e "${RED}error:${NC} unexpected second argument '$1'." >&2
+          exit 1
+        fi
+        img="$1"
+        ;;
+    esac
+    shift
+  done
+
+  if [[ -z "$img" ]]; then
+    echo "Usage: dots wallpaper set <image-path> [--no-sync]" >&2
+    exit 1
+  fi
+
+  # Resolve to an absolute, canonical path; the raw path is what gets recorded.
+  local dir base dir_abs
+  dir="$(dirname -- "$img")"
+  base="$(basename -- "$img")"
+  if [[ ! -d "$dir" ]]; then
+    echo -e "${RED}error:${NC} directory '$dir' does not exist." >&2
+    exit 1
+  fi
+  if ! dir_abs="$(cd -- "$dir" && pwd -P)"; then
+    echo -e "${RED}error:${NC} cannot enter directory '$dir' (permissions?)." >&2
+    exit 1
+  fi
+  img="$dir_abs/$base"
+
+  if [[ ! -f "$img" ]]; then
+    echo -e "${RED}error:${NC} '$img' is not a file." >&2
+    exit 1
+  fi
+  # The path is recorded in the themes.yaml registry. Reject characters that
+  # would need YAML escape handling or that break tooling downstream; ask for
+  # a sanely named copy/symlink instead of corrupting the registry.
+  if [[ "$img" == *[\"\\]* || "$img" == *$'\n'* || "$img" == *$'\r'* ]]; then
+    echo -e "${RED}error:${NC} '$img' contains a quote, backslash or newline;" >&2
+    echo "  rename the file (or symlink it) to a path without those characters." >&2
+    exit 1
+  fi
+  if command -v file >/dev/null 2>&1; then
+    local mime
+    mime="$(file --mime-type -b -- "$img")"
+    if [[ "$mime" != image/* ]]; then
+      echo -e "${RED}error:${NC} '$img' is not an image (mime: $mime)." >&2
+      exit 1
+    fi
+  else
+    case "${img##*.}" in
+      png|jpg|jpeg|webp|bmp|gif|tiff|avif) ;;
+      *)
+        echo -e "${RED}error:${NC} '$img' does not look like an image (no 'file' command to verify)." >&2
+        exit 1
+        ;;
+    esac
+  fi
+
+  if ! command -v matugen >/dev/null 2>&1; then
+    echo -e "${RED}error:${NC} matugen is not installed or not in PATH." >&2
+    matugen_install_hint >&2
+    exit 1
+  fi
+
+  local hash id src gen_dir tpl_dir
+  hash="$(sha256_of "$img")"
+  id="gen-${hash:0:12}"
+  src="$(get_source_dir)"
+  gen_dir="$src/.chezmoidata/generated/$id"
+  tpl_dir="$src/.chezmoitemplates/themes/$id"
+
+  local have_gen=0 have_tpl=0
+  [[ -f "$gen_dir/windows_terminal.json" ]] && have_gen=1
+  [[ -f "$tpl_dir/windows_terminal.json" ]] && have_tpl=1
+
+  if [[ $have_gen -eq 1 && $have_tpl -eq 1 ]]; then
+    echo -e "${GREEN}✓${NC} palette ${BOLD}$id${NC} already exists (same image = same id, nothing to do)"
+  elif [[ $have_gen -eq 1 || $have_tpl -eq 1 ]]; then
+    # Interrupted earlier run: exactly one twin is missing. The palette JSON
+    # is self-contained and both copies are meant to be byte-identical, so
+    # repair by copying the surviving one (atomic: temp file + rename).
+    echo -e "${CYAN}Repairing missing palette copy for ${BOLD}$id${NC}...${NC}"
+    mkdir -p "$gen_dir" "$tpl_dir"
+    if [[ $have_gen -eq 1 ]]; then
+      atomic_copy "$gen_dir/windows_terminal.json" "$tpl_dir/windows_terminal.json"
+    else
+      atomic_copy "$tpl_dir/windows_terminal.json" "$gen_dir/windows_terminal.json"
+    fi
+    echo -e "${GREEN}✓${NC} palette twin restored for ${BOLD}$id${NC}"
+  else
+    echo -e "${CYAN}Generating palette from ${DIM}$img${NC} with matugen...${NC}"
+    local tmp
+    tmp="$(mktemp)"
+    if ! matugen image -m dark -j hex --prefer saturation "$img" > "$tmp"; then
+      rm -f "$tmp"
+      echo -e "${RED}error:${NC} matugen failed to extract a palette from '$img'." >&2
+      exit 1
+    fi
+    mkdir -p "$gen_dir" "$tpl_dir"
+    if python3 - "$tmp" "$gen_dir/windows_terminal.json" "$tpl_dir/windows_terminal.json" "$id" "$base" <<'PY'
+import json
+import os
+import sys
+import tempfile
+
+matugen_path, gen_path, tpl_path, ident, label = sys.argv[1:]
+raw = json.load(open(matugen_path, encoding="utf-8"))
+b16 = raw.get("base16", {})
+palettes = raw.get("palettes", {})
+colors = raw.get("colors", {})
+if not b16:
+    sys.exit("matugen output missing base16 colors (unexpected version format)")
+
+
+def dark(entry):
+    entry = entry or {}
+    return (entry.get("dark") or {}).get("color") or (entry.get("default") or {}).get("color")
+
+
+def ramp(name, tone):
+    pal = palettes.get(name) or {}
+    return (pal.get(tone) or {}).get("color")
+
+
+def named(name):
+    entry = colors.get(name) or {}
+    return dark(entry)
+
+
+missing = [k for k in
+           ["base00", "base01", "base02", "base03", "base05", "base06", "base07"]
+           if not dark(b16.get(k))]
+if missing:
+    sys.exit("matugen output missing base16 keys: " + ", ".join(missing))
+
+# base00-07 carry the grayscale surfaces; matugen 4.2 derives base08-0e from
+# the source tonal palettes at near-background tones, so they read as
+# monochrome. The accent hues live in the tonal ramps (primary/secondary/
+# tertiary/error) and named colors, so accents map from there instead.
+red = ramp("error", "60") or ramp("primary", "60") or named("error")
+green = ramp("tertiary", "60") or named("tertiary")
+yellow = ramp("tertiary", "80") or named("tertiary_fixed_dim")
+blue = ramp("primary", "60") or named("primary_fixed_dim")
+purple = ramp("secondary", "60") or named("secondary_fixed_dim")
+cyan = ramp("secondary", "80") or named("secondary")
+accent = named("primary") or blue
+
+scheme = {
+    "name": ident,
+    "background": dark(b16.get("base00")),
+    "foreground": dark(b16.get("base05")),
+    "black": dark(b16.get("base01")),
+    "red": red,
+    "green": green,
+    "yellow": yellow,
+    "blue": blue,
+    "purple": purple,
+    "cyan": cyan,
+    "white": dark(b16.get("base06")),
+    "brightBlack": dark(b16.get("base03")),
+    "brightRed": ramp("error", "70") or red,
+    "brightGreen": green,
+    "brightYellow": yellow,
+    "brightBlue": blue,
+    "brightPurple": purple,
+    "brightCyan": cyan,
+    "brightWhite": dark(b16.get("base07")),
+    "cursorColor": accent,
+    "selectionBackground": dark(b16.get("base02")),
+}
+for key, value in scheme.items():
+    if not value:
+        sys.exit(f"matugen output missing color for {key} (unexpected version format)")
+text = json.dumps(scheme, indent=4, sort_keys=True) + "\n"
+
+
+def atomic_write(path, text):
+    """Write text to path atomically: temp file in the same dir, then rename."""
+    fd, tmp_path = tempfile.mkstemp(
+        dir=os.path.dirname(path) or ".", prefix=".palette-", suffix=".tmp"
+    )
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as fh:
+            fh.write(text)
+        os.replace(tmp_path, path)
+    except BaseException:
+        try:
+            os.unlink(tmp_path)
+        except OSError:
+            pass
+        raise
+
+
+for path in (gen_path, tpl_path):
+    atomic_write(path, text)
+PY
+    then
+      rm -f "$tmp"
+      echo -e "${GREEN}✓${NC} palette written: ${DIM}.chezmoidata/generated/$id/windows_terminal.json${NC}"
+    else
+      rm -f "$tmp"
+      echo -e "${RED}error:${NC} palette generation from '$img' failed." >&2
+      exit 1
+    fi
+  fi
+
+  # Registry entry: append once, never duplicate (same image = same id).
+  local accent
+  accent="$(python3 -c 'import json,sys; print(json.load(open(sys.argv[1]))["blue"])' "$gen_dir/windows_terminal.json")"
+  # Registry append is idempotent; exit 3 means the entry already existed.
+  local reg_rc=0
+  python3 - "$src/.chezmoidata/themes.yaml" "$id" "$base" "$img" "$hash" "$accent" <<'PY' || reg_rc=$?
+import datetime
+import json
+import os
+import re
+import sys
+import tempfile
+
+path, ident, label, img, sha, accent = sys.argv[1:]
+text = open(path, encoding="utf-8").read()
+if re.search(rf"(?m)^  {re.escape(ident)}:\s*$", text):
+    sys.exit(3)  # already registered
+now = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def q(s):
+    # JSON string escaping is a subset of YAML double-quoted scalars, so
+    # json.dumps is a safe way to embed arbitrary values in themes.yaml.
+    return json.dumps(s)
+
+
+block = (
+    f"  {ident}:\n"
+    f"    label: {q('Generated from ' + label)}\n"
+    f"    appearance: dark\n"
+    f"    format: matugen\n"
+    f"    kind: generated\n"
+    f"    source:\n"
+    f"      path: {q(img)}\n"
+    f"      sha256: {q(sha)}\n"
+    f"      generatedAt: {q(now)}\n"
+    f"    windows:\n"
+    f"      accent: {q(accent)}\n"
+    f"      colorPrevalence: true\n"
+)
+if not text.endswith("\n"):
+    text += "\n"
+# Atomic append: temp file in the same directory, then rename, so an
+# interrupted run can never leave a half-written themes.yaml.
+fd, tmp = tempfile.mkstemp(dir=os.path.dirname(path) or ".", prefix=".themes-", suffix=".tmp")
+try:
+    with os.fdopen(fd, "w", encoding="utf-8") as fh:
+        fh.write(text + block)
+    os.replace(tmp, path)
+except BaseException:
+    try:
+        os.unlink(tmp)
+    except OSError:
+        pass
+    raise
+PY
+  # Registry append is idempotent; report accordingly. Exit 3 = already
+  # registered (fine); any other failure is a real error — fail loudly
+  # instead of masking it as "already present".
+  if [[ $reg_rc -eq 0 ]]; then
+    echo -e "${GREEN}✓${NC} registry entry added: ${DIM}$id in .chezmoidata/themes.yaml${NC}"
+  elif [[ $reg_rc -eq 3 ]]; then
+    echo -e "${GREEN}✓${NC} registry entry ${DIM}$id${NC} already present in .chezmoidata/themes.yaml"
+  else
+    echo -e "${RED}error:${NC} themes.yaml registry append failed (exit $reg_rc)." >&2
+    return "$reg_rc"
+  fi
+
+  # Select it for this machine and re-theme (cmd_theme_set edits
+  # machines.<machine>.theme.name and runs dots sync).
+  local -a set_args=("$id")
+  [[ $no_sync -eq 1 ]] && set_args+=(--no-sync)
+  cmd_theme_set "${set_args[@]}"
+}
+
+cmd_wallpaper_list() {
+  local src
+  src="$(get_source_dir)"
+  # Line-based parsing (no PyYAML: bare macOS python3 has no yaml module).
+  python3 - "$src/.chezmoidata/machines.yaml" "$src/.chezmoidata/themes.yaml" <<'PY'
+import sys
+
+
+def scalar(text):
+    text = text.strip()
+    if text.startswith('"'):
+        return text[1:].split('"', 1)[0]
+    return text.split(" #", 1)[0].strip()
+
+
+def machine_theme_names(path):
+    """machines.<machine>.theme.name via indentation-walk (mirrors cmd_theme_set)."""
+    names = {}
+    in_machines = cur = in_theme = False
+    for raw in open(path, encoding="utf-8"):
+        line = raw.rstrip("\n")
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        indent = len(line) - len(line.lstrip(" "))
+        key = line.strip()
+        if indent == 0:
+            in_machines, cur, in_theme = key == "machines:", None, False
+            continue
+        if not in_machines:
+            continue
+        if indent == 2:
+            cur, in_theme = key.rstrip(":"), False
+        elif cur and indent == 4:
+            if key == "theme:":
+                in_theme = True
+            else:
+                in_theme = False
+        elif cur and in_theme and indent == 6 and key.startswith("name:"):
+            names[cur] = scalar(key.split(":", 1)[1])
+    return names
+
+
+def generated_themes(path):
+    """themes entries with kind: generated -> {name: {label, path, sha256}}."""
+    out = {}
+    in_themes = cur = in_source = False
+    for raw in open(path, encoding="utf-8"):
+        line = raw.rstrip("\n")
+        if not line.strip() or line.lstrip().startswith("#"):
+            continue
+        indent = len(line) - len(line.lstrip(" "))
+        key = line.strip()
+        if indent == 0:
+            in_themes, cur, in_source = key == "themes:", None, False
+            continue
+        if not in_themes:
+            continue
+        if indent == 2:
+            cur, in_source = key.rstrip(":"), False
+            out.setdefault(cur, {})
+        elif cur and indent == 4:
+            if key == "source:":
+                in_source = True
+            else:
+                in_source = False
+                if key.startswith("label:"):
+                    out[cur]["label"] = scalar(key.split(":", 1)[1])
+                elif key.startswith("kind:"):
+                    out[cur]["kind"] = scalar(key.split(":", 1)[1])
+        elif cur and in_source and indent == 6:
+            if key.startswith("path:"):
+                out[cur]["path"] = scalar(key.split(":", 1)[1])
+            elif key.startswith("sha256:"):
+                out[cur]["sha256"] = scalar(key.split(":", 1)[1])
+    return {name: v for name, v in out.items() if v.get("kind") == "generated"}
+
+
+machines = machine_theme_names(sys.argv[1])
+themes = generated_themes(sys.argv[2])
+
+print("Per-machine theme:")
+for name in ("augustus", "hadrian", "vespasian"):
+    theme = machines.get(name)
+    line = f"  {name}: {theme or '(no theme.name)'}"
+    if theme in themes:
+        line += f"   <- {themes[theme].get('path', '?')}"
+    print(line)
+for name, theme in machines.items():
+    if name not in ("augustus", "hadrian", "vespasian"):
+        line = f"  {name}: {theme or '(no theme.name)'}"
+        if theme in themes:
+            line += f"   <- {themes[theme].get('path', '?')}"
+        print(line)
+
+print("\nGenerated themes:")
+if not themes:
+    print("  (none yet — create one with: dots wallpaper set <image>)")
+for name, entry in themes.items():
+    print(f"  {name}  {entry.get('label', '')}")
+    print(f"    image: {entry.get('path', '?')} (sha256 {str(entry.get('sha256', '?'))[:12]}…)")
+PY
 }
 
 cmd_sync() {
@@ -1018,6 +1511,7 @@ main() {
     push|pp)        cmd_push "$@" ;;
     doctor)         cmd_doctor "$@" ;;
     theme)          cmd_theme "$@" ;;
+    wallpaper)      cmd_wallpaper "$@" ;;
     age|key)        cmd_age "$@" ;;
     setup)          cmd_setup "$@" ;;
     help|-h|--help) usage ;;

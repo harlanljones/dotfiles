@@ -30,6 +30,9 @@ brew "bat"
 brew "ripgrep"
 brew "jq"
 
+# Wallpaper palette extraction for `dots wallpaper set`
+brew "matugen"
+
 # Repo tooling. CI lints every managed script with `shellcheck -S warning`
 # (.github/workflows/ci.yml), so having it locally is what lets you reproduce
 # that gate before pushing rather than after.

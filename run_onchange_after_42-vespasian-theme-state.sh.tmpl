@@ -2,12 +2,20 @@
 # Vespasian (WSL) setup; non-vespasian machines: no-op.
 {{- if and (hasKey . "machine") (eq .machine "vespasian") -}}
 {{- $name := (index .machines .machine).theme.name -}}
+{{- $gen := false -}}
+{{- if hasKey .themes $name -}}{{- $tk := index .themes $name -}}{{- if and (hasKey $tk "kind") (eq (index $tk "kind") "generated") -}}{{- $gen = true -}}{{- end -}}{{- end -}}
 {{- $claudeTheme := ternary "light-ansi" "dark-ansi" (eq (index .themes $name).appearance "light") -}}
 # Theme state that lives outside managed files on Vespasian.
 #
 # - bat (and delta, which reuses bat's cache) only sees themes after
 #   `bat cache --build`. Re-runs whenever `dots theme set` changes the theme:
-#   {{ $name }} tmTheme sha256 {{ include (printf ".chezmoitemplates/themes/%s/bat.tmTheme" $name) | sha256sum }}
+#   {{ $name }} theme sha256 {{ if $gen -}}
+{{ include (printf ".chezmoitemplates/themes/%s/windows_terminal.json" $name) | sha256sum }}
+{{- else -}}
+{{ include (printf ".chezmoitemplates/themes/%s/bat.tmTheme" $name) | sha256sum }}
+{{- end -}}
+#   (generated themes carry no curated bat.tmTheme, so their palette JSON is
+#   the cache key instead)
 # - Claude Code keeps its theme in ~/.claude.json, which is runtime state and
 #   not a managed file. The "-ansi" themes draw with the terminal's 16 colors,
 #   so they follow the Windows Terminal scheme; light vs dark follows the

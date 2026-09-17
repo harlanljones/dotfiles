@@ -1,4 +1,113 @@
 {{- $name := includeTemplate ".chezmoitemplates/machine-theme-name.tmpl" . -}}
 # eza colors for the {{ (index .themes $name).label }} theme, selected with `dots theme`.
-# Source: .chezmoitemplates/themes/{{ $name }}/eza.yml
+{{- $gen := false -}}
+{{- if hasKey .themes $name -}}{{- $tk := index .themes $name -}}{{- if and (hasKey $tk "kind") (eq (index $tk "kind") "generated") -}}{{- $gen = true -}}{{- end -}}{{- end -}}
+{{- if $gen }}
+{{- $p := includeTemplate ".chezmoitemplates/gen-palette.tmpl" $name | fromJson }}
+# Derived from the generated windows_terminal.json palette (kind: generated
+# themes carry no curated eza.yml).
+colourful: true
+
+filekinds:
+  normal: { foreground: "{{ $p.foreground }}" }
+  directory: { foreground: "{{ $p.blue }}" }
+  symlink: { foreground: "{{ $p.cyan }}" }
+  pipe: { foreground: "{{ $p.brightBlack }}" }
+  block_device: { foreground: "{{ $p.yellow }}" }
+  char_device: { foreground: "{{ $p.yellow }}" }
+  socket: { foreground: "{{ $p.brightBlack }}" }
+  special: { foreground: "{{ $p.purple }}" }
+  executable: { foreground: "{{ $p.green }}" }
+  mount_point: { foreground: "{{ $p.brightCyan }}" }
+
+perms:
+  user_read: { foreground: "{{ $p.cyan }}" }
+  user_write: { foreground: "{{ $p.purple }}" }
+  user_execute_file: { foreground: "{{ $p.green }}" }
+  user_execute_other: { foreground: "{{ $p.green }}" }
+  group_read: { foreground: "{{ $p.cyan }}" }
+  group_write: { foreground: "{{ $p.yellow }}" }
+  group_execute: { foreground: "{{ $p.green }}" }
+  other_read: { foreground: "{{ $p.cyan }}" }
+  other_write: { foreground: "{{ $p.red }}" }
+  other_execute: { foreground: "{{ $p.green }}" }
+  special_user_file: { foreground: "{{ $p.red }}" }
+  special_other: { foreground: "{{ $p.red }}" }
+  attribute: { foreground: "{{ $p.brightBlack }}" }
+
+size:
+  major: { foreground: "{{ $p.cyan }}" }
+  minor: { foreground: "{{ $p.purple }}" }
+  number_byte: { foreground: "{{ $p.foreground }}" }
+  number_kilo: { foreground: "{{ $p.brightCyan }}" }
+  number_mega: { foreground: "{{ $p.cyan }}" }
+  number_giga: { foreground: "{{ $p.yellow }}" }
+  number_huge: { foreground: "{{ $p.red }}" }
+  unit_byte: { foreground: "{{ $p.foreground }}" }
+  unit_kilo: { foreground: "{{ $p.brightCyan }}" }
+  unit_mega: { foreground: "{{ $p.cyan }}" }
+  unit_giga: { foreground: "{{ $p.yellow }}" }
+  unit_huge: { foreground: "{{ $p.red }}" }
+
+users:
+  user_you: { foreground: "{{ $p.blue }}" }
+  user_root: { foreground: "{{ $p.purple }}" }
+  user_other: { foreground: "{{ $p.cyan }}" }
+  group_yours: { foreground: "{{ $p.brightCyan }}" }
+  group_root: { foreground: "{{ $p.purple }}" }
+  group_other: { foreground: "{{ $p.foreground }}" }
+
+links:
+  normal: { foreground: "{{ $p.brightCyan }}" }
+  multi_link_file: { foreground: "{{ $p.cyan }}" }
+
+git:
+  new: { foreground: "{{ $p.green }}" }
+  modified: { foreground: "{{ $p.purple }}" }
+  deleted: { foreground: "{{ $p.red }}" }
+  renamed: { foreground: "{{ $p.cyan }}" }
+  typechange: { foreground: "{{ $p.cyan }}" }
+  ignored: { foreground: "{{ $p.brightBlack }}" }
+  conflicted: { foreground: "{{ $p.yellow }}" }
+
+git_repo:
+  branch_main: { foreground: "{{ $p.brightBlack }}" }
+  branch_other: { foreground: "{{ $p.brightCyan }}" }
+  git_clean: { foreground: "{{ $p.selectionBackground }}" }
+  git_dirty: { foreground: "{{ $p.purple }}" }
+
+security_context:
+  colon: { foreground: "{{ $p.brightBlack }}" }
+  user: { foreground: "{{ $p.brightBlack }}" }
+  role: { foreground: "{{ $p.cyan }}" }
+  typ: { foreground: "{{ $p.blue }}" }
+  range: { foreground: "{{ $p.purple }}" }
+
+file_type:
+  image: { foreground: "{{ $p.brightCyan }}" }
+  video: { foreground: "{{ $p.brightCyan }}" }
+  music: { foreground: "{{ $p.cyan }}" }
+  lossless: { foreground: "{{ $p.cyan }}" }
+  crypto: { foreground: "{{ $p.red }}" }
+  document: { foreground: "{{ $p.foreground }}" }
+  compressed: { foreground: "{{ $p.yellow }}" }
+  temp: { foreground: "{{ $p.brightBlack }}" }
+  compiled: { foreground: "{{ $p.brightBlack }}" }
+  build: { foreground: "{{ $p.green }}" }
+  source: { foreground: "{{ $p.purple }}" }
+
+punctuation: { foreground: "{{ $p.selectionBackground }}" }
+date: { foreground: "{{ $p.yellow }}" }
+inode: { foreground: "{{ $p.brightBlack }}" }
+blocks: { foreground: "{{ $p.brightBlack }}" }
+header: { foreground: "{{ $p.foreground }}" }
+octal: { foreground: "{{ $p.yellow }}" }
+flags: { foreground: "{{ $p.purple }}" }
+
+symlink_path: { foreground: "{{ $p.brightCyan }}" }
+control_char: { foreground: "{{ $p.yellow }}" }
+broken_symlink: { foreground: "{{ $p.red }}" }
+broken_path_overlay: { foreground: "{{ $p.red }}" }
+{{- else }}
 {{ include (printf ".chezmoitemplates/themes/%s/eza.yml" $name) }}
+{{- end }}

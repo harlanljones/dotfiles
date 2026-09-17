@@ -5,4 +5,25 @@
 # theme cache, not bat's config file.
 [delta]
   syntax-theme = dots
+{{- $gen := false -}}
+{{- if hasKey .themes $name -}}{{- $tk := index .themes $name -}}{{- if and (hasKey $tk "kind") (eq (index $tk "kind") "generated") -}}{{- $gen = true -}}{{- end -}}{{- end -}}
+{{- if $gen }}
+{{- $p := includeTemplate ".chezmoitemplates/gen-palette.tmpl" $name | fromJson }}
+# Derived from the generated windows_terminal.json palette (kind: generated
+# themes carry no curated delta.gitconfig). Diff bodies use a tinted
+# background derived from the accent hues so they stay readable; emphasis
+# rows use the plain red/green accents.
+  minus-style                   = syntax "{{ $p.red }}22"
+  minus-non-emph-style          = syntax "{{ $p.red }}22"
+  minus-emph-style              = syntax "{{ $p.red }}"
+  minus-empty-line-marker-style = syntax "{{ $p.red }}"
+  line-numbers-minus-style      = "{{ $p.red }}"
+  plus-style                    = syntax "{{ $p.green }}22"
+  plus-non-emph-style           = syntax "{{ $p.green }}22"
+  plus-emph-style               = syntax "{{ $p.green }}"
+  plus-empty-line-marker-style  = syntax "{{ $p.green }}"
+  line-numbers-plus-style       = "{{ $p.green }}"
+  line-numbers-zero-style       = "{{ $p.brightBlack }}"
+{{- else }}
 {{ include (printf ".chezmoitemplates/themes/%s/delta.gitconfig" $name) }}
+{{- end }}

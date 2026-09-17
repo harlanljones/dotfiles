@@ -61,4 +61,11 @@ mouse-scroll-multiplier = 0.95
 # Fix general slowness on hyprland (https://github.com/ghostty-org/ghostty/discussions/3224).
 # epoll is Linux-only; macOS has no such backend.
 async-backend = epoll
+
+# herdr-radar maps its icon-font codepoints (vendor logos + state marks) so the
+# primary font stays JetBrainsMono; the font block below is managed upstream.
+# >>> herdr-radar font block
+font-codepoint-map = U+E1A0-U+E1B6="Herdr Agent Icons Max"
+font-codepoint-map = U+E1C0-U+E1C5="Herdr Agent Icons Max"
+# <<< herdr-radar font block
 {{- end }}

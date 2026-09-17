@@ -9,25 +9,25 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**843 tracked entries** across 16 categories.
+**851 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
 | [Shell](#shell) | 20 |
 | [Prompt](#prompt) | 1 |
-| [Terminal & multiplexer](#terminal--multiplexer) | 5 |
-| [Editors](#editors) | 18 |
+| [Terminal & multiplexer](#terminal--multiplexer) | 7 |
+| [Editors](#editors) | 19 |
 | [Desktop & window manager](#desktop--window-manager) | 11 |
 | [Version control](#version-control) | 6 |
 | [Navigation & search](#navigation--search) | 3 |
 | [Toolchain & packages](#toolchain--packages) | 5 |
-| [AI agent harnesses](#ai-agent-harnesses) | 497 |
+| [AI agent harnesses](#ai-agent-harnesses) | 499 |
 | [Background services](#background-services) | 17 |
-| [Custom executables](#custom-executables) | 37 |
+| [Custom executables](#custom-executables) | 38 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Other configuration](#other-configuration) | 156 |
+| [Other configuration](#other-configuration) | 157 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 24 |
-| [Chezmoi control files](#chezmoi-control-files) | 11 |
+| [Chezmoi control files](#chezmoi-control-files) | 12 |
 | [Repository material (not applied)](#repository-material-not-applied) | 30 |
 
 ---
@@ -72,6 +72,8 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/ghostty/config` | `dot_config/ghostty/config.tmpl` | ghostty | template |
 | `~/.config/herdr/config.toml` | `dot_config/herdr/config.toml.tmpl` | herdr multiplexer | template |
 | `~/.config/herdr/plugins.json` | `dot_config/herdr/plugins.json.tmpl` | herdr multiplexer | template |
+| `~/.config/herdr/plugins/config/hhdebb.herdr-radar/config.toml` | `dot_config/herdr/plugins/config/hhdebb.herdr-radar/config.toml` | herdr multiplexer | — |
+| `~/.config/herdr/plugins/config/hhdebb.herdr-radar/hook.js` | `dot_config/herdr/plugins/config/hhdebb.herdr-radar/hook.js` | herdr multiplexer | — |
 
 ## Editors
 
@@ -91,6 +93,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/nvim/lua/plugins/html-preview.lua` | `dot_config/nvim/lua/plugins/empty_html-preview.lua` | neovim / LazyVim | empty |
 | `~/.config/nvim/lua/plugins/example.lua` | `dot_config/nvim/lua/plugins/example.lua` | neovim / LazyVim | — |
 | `~/.config/nvim/lua/plugins/faster-smear-cursor.lua` | `dot_config/nvim/lua/plugins/faster-smear-cursor.lua` | neovim / LazyVim | — |
+| `~/.config/nvim/lua/plugins/herdr-nvim.lua` | `dot_config/nvim/lua/plugins/herdr-nvim.lua` | neovim / LazyVim | — |
 | `~/.config/nvim/lua/plugins/mini-animate-disable-cursor.lua` | `dot_config/nvim/lua/plugins/mini-animate-disable-cursor.lua` | neovim / LazyVim | — |
 | `~/.config/nvim/lua/plugins/theme.lua` | `dot_config/nvim/lua/plugins/theme.lua.tmpl` | neovim / LazyVim | template |
 | `~/.config/nvim/lua/plugins/vim-be-good.lua` | `dot_config/nvim/lua/plugins/vim-be-good.lua` | neovim / LazyVim | — |
@@ -426,6 +429,8 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.hermes/skills/creative/popular-web-designs/templates/zapier.md` | `dot_hermes/skills/creative/popular-web-designs/templates/zapier.md` | hermes | — |
 | `~/.hermes/skills/creative/songwriting-and-ai-music/SKILL.md` | `dot_hermes/skills/creative/songwriting-and-ai-music/SKILL.md` | hermes | — |
 | `~/.hermes/skills/devops/chezmoi-dotfiles/SKILL.md` | `dot_hermes/skills/devops/chezmoi-dotfiles/SKILL.md` | hermes | — |
+| `~/.hermes/skills/devops/company-brain-demo/SKILL.md` | `dot_hermes/skills/devops/company-brain-demo/SKILL.md` | hermes | — |
+| `~/.hermes/skills/devops/company-brain-demo/references/model-choice.md` | `dot_hermes/skills/devops/company-brain-demo/references/model-choice.md` | hermes | — |
 | `~/.hermes/skills/devops/hermes-repo-devsetup/SKILL.md` | `dot_hermes/skills/devops/hermes-repo-devsetup/SKILL.md` | hermes | — |
 | `~/.hermes/skills/devops/sdlc-review/SKILL.md` | `dot_hermes/skills/devops/sdlc-review/SKILL.md` | hermes | — |
 | `~/.hermes/skills/email/DESCRIPTION.md` | `dot_hermes/skills/email/DESCRIPTION.md` | hermes | — |
@@ -670,6 +675,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | Target | Source | Subsystem | Attributes |
 | --- | --- | --- | --- |
 | `~/.local/bin/cline-safety/git` | `dot_local/bin/cline-safety/executable_git` | cline git interceptor | executable |
+| `~/.local/bin/agent-console-home` | `dot_local/bin/executable_agent-console-home` | custom executables | executable |
 | `~/.local/bin/backdrop-split` | `dot_local/bin/executable_backdrop-split` | custom executables | executable |
 | `~/.local/bin/chrome-profile` | `dot_local/bin/executable_chrome-profile` | custom executables | executable |
 | `~/.local/bin/cursor` | `dot_local/bin/executable_cursor` | custom executables | executable |
@@ -730,8 +736,10 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.chezmoitemplates/aether-adapters/zebar.css` | `.chezmoitemplates/aether-adapters/zebar.css.tmpl` | — | template |
 | `~/.chezmoitemplates/codex-config.toml` | `.chezmoitemplates/codex-config.toml` | — | — |
 | `~/.chezmoitemplates/gemini-settings.json` | `.chezmoitemplates/gemini-settings.json` | — | — |
+| `~/.chezmoitemplates/gen-palette` | `.chezmoitemplates/gen-palette.tmpl` | — | template |
 | `~/.chezmoitemplates/littlebigmouse/Current.xml` | `.chezmoitemplates/littlebigmouse/Current.xml` | — | — |
 | `~/.chezmoitemplates/machine-theme-name` | `.chezmoitemplates/machine-theme-name.tmpl` | — | template |
+| `~/.chezmoitemplates/themes/gen-6bd5de2cd3e4/windows_terminal.json` | `.chezmoitemplates/themes/gen-6bd5de2cd3e4/windows_terminal.json` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/bat.tmTheme` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/bat.tmTheme` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/colors.toml` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/colors.toml` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/delta.gitconfig` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/delta.gitconfig` | — | — |
@@ -859,11 +867,10 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/delta/theme.gitconfig` | `dot_config/delta/theme.gitconfig.tmpl` | — | template |
 | `~/.config/eza/theme.yml` | `dot_config/eza/theme.yml.tmpl` | — | template |
 | `~/.config/fzf/theme.sh` | `dot_config/fzf/theme.sh.tmpl` | — | template |
-| `~/.config/hyprshell/config.ron` | `dot_config/hyprshell/config.ron` | — | — |
-| `~/.config/hyprshell/styles.css` | `dot_config/hyprshell/styles.css` | — | — |
 | `~/.local/share/figlet/README.md` | `dot_local/share/figlet/README.md` | — | — |
 | `~/.local/share/figlet/Roman.flf` | `dot_local/share/figlet/Roman.flf` | — | — |
 | `~/.local/share/omarchy-patches/esemczak.theme-modes-profiles.patch` | `dot_local/share/omarchy-patches/esemczak.theme-modes-profiles.patch` | — | — |
+| `~/.local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch` | `dot_local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch` | — | — |
 | `~/.local/share/wsl-ssh-bridge/main.go` | `dot_local/share/wsl-ssh-bridge/main.go` | — | — |
 | `~/install.sh` | `install.sh` | — | — |
 | `~/theme-assets/omarchy-catppuccin-latte/wallpaper.png` | `theme-assets/omarchy-catppuccin-latte/wallpaper.png` | — | — |
@@ -913,6 +920,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `.chezmoidata/claude_mcp.yaml` | Controls how chezmoi renders and applies this tree |
 | `.chezmoidata/claude_settings.yaml` | Controls how chezmoi renders and applies this tree |
 | `.chezmoidata/codex_projects.yaml` | Controls how chezmoi renders and applies this tree |
+| `.chezmoidata/generated/gen-6bd5de2cd3e4/windows_terminal.json` | Controls how chezmoi renders and applies this tree |
 | `.chezmoidata/hermes_skills.yaml` | Controls how chezmoi renders and applies this tree |
 | `.chezmoidata/machines.yaml` | Controls how chezmoi renders and applies this tree |
 | `.chezmoidata/omarchy_agents.yaml` | Controls how chezmoi renders and applies this tree |

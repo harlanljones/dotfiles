@@ -14,7 +14,42 @@ customCommands:
 {{ if eq .machine "vespasian" -}}
 {{- $name := includeTemplate ".chezmoitemplates/machine-theme-name.tmpl" . -}}
 # Theme selected with `dots theme`: .chezmoitemplates/themes/{{ $name }}/lazygit.yml
+{{- $gen := false -}}
+{{- if hasKey .themes $name -}}{{- $tk := index .themes $name -}}{{- if and (hasKey $tk "kind") (eq (index $tk "kind") "generated") -}}{{- $gen = true -}}{{- end -}}{{- end -}}
+{{- if $gen }}
+{{- $p := includeTemplate ".chezmoitemplates/gen-palette.tmpl" $name | fromJson }}
+# Derived from the generated windows_terminal.json palette (kind: generated
+# themes carry no curated lazygit.yml).
+gui:
+  nerdFontsVersion: "3"
+  theme:
+    activeBorderColor:
+      - "{{ $p.foreground }}"
+      - "bold"
+    inactiveBorderColor:
+      - "{{ $p.brightBlack }}"
+    searchingActiveBorderColor:
+      - "{{ $p.foreground }}"
+      - "bold"
+    optionsTextColor:
+      - "{{ $p.blue }}"
+    selectedLineBgColor:
+      - "{{ $p.selectionBackground }}"
+    cherryPickedCommitFgColor:
+      - "{{ $p.blue }}"
+    cherryPickedCommitBgColor:
+      - "{{ $p.purple }}"
+    markedBaseCommitFgColor:
+      - "{{ $p.blue }}"
+    markedBaseCommitBgColor:
+      - "{{ $p.yellow }}"
+    unstagedChangesColor:
+      - "{{ $p.red }}"
+    defaultFgColor:
+      - "{{ $p.foreground }}"
+{{- else }}
 {{ include (printf ".chezmoitemplates/themes/%s/lazygit.yml" $name) | trim }}
+{{- end }}
 {{ end -}}
 {{ if lookPath "delta" -}}
 git:

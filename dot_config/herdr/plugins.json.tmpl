@@ -1,6 +1,223 @@
 [
 {{- if eq .machine "augustus" }}
   {
+    "plugin_id": "agent-progress",
+    "name": "Agent Progress",
+    "version": "0.1.0",
+    "min_herdr_version": "0.9.0",
+    "description": "Shows an agent's estimated task completion and current activity in the native sidebar.",
+    "manifest_path": "{{ .chezmoi.homeDir }}/.config/herdr/plugins/github/agent-progress-c4a36df50adc/herdr-plugin.toml",
+    "plugin_root": "{{ .chezmoi.homeDir }}/.config/herdr/plugins/github/agent-progress-c4a36df50adc",
+    "enabled": true,
+    "platforms": [
+      "macos"
+    ],
+    "build": [
+      {
+        "command": [
+          "cargo",
+          "build",
+          "--release",
+          "--locked"
+        ]
+      }
+    ],
+    "startup": [
+      {
+        "command": [
+          "target/release/herdr-progress",
+          "startup"
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "activate",
+        "title": "Print bound progress instructions for selected agent",
+        "contexts": [
+          "workspace"
+        ],
+        "command": [
+          "target/release/herdr-progress",
+          "activate"
+        ]
+      },
+      {
+        "id": "configure",
+        "title": "Configure agent progress",
+        "contexts": [
+          "workspace"
+        ],
+        "command": [
+          "target/release/herdr-progress",
+          "configure"
+        ]
+      },
+      {
+        "id": "doctor",
+        "title": "Check agent progress setup",
+        "contexts": [
+          "workspace"
+        ],
+        "command": [
+          "target/release/herdr-progress",
+          "doctor"
+        ]
+      },
+      {
+        "id": "start",
+        "title": "Start progress publisher",
+        "contexts": [
+          "workspace"
+        ],
+        "command": [
+          "target/release/herdr-progress",
+          "start"
+        ]
+      },
+      {
+        "id": "stop",
+        "title": "Stop progress publisher before upgrade",
+        "contexts": [
+          "workspace"
+        ],
+        "command": [
+          "target/release/herdr-progress",
+          "stop"
+        ]
+      },
+      {
+        "id": "unconfigure",
+        "title": "Remove agent progress configuration",
+        "contexts": [
+          "workspace"
+        ],
+        "command": [
+          "target/release/herdr-progress",
+          "unconfigure"
+        ]
+      }
+    ],
+    "source": {
+      "kind": "local"
+    }
+  },
+  {
+    "plugin_id": "chmarax.herdr-nvim",
+    "name": "herdr-nvim",
+    "version": "1.0.1",
+    "min_herdr_version": "0.7.4",
+    "description": "Full-height nvim sidebar with agent annotations: toggle with one key, comment code, send to any agent.",
+    "manifest_path": "{{ .chezmoi.homeDir }}/.config/herdr/plugins/github/chmarax.herdr-nvim-178624809c23/herdr-plugin.toml",
+    "plugin_root": "{{ .chezmoi.homeDir }}/.config/herdr/plugins/github/chmarax.herdr-nvim-178624809c23",
+    "enabled": true,
+    "platforms": [
+      "macos",
+      "linux",
+      "windows"
+    ],
+    "build": [
+      {
+        "platforms": [
+          "macos",
+          "linux"
+        ],
+        "command": [
+          "bash",
+          "herdr/install.sh"
+        ]
+      },
+      {
+        "platforms": [
+          "windows"
+        ],
+        "command": [
+          "powershell.exe",
+          "-NoProfile",
+          "-ExecutionPolicy",
+          "Bypass",
+          "-File",
+          "herdr/install.ps1"
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "open-link",
+        "title": "nvim sidebar: open clicked file",
+        "command": [
+          "bin/herdr-nvim",
+          "open-link"
+        ]
+      },
+      {
+        "id": "pick-file",
+        "title": "nvim sidebar: open file from agent output",
+        "contexts": [
+          "pane"
+        ],
+        "command": [
+          "bin/herdr-nvim",
+          "pick-file"
+        ]
+      },
+      {
+        "id": "toggle",
+        "title": "nvim sidebar: toggle",
+        "contexts": [
+          "pane",
+          "workspace"
+        ],
+        "command": [
+          "bin/herdr-nvim",
+          "toggle"
+        ]
+      }
+    ],
+    "panes": [
+      {
+        "id": "picker",
+        "title": "open file",
+        "placement": "popup",
+        "command": [
+          "bin/herdr-nvim",
+          "picker"
+        ]
+      },
+      {
+        "id": "sidebar",
+        "title": "nvim sidebar",
+        "placement": "split",
+        "command": [
+          "bin/herdr-nvim",
+          "sidebar"
+        ]
+      }
+    ],
+    "link_handlers": [
+      {
+        "id": "file-path",
+        "title": "Open in nvim sidebar",
+        "pattern": "^~?[\\w.@/()\\[\\]\\\\:+-]+[\\\\/][\\w.@()\\[\\]\\\\:+-]+\\.[A-Za-z]\\w*(?::\\d+){0,2}$",
+        "action": "open-link"
+      },
+      {
+        "id": "file-url",
+        "title": "Open in nvim sidebar",
+        "pattern": "^file://",
+        "action": "open-link"
+      }
+    ],
+    "source": {
+      "kind": "github",
+      "owner": "ChmaraX",
+      "repo": "herdr-nvim",
+      "resolved_commit": "0450dc7b4c40c986052541c00dba5cdcd1be7ac6",
+      "managed_path": "{{ .chezmoi.homeDir }}/.config/herdr/plugins/github/chmarax.herdr-nvim-178624809c23",
+      "installed_unix_ms": 1789599022275
+    }
+  },
+  {
     "plugin_id": "harlan.corral",
     "name": "Corral",
     "version": "0.1.0",
@@ -110,6 +327,259 @@
     ],
     "source": {
       "kind": "local"
+    }
+  },
+  {
+    "plugin_id": "herdr.auto-title",
+    "name": "Auto Title",
+    "version": "0.6.2",
+    "min_herdr_version": "0.8.2",
+    "description": "Automatically generates contextual tab titles",
+    "manifest_path": "{{ .chezmoi.homeDir }}/.config/herdr/plugins/github/herdr.auto-title-4b7d61f48ce8/herdr-plugin.toml",
+    "plugin_root": "{{ .chezmoi.homeDir }}/.config/herdr/plugins/github/herdr.auto-title-4b7d61f48ce8",
+    "enabled": true,
+    "platforms": [
+      "linux",
+      "macos",
+      "windows"
+    ],
+    "build": [
+      {
+        "platforms": [
+          "linux",
+          "macos"
+        ],
+        "command": [
+          "go",
+          "build",
+          "-o",
+          "herdr-auto-title",
+          "./cmd/herdr-auto-title"
+        ]
+      },
+      {
+        "platforms": [
+          "windows"
+        ],
+        "command": [
+          "go",
+          "build",
+          "-o",
+          "herdr-auto-title.exe",
+          "./cmd/herdr-auto-title"
+        ]
+      }
+    ],
+    "startup": [
+      {
+        "platforms": [
+          "linux",
+          "macos"
+        ],
+        "command": [
+          "./herdr-auto-title"
+        ]
+      },
+      {
+        "platforms": [
+          "windows"
+        ],
+        "command": [
+          "./herdr-auto-title.exe"
+        ]
+      }
+    ],
+    "source": {
+      "kind": "github",
+      "owner": "kryptamine",
+      "repo": "herdr-auto-title",
+      "resolved_commit": "e2f6fd1d5a613e0debb90da208bf777e9385823b",
+      "managed_path": "{{ .chezmoi.homeDir }}/.config/herdr/plugins/github/herdr.auto-title-4b7d61f48ce8",
+      "installed_unix_ms": 1789615150782
+    }
+  },
+  {
+    "plugin_id": "hhdebb.herdr-radar",
+    "name": "Herdr Radar",
+    "version": "1.3.4",
+    "min_herdr_version": "0.9.0",
+    "description": "Readable Herdr sidebar: which agent is working, waiting on you, or abandoned — with groups, worktree trees and activity order.",
+    "manifest_path": "{{ .chezmoi.homeDir }}/.config/herdr/plugins/github/hhdebb.herdr-radar-afabda667cbe/herdr-plugin.toml",
+    "plugin_root": "{{ .chezmoi.homeDir }}/.config/herdr/plugins/github/hhdebb.herdr-radar-afabda667cbe",
+    "enabled": true,
+    "platforms": [
+      "linux",
+      "macos",
+      "windows"
+    ],
+    "build": [
+      {
+        "command": [
+          "node",
+          "bin/setup.js"
+        ]
+      }
+    ],
+    "startup": [
+      {
+        "command": [
+          "node",
+          "bin/agent-icons.js"
+        ]
+      },
+      {
+        "command": [
+          "node",
+          "bin/agent-state.js"
+        ]
+      },
+      {
+        "command": [
+          "node",
+          "bin/agent-view.js",
+          "--reapply"
+        ]
+      }
+    ],
+    "actions": [
+      {
+        "id": "configure",
+        "title": "Configure: install the sidebar, tab-bar and theme blocks",
+        "description": "Write (or repair) the three managed blocks in Herdr's config.toml and reload.",
+        "command": [
+          "node",
+          "bin/configure.js",
+          "--apply",
+          "--reload"
+        ]
+      },
+      {
+        "id": "install-font",
+        "title": "Font: install for this user and map codepoints in the terminal",
+        "description": "Copy the icon font into your user font directory (no admin needed) and write the codepoint map into ghostty/kitty configs that exist; other terminals get instructions in the log.",
+        "command": [
+          "node",
+          "bin/install-font.js"
+        ]
+      },
+      {
+        "id": "refresh",
+        "title": "Agent icons: refresh",
+        "description": "Reapply icon variants to all current panes.",
+        "command": [
+          "node",
+          "bin/agent-icons.js"
+        ]
+      },
+      {
+        "id": "settings",
+        "title": "Settings",
+        "description": "Open the settings popup.",
+        "command": [
+          "node",
+          "bin/settings.js",
+          "--open"
+        ]
+      },
+      {
+        "id": "state-start",
+        "title": "Agent state: start animator",
+        "description": "Start the lifecycle-state glyph animator.",
+        "command": [
+          "node",
+          "bin/agent-state.js"
+        ]
+      },
+      {
+        "id": "state-stop",
+        "title": "Agent state: stop animator",
+        "description": "Stop the lifecycle-state glyph animator and clear its marks. Titles and sort keys stay so the list stays readable; unconfigure clears everything.",
+        "command": [
+          "node",
+          "bin/agent-state.js",
+          "--stop"
+        ]
+      },
+      {
+        "id": "unconfigure",
+        "title": "Configure: remove the managed blocks",
+        "description": "Stop the daemon, clear every token it wrote, remove the three managed blocks from Herdr's config.toml and reload. Do this before uninstalling.",
+        "command": [
+          "node",
+          "bin/configure.js",
+          "--uninstall",
+          "--reload"
+        ]
+      },
+      {
+        "id": "uninstall-font",
+        "title": "Font: remove",
+        "description": "Remove the installed icon font and the terminal codepoint map this plugin wrote.",
+        "command": [
+          "node",
+          "bin/install-font.js",
+          "--uninstall"
+        ]
+      },
+      {
+        "id": "view-flip",
+        "title": "Agents: active <-> recent",
+        "description": "Flip between grouped-by-activity and flat-by-activity without leaving the plugin's order.",
+        "command": [
+          "node",
+          "bin/agent-view.js",
+          "--flip"
+        ]
+      },
+      {
+        "id": "view-native",
+        "title": "Agents: Herdr's panel <-> ours",
+        "description": "Toggle the whole Agents panel — order and row colours — between Herdr's own and the plugin's.",
+        "command": [
+          "node",
+          "bin/agent-view.js",
+          "--native"
+        ]
+      },
+      {
+        "id": "view-toggle",
+        "title": "Agents: cycle order (active / recent / off)",
+        "description": "Cycle the Agents panel: grouped by activity, flat by activity, or the panel's own order.",
+        "command": [
+          "node",
+          "bin/agent-view.js"
+        ]
+      }
+    ],
+    "events": [
+      {
+        "on": "pane.agent_detected",
+        "command": [
+          "node",
+          "bin/agent-state.js"
+        ]
+      }
+    ],
+    "panes": [
+      {
+        "id": "settings",
+        "title": "herdr-radar settings",
+        "placement": "popup",
+        "width": 84,
+        "height": 26,
+        "command": [
+          "node",
+          "bin/settings.js"
+        ]
+      }
+    ],
+    "source": {
+      "kind": "github",
+      "owner": "hhdebb",
+      "repo": "herdr-radar",
+      "resolved_commit": "29160ada331305c5972f4b254bb4c3e6d33e6da5",
+      "managed_path": "{{ .chezmoi.homeDir }}/.config/herdr/plugins/github/hhdebb.herdr-radar-afabda667cbe",
+      "installed_unix_ms": 1789601898071
     }
   },
 {{- end }}

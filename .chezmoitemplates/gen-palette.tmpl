@@ -1,0 +1,17 @@
+{{- /* Shared palette resolver for `dots wallpaper` generated themes.
+
+       Consumed as:
+         $p := include ".chezmoitemplates/gen-palette.tmpl" $name | fromJson
+
+       Generated themes (kind: generated in .chezmoidata/themes.yaml) carry
+       ONLY windows_terminal.json — no curated per-tool ports (eza.yml,
+       fzf.sh, delta.gitconfig, lazygit.yml, bat.tmTheme) — so the themed
+       templates branch on that kind and derive their colors from this JSON
+       instead of including the missing files. Strips the leading `#`
+       comment lines curated snapshots carry (generated palettes have none,
+       but stripping is harmless). */ -}}
+{{- $buf := "" -}}
+{{- range $line := splitList "\n" (include (printf ".chezmoitemplates/themes/%s/windows_terminal.json" .)) -}}
+{{-   if not (hasPrefix "#" (trim $line)) }}{{ $buf = printf "%s%s" $buf $line }}{{ end -}}
+{{- end -}}
+{{- $buf -}}

@@ -1,0 +1,9 @@
+follow_appearance = false
+variant = "auto"
+show_tab = false
+group_gap = false
+render_hook = "hook.js"
+
+[colors]
+active_row_bg_light = ""
+active_row_bg_dark = ""

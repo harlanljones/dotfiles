@@ -6,6 +6,7 @@ machines:
     role: "The foundational architect"
     backstory: "You built this machine from the ground up to establish order over the bare metal, making it the supreme ruler of your local network."
     theme:
+      name: gen-6bd5de2cd3e4
       accent: "bold dimmed cyan"
     type: personal
     # Machine-identity banner data (phase 7.12). The wordmark is the

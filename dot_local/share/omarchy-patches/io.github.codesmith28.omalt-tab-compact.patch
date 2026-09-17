@@ -1,0 +1,365 @@
+diff --git a/js/Dimensions.js b/js/Dimensions.js
+index 6cc63b3..23a8fb1 100644
+--- a/js/Dimensions.js
++++ b/js/Dimensions.js
+@@ -7,16 +7,16 @@
+ // -----------------------------------------------------------------------------
+ 
+ var overlay = {
+-    screenMargin: 64,
+-    containerPadding: 50,
+-    containerPaddingVertical: 42,
+-    minAllowedWidth: 400,
+-    minAllowedHeight: 320,
+-    panelGap: 12,
+-    cardSpacing: 15,
+-    rowSpacing: 14,
+-    flickableExtraHeight: 10,
+-    cornerRadius: 14
++    screenMargin: 54,
++    containerPadding: 42,
++    containerPaddingVertical: 36,
++    minAllowedWidth: 340,
++    minAllowedHeight: 272,
++    panelGap: 10,
++    cardSpacing: 13,
++    rowSpacing: 12,
++    flickableExtraHeight: 8,
++    cornerRadius: 12
+ };
+ 
+ // -----------------------------------------------------------------------------
+@@ -25,45 +25,45 @@ var overlay = {
+ 
+ var card = {
+     // Responsive dynamic card width calculation tokens
+-    maxAvailBase: 380,
+-    minWidth: 210,
+-    maxWidthSingle: 330,
+-    maxWidthDouble: 310,
+-    maxWidthMulti: 285, // Sweet-spot default size matching 6 workspaces
++    maxAvailBase: 323,
++    minWidth: 178,
++    maxWidthSingle: 280,
++    maxWidthDouble: 264,
++    maxWidthMulti: 242, // Sweet-spot default size matching 6 workspaces
+ 
+     // Dimensions
+-    headerHeight: 28,
+-    headerSpacing: 9,
+-    margins: 9,
+-    spacing: 5,
+-    radius: 12,
++    headerHeight: 24,
++    headerSpacing: 8,
++    margins: 8,
++    spacing: 4,
++    radius: 10,
+ 
+     // Header letter badge
+-    letterBadgeSize: 26,
+-    letterBadgeRadius: 4,
+-    letterBadgeFontSize: 12,
++    letterBadgeSize: 22,
++    letterBadgeRadius: 3,
++    letterBadgeFontSize: 10,
+ 
+     // Header workspace label
+-    nameFontSize: 12,
+-    nameThresholdCompact: 240,
++    nameFontSize: 10,
++    nameThresholdCompact: 204,
+ 
+     // Header window count badge
+-    countBadgeHeight: 20,
+-    countBadgePadding: 13,
+-    countBadgeRadius: 4,
+-    countBadgeFontSize: 11,
+-    countBadgeThreshold: 220,
++    countBadgeHeight: 17,
++    countBadgePadding: 11,
++    countBadgeRadius: 3,
++    countBadgeFontSize: 9,
++    countBadgeThreshold: 187,
+ 
+     // Viewport
+-    viewportRadius: 7,
+-    viewportInset: 18, // cardWidth - viewportInset = viewportWidth
++    viewportRadius: 6,
++    viewportInset: 15, // cardWidth - viewportInset = viewportWidth
+     canvasMargin: 2,
+ 
+     // Empty state
+-    emptyIconSize: 24,
+-    emptyTitleSize: 13,
+-    emptyHintSize: 11,
+-    emptySpacing: 4
++    emptyIconSize: 20,
++    emptyTitleSize: 11,
++    emptyHintSize: 9,
++    emptySpacing: 3
+ };
+ 
+ // -----------------------------------------------------------------------------
+@@ -71,56 +71,56 @@ var card = {
+ // -----------------------------------------------------------------------------
+ 
+ var windowTile = {
+-    minWidth: 33,
+-    minHeight: 26,
+-    radius: 4,
++    minWidth: 28,
++    minHeight: 22,
++    radius: 3,
+ 
+     borderWidthNormal: 1,
+     borderWidthSelected: 2,
+     innerRingMargin: 2,
+ 
+     // Index hotkey badge [1], [2], ...
+-    indexBadgeSize: 20,
+-    indexBadgeMinSize: 15,
+-    indexBadgeMargin: 4,
++    indexBadgeSize: 17,
++    indexBadgeMinSize: 13,
++    indexBadgeMargin: 3,
+     indexBadgeRadius: 3,
+-    indexBadgeFontSize: 11,
++    indexBadgeFontSize: 9,
+ 
+     // Mini group badge for small tiles
+-    miniGroupBadgeSize: 18,
+-    miniGroupBadgeMargin: 4,
++    miniGroupBadgeSize: 15,
++    miniGroupBadgeMargin: 3,
+     miniGroupBadgeRadius: 3,
+-    miniGroupBadgeFontSize: 9,
++    miniGroupBadgeFontSize: 8,
+ 
+     // Group Tab Bar
+-    tabBarHeight: 22,
++    tabBarHeight: 19,
+     tabBarRadius: 3,
+     tabBarMargin: 2,
+     tabBarSpacing: 2,
+-    tabBarThresholdHeight: 42,
+-    tabBarThresholdWidth: 60,
++    tabBarThresholdHeight: 36,
++    tabBarThresholdWidth: 51,
+ 
+     // Individual Tab Pill
+-    tabPillHeight: 18,
+-    tabPillMinWidth: 26,
+-    tabPillMaxWidth: 95,
++    tabPillHeight: 15,
++    tabPillMinWidth: 22,
++    tabPillMaxWidth: 81,
+     tabPillRadius: 3,
+     tabPillSpacing: 3,
+-    tabPillFontSize: 10,
+-    tabPillIconSize: 13,
+-    tabPillIconThreshold: 38,
++    tabPillFontSize: 8,
++    tabPillIconSize: 11,
++    tabPillIconThreshold: 32,
+ 
+     // Tab Bar Group Counter
+-    groupCounterThreshold: 100,
+-    groupCounterNumberThreshold: 120,
+-    groupCounterMargin: 5,
++    groupCounterThreshold: 85,
++    groupCounterNumberThreshold: 102,
++    groupCounterMargin: 4,
+     groupCounterSpacing: 2,
+-    groupCounterIconSize: 10,
+-    groupCounterFontSize: 9,
++    groupCounterIconSize: 8,
++    groupCounterFontSize: 8,
+ 
+     // Center App Icon
+-    appIconSize: 36,
+-    appIconSourceSize: 48
++    appIconSize: 31,
++    appIconSourceSize: 41
+ };
+ 
+ // -----------------------------------------------------------------------------
+@@ -128,42 +128,42 @@ var windowTile = {
+ // -----------------------------------------------------------------------------
+ 
+ var header = {
+-    height: 38,
+-    minWidth: 290,
+-    spacing: 13,
++    height: 32,
++    minWidth: 246,
++    spacing: 11,
+ 
+     // Brand icon box
+-    brandBoxSize: 31,
+-    brandBoxRadius: 4,
+-    brandIconSize: 26,
++    brandBoxSize: 26,
++    brandBoxRadius: 3,
++    brandIconSize: 22,
+ 
+     // Title
+-    titleFontSize: 18,
++    titleFontSize: 15,
+     titleLetterSpacing: 1.3,
+ 
+     // Dev mode tag
+-    devTagHeight: 24,
+-    devTagPadding: 15,
+-    devTagRadius: 4,
+-    devTagSpacing: 5,
+-    devTagFontSize: 11,
++    devTagHeight: 20,
++    devTagPadding: 13,
++    devTagRadius: 3,
++    devTagSpacing: 4,
++    devTagFontSize: 9,
+     devTagLetterSpacing: 0.9,
+ 
+     // Screenshot button
+-    shotBtnHeight: 24,
+-    shotBtnPadding: 15,
+-    shotBtnRadius: 4,
+-    shotBtnSpacing: 5,
+-    shotBtnFontSize: 11,
++    shotBtnHeight: 20,
++    shotBtnPadding: 13,
++    shotBtnRadius: 3,
++    shotBtnSpacing: 4,
++    shotBtnFontSize: 9,
+ 
+     // Direct jump shortcuts
+-    shortcutHeight: 26,
+-    shortcutPadding: 17,
+-    shortcutRadius: 4,
+-    shortcutFontSize: 11,
+-    shortcutThresholdWide: 550,
+-    shortcutThresholdMid: 470,
+-    shortcutThresholdCompact: 375
++    shortcutHeight: 22,
++    shortcutPadding: 14,
++    shortcutRadius: 3,
++    shortcutFontSize: 9,
++    shortcutThresholdWide: 468,
++    shortcutThresholdMid: 400,
++    shortcutThresholdCompact: 319
+ };
+ 
+ // -----------------------------------------------------------------------------
+@@ -171,36 +171,36 @@ var header = {
+ // -----------------------------------------------------------------------------
+ 
+ var footer = {
+-    height: 62,
+-    minWidth: 350,
+-    radius: 6,
+-    padding: 13,
++    height: 53,
++    minWidth: 298,
++    radius: 5,
++    padding: 11,
+ 
+     // App icon container
+-    iconContainerSize: 40,
+-    appIconSourceSize: 64,
+-    workspaceIconRadius: 4,
+-    workspaceIconFontSize: 20,
++    iconContainerSize: 34,
++    appIconSourceSize: 54,
++    workspaceIconRadius: 3,
++    workspaceIconFontSize: 17,
+ 
+     // Status & hints
+-    statusSpacing: 13,
+-    statusThreshold: 510,
+-    statusDividerHeight: 15,
+-    statusFontSize: 11,
++    statusSpacing: 11,
++    statusThreshold: 434,
++    statusDividerHeight: 13,
++    statusFontSize: 9,
+ 
+     // Center text
+     textSpacing: 3,
+-    titleFontSize: 14,
++    titleFontSize: 12,
+ 
+     // Metadata Badges
+-    badgeHeight: 20,
+-    badgePadding: 13,
++    badgeHeight: 17,
++    badgePadding: 11,
+     badgeRadius: 3,
+-    badgeSpacing: 5,
+-    badgeFontSize: 11,
++    badgeSpacing: 4,
++    badgeFontSize: 9,
+ 
+     // Group Tab Badge
+-    groupBadgeSpacing: 4,
+-    groupBadgeIconSize: 11,
+-    groupBadgeFontSize: 11
++    groupBadgeSpacing: 3,
++    groupBadgeIconSize: 9,
++    groupBadgeFontSize: 9
+ };
+diff --git a/tests/test_logic.js b/tests/test_logic.js
+index f660654..9bf797e 100644
+--- a/tests/test_logic.js
++++ b/tests/test_logic.js
+@@ -948,32 +948,32 @@ const nav = loadModule("js/Navigation.js");
+ 
+   // 1. Verify Dimensions.js design token sections exist with valid numeric metrics
+   assert(dim.overlay && typeof dim.overlay === "object", "Dimensions should export overlay object");
+-  assert.strictEqual(dim.overlay.containerPadding, 50);
+-  assert.strictEqual(dim.overlay.containerPaddingVertical, 42);
+-  assert.strictEqual(dim.overlay.cornerRadius, 14);
+-  assert.strictEqual(dim.overlay.rowSpacing, 14);
++  assert.strictEqual(dim.overlay.containerPadding, 42);
++  assert.strictEqual(dim.overlay.containerPaddingVertical, 36);
++  assert.strictEqual(dim.overlay.cornerRadius, 12);
++  assert.strictEqual(dim.overlay.rowSpacing, 12);
+ 
+   assert(dim.card && typeof dim.card === "object", "Dimensions should export card object");
+-  assert.strictEqual(dim.card.headerHeight, 28);
+-  assert.strictEqual(dim.card.letterBadgeSize, 26);
+-  assert.strictEqual(dim.card.emptyIconSize, 24);
+-  assert.strictEqual(dim.card.maxWidthMulti, 285);
++  assert.strictEqual(dim.card.headerHeight, 24);
++  assert.strictEqual(dim.card.letterBadgeSize, 22);
++  assert.strictEqual(dim.card.emptyIconSize, 20);
++  assert.strictEqual(dim.card.maxWidthMulti, 242);
+ 
+   assert(dim.windowTile && typeof dim.windowTile === "object", "Dimensions should export windowTile object");
+-  assert.strictEqual(dim.windowTile.indexBadgeSize, 20);
+-  assert.strictEqual(dim.windowTile.indexBadgeMinSize, 15);
+-  assert.strictEqual(dim.windowTile.tabBarHeight, 22);
+-  assert.strictEqual(dim.windowTile.appIconSize, 36);
++  assert.strictEqual(dim.windowTile.indexBadgeSize, 17);
++  assert.strictEqual(dim.windowTile.indexBadgeMinSize, 13);
++  assert.strictEqual(dim.windowTile.tabBarHeight, 19);
++  assert.strictEqual(dim.windowTile.appIconSize, 31);
+ 
+   assert(dim.header && typeof dim.header === "object", "Dimensions should export header object");
+-  assert.strictEqual(dim.header.height, 38);
+-  assert.strictEqual(dim.header.titleFontSize, 18);
+-  assert.strictEqual(dim.header.brandBoxSize, 31);
++  assert.strictEqual(dim.header.height, 32);
++  assert.strictEqual(dim.header.titleFontSize, 15);
++  assert.strictEqual(dim.header.brandBoxSize, 26);
+ 
+   assert(dim.footer && typeof dim.footer === "object", "Dimensions should export footer object");
+-  assert.strictEqual(dim.footer.height, 62);
+-  assert.strictEqual(dim.footer.iconContainerSize, 40);
+-  assert.strictEqual(dim.footer.titleFontSize, 14);
++  assert.strictEqual(dim.footer.height, 53);
++  assert.strictEqual(dim.footer.iconContainerSize, 34);
++  assert.strictEqual(dim.footer.titleFontSize, 12);
+ 
+   // Dimensions.js is purely for layout tokens; verify text functions are not in Dimensions
+   assert.strictEqual(dim.sanitizeText, undefined, "sanitizeText should live in Utils.js, not Dimensions.js");

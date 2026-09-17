@@ -41,6 +41,17 @@ if [[ -d "$theme_modes_dir/.git" && -f "$theme_modes_patch" ]] \
   git -C "$theme_modes_dir" apply --reverse "$theme_modes_patch"
 fi
 
+# The omalt-tab compact patch is applied below. Temporarily reverse it (like
+# Theme modes above) before an upstream update so Git sees a clean worktree,
+# then reapply it after all plugin updates have finished.
+omalt_tab_dir="$PLUGINS_DIR/io.github.codesmith28.omalt-tab"
+omalt_tab_patch="$HOME/.local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch"
+if [[ -d "$omalt_tab_dir/.git" && -f "$omalt_tab_patch" ]] \
+  && git -C "$omalt_tab_dir" apply --reverse --check "$omalt_tab_patch"; then
+  echo "omarchy plugin: temporarily removing omalt-tab compact patch for update"
+  git -C "$omalt_tab_dir" apply --reverse "$omalt_tab_patch"
+fi
+
 {{- range .omarchyPlugins }}
 {{- if .enabled }}
 
@@ -65,6 +76,24 @@ if [[ -d "$theme_modes_dir/.git" && -f "$theme_modes_patch" ]]; then
     git -C "$theme_modes_dir" apply "$theme_modes_patch"
   else
     echo "omarchy plugin: Theme modes profiles patch no longer applies; update the managed patch before continuing" >&2
+    exit 1
+  fi
+fi
+
+# Compact sizing for omalt-tab: 0.85x token set (denser cards for the 4K
+# panel) plus matching test assertions. Same reverse-before-update discipline
+# as Theme modes above so upstream updates apply to a clean tree and the
+# sizing re-applies after.
+omalt_tab_dir="$PLUGINS_DIR/io.github.codesmith28.omalt-tab"
+omalt_tab_patch="$HOME/.local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch"
+if [[ -d "$omalt_tab_dir/.git" && -f "$omalt_tab_patch" ]]; then
+  if git -C "$omalt_tab_dir" apply --reverse --check "$omalt_tab_patch"; then
+    echo "omarchy plugin: omalt-tab compact patch already applied"
+  elif git -C "$omalt_tab_dir" apply --check "$omalt_tab_patch"; then
+    echo "omarchy plugin: applying omalt-tab compact patch"
+    git -C "$omalt_tab_dir" apply "$omalt_tab_patch"
+  else
+    echo "omarchy plugin: omalt-tab compact patch no longer applies; update the managed patch before continuing" >&2
     exit 1
   fi
 fi

@@ -289,6 +289,9 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   ├── claude_mcp.yaml
 │   ├── claude_settings.yaml
 │   ├── codex_projects.yaml
+│   ├── generated
+│   │   └── gen-6bd5de2cd3e4
+│   │       └── windows_terminal.json
 │   ├── hermes_skills.yaml
 │   ├── machines.yaml
 │   ├── omarchy_agents.yaml
@@ -309,10 +312,13 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   └── zebar.css.tmpl
 │   ├── codex-config.toml
 │   ├── gemini-settings.json
+│   ├── gen-palette.tmpl
 │   ├── littlebigmouse
 │   │   └── Current.xml
 │   ├── machine-theme-name.tmpl
 │   └── themes
+│       ├── gen-6bd5de2cd3e4
+│       │   └── windows_terminal.json
 │       ├── omarchy-catppuccin
 │       │   ├── bat.tmTheme
 │       │   ├── colors.toml
@@ -525,6 +531,11 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   └── ignore
 │   ├── herdr
 │   │   ├── config.toml.tmpl
+│   │   ├── plugins
+│   │   │   └── config
+│   │   │       └── hhdebb.herdr-radar
+│   │   │           ├── config.toml
+│   │   │           └── hook.js
 │   │   └── plugins.json.tmpl
 │   ├── hypr
 │   │   ├── bindings.lua
@@ -533,9 +544,6 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   ├── input.lua
 │   │   ├── looknfeel.lua
 │   │   └── monitors.lua
-│   ├── hyprshell
-│   │   ├── config.ron
-│   │   └── styles.css
 │   ├── lazygit
 │   │   └── config.yml.tmpl
 │   ├── mise
@@ -560,6 +568,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │           ├── empty_html-preview.lua
 │   │           ├── example.lua
 │   │           ├── faster-smear-cursor.lua
+│   │           ├── herdr-nvim.lua
 │   │           ├── mini-animate-disable-cursor.lua
 │   │           ├── theme.lua.tmpl
 │   │           └── vim-be-good.lua
@@ -652,11 +661,12 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 ├── dot_hermes
 │   ├── SOUL.md
 │   ├── config.yaml.tmpl
-│   └── skills/ (454 files across 36 skill groups — see .chezmoidata/hermes_skills.yaml)
+│   └── skills/ (456 files across 36 skill groups — see .chezmoidata/hermes_skills.yaml)
 ├── dot_local
 │   ├── bin
 │   │   ├── cline-safety
 │   │   │   └── executable_git
+│   │   ├── executable_agent-console-home
 │   │   ├── executable_backdrop-split
 │   │   ├── executable_chrome-profile
 │   │   ├── executable_cursor
@@ -700,7 +710,8 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │       │   ├── README.md
 │       │   └── Roman.flf
 │       ├── omarchy-patches
-│       │   └── esemczak.theme-modes-profiles.patch
+│       │   ├── esemczak.theme-modes-profiles.patch
+│       │   └── io.github.codesmith28.omalt-tab-compact.patch
 │       └── wsl-ssh-bridge
 │           └── main.go
 ├── dot_pi

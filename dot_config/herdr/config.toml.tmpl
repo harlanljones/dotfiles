@@ -151,30 +151,20 @@ mouse_scroll_lines = 2
 delivery = "system"
 delay_seconds = 2   # don't fire on sub-2s agent turns
 
-# Detailed statusline-level info for all agent harnesses/providers on machine
-# Line 1: workspace/tab, line 2: harness (own line), line 3: provider/model/
-# effort - $provider, $model, and $effort are custom metadata tokens, not
-# built-in ones, so they only render once something reports them via
-# `herdr pane report-metadata --token provider=... --token model=... --token effort=...`
 [ui.sidebar.agents]
-rows = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
-
-[ui.sidebar.agents.rows_by_agent]
-claude = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
-codex = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
-cursor = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
-gemini = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
-agy = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
-pi = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
-omp = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
-grok = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
-opencode = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
-cline = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
-copilot = [["state_icon", "workspace", "tab"], ["agent"], ["$provider", "$model", "$effort"]]
-
-# Spaces sidebar: display git branch and status (useful workspace info not included in agents)
+row_gap = 1
+{{ if eq .machine "augustus" -}}
+rows = [
+  ["$logo", "$logo_working", { token = "$logo_stale", dim = true }, { token = "$title_working", bold = true }, "$title_done", { token = "$title_blocked", bold = true }, "$title_idle_fresh", { token = "$title_idle", dim = true }, { token = "$title_idle_stale", dim = true }, { token = "$title_unknown", dim = true }],
+  [{ token = "$provider", dim = true }, { token = "$model", dim = true }, { token = "$effort", dim = true }],
+  [{ token = "$agent_progress_summary", dim = true }],
+]
+{{ else -}}
+rows = [["state_icon", "agent"], ["terminal_title_stripped"], ["$provider", "$model", "$effort"]]
+{{ end }}
 [ui.sidebar.spaces]
-rows = [["state_icon", "workspace"], ["branch", "git_status"]]
+row_gap = 1
+rows = [["workspace"], ["branch", "git_status"]]
 
 [server]
 # Layout size while no client is attached. Default 120x40 is far short of a

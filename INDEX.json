@@ -3,23 +3,23 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 843,
+    "total": 851,
     "by_category": {
       "shell": 20,
       "prompt": 1,
-      "terminal": 5,
-      "editor": 18,
+      "terminal": 7,
+      "editor": 19,
       "desktop": 11,
       "vcs": 6,
       "navigation": 3,
       "toolchain": 5,
-      "agents": 497,
+      "agents": 499,
       "services": 17,
-      "scripts": 37,
+      "scripts": 38,
       "security": 2,
-      "other": 156,
+      "other": 157,
       "hooks": 24,
-      "chezmoi": 11,
+      "chezmoi": 12,
       "repo": 30
     }
   },
@@ -311,6 +311,22 @@
       "subsystem": "herdr multiplexer"
     },
     {
+      "source": "dot_config/herdr/plugins/config/hhdebb.herdr-radar/config.toml",
+      "target": "~/.config/herdr/plugins/config/hhdebb.herdr-radar/config.toml",
+      "kind": "dotfile",
+      "category": "terminal",
+      "attributes": [],
+      "subsystem": "herdr multiplexer"
+    },
+    {
+      "source": "dot_config/herdr/plugins/config/hhdebb.herdr-radar/hook.js",
+      "target": "~/.config/herdr/plugins/config/hhdebb.herdr-radar/hook.js",
+      "kind": "dotfile",
+      "category": "terminal",
+      "attributes": [],
+      "subsystem": "herdr multiplexer"
+    },
+    {
       "source": "dot_config/nvim/init.lua",
       "target": "~/.config/nvim/init.lua",
       "kind": "dotfile",
@@ -419,6 +435,14 @@
     {
       "source": "dot_config/nvim/lua/plugins/faster-smear-cursor.lua",
       "target": "~/.config/nvim/lua/plugins/faster-smear-cursor.lua",
+      "kind": "dotfile",
+      "category": "editor",
+      "attributes": [],
+      "subsystem": "neovim / LazyVim"
+    },
+    {
+      "source": "dot_config/nvim/lua/plugins/herdr-nvim.lua",
+      "target": "~/.config/nvim/lua/plugins/herdr-nvim.lua",
       "kind": "dotfile",
       "category": "editor",
       "attributes": [],
@@ -2977,6 +3001,22 @@
       "subsystem": "hermes"
     },
     {
+      "source": "dot_hermes/skills/devops/company-brain-demo/SKILL.md",
+      "target": "~/.hermes/skills/devops/company-brain-demo/SKILL.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "hermes"
+    },
+    {
+      "source": "dot_hermes/skills/devops/company-brain-demo/references/model-choice.md",
+      "target": "~/.hermes/skills/devops/company-brain-demo/references/model-choice.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "hermes"
+    },
+    {
       "source": "dot_hermes/skills/devops/hermes-repo-devsetup/SKILL.md",
       "target": "~/.hermes/skills/devops/hermes-repo-devsetup/SKILL.md",
       "kind": "dotfile",
@@ -4899,6 +4939,16 @@
       "subsystem": "cline git interceptor"
     },
     {
+      "source": "dot_local/bin/executable_agent-console-home",
+      "target": "~/.local/bin/agent-console-home",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
       "source": "dot_local/bin/executable_backdrop-split",
       "target": "~/.local/bin/backdrop-split",
       "kind": "dotfile",
@@ -5401,6 +5451,15 @@
       "attributes": []
     },
     {
+      "source": ".chezmoitemplates/gen-palette.tmpl",
+      "target": "~/.chezmoitemplates/gen-palette",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": [
+        "template"
+      ]
+    },
+    {
       "source": ".chezmoitemplates/littlebigmouse/Current.xml",
       "target": "~/.chezmoitemplates/littlebigmouse/Current.xml",
       "kind": "dotfile",
@@ -5415,6 +5474,13 @@
       "attributes": [
         "template"
       ]
+    },
+    {
+      "source": ".chezmoitemplates/themes/gen-6bd5de2cd3e4/windows_terminal.json",
+      "target": "~/.chezmoitemplates/themes/gen-6bd5de2cd3e4/windows_terminal.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
     },
     {
       "source": ".chezmoitemplates/themes/omarchy-catppuccin-latte/bat.tmTheme",
@@ -6314,20 +6380,6 @@
       ]
     },
     {
-      "source": "dot_config/hyprshell/config.ron",
-      "target": "~/.config/hyprshell/config.ron",
-      "kind": "dotfile",
-      "category": "other",
-      "attributes": []
-    },
-    {
-      "source": "dot_config/hyprshell/styles.css",
-      "target": "~/.config/hyprshell/styles.css",
-      "kind": "dotfile",
-      "category": "other",
-      "attributes": []
-    },
-    {
       "source": "dot_local/share/figlet/README.md",
       "target": "~/.local/share/figlet/README.md",
       "kind": "dotfile",
@@ -6344,6 +6396,13 @@
     {
       "source": "dot_local/share/omarchy-patches/esemczak.theme-modes-profiles.patch",
       "target": "~/.local/share/omarchy-patches/esemczak.theme-modes-profiles.patch",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "dot_local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch",
+      "target": "~/.local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch",
       "kind": "dotfile",
       "category": "other",
       "attributes": []
@@ -6756,6 +6815,12 @@
     },
     {
       "source": ".chezmoidata/codex_projects.yaml",
+      "kind": "chezmoi",
+      "category": "chezmoi",
+      "role": "Controls how chezmoi renders and applies this tree"
+    },
+    {
+      "source": ".chezmoidata/generated/gen-6bd5de2cd3e4/windows_terminal.json",
       "kind": "chezmoi",
       "category": "chezmoi",
       "role": "Controls how chezmoi renders and applies this tree"

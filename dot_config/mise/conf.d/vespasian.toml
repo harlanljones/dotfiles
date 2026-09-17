@@ -17,3 +17,7 @@ neovim = "latest"
 ripgrep = "latest"
 starship = "latest"
 zoxide = "latest"
+# matugen: wallpaper palette extraction for `dots wallpaper set`. On Augustus
+# pacman owns it (dot_config/pacman/pkglist.txt) and on Hadrian the Brewfile
+# does; Ubuntu's archive has no package, so cargo builds it here.
+"cargo:matugen" = "latest"

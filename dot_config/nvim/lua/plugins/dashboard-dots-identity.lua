@@ -85,6 +85,7 @@ local function discover_projects()
   local seen = {}
   local roots = { vim.fn.expand("~/dev"), vim.fn.expand("~/src") }
   for _, root in ipairs(roots) do
+    if vim.fn.isdirectory(root) ~= 1 then goto continue end
     local dirs = vim.fn.readdir(root) or {}
     for _, name in ipairs(dirs) do
       local dir = root .. "/" .. name
@@ -93,6 +94,7 @@ local function discover_projects()
         projects[#projects + 1] = { name, dir }
       end
     end
+    ::continue::
   end
   local dots = vim.fn.expand("~/.local/share/chezmoi")
   if vim.fn.isdirectory(dots) == 1 and not seen[dots] then
@@ -133,14 +135,14 @@ local function projects_section()
       end,
     }
   end
+  -- Snacks requires `section` to be a built-in string name; custom entries
+  -- are child items in the array part (item[1]), resolved recursively.
   return {
     icon = " ",
     title = "Projects",
     indent = 2,
     padding = 1,
-    section = function()
-      return items
-    end,
+    items,
   }
 end
 

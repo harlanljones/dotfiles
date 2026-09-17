@@ -235,7 +235,30 @@ Quality bar for every item below: no stock copy-paste configs, no aesthetic carg
 default and diverges by hooking into THIS stack: the `.chezmoidata/themes` engine,
 `dots` CLI, the per-agent usage collectors, or the 3-machine spread.
 
-- [ ] **7.1 Wallpaper → palette, wired into the theme engine** — Priority 1, effort M
+- [x] **7.1 Wallpaper → palette, wired into the theme engine** — Priority 1, effort M
+  - 2026-09-16: DONE — real end-to-end run verified (Pompeii wallpaper → gen-6bd5de2cd3e4,
+    all surfaces re-rendered, augustus switched). CODE COMPLETE (task 1 + task 2 reviewed,
+    all ad-hoc verification passing). One-time setup note: matugen 4.2 lives in official
+    `extra` (pkglist, not aurlist) and needs `--prefer saturation` in non-TTY runs; the
+    dots script handles both.
+    * `dots wallpaper set <path>` — per-machine source wallpaper (NOT stored in the
+      repo; only path + sha256 recorded), matugen (hard dep, owned per §5 manifest
+      table per machine) extracts the palette.
+    * Palette stored self-contained as `.chezmoidata/generated/gen-<hash>/windows_terminal.json`
+      (same format curated themes use, so every tool template parses it unchanged)
+      plus a `themes.yaml` registry entry `gen-<hash>` with `kind: generated`,
+      `source: {path, sha256}`; `dots theme set gen-<hash>` selects it per machine.
+    * Surfaces: everything dots manages — ghostty, starship (chrome, see 7.3), btop,
+      fzf, delta, eza, bat, lazygit, omalt-tab (via the Omarchy theme, no dots
+      wiring), Windows Terminal.
+    * One registry, two kinds: `generated` vs `imported`; `dots theme list` shows both.
+    * Renders must not require the source image (palette JSON is self-contained).
+    * ACCEPTED AMENDMENT: the palette is written to BOTH
+      `.chezmoidata/generated/gen-<hash>/windows_terminal.json` (spec storage) and
+      `.chezmoitemplates/themes/gen-<hash>/windows_terminal.json` (byte-identical
+      copy) — consumer templates `include` only from `.chezmoitemplates`, and
+      chezmoi has no file-exists test, so dual-write avoids touching every tool
+      template.
   - The 2026 trend is matugen (InioX/matugen ★2k) regenerating every config from a
     wallpaper; skwd-wall extends it to video sources. Stock adoption = a parallel
     theming system bolted next to chezmoi — rejected.
@@ -247,6 +270,30 @@ default and diverges by hooking into THIS stack: the `.chezmoidata/themes` engin
     `.chezmoidata/themes.yaml`, `.chezmoitemplates/themes/` consumers.
   - Accept: applying a new wallpaper produces a commit-sized diff across tools on all
     3 machines with no hand-tuned colors anywhere.
+  - 2026-09-16: task 2 (generated-theme render audit) DONE. Verified every themed
+    surface against a synthetic `gen-test` palette (twin-written, registry
+    `kind: generated`; fixture removed afterwards). Found and fixed the
+    curated-only assumptions — templates that included per-tool theme ports
+    which generated themes don't carry — by branching on the registry `kind`
+    and deriving colors from the palette JSON via a new shared resolver,
+    `.chezmoitemplates/gen-palette.tmpl`:
+    * dot_config/eza/theme.yml.tmpl — derived eza.yml (was a hard include)
+    * dot_config/bat/themes/dots.tmTheme.tmpl — derived tmTheme plist (hard include)
+    * dot_config/delta/theme.gitconfig.tmpl — derived delta styles (hard include)
+    * dot_config/fzf/theme.sh.tmpl — derived --color lines (hard include, vespasian)
+    * dot_config/lazygit/config.yml.tmpl — derived gui.theme (hard include, vespasian)
+    * run_onchange_after_42 — bat-cache key hashes windows_terminal.json for
+      generated themes instead of the missing bat.tmTheme
+    Already palette-driven (no changes needed): ghostty on Augustus reads the
+    live Omarchy theme via the `config-file = ?"~/.local/state/omarchy/current/
+    theme/ghostty.conf"` include in dot_config/ghostty/config.tmpl (dots picks
+    the Omarchy side with `omarchy theme set`; machines.yaml only drives the
+    CLI-tool templates),
+    starship (machines.yaml accent), btop, omalt-tab (Omarchy theme, no dots
+    wiring), Windows Terminal
+    (run_40), run_45, nvim (falls back to Tokyo Night for generated themes).
+    All surfaces render for both augustus and vespasian against generated AND
+    curated themes; outputs validated (YAML/plist parse, bash -n, line counts).
 
 - [ ] **7.2 One agent-usage widget in the shell (augustus)** — Priority 1, effort M
   - Everyone copies generic waybar modules; 2026 trend is Claude-Code-usage waybar
@@ -330,9 +377,11 @@ default and diverges by hooking into THIS stack: the `.chezmoidata/themes` engin
     fallback, timeout-1s drift chip, index-guarded template); 61-splash.sh first-shell-per-window
     module; snacks.nvim quiet-ops dashboard; dot_config/btop/themes/dots.theme.tmpl palette mapping
     (regenerates on `dots theme set`); run_onchange_after_33-augustus-machine-branding.sh.tmpl
-    (screensaver/about art). All three packages installed 2026-09-16; hyprshell
-    service enabled+active (filter_by fixed to snake_case `current_monitor` per
-    hyprshell 4.10 schema); Roman branding written to both files; figlet upgrade
+    (screensaver/about art). All three packages installed 2026-09-16; Roman
+    branding written to both files (figlet vendored in-repo at
+    dot_local/share/figlet/, provenance in figlet/README.md); identical
+    output on all 3 machines; fallback chain = figlet+Roman -> embedded mini-font
+    (approved spec amendment — plain-bold judged too bare) -> plain bold,
     confirmed live. Remaining: visual check of the snacks dashboard on next nvim
     open; AGENTS.md §3 row for hook 33 (manual). 2026-09-16 later: dots-identity
     gained a runtime project-context line (branch+dirty, file count, top
@@ -381,18 +430,23 @@ default and diverges by hooking into THIS stack: the `.chezmoidata/themes` engin
     the watch list.
   - Files: manifest entry + `dot_config/yt-x/` or shell alias.
 
-- [x] **7.14 hyprshell thumbnail alt-tab** — Priority 5, effort S
-  - Done 2026-09-16: dot_config/hyprshell/{config.ron,styles.css} (switch-only, variable-only CSS),
-    augustus-gated via .chezmoiignore; hyprshell in aurlist.txt. Installed (4.10.8-1), service
-    enabled+active, config check rc=0 (needed snake_case `current_monitor`).
-  - Restrained thumbnail-grid window switcher for augustus. Promoted from the watch
+- [x] **7.14 omalt-tab spatial alt-tab** (was: hyprshell thumbnail alt-tab) — Priority 5, effort S
+  - 2026-09-16: hyprshell switch-only config done (config.ron + styles.css,
+    augustus-gated; 4.10.8-1, config check rc=0).
+  - 2026-09-17: REPLACED with omalt-tab (Codesmith28/omalt-tab, Omarchy
+    Quickshell plugin — spatial workspace cards, home-row jump, grouped tabs;
+    inherits the Omarchy theme live, so no dots palette wiring needed).
+    dot_config/hyprshell/ removed, .chezmoiignore gate dropped;
+    `.chezmoidata/omarchy_plugins.yaml` entry installs/enables it;
+    dot_config/hypr/bindings.lua loads its hypr/bindings.lua (omalt-tab submap)
+    when installed, else Omarchy tiling.lua defaults stay.
+  - Restrained window switcher for augustus. Promoted from the watch
     list; do after 7.6 (Lua/scrolling) so it doesn't fight the layout change.
-  - Files: `dot_config/hypr/` binding + hyprshell config, `omarchy-` gated.
 
 - [ ] **7.15 Watch list (fun)** — no action now
   - Crush as config-pattern source only; SDDM/lockscreen themes (qylock/SilentSDDM)
     only if theme-selector-integrated; omacosy for hadrian watch-only. (yt-x and
-    hyprshell promoted to 7.13/7.14; snacks.nvim dashboard folded into 7.12.)
+    omalt-tab promoted to 7.13/7.14; snacks.nvim dashboard folded into 7.12.)
   - Dropped as tacky/dead: waifufetch & all ascii fetchers, cava-in-waybar (most
     copied r/unixporn element — zero function), blur-everything rice, pywal,
     rice-cooker, vibecoded shell distributions, generic ghostty config generators.

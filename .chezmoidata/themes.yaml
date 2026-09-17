@@ -113,3 +113,15 @@ themes:
     windows:
       accent: "#1e66f5"
       colorPrevalence: true
+  gen-6bd5de2cd3e4:
+    label: "Generated from 94c6d6cb3a9d83dd.jpg"
+    appearance: dark
+    format: matugen
+    kind: generated
+    source:
+      path: "/home/harlan/.config/omarchy/themes/pompeii-palette/backgrounds/94c6d6cb3a9d83dd.jpg"
+      sha256: "6bd5de2cd3e46661f26f55c71e146a6570ce95531e61a93353f3de5f2c689423"
+      generatedAt: "2026-09-17T03:20:12Z"
+    windows:
+      accent: "#d87186"
+      colorPrevalence: true

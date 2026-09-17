@@ -75,3 +75,5 @@ omarchyPlugins:
     enabled: true
   - url: https://github.com/crmne/omatasks.git
     enabled: true
+  - url: https://github.com/Codesmith28/omalt-tab.git
+    enabled: true
