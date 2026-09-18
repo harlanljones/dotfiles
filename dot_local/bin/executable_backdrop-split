@@ -7,11 +7,47 @@
 #   - ~/.config/omarchy/hooks/theme-set.d/backdrop-split  (omarchy theme set)
 #   - run_after_34-augustus-backdrop-split                (every dots sync)
 #
-# Geometry is computed from the live Hyprland monitor layout: the image is
-# cover-fitted over the full logical desktop bounding box, rendered at the
-# highest monitor scale, and each display gets its logical rect cropped out
-# and resampled to its native resolution.
+# Modes:
+#   backdrop-split [--auto]          headless: reuse hand-placed tiles when a
+#                                  saved set matches this wallpaper + layout,
+#                                  else cover-fit over the monitor bounding box.
+#                                  This is the default; hooks use it so applies
+#                                  never block on a picker.
+#   backdrop-split --interactive     open a Tk tile picker: one crop box per
+#     (-i)                         monitor (locked to that display's aspect),
+#                                  drag to move, wheel to zoom, then Save &
+#                                  Apply. Tiles are persisted per wallpaper +
+#                                  layout and reused by later --auto runs.
+#   backdrop-split --reset            forget the saved tiles for the current
+#                                  wallpaper + layout (next run cover-fits).
+#   backdrop-split --help             this text.
+#
+# Any other positional argument (e.g. the theme name the theme-set hook
+# passes as $1) is ignored.
+#
+# Headless geometry: the image is cover-fitted over the full logical desktop
+# bounding box, rendered at the highest monitor scale, and each display gets
+# its logical rect cropped out and resampled to its native resolution.
+# Manual tiles bypass the canvas entirely: each box is cropped straight from
+# the source file and resampled to its monitor's native resolution.
 set -euo pipefail
+
+MODE="auto"
+for arg in "$@"; do
+	case "$arg" in
+	-i | --interactive) MODE="interactive" ;;
+	--auto) MODE="auto" ;;
+	--reset) MODE="reset" ;;
+	-h | --help | help) MODE="help" ;;
+	-*) echo "backdrop-split: unknown flag '$arg' (see --help)" >&2; exit 2 ;;
+	*) ;; # ignore positionals (theme-set hook passes the theme name)
+	esac
+done
+
+if [[ "$MODE" == "help" ]]; then
+	sed -n '2,/^set -euo pipefail/p' "$0" | sed '$d; s/^# \?//'
+	exit 0
+fi
 
 for cmd in omarchy-shell omarchy hyprctl magick python3; do
 	command -v "$cmd" >/dev/null 2>&1 || {
@@ -40,42 +76,154 @@ if [[ -z "$src" ]]; then
 fi
 
 out_dir="$HOME/.config/omarchy/backdrop/segments"
-mkdir -p "$out_dir"
+tiles_dir="$HOME/.config/omarchy/backdrop/tiles"
+mkdir -p "$out_dir" "$tiles_dir"
 
-# Optional framing, read from ~/.config/omarchy/backdrop/settings (KEY=VALUE):
-#   ZOOM   >=1, how hard to zoom into the image before mapping (1 = cover-fit)
-#   FOCUSX/FOCUSY  0..1, the image point kept at the zoom center
-# A painting whose interesting content sits off-center needs zoom+focus so
-# every monitor gets meaningful art instead of a near-black region.
-zoom=1; focus_x=0.5; focus_y=0.5
-settings="$HOME/.config/omarchy/backdrop/settings"
-if [[ -r "$settings" ]]; then
-	# shellcheck disable=SC1090
-	source "$settings"
-	zoom="${ZOOM:-1}"; focus_x="${FOCUSX:-0.5}"; focus_y="${FOCUSY:-0.5}"
+# Snapshot the live monitor layout once; every path below derives from it so
+# the fingerprint, the picker, and the renderer can never disagree.
+mons_file="$(mktemp "$out_dir/.mons.XXXXXX.json")"
+trap 'rm -f "$mons_file"' EXIT
+hyprctl monitors -j >"$mons_file"
+
+# Canonical layout fingerprint: sorted active monitors + canvas at max scale.
+# Key format: <sha1>|<short12>|<canvasW>|<canvasH>
+layout_info="$(python3 - "$mons_file" <<'PYKEY'
+import hashlib, json, math, sys
+
+with open(sys.argv[1]) as f:
+    mons = json.load(f)
+mons = [m for m in mons if m.get("active", True) and not m.get("disabled", False)]
+if not mons:
+    sys.exit("no active monitors")
+
+for m in mons:
+    s = m["scale"]
+    m["_lw"], m["_lh"] = m["width"] / s, m["height"] / s
+
+canon = "|".join(
+    f"{m['name']}:{m['width']}x{m['height']}@{m['x']},{m['y']}s{m['scale']}"
+    for m in sorted(mons, key=lambda m: m["name"])
+)
+min_x = min(m["x"] for m in mons)
+min_y = min(m["y"] for m in mons)
+max_x = max(m["x"] + m["_lw"] for m in mons)
+max_y = max(m["y"] + m["_lh"] for m in mons)
+density = max(m["scale"] for m in mons)
+cw = math.ceil((max_x - min_x) * density)
+ch = math.ceil((max_y - min_y) * density)
+key = hashlib.sha1(canon.encode()).hexdigest()
+print(f"{key}|{key[:12]}")
+PYKEY
+)"
+layout_key="${layout_info%%|*}"
+layout_short="${layout_info##*|}"
+
+tiles_file="$tiles_dir/${hash}_${layout_short}.json"
+
+if [[ "$MODE" == "reset" ]]; then
+	if [[ -f "$tiles_file" ]]; then
+		rm -f "$tiles_file"
+		echo "backdrop-split: forgot saved tiles for this wallpaper + layout"
+	else
+		echo "backdrop-split: no saved tiles for this wallpaper + layout"
+	fi
+	exit 0
 fi
 
-# Zoom into the image around the focal point before mapping: crop a
-# (1/zoom)-sized window centered on FOCUSX/FOCUSY (clamped to the image).
-pre="$src"
-if awk -v z="$zoom" 'BEGIN{exit !(z > 1.001)}'; then
-	read -r sw sh <<<"$(identify -format '%w %h' "$src")"
-	cw=$(( sw / zoom )); ch=$(( sh / zoom ))
-	cx=$(awk -v sw="$sw" -v cw="$cw" -v f="$focus_x" 'BEGIN{c=int(f*sw-cw/2); print c<0?0:(c>sw-cw?sw-cw:c)}')
-	cy=$(awk -v sh="$sh" -v ch="$ch" -v f="$focus_y" 'BEGIN{c=int(f*sh-ch/2); print c<0?0:(c>sh-ch?sh-ch:c)}')
-	pre="$out_dir/.pre-crop.png"
-	magick "$src" -crop "${cw}x${ch}+${cx}+${cy}" +repage "$pre"
-fi
+# Render explicit per-monitor source-pixel crops.
+# stdin lines: name|srcX|srcY|srcW|srcH|nativeW|nativeH
+render_crops() {
+	local status=0 name sx sy sw2 sh2 mw mh seg tmp
+	while IFS='|' read -r name sx sy sw2 sh2 mw mh; do
+		[[ -z "$name" ]] && continue
+		seg="$out_dir/${name}.png"
+		tmp="$(mktemp "$out_dir/.${name}.XXXXXX.png")"
+		if ! magick "$src" \
+			-crop "${sw2}x${sh2}+${sx}+${sy}" +repage \
+			-filter Lanczos -resize "${mw}x${mh}!" \
+			-strip \
+			"$tmp"; then
+			echo "backdrop-split: magick failed for $name" >&2
+			rm -f "$tmp"
+			status=1
+			continue
+		fi
+		chmod 644 "$tmp"
+		mv -f "$tmp" "$seg"
+		# Deliberately without -q: -q fakes success when the IPC target is gone.
+		if ! omarchy-shell background setForScreen "$name" "$seg"; then
+			echo "backdrop-split: setForScreen $name failed" >&2
+			status=1
+		fi
+	done
+	return "$status"
+}
 
-# Plan the crops. Fields per monitor: name|cropX|cropY|cropW|cropH|nativeW|nativeH
-plan="$(ZOOM="$zoom" FOCUSX="$focus_x" FOCUSY="$focus_y" python3 <<'PY'
-import json, math, os, subprocess
+# Validate the saved tiles against the live layout + source dimensions and,
+# when they match, emit cover lines for render_crops.
+load_tiles() {
+	python3 - "$mons_file" "$tiles_file" "$layout_key" "$src" <<'PYCROPS'
+import json, subprocess, sys
 
-zoom = float(os.environ.get("ZOOM", "1"))
-fx = min(max(float(os.environ.get("FOCUSX", "0.5")), 0), 1)
-fy = min(max(float(os.environ.get("FOCUSY", "0.5")), 0), 1)
+mons_file, tiles_file, layout_key, src = sys.argv[1:5]
+with open(mons_file) as f:
+    mons = json.load(f)
+mons = [m for m in mons if m.get("active", True) and not m.get("disabled", False)]
+live = {m["name"]: m for m in mons}
 
-mons = json.loads(subprocess.check_output(["hyprctl", "monitors", "-j"]))
+with open(tiles_file) as f:
+    saved = json.load(f)
+if saved.get("layout_key") != layout_key:
+    sys.exit("layout changed")
+tiles = saved.get("tiles", {})
+
+sw, sh = map(int, subprocess.check_output(
+    ["magick", "identify", "-format", "%w %h", src]).decode().split())
+if (sw, sh) != (saved["src"]["w"], saved["src"]["h"]):
+    sys.exit("source dimensions changed")
+
+for name, m in live.items():
+    if name not in tiles:
+        sys.exit(f"missing tile for {name}")
+    x, y, w, h = (int(tiles[name][k]) for k in ("x", "y", "w", "h"))
+    if w < 16 or h < 16 or x < 0 or y < 0 or x + w > sw or y + h > sh:
+        sys.exit(f"tile for {name} out of bounds")
+    print(f"{name}|{x}|{y}|{w}|{h}|{m['width']}|{m['height']}")
+PYCROPS
+}
+
+# Headless cover-fit over the bounding-box canvas (legacy ZOOM/FOCUS path).
+render_cover_fit() {
+	local zoom=1 focus_x=0.5 focus_y=0.5
+	local settings="$HOME/.config/omarchy/backdrop/settings"
+	if [[ -r "$settings" ]]; then
+		# shellcheck disable=SC1090
+		source "$settings"
+		zoom="${ZOOM:-1}" focus_x="${FOCUSX:-0.5}" focus_y="${FOCUSY:-0.5}"
+	fi
+
+	# Zoom into the image around the focal point before mapping: crop a
+	# (1/zoom)-sized window centered on FOCUSX/FOCUSY (clamped to the image).
+	local pre="$src"
+	if awk -v z="$zoom" 'BEGIN{exit !(z > 1.001)}'; then
+		local sw sh cwi chi cx cy
+		read -r sw sh <<<"$(magick identify -format '%w %h' "$src")"
+		# awk, not $(( )), because ZOOM may be fractional (e.g. 1.5).
+		cwi=$(awk -v sw="$sw" -v z="$zoom" 'BEGIN{print int(sw/z)}')
+		chi=$(awk -v sh="$sh" -v z="$zoom" 'BEGIN{print int(sh/z)}')
+		cx=$(awk -v sw="$sw" -v cw="$cwi" -v f="$focus_x" 'BEGIN{c=int(f*sw-cw/2); print c<0?0:(c>sw-cw?sw-cw:c)}')
+		cy=$(awk -v sh="$sh" -v ch="$chi" -v f="$focus_y" 'BEGIN{c=int(f*sh-ch/2); print c<0?0:(c>sh-ch?sh-ch:c)}')
+		pre="$out_dir/.pre-crop.png"
+		magick "$src" -crop "${cwi}x${chi}+${cx}+${cy}" +repage "$pre"
+	fi
+
+	# Plan the crops. Fields per monitor: name|cropX|cropY|cropW|cropH|nativeW|nativeH
+	local plan
+	plan="$(python3 - "$mons_file" <<'PYPLAN'
+import json, math, sys
+
+with open(sys.argv[1]) as f:
+    mons = json.load(f)
 mons = [m for m in mons if m.get("active", True) and not m.get("disabled", False)]
 if not mons:
     sys.exit("no active monitors")
@@ -101,39 +249,466 @@ for m in mons:
     print(f"{m['name']}|{ox}|{oy}|{ow}|{oh}|{m['width']}|{m['height']}")
 
 print(f"CANVAS|{canvas_w}|{canvas_h}")
-PY
+PYPLAN
 )"
 
-canvas="$(grep '^CANVAS|' <<<"$plan" | cut -d'|' -f2,3 | tr '|' 'x')"
-cw="${canvas%x*}" ch="${canvas#*x}"
+	local canvas cw ch
+	canvas="$(grep '^CANVAS|' <<<"$plan" | cut -d'|' -f2,3 | tr '|' 'x')"
+	cw="${canvas%x*}" ch="${canvas#*x}"
 
-# Idempotent: same background + same layout -> byte-identical outputs.
-# Writes are atomic (tmp + mv): the shell may reload the QML plugin at any
-# moment (e.g. during a concurrent `chezmoi apply`), and a half-written or
-# missing segment file crashes the backdrop plugin and gets it auto-disabled.
-status=0
-while IFS='|' read -r name ox oy ow oh mw mh; do
-	[[ "$name" == "CANVAS" ]] && continue
-	seg="$out_dir/${name}.png"
-	tmp="$(mktemp "$out_dir/.${name}.XXXXXX.png")"
-	if ! magick "$pre" \
-		-resize "${cw}x${ch}^" -gravity center -extent "${cw}x${ch}" \
-		-crop "${ow}x${oh}+${ox}+${oy}" +repage \
-		-resize "${mw}x${mh}!" \
-		-strip \
-		"$tmp"; then
-		echo "backdrop-split: magick failed for $name" >&2
-		rm -f "$tmp"
-		status=1
-		continue
-	fi
-	chmod 644 "$tmp"
-	mv -f "$tmp" "$seg"
-	# Deliberately without -q: -q fakes success when the IPC target is gone.
-	if ! omarchy-shell background setForScreen "$name" "$seg"; then
-		echo "backdrop-split: setForScreen $name failed" >&2
-		status=1
-	fi
-done <<<"$plan"
+	# Idempotent: same background + same layout -> byte-identical outputs.
+	# Writes are atomic (tmp + mv): the shell may reload the QML plugin at any
+	# moment (e.g. during a concurrent `chezmoi apply`), and a half-written or
+	# missing segment file crashes the backdrop plugin and gets it auto-disabled.
+	local status=0 name ox oy ow oh mw mh seg tmp
+	while IFS='|' read -r name ox oy ow oh mw mh; do
+		[[ "$name" == "CANVAS" ]] && continue
+		seg="$out_dir/${name}.png"
+		tmp="$(mktemp "$out_dir/.${name}.XXXXXX.png")"
+		if ! magick "$pre" \
+			-resize "${cw}x${ch}^" -gravity center -extent "${cw}x${ch}" \
+			-crop "${ow}x${oh}+${ox}+${oy}" +repage \
+			-resize "${mw}x${mh}!" \
+			-strip \
+			"$tmp"; then
+			echo "backdrop-split: magick failed for $name" >&2
+			rm -f "$tmp"
+			status=1
+			continue
+		fi
+		chmod 644 "$tmp"
+		mv -f "$tmp" "$seg"
+		# Deliberately without -q: -q fakes success when the IPC target is gone.
+		if ! omarchy-shell background setForScreen "$name" "$seg"; then
+			echo "backdrop-split: setForScreen $name failed" >&2
+			status=1
+		fi
+	done <<<"$plan"
 
-exit "$status"
+	return "$status"
+}
+
+# Interactive tile picker (Tk): one aspect-locked crop box per monitor.
+run_interactive() {
+	if [[ -z "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ]]; then
+		echo "backdrop-split: --interactive needs a display (WAYLAND_DISPLAY/DISPLAY unset)" >&2
+		exit 2
+	fi
+	python3 - "$src" "$mons_file" "$tiles_file" "$hash" "$layout_key" <<'PYUI'
+import json
+import math
+import os
+import sys
+import tempfile
+
+from PIL import Image, ImageTk
+import tkinter as tk
+
+src, mons_file, tiles_file, bg_hash, layout_key = sys.argv[1:6]
+
+with open(mons_file) as f:
+    mons = json.load(f)
+mons = [m for m in mons if m.get("active", True) and not m.get("disabled", False)]
+if not mons:
+    sys.exit("no active monitors")
+mons.sort(key=lambda m: m["name"])
+
+for m in mons:
+    s = m["scale"]
+    m["_lw"], m["_lh"] = m["width"] / s, m["height"] / s
+min_x = min(m["x"] for m in mons)
+min_y = min(m["y"] for m in mons)
+max_x = max(m["x"] + m["_lw"] for m in mons)
+max_y = max(m["y"] + m["_lh"] for m in mons)
+density = max(m["scale"] for m in mons)
+canvas_w = math.ceil((max_x - min_x) * density)
+canvas_h = math.ceil((max_y - min_y) * density)
+
+img = Image.open(src).convert("RGB")
+sw, sh = img.size
+
+# Seed boxes: saved tiles when they match, else the cover-fit inversion so
+# the picker starts from exactly what --auto would produce.
+boxes = {}
+try:
+    with open(tiles_file) as f:
+        saved = json.load(f)
+    if saved.get("layout_key") == layout_key and (sw, sh) == (saved["src"]["w"], saved["src"]["h"]):
+        for m in mons:
+            t = saved["tiles"][m["name"]]
+            boxes[m["name"]] = [float(t["x"]), float(t["y"]), float(t["w"]), float(t["h"])]
+except (OSError, ValueError, KeyError):
+    pass
+
+if not boxes:
+    scale = max(canvas_w / sw, canvas_h / sh)
+    ox = (canvas_w - sw * scale) / 2
+    oy = (canvas_h - sh * scale) / 2
+    for m in mons:
+        mx = round((m["x"] - min_x) * density)
+        my = round((m["y"] - min_y) * density)
+        mw = round(m["_lw"] * density)
+        mh = round(m["_lh"] * density)
+        boxes[m["name"]] = [(mx - ox) / scale, (my - oy) / scale, mw / scale, mh / scale]
+
+COLORS = ["#7dd3fc", "#f0abfc", "#bef264", "#fcd34d", "#fca5a5", "#c4b5fd"]
+color = {m["name"]: COLORS[i % len(COLORS)] for i, m in enumerate(mons)}
+aspect = {m["name"]: m["width"] / m["height"] for m in mons}
+
+
+def clamp(name):
+    x, y, w, h = boxes[name]
+    a = aspect[name]
+    w = min(max(w, 64), sw, sh * a)
+    h = w / a
+    if h > sh:
+        h = sh
+        w = h * a
+    x = min(max(x, 0), sw - w)
+    y = min(max(y, 0), sh - h)
+    boxes[name] = [x, y, w, h]
+
+
+for m in mons:
+    clamp(m["name"])
+
+root = tk.Tk()
+root.title("backdrop-split — drag each monitor's tile, wheel to zoom")
+selected = {"name": mons[0]["name"]}
+
+hint = tk.Label(root, text=(
+    "Drag a box to move it • wheel zooms the selected tile (Shift = fine) • "
+    "click a box or press 1-%d/Tab to select • arrows nudge • Enter saves" % len(mons)))
+hint.pack(padx=8, pady=(8, 4))
+
+body = tk.Frame(root)
+body.pack(fill="both", expand=True, padx=8)
+
+disp_w = min(1150, sw)
+disp_scale = min(1150 / sw, 640 / sh)
+DW, DH = max(1, round(sw * disp_scale)), max(1, round(sh * disp_scale))
+preview_img = img.resize((DW, DH), Image.LANCZOS)
+photo = ImageTk.PhotoImage(preview_img)
+
+canvas = tk.Canvas(body, width=DW, height=DH, highlightthickness=1,
+                   highlightbackground="#555")
+canvas.pack(side="left")
+canvas.create_image(0, 0, anchor="nw", image=photo)
+canvas._img = photo
+
+rect_id = {}
+label_id = {}
+
+
+def to_disp(x, y):
+    return x * disp_scale, y * disp_scale
+
+
+def draw():
+    for m in mons:
+        n = m["name"]
+        x, y, w, h = boxes[n]
+        x0, y0 = to_disp(x, y)
+        x1, y1 = to_disp(x + w, y + h)
+        sel = n == selected["name"]
+        if n in rect_id:
+            canvas.coords(rect_id[n], x0, y0, x1, y1)
+            canvas.itemconfig(rect_id[n], width=3 if sel else 1)
+            canvas.coords(label_id[n], x0 + 4, y0 + 2)
+        else:
+            rect_id[n] = canvas.create_rectangle(
+                x0, y0, x1, y1, outline=color[n], width=3 if sel else 1)
+            label_id[n] = canvas.create_text(
+                x0 + 4, y0 + 2, anchor="nw", fill=color[n],
+                text=f"{n}  {m['width']}x{m['height']}")
+    for m in mons:
+        canvas.tag_raise(rect_id[m["name"]])
+        canvas.tag_raise(label_id[m["name"]])
+
+
+side = tk.Frame(body)
+side.pack(side="left", fill="y", padx=(10, 0))
+
+tk.Label(side, text="Tiles").pack(anchor="w")
+tile_btns = {}
+btn_frame = tk.Frame(side)
+btn_frame.pack(anchor="w")
+
+
+def select(name):
+    selected["name"] = name
+    for n, b in tile_btns.items():
+        b.config(relief="sunken" if n == name else "raised")
+    sync_slider()
+    draw()
+    schedule_preview()
+
+
+for m in mons:
+    b = tk.Button(btn_frame, text=m["name"], width=8,
+                  command=lambda n=m["name"]: select(n))
+    b.pack(side="left", padx=2)
+    tile_btns[m["name"]] = b
+
+tk.Label(side, text="Selected tile zoom").pack(anchor="w", pady=(10, 0))
+zoom_var = tk.DoubleVar()
+
+
+def max_fit_w(name):
+    return min(sw, sh * aspect[name])
+
+
+def sync_slider():
+    n = selected["name"]
+    zoom_var.set(boxes[n][2] / max_fit_w(n) * 100)
+
+
+def on_slider(_v):
+    n = selected["name"]
+    x, y, w, h = boxes[n]
+    cx, cy = x + w / 2, y + h / 2
+    w = max_fit_w(n) * float(zoom_var.get()) / 100.0
+    boxes[n] = [cx - w / 2, cy - (w / aspect[n]) / 2, w, w / aspect[n]]
+    clamp(n)
+    draw()
+    schedule_preview()
+
+
+slider = tk.Scale(side, from_=10, to=100, orient="horizontal", length=220,
+                  variable=zoom_var, command=on_slider,
+                  label="box width (% of image fit)")
+slider.pack(anchor="w")
+
+meta = tk.Label(side, justify="left", fg="#888", wraplength=240,
+                text="\n".join(f"{m['name']}: {m['width']}x{m['height']} "
+                               f"@{m['x']},{m['y']} s={m['scale']}" for m in mons))
+meta.pack(anchor="w", pady=(10, 0))
+
+prev_frame = tk.Frame(root)
+prev_frame.pack(fill="x", padx=8, pady=8)
+prev_labels = {}
+for m in mons:
+    f = tk.Frame(prev_frame, highlightbackground=color[m["name"]],
+                 highlightthickness=1)
+    f.pack(side="left", padx=4)
+    tk.Label(f, text=m["name"]).pack()
+    lab = tk.Label(f)
+    lab.pack()
+    prev_labels[m["name"]] = lab
+preview_after = {"id": None}
+
+
+def update_previews():
+    preview_after["id"] = None
+    for m in mons:
+        n = m["name"]
+        x, y, w, h = (int(round(v)) for v in boxes[n])
+        x = min(max(x, 0), sw - 1)
+        y = min(max(y, 0), sh - 1)
+        w = min(max(w, 1), sw - x)
+        h = min(max(h, 1), sh - y)
+        thumb = img.crop((x, y, x + w, y + h))
+        thumb.thumbnail((240, 135), Image.LANCZOS)
+        tk_img = ImageTk.PhotoImage(thumb)
+        prev_labels[n].config(image=tk_img)
+        prev_labels[n].image = tk_img
+
+
+def schedule_preview():
+    if preview_after["id"] is not None:
+        root.after_cancel(preview_after["id"])
+    preview_after["id"] = root.after(150, update_previews)
+
+
+drag = {"name": None, "dx": 0, "dy": 0}
+
+
+def hit_test(ex, ey):
+    sx, sy = ex / disp_scale, ey / disp_scale
+    for m in reversed(mons):
+        x, y, w, h = boxes[m["name"]]
+        if x <= sx <= x + w and y <= sy <= y + h:
+            return m["name"], sx - x, sy - y
+    return None, 0, 0
+
+
+def on_press(ev):
+    name, dx, dy = hit_test(ev.x, ev.y)
+    if name:
+        select(name)
+        drag.update(name=name, dx=dx, dy=dy)
+
+
+def on_move(ev):
+    if not drag["name"]:
+        return
+    n = drag["name"]
+    sx, sy = ev.x / disp_scale, ev.y / disp_scale
+    _, _, w, h = boxes[n]
+    boxes[n] = [sx - drag["dx"], sy - drag["dy"], w, h]
+    clamp(n)
+    draw()
+    schedule_preview()
+
+
+def on_release(_ev):
+    drag["name"] = None
+
+
+def on_wheel(ev):
+    n = selected["name"]
+    step = 0.98 if (ev.state & 1) else 0.9
+    factor = step if ev.delta > 0 else 1 / step
+    x, y, w, h = boxes[n]
+    cx, cy = x + w / 2, y + h / 2
+    boxes[n] = [cx - w * factor / 2, cy - h * factor / 2,
+                w * factor, h * factor]
+    clamp(n)
+    sync_slider()
+    draw()
+    schedule_preview()
+
+
+def nudge(dx, dy):
+    n = selected["name"]
+    x, y, w, h = boxes[n]
+    boxes[n] = [x + dx, y + dy, w, h]
+    clamp(n)
+    draw()
+    schedule_preview()
+
+
+result = {"save": False}
+
+
+def do_save(_ev=None):
+    result["save"] = True
+    root.destroy()
+
+
+def do_cancel(_ev=None):
+    root.destroy()
+
+
+canvas.bind("<ButtonPress-1>", on_press)
+canvas.bind("<B1-Motion>", on_move)
+canvas.bind("<ButtonRelease-1>", on_release)
+canvas.bind("<MouseWheel>", on_wheel)
+canvas.bind("<Button-4>", lambda e: on_wheel(type("E", (), {"delta": 120, "state": 0})()))
+canvas.bind("<Button-5>", lambda e: on_wheel(type("E", (), {"delta": -120, "state": 0})()))
+for i, m in enumerate(mons[:9]):
+    root.bind(str(i + 1), lambda e, n=m["name"]: select(n))
+root.bind("<Left>", lambda e: nudge(-10 if not e.state & 1 else -1, 0))
+root.bind("<Right>", lambda e: nudge(10 if not e.state & 1 else 1, 0))
+root.bind("<Up>", lambda e: nudge(0, -10 if not e.state & 1 else -1))
+root.bind("<Down>", lambda e: nudge(0, 10 if not e.state & 1 else 1))
+root.bind("<Return>", do_save)
+root.bind("<Escape>", do_cancel)
+
+
+def cycle(_e=None):
+    names = ids()
+    select(names[(names.index(selected["name"]) + 1) % len(names)])
+    return "break"
+
+
+root.bind("<Tab>", cycle)
+
+
+def ids():
+    return [m["name"] for m in mons]
+
+
+def do_reset():
+    scale = max(canvas_w / sw, canvas_h / sh)
+    ox = (canvas_w - sw * scale) / 2
+    oy = (canvas_h - sh * scale) / 2
+    for m in mons:
+        mx = round((m["x"] - min_x) * density)
+        my = round((m["y"] - min_y) * density)
+        mw = round(m["_lw"] * density)
+        mh = round(m["_lh"] * density)
+        boxes[m["name"]] = [(mx - ox) / scale, (my - oy) / scale, mw / scale, mh / scale]
+        clamp(m["name"])
+    sync_slider()
+    draw()
+    schedule_preview()
+
+
+btns = tk.Frame(side)
+btns.pack(anchor="w", pady=(12, 0))
+tk.Button(btns, text="Reset to cover-fit", command=do_reset).pack(side="left", padx=2)
+tk.Button(btns, text="Save & Apply", command=do_save,
+          background="#166534", foreground="white").pack(side="left", padx=2)
+tk.Button(btns, text="Cancel", command=do_cancel).pack(side="left", padx=2)
+
+select(mons[0]["name"])
+draw()
+update_previews()
+try:
+    root.mainloop()
+except tk.TclError:
+    sys.exit("UI closed")
+
+if not result["save"]:
+    sys.exit(1)
+
+tiles = {}
+for n, v in boxes.items():
+    # Round, then re-clamp: round(x)+round(w) can exceed the source by a
+    # pixel even when the float box fits, and load_tiles rejects that.
+    w = min(max(int(round(v[2])), 16), sw)
+    h = min(max(int(round(v[2] / aspect[n])), 16), sh)
+    x = min(max(int(round(v[0])), 0), sw - w)
+    y = min(max(int(round(v[1])), 0), sh - h)
+    if x + w > sw:
+        w = sw - x
+    if y + h > sh:
+        h = sh - y
+    tiles[n] = {"x": x, "y": y, "w": w, "h": h}
+doc = {
+    "hash": bg_hash,
+    "layout_key": layout_key,
+    "layout": [{"name": m["name"], "width": m["width"], "height": m["height"],
+                "x": m["x"], "y": m["y"], "scale": m["scale"]} for m in mons],
+    "canvas": {"w": canvas_w, "h": canvas_h},
+    "src": {"w": sw, "h": sh, "file": src},
+    "tiles": tiles,
+}
+os.makedirs(os.path.dirname(tiles_file), exist_ok=True)
+fd, tmp = tempfile.mkstemp(dir=os.path.dirname(tiles_file), prefix=".tiles.")
+with os.fdopen(fd, "w") as f:
+    json.dump(doc, f, indent=2)
+os.chmod(tmp, 0o644)
+os.replace(tmp, tiles_file)
+print(f"saved tiles for {len(tiles)} monitor(s)")
+PYUI
+}
+
+if [[ "$MODE" == "interactive" ]]; then
+	if run_interactive; then
+		echo "backdrop-split: applying hand-placed tiles"
+		if crops="$(load_tiles)"; then
+			status=0
+			render_crops <<<"$crops" || status=$?
+			exit "$status"
+		else
+			echo "backdrop-split: saved tiles failed validation after picker" >&2
+			exit 1
+		fi
+	else
+		echo "backdrop-split: picker cancelled, nothing changed"
+		exit 0
+	fi
+fi
+
+# Headless default: saved hand-placed tiles win when they match this wallpaper
+# + layout, otherwise fall back to the automatic cover-fit.
+if [[ -f "$tiles_file" ]] && crops="$(load_tiles 2>/dev/null)"; then
+	echo "backdrop-split: reusing saved tiles for this wallpaper + layout"
+	status=0
+	render_crops <<<"$crops" || status=$?
+	exit "$status"
+fi
+
+render_cover_fit
