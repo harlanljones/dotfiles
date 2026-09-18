@@ -1,0 +1,74 @@
+#!/bin/bash
+# Ad-hoc/self-serve verification for the herdr agent integrations.
+# Not wired into CI: run manually with `herdr-verify` after touching any of
+# these files. Checks are cheap and use only local data.
+set -u
+fails=0
+repo="$HOME/.local/share/chezmoi"
+lifecycle="$repo/dot_local/bin/executable_herdr-agent-lifecycle"
+
+# 1. lint every integration script
+for f in "$lifecycle" \
+         "$repo/dot_local/bin/executable_herdr-cline-state" \
+         "$HOME/.gemini/config/hooks/herdr-agent-metadata.sh"; do
+  if shellcheck -s sh "$f" 2>/dev/null; then
+    echo "PASS lint $(basename "$f")"
+  else
+    echo "FAIL lint $f"; fails=$((fails+1))
+  fi
+done
+
+# 2. installed lifecycle copy matches the repo source
+if diff "$HOME/.local/bin/herdr-agent-lifecycle" "$lifecycle" >/dev/null 2>&1; then
+  echo "PASS installed-copy"
+else
+  echo "FAIL installed-copy"; fails=$((fails+1))
+fi
+
+# 3. herdr config matches its template
+want=$(mktemp) ; got=$(mktemp)
+chezmoi execute-template < "$repo/dot_config/herdr/config.toml.tmpl" > "$want" 2>/dev/null
+want_n=$(grep -v '^#' "$want" | grep -cv '^[[:space:]]*$')
+got_n=$(grep -v '^#' "$HOME/.config/herdr/config.toml" | grep -cv '^[[:space:]]*$')
+if [[ $want_n -eq $got_n ]] && diff <(grep -v '^#' "$want" | grep -v '^[[:space:]]*$') \
+     <(grep -v '^#' "$HOME/.config/herdr/config.toml" | grep -v '^[[:space:]]*$') >/dev/null 2>&1; then
+  echo "PASS herdr-config"
+else
+  echo "FAIL herdr-config"; fails=$((fails+1))
+fi
+rm -f "$want" "$got"
+
+# 4. metadata extraction: claude (transcript) and codex (rollout)
+pybody=$(sed -n "/<<'PY'/,/^PY$/p" "$HOME/.local/bin/herdr-agent-lifecycle" | sed '1d;$d')
+tr=""
+while read -r _ f; do
+  if grep -q '"usage"' "$f" 2>/dev/null; then tr="$f"; break; fi
+done < <(find "$HOME/.claude/projects" -name '*.jsonl' -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -5)
+claude_out=$(HOOK_INPUT="{\"transcript_path\":\"$tr\"}" python3 - claude <<< "$pybody" 2>/dev/null)
+case "$claude_out" in *usage_pct=*effort=*|*effort=*usage_pct=*) echo "PASS claude-metadata" ;; *) echo "FAIL claude-metadata ($claude_out)"; fails=$((fails+1)); ;; esac
+codex_cwd=$(python3 -c "
+import json, glob, os
+f = sorted(glob.glob(os.path.expanduser('~/.codex/sessions/*/*/*/rollout-*.jsonl')), key=os.path.getmtime)[-1]
+print(json.loads(open(f, encoding='utf-8', errors='replace').readline())['payload']['cwd'])" 2>/dev/null)
+codex_out=$(HOOK_INPUT="{\"cwd\":\"$codex_cwd\"}" python3 - codex <<< "$pybody" 2>/dev/null)
+case "$codex_out" in *provider=openai*usage_pct=*|*usage_pct=*provider=openai*) echo "PASS codex-metadata" ;; *) echo "FAIL codex-metadata ($codex_out)"; fails=$((fails+1)); ;; esac
+
+# 5. hermes plugin: parses, reports model/provider/effort from profile config
+shim=$(mktemp) ; log=$(mktemp)
+printf '#!/bin/bash\nprintf "%%s\\n" "$*" >> %s\n' "'$log'" > "$shim"
+chmod +x "$shim"
+HERDR_ENV=1 HERDR_PANE_ID=verify HERDR_SOCKET_PATH=x HERDR_BIN_PATH="$shim" \
+  python3 -c "
+import importlib.util, os
+spec = importlib.util.spec_from_file_location('has', os.path.expanduser('~/.hermes/profiles/dotfiles/plugins/herdr-agent-state/__init__.py'))
+m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+m._report_model(model='z-ai/glm-5.3-flash', platform='cli')" 2>/dev/null
+if grep -q "provider=nous" "$log" 2>/dev/null && grep -q "effort=" "$log" 2>/dev/null; then
+  echo "PASS hermes-metadata"
+else
+  echo "FAIL hermes-metadata"; fails=$((fails+1))
+fi
+rm -f "$shim" "$log"
+
+echo "FAILURES=$fails"
+exit $fails

@@ -104,6 +104,9 @@ trusted_hash = "sha256:ff051adf363232a355758bbc96941b87ab8b38bd47e6c5940b1232827
 trusted_hash = "sha256:259af6de997af555cb363624a6db1b8e9a9ec644864293ec97b5abe3ad30eb55"
 
 [tui]
+# "dots" = dot_codex/themes/dots.tmTheme.tmpl, derived from the active
+# `dots theme` palette like every other agent TUI theme.
+theme = "dots"
 status_line = ["model-with-reasoning", "current-dir", "git-branch", "branch-changes", "run-state", "context-used", "five-hour-limit", "weekly-limit", "used-tokens", "task-progress"]
 status_line_use_colors = true
 

@@ -35,8 +35,8 @@ chezmoi:modify-template
 {{-   end -}}
 {{- end -}}
 
-{{- /* tui: the status line is repo-owned; nux counters and the rest are Codex's. */ -}}
-{{- $baseTui := pick (get $base "tui" | default dict) "status_line" "status_line_use_colors" -}}
+{{- /* tui: the status line and theme are repo-owned; nux counters and the rest are Codex's. */ -}}
+{{- $baseTui := pick (get $base "tui" | default dict) "status_line" "status_line_use_colors" "theme" -}}
 {{- $liveTui := get $live "tui" | default dict -}}
 {{- $_ := set $out "tui" (mustMergeOverwrite (deepCopy $liveTui) $baseTui) -}}
 

@@ -1,0 +1,49 @@
+{{- /* OpenCode "dots" theme, derived from the active `dots theme` palette via
+       theme-palette.tmpl - same colors the other agent TUIs get. Selected with
+       "theme": "dots" in tui.json (see modify_tui.jsonc.tmpl). */ -}}
+{{- $p := includeTemplate ".chezmoitemplates/theme-palette.tmpl" . | fromJson -}}
+{
+  "$schema": "https://opencode.ai/theme.json",
+  "defs": {
+    "bg": "{{ $p.bg }}",
+    "panel": "{{ $p.black }}",
+    "element": "{{ $p.selection }}",
+    "fg": "{{ $p.fg }}",
+    "muted": "{{ $p.muted }}",
+    "accent": "{{ $p.accent }}",
+    "blue": "{{ $p.blue }}",
+    "cyan": "{{ $p.cyan }}",
+    "green": "{{ $p.green }}",
+    "yellow": "{{ $p.yellow }}",
+    "red": "{{ $p.red }}",
+    "magenta": "{{ $p.magenta }}"
+  },
+  "theme": {
+    "primary": { "dark": "accent", "light": "accent" },
+    "secondary": { "dark": "blue", "light": "blue" },
+    "accent": { "dark": "cyan", "light": "cyan" },
+    "error": { "dark": "red", "light": "red" },
+    "warning": { "dark": "yellow", "light": "yellow" },
+    "success": { "dark": "green", "light": "green" },
+    "info": { "dark": "cyan", "light": "cyan" },
+    "text": { "dark": "fg", "light": "fg" },
+    "textMuted": { "dark": "muted", "light": "muted" },
+    "background": { "dark": "bg", "light": "bg" },
+    "backgroundPanel": { "dark": "panel", "light": "panel" },
+    "backgroundElement": { "dark": "element", "light": "element" },
+    "border": { "dark": "panel", "light": "panel" },
+    "borderActive": { "dark": "muted", "light": "muted" },
+    "borderSubtle": { "dark": "panel", "light": "panel" },
+    "diffAdded": { "dark": "green", "light": "green" },
+    "diffRemoved": { "dark": "red", "light": "red" },
+    "syntaxComment": { "dark": "muted", "light": "muted" },
+    "syntaxKeyword": { "dark": "magenta", "light": "magenta" },
+    "syntaxFunction": { "dark": "accent", "light": "accent" },
+    "syntaxVariable": { "dark": "fg", "light": "fg" },
+    "syntaxString": { "dark": "green", "light": "green" },
+    "syntaxNumber": { "dark": "yellow", "light": "yellow" },
+    "syntaxType": { "dark": "cyan", "light": "cyan" },
+    "syntaxOperator": { "dark": "blue", "light": "blue" },
+    "syntaxPunctuation": { "dark": "muted", "light": "muted" }
+  }
+}

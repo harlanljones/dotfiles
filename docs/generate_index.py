@@ -149,7 +149,6 @@ CATEGORY_RULES = (
     (".grokbot/", "agents", "grokbot"),
     (".pi/", "agents", "pi"),
     (".hermes/", "agents", "hermes"),
-    (".evotai/", "agents", "evot"),
     (".config/opencode/", "agents", "opencode"),
     # background services
     (".config/systemd/", "services", "user systemd units"),

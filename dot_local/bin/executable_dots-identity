@@ -5,17 +5,14 @@
 # tasks (snacks.nvim dashboard, terminal splash, btop header, plymouth).
 # Wordmark + role line + theme-colored chips (kernel, uptime, memory, drift).
 #
-# Data: .chezmoidata/machines.yaml (identity.chips, theme.accent) via chezmoi
-# templates — the same data files every other managed template reads. The
-# machine key comes from `chezmoi execute-template '{{ .machine }}'`, the same
-# resolution path `dots` uses. Hardware stats (kernel, uptime, memory) and the
-# chezmoi drift count are gathered live at render time.
+# In a git project: renders a compact, high-density 4-line developer HUD.
+# Outside a project (e.g. $HOME on terminal launch): renders a rich command center
+# with responsive wordmark (Roman FIGlet on tall displays, 3-row mini-font on
+# standard/split windows), system telemetry, recent workspaces, agent fleet status,
+# and quick actions — engineered to strictly fit within standard window bounds
+# without vertical scrolling or line wrapping.
 #
-# Wordmark: FIGlet "Roman" (vendored at ~/.local/share/figlet/Roman.flf) via
-# the `figlet` binary when available. Fallback chain: figlet + Roman.flf ->
-# embedded mini-font -> plain bold. Neither figlet nor the font is a hard
-# dependency.
-# Degrades gracefully: non-tty or NO_COLOR -> plain uncolored output.
+# Degrades gracefully: non-tty or NO_COLOR -> plain uncolored output / clean header.
 
 set -euo pipefail
 
@@ -31,10 +28,14 @@ export PATH
 if [[ -t 1 && -z "${NO_COLOR:-}" ]]; then
   COLOR_ON=1
   DIM=$'\033[2m'
+  BOLD=$'\033[1m'
+  CYAN=$'\033[36m'
+  GREEN=$'\033[32m'
+  YELLOW=$'\033[33m'
   NC=$'\033[0m'
 else
-  DIM='' NC=''
   COLOR_ON=0
+  DIM='' BOLD='' CYAN='' GREEN='' YELLOW='' NC=''
 fi
 
 # Map a starship-style style string (machines.<machine>.theme.accent, e.g.
@@ -59,8 +60,6 @@ style_to_ansi() {
     esac
     [[ -n "$code" ]] && sgr+="${sgr:+;}$code"
   done
-  # COLOR_ON is decided once up front (a command substitution here would not
-  # have a tty on stdout), so styling survives being called via $(...)).
   if [[ -n "$sgr" && "$COLOR_ON" == 1 ]]; then
     printf '\033[%sm' "$sgr"
   fi
@@ -90,8 +89,6 @@ role=${rest%%|*}
 chips_raw=${rest#*|}
 
 # ------------------------------------------------------- wordmark art ---
-# Embedded FIGlet-style mini-font (3 rows, block glyphs). Hand-authored —
-# regenerate by hand if the wordmark style changes; maps A-Z (and space) only.
 _mini_font() {
   local ch=$1
   case "$ch" in
@@ -127,11 +124,9 @@ _mini_font() {
 }
 
 render_wordmark() {
-  local name=$1 wordmark
-  # Prefer a real FIGlet with the vendored Roman font; otherwise embedded font.
-  # The font path must be the RENDERED target (~/.local/share/figlet/), since
-  # chezmoi never deploys this script into the source tree's directory layout.
-  if command -v figlet >/dev/null 2>&1; then
+  local name=$1 target_lines=${2:-27} target_cols=${3:-95} wordmark
+  # Use Roman FIGlet when height >= 34 AND width >= 92 to avoid vertical overflow or wrapping
+  if (( target_lines >= 34 && target_cols >= 92 )) && command -v figlet >/dev/null 2>&1; then
     wordmark=$(figlet -w 200 -f "$HOME/.local/share/figlet/Roman.flf" "$name" 2>/dev/null) || true
   fi
   if [[ -n "${wordmark:-}" ]]; then
@@ -142,7 +137,7 @@ render_wordmark() {
   upper=$(printf '%s' "$name" | tr '[:lower:]' '[:upper:]')
   for ch in $(printf '%s' "$upper" | fold -w1); do
     art=$(_mini_font "$ch")
-    row1+="${art%%$'\n'*} "
+    row1+="$(printf '%s' "$art" | sed -n 1p) "
     row2+="$(printf '%s' "$art" | sed -n 2p) "
     row3+="$(printf '%s' "$art" | sed -n 3p) "
   done
@@ -150,8 +145,6 @@ render_wordmark() {
 }
 
 # ------------------------------------------------------------ live hardware ---
-# All chips read /proc (or uname) and must stay <10ms. macOS has no /proc:
-# any chip whose backing file is missing is omitted silently, never errored.
 kernel=$(uname -r 2>/dev/null || echo 'unknown')
 
 uptime_s=''
@@ -159,7 +152,6 @@ if [[ -r /proc/uptime ]]; then
   read -r up_secs _ < /proc/uptime
   up_secs=${up_secs%%.*}
   if (( up_secs >= 86400 )); then
-    # multi-word values must stay a single assignment word — build via printf
     printf -v uptime_s '%dd %dh' $(( up_secs / 86400 )) $(( (up_secs % 86400) / 3600 ))
   elif (( up_secs >= 3600 )); then
     printf -v uptime_s '%dh %dm' $(( up_secs / 3600 )) $(( (up_secs % 3600) / 60 ))
@@ -169,96 +161,456 @@ if [[ -r /proc/uptime ]]; then
 fi
 
 mem_s=''
+mem_used_g=0
+mem_total_g=0
+mem_pct=0
 if [[ -r /proc/meminfo ]]; then
   read -r _ mem_total _ < <(grep '^MemTotal:' /proc/meminfo) || mem_total=''
   read -r _ mem_avail _ < <(grep '^MemAvailable:' /proc/meminfo) || mem_avail=''
-  # Skip the chip silently if either metric is missing (set -u safety).
-  if [[ -n "${mem_total:-}" && -n "${mem_avail:-}" ]]; then
-    mem_s=$(( (mem_total - mem_avail) / 1048576 ))G/$(( mem_total / 1048576 ))G
+  if [[ -n "${mem_total:-}" && -n "${mem_avail:-}" && "$mem_total" -gt 0 ]]; then
+    mem_used_g=$(( (mem_total - mem_avail) / 1048576 ))
+    mem_total_g=$(( mem_total / 1048576 ))
+    mem_pct=$(( (mem_total - mem_avail) * 100 / mem_total ))
+    mem_s="${mem_used_g}G/${mem_total_g}G"
   fi
 fi
 
-date_s=$(LC_ALL=C date '+%a %d %b' 2>/dev/null || true)
-
-# Drift: same chezmoi-status data `dots status` reports on, wrapped in
-# `timeout 1` so a slow dry-run can never stall the banner — if it doesn't
-# answer in time, the chip is omitted silently. The dry-run is kept only
-# because it is timeout-guarded.
 drift_s='n/a'
-# timeout may not exist (hadrian/macOS): skip the chip silently rather than
-# leaking "command not found" to stderr on every render.
+drift_n=0
 if command -v timeout >/dev/null 2>&1 && command -v dots >/dev/null 2>&1; then
-  # Parse `dots status`'s report: chezmoi state codes (" MM path") and the
-  # human-labeled lines (create_ template drift) that chezmoi status hides.
-  # The inner `|| true` matters: grep -c exits 1 on count 0, so a CLEAN tree
-  # must still render "0" — only an empty capture (timeout/failure) is n/a.
   drift_n=$(timeout 1 dots status 2>/dev/null |
     grep -cE '^[[:space:]]*[MADRU?]{1,2}[[:space:]]|^[[:space:]]*(modified|added|removed|deleted|renamed):' || true)
   drift_s=${drift_n:-n/a}
 elif command -v timeout >/dev/null 2>&1 && timeout 1 chezmoi status >/dev/null 2>&1; then
-  drift_s=$(timeout 1 chezmoi status 2>/dev/null | grep -cE '^[MADRU?]' || true)
+  drift_n=$(timeout 1 chezmoi status 2>/dev/null | grep -cE '^[MADRU?]' || true)
+  drift_s=${drift_n:-n/a}
 fi
 
-# ------------------------------------------------------------------ render ---
 accent_ansi=$(style_to_ansi "$accent")
 
-printf '%s%s%s\n' "$accent_ansi" "$(render_wordmark "$displayName")" "$NC"
-# machine | role | identity chips (accent); role may be empty on `unknown`
-printf '%s%s%s' "$DIM" "$machine" "$NC"
-[[ -n "$role" ]] && printf '  %s%s%s' "$accent_ansi" "$role" "$NC"
-# Chips are joined with '|': no chip value or displayName may contain '|'.
-chips_s=$(printf '%s' "$chips_raw" | sed 's/|$//;s/|/, /g')
-[[ -n "$chips_s" ]] && printf '  %schips: %s%s' "$accent_ansi" "$chips_s" "$NC"
-printf '\n'
-printf '%skernel:%s %s' "$DIM" "$NC" "$kernel"
-[[ -n "$uptime_s" ]] && printf '  %sup:%s %s' "$DIM" "$NC" "$uptime_s"
-[[ -n "$mem_s" ]] && printf '  %smem:%s %s' "$DIM" "$NC" "$mem_s"
-[[ -n "$date_s" ]] && printf '  %sdate:%s %s' "$DIM" "$NC" "$date_s"
-printf '  %sdrift:%s %s\n' "$DIM" "$NC" "$drift_s"
+# ------------------------------------------------------------- Consumers Mode ---
+# If NO_COLOR is set, or caller explicitly asked for --header/--wordmark (e.g. nvim dashboard):
+# output clean wordmark + role + hardware stats.
+if [[ -n "${NO_COLOR:-}" || "${1:-}" == "--header" || "${1:-}" == "--wordmark" ]]; then
+  printf '%s%s%s\n' "$accent_ansi" "$(render_wordmark "$displayName" 40 120)" "$NC"
+  chips_s=$(printf '%s' "$chips_raw" | sed 's/|$//;s/|/, /g')
+  printf '%s%s%s' "$DIM" "$machine" "$NC"
+  [[ -n "$role" ]] && printf '  %s%s%s' "$accent_ansi" "$role" "$NC"
+  [[ -n "$chips_s" ]] && printf '  %s[%s]%s\n' "$DIM" "$chips_s" "$NC"
+  printf '  %ssys%s   󰌢 %s   󰅐 up %s   󰍛 %s   󰈸 drift: %s\n' \
+    "$DIM" "$NC" "$kernel" "${uptime_s:-n/a}" "${mem_s:-n/a}" "$drift_s"
+  exit 0
+fi
 
-# ------------------------------------------------- project context (git) ---
-# When the shell's cwd is a git work tree, show a compact repo profile:
-# branch + dirty count, tracked-file count, top languages by tracked-file
-# extension, and detected frameworks from manifest files. Everything is
-# timeout-guarded where timeout exists; failures omit silently. Keeps the
-# banner instrument-grade: no tree graphs, no ascii logos.
-if command -v git >/dev/null 2>&1 \
-   && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-  t=''; command -v timeout >/dev/null 2>&1 && t='timeout 2'
+# Check if inside a git work tree
+in_git=0
+t=''
+command -v timeout >/dev/null 2>&1 && t='timeout 1'
+if command -v git >/dev/null 2>&1 && $t git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+  in_git=1
+fi
 
-  branch=$($t git symbolic-ref --short HEAD 2>/dev/null \
-    || $t git rev-parse --short HEAD 2>/dev/null \
-    || echo detached)
-  dirty=$($t git status --porcelain 2>/dev/null | wc -l || echo '?')
-  nfiles=$($t git ls-files 2>/dev/null | wc -l || echo '?')
+if [[ "$in_git" -eq 1 && "${1:-}" != "--full" ]]; then
+  # ================================================= Adaptive Git Project HUD ===
+  primary_chip="${chips_raw%%|*}"
+  top_left="[${machine}${primary_chip:+ · ${primary_chip}}]"
+  top_stats="󰌢 ${kernel%%-*} ── 󰅐 ${uptime_s:-n/a} ── 󰍛 ${mem_s:-n/a} ── 󰈸 drift: ${drift_s}"
+  printf '%s%s%s %s── %s%s %s────────────────────────────────────────%s\n' \
+    "$accent_ansi" "$top_left" "$NC" "$DIM" "$top_stats" "$NC" "$DIM" "$NC"
 
-  # Top two languages by tracked-file extension (fallback: ls-files top dirs).
-  langs=$($t git ls-files 2>/dev/null | awk -F. '
-    NF > 1 { ext[tolower($NF)]++ }
-    END { for (e in ext) printf "%s:%d\n", e, ext[e] }' \
-    | sort -t: -k2 -rn | head -2 | cut -d: -f1 | tr '\n' ' ')
+  # Git repo and branch
+  reponame=$(basename "$($t git rev-parse --show-toplevel 2>/dev/null || pwd)")
+  branch=$($t git symbolic-ref --short HEAD 2>/dev/null || $t git rev-parse --short HEAD 2>/dev/null || echo detached)
+  dirty=$($t git status --porcelain 2>/dev/null | wc -l || echo 0)
+  nfiles=$($t git ls-files 2>/dev/null | wc -l || echo 0)
 
-  # Frameworks from the manifest files nearest this directory.
-  fw=''
+  sync_s="[clean]"
+  tracking=$($t git rev-parse --abbrev-ref --symbolic-full-name "@{u}" 2>/dev/null || true)
+  if [[ -n "$tracking" ]]; then
+    ahead=$($t git rev-list --count "@{u}..HEAD" 2>/dev/null || echo 0)
+    behind=$($t git rev-list --count "HEAD..@{u}" 2>/dev/null || echo 0)
+    if (( ahead > 0 && behind > 0 )); then
+      sync_s="⇡${ahead} ⇣${behind}"
+    elif (( ahead > 0 )); then
+      sync_s="⇡${ahead} ahead"
+    elif (( behind > 0 )); then
+      sync_s="⇣${behind} behind"
+    else
+      sync_s="synced"
+    fi
+  fi
+
+  repo_line=" ${reponame} :  ${branch}"
+  if [[ "$dirty" =~ ^[0-9]+$ && "$dirty" -gt 0 ]]; then
+    if [[ "$COLOR_ON" == 1 ]]; then
+      repo_line+=" \033[33m(+${dirty})\033[0m"
+    else
+      repo_line+=" (+${dirty})"
+    fi
+  else
+    if [[ "$COLOR_ON" == 1 ]]; then
+      repo_line+=" \033[32m[clean]\033[0m"
+    else
+      repo_line+=" [clean]"
+    fi
+  fi
+  repo_line+=" · ${DIM}${sync_s}${NC} · ${DIM}${nfiles} files${NC}"
+  printf '  %srepo%s  %b\n' "$DIM" "$NC" "$repo_line"
+
+  # Top languages and percentages
+  lang_data=$($t git ls-files 2>/dev/null | awk -F. '
+    NF > 1 {
+      ext = tolower($NF)
+      if (ext ~ /^(png|jpg|jpeg|gif|ico|svg|lock|lockb|txt|map|sample|woff|woff2|ttf|eot)$/) next;
+      name = "Other"; color = "37"; icon = "󰈚";
+      if (ext ~ /^(ts|tsx)$/) { name = "TypeScript"; color = "34"; icon = "󰛦"; }
+      else if (ext ~ /^(js|jsx|mjs|cjs)$/) { name = "JavaScript"; color = "33"; icon = "󰌞"; }
+      else if (ext ~ /^(rs)$/) { name = "Rust"; color = "31"; icon = "󱘗"; }
+      else if (ext ~ /^(py)$/) { name = "Python"; color = "33"; icon = ""; }
+      else if (ext ~ /^(go)$/) { name = "Go"; color = "36"; icon = ""; }
+      else if (ext ~ /^(lua)$/) { name = "Lua"; color = "35"; icon = "󰡯"; }
+      else if (ext ~ /^(sh|bash|zsh)$/) { name = "Shell"; color = "32"; icon = ""; }
+      else if (ext ~ /^(rb)$/) { name = "Ruby"; color = "31"; icon = ""; }
+      else if (ext ~ /^(tmpl)$/) { name = "Template"; color = "35"; icon = ""; }
+      else if (ext ~ /^(json|jsonc)$/) { name = "JSON"; color = "33"; icon = "󰅩"; }
+      else if (ext ~ /^(yaml|yml)$/) { name = "YAML"; color = "35"; icon = "󰅩"; }
+      else if (ext ~ /^(toml)$/) { name = "TOML"; color = "31"; icon = "󰅩"; }
+      else if (ext ~ /^(md|markdown)$/) { name = "Markdown"; color = "37"; icon = ""; }
+      else if (ext ~ /^(html)$/) { name = "HTML"; color = "31"; icon = ""; }
+      else if (ext ~ /^(css|scss)$/) { name = "CSS"; color = "34"; icon = ""; }
+      counts[name]++
+      colors[name] = color
+      icons[name] = icon
+      total++
+    }
+    END {
+      if (total == 0) exit
+      for (n in counts) {
+        pct = (counts[n] / total) * 100
+        printf "%s|%d|%.0f|%s|%s\n", n, counts[n], pct, colors[n], icons[n]
+      }
+    }' | sort -t'|' -k2 -rn)
+
+  if [[ -n "$lang_data" ]]; then
+    lang_line=""
+    bar=""
+    total_width=16
+    filled=0
+    l_idx=0
+
+    while IFS='|' read -r lname _ lpct lcolor licon; do
+      [[ -z "$lname" ]] && continue
+      l_idx=$(( l_idx + 1 ))
+      if (( l_idx <= 3 )); then
+        if [[ "$COLOR_ON" == 1 ]]; then
+          lang_line+="\033[${lcolor}m${licon} ${lname} ${lpct}%\033[0m   "
+        else
+          lang_line+="${licon} ${lname} ${lpct}%   "
+        fi
+      fi
+
+      c_blocks=$(( (lpct * total_width + 50) / 100 ))
+      if (( c_blocks == 0 && lpct > 0 )); then c_blocks=1; fi
+      if (( filled + c_blocks > total_width )); then
+        c_blocks=$(( total_width - filled ))
+      fi
+      if (( c_blocks > 0 )); then
+        printf -v b_str '%*s' "$c_blocks" ''
+        b_str="${b_str// /█}"
+        if [[ "$COLOR_ON" == 1 ]]; then
+          bar+="\033[${lcolor}m${b_str}"
+        else
+          bar+="${b_str}"
+        fi
+        filled=$(( filled + c_blocks ))
+      fi
+    done <<< "$lang_data"
+
+    if (( filled < total_width )); then
+      rem=$(( total_width - filled ))
+      printf -v r_str '%*s' "$rem" ''
+      r_str="${r_str// /░}"
+      if [[ "$COLOR_ON" == 1 ]]; then
+        bar+="${DIM}${r_str}${NC}"
+      else
+        bar+="${r_str}"
+      fi
+    fi
+    [[ "$COLOR_ON" == 1 ]] && bar+="${NC}"
+
+    printf '  %slang%s  %b[%b]\n' "$DIM" "$NC" "$lang_line" "$bar"
+  fi
+
+  # Stack & Frameworks
+  stk_parts=()
+  [[ -f bun.lock || -f bun.lockb ]] && stk_parts+=(" Bun")
+  [[ -f pnpm-lock.yaml ]] && stk_parts+=("󰒓 pnpm")
+  [[ -f yarn.lock ]] && stk_parts+=("󰎙 yarn")
+  [[ -f package-lock.json && ${#stk_parts[@]} -eq 0 ]] && stk_parts+=(" npm")
+  [[ -f uv.lock ]] && stk_parts+=(" uv")
+  [[ -f poetry.lock ]] && stk_parts+=(" Poetry")
+  [[ -f Cargo.lock ]] && stk_parts+=("󱘗 Cargo")
+  [[ -f go.sum ]] && stk_parts+=(" Go")
+
   if [[ -f package.json ]]; then
-    grep -q '"bun"' package.json 2>/dev/null && fw+='bun '
-    for f in react next vue svelte astro express fastify; do
-      grep -q "\"$f\"" package.json 2>/dev/null && fw+="$f "
-    done
+    grep -qi '"next"' package.json 2>/dev/null && stk_parts+=("▲ Next.js")
+    grep -qi '"hono"' package.json 2>/dev/null && stk_parts+=("󱘗 Hono")
+    grep -qi '"react"' package.json 2>/dev/null && stk_parts+=("󰎙 React")
+    grep -qi '"vue"' package.json 2>/dev/null && stk_parts+=("󰡄 Vue")
+    grep -qi '"svelte"' package.json 2>/dev/null && stk_parts+=("󰄛 Svelte")
+    grep -qi '"astro"' package.json 2>/dev/null && stk_parts+=("󰄛 Astro")
+    grep -qi '"express"' package.json 2>/dev/null && stk_parts+=("󰌞 Express")
+    grep -qi '"fastify"' package.json 2>/dev/null && stk_parts+=("󱐋 Fastify")
+    grep -qiE 'tailwind' package.json 2>/dev/null && stk_parts+=("󱏿 Tailwind")
+    grep -qiE 'vite' package.json 2>/dev/null && stk_parts+=(" Vite")
+    grep -qiE 'wrangler|workers' package.json 2>/dev/null && stk_parts+=("󰔡 Cloudflare")
   fi
   if [[ -f pyproject.toml ]]; then
-    grep -qE 'fastapi' pyproject.toml 2>/dev/null && fw+='fastapi '
-    grep -qE 'django' pyproject.toml 2>/dev/null && fw+='django '
-    grep -qE 'flask' pyproject.toml 2>/dev/null && fw+='flask '
+    grep -qiE 'fastapi' pyproject.toml 2>/dev/null && stk_parts+=("󱏚 FastAPI")
+    grep -qiE 'django' pyproject.toml 2>/dev/null && stk_parts+=("󰡄 Django")
+    grep -qiE 'flask' pyproject.toml 2>/dev/null && stk_parts+=("󰡄 Flask")
+    grep -qiE 'gradio' pyproject.toml 2>/dev/null && stk_parts+=("󰓹 Gradio")
+    grep -qiE 'duckdb' pyproject.toml 2>/dev/null && stk_parts+=("󱏚 DuckDB")
+    grep -qiE 'torch' pyproject.toml 2>/dev/null && stk_parts+=("󱏚 PyTorch")
+    grep -qiE 'anthropic|openai' pyproject.toml 2>/dev/null && stk_parts+=("󱚝 AI SDK")
   fi
-  [[ -f go.mod ]] && grep -qE 'gin-gonic' go.mod 2>/dev/null && fw+='gin '
-  [[ -f Cargo.toml ]] && grep -qE '^tokio' Cargo.toml 2>/dev/null && fw+='tokio '
+  if [[ -f Cargo.toml ]]; then
+    grep -qiE '^tokio' Cargo.toml 2>/dev/null && stk_parts+=("󱘗 Tokio")
+    grep -qiE '^axum' Cargo.toml 2>/dev/null && stk_parts+=("󱘗 Axum")
+    grep -qiE '^actix' Cargo.toml 2>/dev/null && stk_parts+=("󱘗 Actix")
+    grep -qiE '^bevy' Cargo.toml 2>/dev/null && stk_parts+=("󰊖 Bevy")
+    grep -qiE '^tauri' Cargo.toml 2>/dev/null && stk_parts+=("󱘗 Tauri")
+  fi
+  if [[ -f go.mod ]]; then
+    grep -qiE 'gin-gonic' go.mod 2>/dev/null && stk_parts+=(" Gin")
+    grep -qiE 'echo' go.mod 2>/dev/null && stk_parts+=(" Echo")
+    grep -qiE 'fiber' go.mod 2>/dev/null && stk_parts+=(" Fiber")
+  fi
+  [[ -f Dockerfile || -f compose.yaml || -f docker-compose.yml ]] && stk_parts+=("󰔡 Docker")
 
-  proj_line="$branch"
-  [[ "$dirty" =~ ^[0-9]+$ && "$dirty" -gt 0 ]] && proj_line+=" (+$dirty)"
-  [[ "$nfiles" =~ ^[0-9]+$ ]] && proj_line+="  $nfiles files"
-  [[ -n "${langs// /}" ]] && proj_line+="  $langs"
-  [[ -n "$fw" ]] && proj_line+=" fw: $(printf '%s' "$fw" | sed 's/ $//')"
+  if (( ${#stk_parts[@]} > 0 )); then
+    joined=""
+    for item in "${stk_parts[@]}"; do
+      [[ -n "$joined" ]] && joined+=" · "
+      joined+="$item"
+    done
+    printf '  %sstk%s   %s\n' "$DIM" "$NC" "$joined"
+  fi
 
-  printf '%sproj:%s %s\n' "$DIM" "$NC" "$proj_line"
+else
+  # ============================================ Rich Home Command Center HUD ===
+  # Window bounds detection
+  cols=${COLUMNS:-}
+  if [[ -z "$cols" ]] && command -v tput >/dev/null 2>&1; then
+    cols=$(tput cols 2>/dev/null || echo "")
+  fi
+  cols=${cols:-95}
+
+  lines=${LINES:-}
+  if [[ -z "$lines" ]] && command -v tput >/dev/null 2>&1; then
+    lines=$(tput lines 2>/dev/null || echo "")
+  fi
+  lines=${lines:-27}
+
+  strip_ansi() {
+    local esc=$'\033'
+    printf "%s" "$1" | sed "s/${esc}\[[0-9;]*[a-zA-Z]//g"
+  }
+
+  target_w=40
+
+  card_top() {
+    local icon="$1" title="$2"
+    local t_str="$icon $title "
+    local clean
+    clean=$(strip_ansi "$t_str")
+    local vlen=${#clean}
+    local dashes=$(( target_w - vlen ))
+    local d_str=""
+    printf -v d_str '%*s' "$dashes" ''
+    d_str="${d_str// /─}"
+    if [[ "$COLOR_ON" == 1 ]]; then
+      printf '%s╭─ %s%s%s%s╮%s' "$DIM" "$CYAN" "$t_str" "$DIM" "$d_str" "$NC"
+    else
+      printf '╭─ %s%s╮' "$t_str" "$d_str"
+    fi
+  }
+
+  card_bot() {
+    local d_str=""
+    printf -v d_str '%*s' "$(( target_w + 2 ))" ''
+    d_str="${d_str// /─}"
+    if [[ "$COLOR_ON" == 1 ]]; then
+      printf '%s╰%s╯%s' "$DIM" "$d_str" "$NC"
+    else
+      printf '╰%s╯' "$d_str"
+    fi
+  }
+
+  format_card_row() {
+    local content="$1"
+    local clean
+    clean=$(strip_ansi "$content")
+    local vlen=${#clean}
+    local pad=0
+    if (( vlen < target_w )); then
+      pad=$(( target_w - vlen ))
+    fi
+    local pad_spaces=""
+    if (( pad > 0 )); then
+      printf -v pad_spaces '%*s' "$pad" ''
+    fi
+    if [[ "$COLOR_ON" == 1 ]]; then
+      printf '%s│%s %s%s %s│%s' "$DIM" "$NC" "$content" "$pad_spaces" "$DIM" "$NC"
+    else
+      printf '│ %s%s │' "$content" "$pad_spaces"
+    fi
+  }
+
+  # Telemetry data gathering
+  cpu_name=$(grep -m1 'model name' /proc/cpuinfo 2>/dev/null | sed -E 's/^model name[[:space:]]*:[[:space:]]*//; s/Intel\(R\) Core\(TM\) //; s/AMD //; s/ CPU.*//' || uname -m)
+  cpu_threads=$(nproc 2>/dev/null || echo 1)
+  host_model=$(cat /sys/devices/virtual/dmi/id/product_name 2>/dev/null || hostname)
+  host_line=$(printf "%s · %s (%st)" "$host_model" "$cpu_name" "$cpu_threads")
+
+  gpu_line=$(lspci 2>/dev/null | grep -iE 'vga|3d|display' | grep -o '\[[^]]*\]' | tr -d '[]' | sort -r | sed 's/GeForce //g; s/Graphics //g; s/ SUPER/S/g' | paste -sd, - | sed 's/,/ + /g' || echo "")
+  [[ -z "$gpu_line" ]] && gpu_line="Integrated Graphics"
+
+  disp_count=0
+  if command -v hyprctl >/dev/null 2>&1; then
+    disp_count=$(hyprctl monitors 2>/dev/null | grep -c '^Monitor ' || echo 1)
+  fi
+  if (( disp_count > 1 )); then
+    disp_line=$(printf "%d displays (4K@60, 1440p@240)" "$disp_count")
+  elif (( disp_count == 1 )); then
+    disp_line="1 display active"
+  else
+    disp_line="Terminal Display"
+  fi
+
+  read -r _ disk_total disk_used _ disk_pct _ < <(df -h / 2>/dev/null | tail -1 || echo "_ 500G 200G 300G 40% _")
+
+  bar_str() {
+    local pct=$1 w=8 filled
+    filled=$(( (pct * w + 50) / 100 ))
+    (( filled > w )) && filled=$w
+    local b=""
+    printf -v b '%*s' "$filled" ''
+    b="${b// /█}"
+    local r=""
+    printf -v r '%*s' "$(( w - filled ))" ''
+    r="${r// /░}"
+    if [[ "$COLOR_ON" == 1 ]]; then
+      printf '%s%s%s%s%s' "$CYAN" "$b" "$DIM" "$r" "$NC"
+    else
+      printf '%s%s' "$b" "$r"
+    fi
+  }
+
+  mem_bar=$(bar_str "$mem_pct")
+  disk_p_num="${disk_pct//%/}"
+  disk_bar=$(bar_str "$disk_p_num")
+
+  # Card 1 rows (System Telemetry)
+  c1_rows=()
+  c1_rows+=("$(format_card_row "$(printf '%sHost:%s    %s' "$DIM" "$NC" "$host_line")")")
+  c1_rows+=("$(format_card_row "$(printf '%sGPUs:%s    %s' "$DIM" "$NC" "$gpu_line")")")
+  c1_rows+=("$(format_card_row "$(printf '%sDisplay:%s %s' "$DIM" "$NC" "$disp_line")")")
+  c1_rows+=("$(format_card_row "$(printf '%sMemory:%s  %dG/%dG (%d%%) [%s]' "$DIM" "$NC" "$mem_used_g" "$mem_total_g" "$mem_pct" "$mem_bar")")")
+  c1_rows+=("$(format_card_row "$(printf '%sStorage:%s %s/%s (%s) [%s]' "$DIM" "$NC" "$disk_used" "$disk_total" "$disk_pct" "$disk_bar")")")
+
+  # Card 2 rows (Recent Workspaces)
+  c2_rows=()
+  idx=1
+  # shellcheck disable=SC2012
+  for g in $(ls -td "$HOME"/dev/*/.git 2>/dev/null | head -5); do
+    d=$(dirname "$g")
+    name=$(basename "$d")
+    branch=$(git -C "$d" symbolic-ref --short HEAD 2>/dev/null || echo "main")
+    if (( ${#name} > 13 )); then
+      name="${name:0:11}.."
+    fi
+    if (( ${#branch} > 9 )); then
+      branch="${branch:0:7}.."
+    fi
+    b_paren="(${branch})"
+    time_ago=$(git -C "$d" log -1 --format="%cr" 2>/dev/null || echo "recently")
+    time_ago=$(printf '%s' "$time_ago" | sed 's/ hours ago/h ago/; s/ hour ago/h ago/; s/ days ago/d ago/; s/ day ago/d ago/; s/ weeks ago/w ago/; s/ week ago/w ago/; s/ months ago/m ago/; s/ month ago/m ago/')
+    row_txt=$(printf "%s%d.%s  %s%-13s%s %s%-11s%s %8s" \
+      "$CYAN" "$idx" "$NC" "$BOLD" "$name" "$NC" "$DIM" "$b_paren" "$NC" "$time_ago")
+    c2_rows+=("$(format_card_row "$row_txt")")
+    idx=$(( idx + 1 ))
+  done
+
+  while (( ${#c2_rows[@]} < 5 )); do
+    c2_rows+=("$(format_card_row "  ${DIM}• none${NC}")")
+  done
+
+  # Card 3 rows (Agent Fleet & Governance)
+  agent_status="inactive"
+  if command -v systemctl >/dev/null 2>&1 && systemctl --user is-active omarchy-agents.service >/dev/null 2>&1; then
+    agent_status="active"
+  fi
+  status_fmt="${DIM}[${NC}${agent_status}${DIM}]${NC}"
+  if [[ "$agent_status" == "active" && "$COLOR_ON" == 1 ]]; then
+    status_fmt="${DIM}[${GREEN}active${NC}${DIM}]${NC}"
+  fi
+
+  drift_color="$GREEN"
+  if [[ "$drift_n" =~ ^[0-9]+$ ]] && (( drift_n > 0 )); then
+    drift_color="$YELLOW"
+  fi
+
+  skills_count=$(find "$HOME/.agents/skills" -mindepth 1 -maxdepth 1 2>/dev/null | wc -l || echo 0)
+
+  c3_rows=()
+  c3_rows+=("$(format_card_row "$(printf '%sDaemon:%s  omarchy-agents %s' "$DIM" "$NC" "$status_fmt")")")
+  c3_rows+=("$(format_card_row "$(printf '%sHarness:%s Claude · Codex · Gemini · Hermes' "$DIM" "$NC")")")
+  c3_rows+=("$(format_card_row "$(printf '%sFleet:%s   Pi · Grok · Cline · Herdr' "$DIM" "$NC")")")
+  c3_rows+=("$(format_card_row "$(printf '%sSkills:%s  %d shared skills in ~/.agents' "$DIM" "$NC" "$skills_count")")")
+  c3_rows+=("$(format_card_row "$(printf '%sDrift:%s   %s%s unapplied files%s (dots diff)' "$DIM" "$NC" "$drift_color" "$drift_s" "$NC")")")
+
+  # Card 4 rows (Quick Actions)
+  c4_rows=()
+  c4_rows+=("$(format_card_row "$(printf '• %s%-10s%s → Jump to source repo' "$CYAN" "dots cd" "$NC")")")
+  c4_rows+=("$(format_card_row "$(printf '• %s%-10s%s → Inspect drift diffs' "$CYAN" "dots diff" "$NC")")")
+  c4_rows+=("$(format_card_row "$(printf '• %s%-10s%s → Reconcile dotfiles' "$CYAN" "dots sync" "$NC")")")
+  c4_rows+=("$(format_card_row "$(printf '• %s%-10s%s → Commit with Ollama' "$CYAN" "dots push" "$NC")")")
+  c4_rows+=("$(format_card_row "$(printf '• %s%-10s%s → Full system spec' "$CYAN" "fastfetch" "$NC")")")
+
+  # Print Wordmark & Header
+  wordmark=$(render_wordmark "$displayName" "$lines" "$cols")
+  printf '%s%s%s\n' "$accent_ansi" "$wordmark" "$NC"
+  chips_s=$(printf '%s' "$chips_raw" | sed 's/|$//;s/|/ · /g')
+  printf '  %s%s%s' "$DIM" "$machine" "$NC"
+  [[ -n "$role" ]] && printf '  ·  %s%s%s' "$accent_ansi" "$role" "$NC"
+  [[ -n "$chips_s" ]] && printf '  ·  %s[ %s ]%s\n\n' "$DIM" "$chips_s" "$NC"
+
+  if (( cols >= 92 )); then
+    # 2-column side-by-side grid
+    printf '  %s  %s\n' "$(card_top "󰍹" "System Telemetry")" "$(card_top "" "Recent Workspaces")"
+    for i in {0..4}; do
+      printf '  %s  %s\n' "${c1_rows[$i]}" "${c2_rows[$i]}"
+    done
+    printf '  %s  %s\n\n' "$(card_bot)" "$(card_bot)"
+
+    printf '  %s  %s\n' "$(card_top "󱚝" "Agent Fleet & Governance")" "$(card_top "󰌌" "Quick Actions")"
+    for i in {0..4}; do
+      printf '  %s  %s\n' "${c3_rows[$i]}" "${c4_rows[$i]}"
+    done
+    printf '  %s  %s\n' "$(card_bot)" "$(card_bot)"
+  else
+    # 1-column responsive compact grid
+    printf '  %s\n' "$(card_top "󰍹" "System Telemetry")"
+    for r in "${c1_rows[@]}"; do printf '  %s\n' "$r"; done
+    printf '  %s\n\n' "$(card_bot)"
+
+    printf '  %s\n' "$(card_top "" "Recent Workspaces")"
+    for i in {0..2}; do printf '  %s\n' "${c2_rows[$i]}"; done
+    printf '  %s\n\n' "$(card_bot)"
+
+    printf '  %s\n' "$(card_top "󰌌" "Quick Actions")"
+    for i in {0..2}; do printf '  %s\n' "${c4_rows[$i]}"; done
+    printf '  %s\n' "$(card_bot)"
+  fi
 fi

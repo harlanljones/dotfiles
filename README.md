@@ -201,7 +201,7 @@ two of these, or an apply will fight your package manager:
 | Homebrew (macOS) | `~/.Brewfile` | brews + casks (Ghostty, JetBrainsMono Nerd Font, …) |
 | pacman/paru (Augustus) | `dot_config/pacman/pkglist.txt` + `aurlist.txt` | native + AUR packages |
 | apt (Vespasian) | `dot_config/apt/pkglist.txt` | age, build-essential, curl, erlang-nox, jq, postgresql, sqlite3, tailscale, unzip |
-| standalone/scripts | `dot_local/bin/`, `~/.fly/bin` | flyctl, evot, chrome-profile, custom usage collectors |
+| standalone/scripts | `dot_local/bin/`, `~/.fly/bin` | flyctl, chrome-profile, custom usage collectors |
 
 Install order on a new machine: system packages first (Brewfile / pkglist /
 apt), then `mise install`, then the npm-layer `bun install` at the repo root —
@@ -373,6 +373,9 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   └── 10-machine.conf.tmpl
 │   ├── eza
 │   │   └── theme.yml.tmpl
+│   ├── fastfetch
+│   │   ├── augustus.jpg
+│   │   └── config.jsonc.tmpl
 │   ├── fzf
 │   │   └── theme.sh.tmpl
 │   ├── gh
@@ -483,8 +486,6 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │       └── omarchy-* units (13 — scrapers, relays, daemons)
 │   └── zoxide
 │       └── config.toml
-├── dot_evotai
-│   └── evot.env
 ├── dot_gemini
 │   ├── agents
 │   │   ├── private_codebase-memory-auditor.md
@@ -504,8 +505,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │       └── herdr.json
 ├── dot_hermes
 │   ├── SOUL.md
-│   ├── config.yaml.tmpl
-│   └── skills/ (456 files across 36 skill groups — see .chezmoidata/hermes_skills.yaml)
+│   └── config.yaml.tmpl
 ├── dot_local
 │   ├── bin
 │   │   ├── cline-safety
@@ -539,8 +539,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   ├── executable_piper
 │   │   ├── executable_ratbagctl
 │   │   ├── executable_statusline.tmpl
-│   │   ├── executable_wsl-windows-tool
-│   │   └── symlink_evot
+│   │   └── executable_wsl-windows-tool
 │   └── share
 │       ├── applications
 │       │   └── cursor-desktop.desktop

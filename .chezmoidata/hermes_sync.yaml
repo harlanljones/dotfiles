@@ -1,0 +1,6 @@
+hermesSkills:
+  # Default-profile skill library repo (see README/AGENTS.md there). The
+  # run_once_before_05-sync-hermes-skills hook clones or fast-forwards it
+  # into ~/.hermes/skills on every machine.
+  repo: https://github.com/harlanljones/hermes-skills.git
+  ref: main

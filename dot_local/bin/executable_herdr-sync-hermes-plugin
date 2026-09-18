@@ -1,0 +1,51 @@
+#!/bin/sh
+# Sync the (patched) hermes herdr integration into every Hermes profile.
+#
+# The dotfiles profile carries the integration installed by
+# `herdr integration install hermes` PLUS local additions (model/provider/
+# effort metadata reporting). `herdr integration install hermes` only ever
+# touches the profile it runs in, and overwrites the additions — so this
+# script is the idempotent way to propagate the patched plugin everywhere:
+# copy files, enable in the profile config, leave state alone.
+#
+# Re-run after any `herdr integration install hermes`.
+set -eu
+
+src="$HOME/.hermes/profiles/dotfiles/plugins/herdr-agent-state"
+[ -d "$src" ] || {
+  echo "herdr-sync-hermes-plugin: source plugin missing — run 'herdr integration install hermes' in the dotfiles profile first" >&2
+  exit 1
+}
+
+for cfg in "$HOME"/.hermes/profiles/*/config.yaml; do
+  [ -f "$cfg" ] || continue
+  prof=$(dirname "$cfg")
+  [ "$prof" = "$HOME/.hermes/profiles/dotfiles" ] && continue
+  name=$(basename "$prof")
+
+  mkdir -p "$prof/plugins"
+  rm -rf "$prof/plugins/herdr-agent-state"
+  cp -R "$src" "$prof/plugins/herdr-agent-state"
+
+  if grep -q "herdr-agent-state" "$cfg"; then
+    echo "$name: already enabled"
+  elif grep -q "^plugins:" "$cfg"; then
+    # Insert into an existing plugins.enabled list (right after its header).
+    tmp="$cfg.tmp-sync"
+    awk '
+      !done && $0 ~ /^plugins:/ {
+        print
+        getline enabled
+        print enabled
+        print "    - herdr-agent-state"
+        done = 1
+        next
+      }
+      { print }
+    ' "$cfg" > "$tmp" && mv "$tmp" "$cfg"
+    echo "$name: enabled (existing plugins block) + synced"
+  else
+    printf '\nplugins:\n  enabled:\n    - herdr-agent-state\n' >> "$cfg"
+    echo "$name: enabled + synced"
+  fi
+done

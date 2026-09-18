@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# Syncs the Hermes default-profile skill library from its own git repo
+# (github.com/harlanljones/hermes-skills) into ~/.hermes/skills.
+#
+# Replaces direct chezmoi management of dot_hermes/skills:
+#   - repo missing locally           -> clone
+#   - dir exists, not yet a repo     -> adopt in place (init + fetch +
+#                                       hard-reset to origin; untracked
+#                                       runtime state is preserved)
+#   - dir is a repo                  -> fast-forward only; warn on drift,
+#                                       never destroy local commits
+# Then recreates the `linked` symlinks into the shared ~/.agents/skills pool.
+# Managed by chezmoi; runs once per machine (state-tracked).
+
+set -euo pipefail
+
+skills_dir="$HOME/.hermes/skills"
+repo_url="{{ .hermesSkills.repo }}"
+ref="{{ .hermesSkills.ref }}"
+
+if ! command -v git >/dev/null 2>&1; then
+  printf 'hermes-skills-sync: git not found; skill library not synced\n' >&2
+  exit 0
+fi
+
+git_sync() {
+  if [[ -d "$skills_dir/.git" ]]; then
+    git -C "$skills_dir" fetch --quiet origin "$ref"
+    if git -C "$skills_dir" merge-base --is-ancestor HEAD "origin/$ref" 2>/dev/null; then
+      git -C "$skills_dir" merge --ff-only --quiet "origin/$ref" \
+        || printf 'hermes-skills-sync: fast-forward failed for %s\n' "$skills_dir" >&2
+    elif git -C "$skills_dir" rev-parse --verify -q "origin/$ref" >/dev/null \
+      && git -C "$skills_dir" merge-base --is-ancestor "origin/$ref" HEAD 2>/dev/null; then
+      printf 'hermes-skills-sync: %s is ahead of origin; pushing is your job (not pushed here)\n' "$skills_dir" >&2
+    else
+      printf 'hermes-skills-sync: %s diverged from origin; NOT auto-resetting — resolve by hand (commit/push your edits, then pull)\n' "$skills_dir" >&2
+    fi
+  elif [[ -d "$skills_dir" ]] && [[ -n "$(ls -A "$skills_dir" 2>/dev/null)" ]]; then
+    # Adopt the existing chezmoi-managed tree in place so runtime state
+    # (.hub, curator/usage ledgers) and local content survive.
+    git -C "$skills_dir" init --quiet
+    git -C "$skills_dir" remote add origin "$repo_url"
+    git -C "$skills_dir" fetch --quiet origin "$ref"
+    git -C "$skills_dir" reset --hard --quiet "origin/$ref"
+    printf 'hermes-skills-sync: adopted existing %s as git repo at origin/%s\n' "$skills_dir" "$ref"
+  else
+    mkdir -p "$(dirname "$skills_dir")"
+    git clone --quiet --branch "$ref" "$repo_url" "$skills_dir"
+  fi
+}
+
+link_pool_skills() {
+  # Names listed in linked-skills.txt are owned by the shared cross-harness
+  # pool (~/.agents/skills, installed by the dotfiles repo); recreate the
+  # relative symlinks Hermes used to get from chezmoi.
+  local list="$skills_dir/linked-skills.txt"
+  [[ -f "$list" ]] || return 0
+  local name
+  while IFS= read -r name; do
+    [[ -n "$name" ]] || continue
+    ln -sfn "../../.agents/skills/$name" "$skills_dir/$name"
+  done < "$list"
+}
+
+git_sync
+link_pool_skills

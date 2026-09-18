@@ -1,0 +1,15 @@
+{{- /* Hermes "omarchy" skin, derived from the active `dots theme` palette —
+       same resolver the other agent TUIs use. Referenced as `skin: omarchy`
+       in Hermes profile configs; missing skins fall back to the default
+       gold, which is why the TUI looked unthemed. */ -}}
+{{- $p := includeTemplate ".chezmoitemplates/theme-palette.tmpl" . | fromJson }}
+name: omarchy
+description: Derived from the active dots theme (Omarchy/wallpaper palette)
+colors:
+  banner_border: "{{ $p.accent }}"
+  banner_title: "{{ $p.fg }}"
+  banner_accent: "{{ $p.accent }}"
+  banner_dim: "{{ $p.muted }}"
+  banner_text: "{{ $p.fg }}"
+  ui_accent: "{{ $p.accent }}"
+  response_border: "{{ $p.cursor }}"

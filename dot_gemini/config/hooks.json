@@ -1,0 +1,18 @@
+{
+  "herdr": {
+    "PreInvocation": [
+      {
+        "command": "bash '/home/harlan/.gemini/config/hooks/herdr-agent-state.sh' session",
+        "timeout": 10,
+        "type": "command"
+      }
+    ],
+    "PostInvocation": [
+      {
+        "command": "bash '/home/harlan/.gemini/config/hooks/herdr-agent-metadata.sh'",
+        "timeout": 5,
+        "type": "command"
+      }
+    ]
+  }
+}

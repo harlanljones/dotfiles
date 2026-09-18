@@ -1,3 +1,4 @@
 {
+  "theme": "dots",
   "plugin": ["./herdr-tui-session.js"]
 }

@@ -1,0 +1,47 @@
+{{- /* Claude Code theme derived from the active `dots theme` palette, so all
+       agent TUIs follow the same Omarchy/wallpaper colors. Selected with
+       "theme": "custom:Omarchy" in ~/.claude/settings.json. */ -}}
+{{- $p := includeTemplate ".chezmoitemplates/theme-palette.tmpl" . | fromJson -}}
+{
+  "name": "Omarchy",
+  "base": "dark",
+  "overrides": {
+    "claude": "{{ $p.accent }}",
+    "claudeShimmer": "{{ $p.cursor }}",
+    "text": "{{ $p.muted }}",
+    "inverseText": "{{ $p.bg }}",
+    "inactive": "{{ $p.muted }}",
+    "inactiveShimmer": "{{ $p.white }}",
+    "subtle": "{{ $p.black }}",
+    "suggestion": "{{ $p.cyan }}",
+    "permission": "{{ $p.blue }}",
+    "permissionShimmer": "{{ $p.brightBlue }}",
+    "remember": "{{ $p.accent }}",
+    "success": "{{ $p.green }}",
+    "error": "{{ $p.red }}",
+    "warning": "{{ $p.accent }}",
+    "warningShimmer": "{{ $p.cursor }}",
+    "merged": "{{ $p.magenta }}",
+    "promptBorder": "{{ $p.accent }}",
+    "promptBorderShimmer": "{{ $p.cursor }}",
+    "planMode": "{{ $p.cyan }}",
+    "autoAccept": "{{ $p.accent }}",
+    "bashBorder": "{{ $p.brightRed }}",
+    "ide": "{{ $p.brightCyan }}",
+    "diffAdded": "{{ $p.black }}",
+    "diffRemoved": "{{ $p.black }}",
+    "diffAddedDimmed": "{{ $p.bg }}",
+    "diffRemovedDimmed": "{{ $p.bg }}",
+    "diffAddedWord": "{{ $p.selection }}",
+    "diffRemovedWord": "{{ $p.selection }}",
+    "userMessageBackground": "{{ $p.bg }}",
+    "userMessageBackgroundHover": "{{ $p.selection }}",
+    "bashMessageBackgroundColor": "{{ $p.bg }}",
+    "memoryBackgroundColor": "{{ $p.bg }}",
+    "selectionBg": "{{ $p.accent }}",
+    "rate_limit_fill": "{{ $p.accent }}",
+    "rate_limit_empty": "{{ $p.black }}",
+    "briefLabelYou": "{{ $p.accent }}",
+    "briefLabelClaude": "{{ $p.accent }}"
+  }
+}

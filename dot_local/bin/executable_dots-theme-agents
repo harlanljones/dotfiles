@@ -1,0 +1,30 @@
+#!/bin/sh
+# Re-apply the agent TUI themes after an Omarchy theme or wallpaper switch.
+#
+# Triggered by dots-theme-agents.path (watches ~/.local/state/omarchy/current/
+# theme, which the Omarchy theme switcher and `dots wallpaper set` rewrite).
+# Applies only the theme-owned targets - never the whole chezmoi source - so
+# running agents and interactive prompts (plugins.json drift) are untouched.
+set -eu
+
+chezmoi apply --no-tty -- \
+  "$HOME/.hermes/skins/omarchy.yaml" \
+  "$HOME/.claude/themes/omarchy.json" \
+  "$HOME/.codex/config.toml" \
+  "$HOME/.codex/themes/dots.tmTheme" \
+  "$HOME/.config/opencode/tui.jsonc" \
+  "$HOME/.config/opencode/themes/dots.json" \
+  "$HOME/.gemini/settings.json" \
+  "$HOME/.config/lazygit/config.yml" \
+  "$HOME/.config/herdr/config.toml"
+
+# Refresh the Hermes "omarchy" skin into every profile that selects it.
+# Profile dirs are runtime state (not chezmoi targets), so the freshly
+# rendered skin is copied in place; sessions pick it up on next start.
+skin="$HOME/.hermes/skins/omarchy.yaml"
+for cfg in "$HOME"/.hermes/profiles/*/config.yaml; do
+  [ -f "$cfg" ] || continue
+  grep -q 'skin: *omarchy' "$cfg" || continue
+  mkdir -p "${cfg%/*}/skins"
+  cp "$skin" "${cfg%/*}/skins/omarchy.yaml"
+done

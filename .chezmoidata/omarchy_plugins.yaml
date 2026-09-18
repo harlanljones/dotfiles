@@ -77,3 +77,9 @@ omarchyPlugins:
     enabled: true
   - url: https://github.com/Codesmith28/omalt-tab.git
     enabled: true
+  - url: https://github.com/Deca/omarchy-from-time-to-time.git
+    enabled: true
+  - url: https://github.com/karamble/omarchy-omabudget.git
+    enabled: true
+  - url: https://github.com/mtolhuys/omarchy-news-radar.git
+    enabled: true

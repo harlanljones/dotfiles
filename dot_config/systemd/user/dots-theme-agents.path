@@ -1,0 +1,11 @@
+[Unit]
+Description=Re-apply agent TUI themes when the Omarchy theme changes
+PartOf=graphical-session.target
+
+[Path]
+# The Omarchy theme switcher and `dots wallpaper set` rewrite the files in
+# this directory; any change means the generated palette changed.
+PathModified=%h/.local/state/omarchy/current/theme
+
+[Install]
+WantedBy=default.target

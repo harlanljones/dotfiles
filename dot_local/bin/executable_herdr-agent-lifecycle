@@ -7,10 +7,15 @@
 # itself the state authority for the pane instead, per herdr's documented
 # custom-integration pattern: https://herdr.dev/docs/integrations/#integrate-your-own-agent
 #
+# It also reports sidebar metadata tokens ($model, $provider, $effort,
+# $usage_pct) via `pane report-metadata`, so the sidebar rows in
+# config.toml.tmpl have real values to render. usage_pct is context-window
+# usage from the Claude transcript tail. Unreported tokens simply don't render - rows collapse gracefully.
+#
 # Usage: herdr-agent-lifecycle <agent-label> working|idle|blocked|release
-# Reads the hook's JSON payload on stdin (used only to detect and ignore
-# subagent-context hook firings, so a subagent's turn never overwrites the
-# main pane's reported state).
+# Reads the hook's JSON payload on stdin (used for metadata extraction and to
+# detect and ignore subagent-context hook firings, so a subagent's turn never
+# overwrites the main pane's reported state).
 set -eu
 
 agent="${1:?agent label required}"
@@ -37,16 +42,219 @@ fi
 
 source="custom:${agent}-lifecycle"
 
+# Sidebar metadata: emit shell-quoted `--token k=v` args. Values come from the
+# hook payload when it has them, otherwise from the agent's own config. Only
+# python3 machines report metadata; state reporting below works everywhere.
+meta_args=""
+if [ "$phase" != "release" ] && command -v python3 >/dev/null 2>&1; then
+  meta_args="$(HOOK_INPUT="$hook_input" python3 - "$agent" <<'PY'
+import json, os, sys
+
+agent = sys.argv[1]
+try:
+    data = json.loads(os.environ.get("HOOK_INPUT") or "{}")
+except Exception:
+    data = {}
+if not isinstance(data, dict):
+    data = {}
+
+
+def q(v):
+    return "'" + str(v).replace("'", "'\\''") + "'"
+
+
+args = []
+
+# Codex payloads carry no model info; fall back to its top-level config keys.
+cfg_model = cfg_effort = ""
+if agent == "codex":
+    try:
+        with open(os.path.expanduser("~/.codex/config.toml")) as f:
+            for line in f:
+                s = line.strip()
+                if s.startswith("["):
+                    break
+                for key, slot in (("model =", "m"), ("model_reasoning_effort =", "e")):
+                    if s.startswith(key):
+                        val = s[len(key):].strip().strip('"').strip("'")
+                        if slot == "m":
+                            cfg_model = val
+                        else:
+                            cfg_effort = val
+    except Exception:
+        pass
+
+model = data.get("model")
+if isinstance(model, dict):
+    model = model.get("display_name") or model.get("id")
+model = model or cfg_model
+
+# Transcript fallback: the model id on the newest assistant message.
+tp_early = data.get("transcript_path")
+if not model and tp_early and os.path.isfile(tp_early):
+    try:
+        with open(tp_early, "rb") as f:
+            f.seek(0, 2)
+            f.seek(max(0, f.tell() - 524288))
+            for line in reversed(f.read().decode("utf-8", "replace").splitlines()):
+                if '"model"' not in line:
+                    continue
+                try:
+                    obj = json.loads(line)
+                except Exception:
+                    continue
+                cand = (obj.get("message") or {}).get("model") or obj.get("model")
+                if isinstance(cand, str) and cand:
+                    model = cand
+                    break
+    except Exception:
+        pass
+
+if model:
+    args += ["--token", "model=%s" % model]
+
+provider = data.get("provider") or ("anthropic" if agent == "claude" else ("openai" if agent == "codex" else ""))
+if provider:
+    args += ["--token", "provider=%s" % provider]
+
+effort = data.get("effort") or cfg_effort
+# Claude Code: effortLevel in ~/.claude/settings.json (top-level default,
+# per-model override in modelSettings.<model>). Payloads don't carry it.
+if not effort:
+    try:
+        with open(os.path.expanduser("~/.claude/settings.json")) as f:
+            cs = json.load(f)
+        ms = cs.get("modelSettings") or {}
+        for key in (model, (model or "").replace("-[1m]", "")):
+            e = (ms.get(key) or {}).get("effortLevel")
+            if e:
+                effort = e
+                break
+        else:
+            effort = cs.get("effortLevel") or ""
+    except Exception:
+        effort = ""
+if effort:
+    args += ["--token", "effort=%s" % effort]
+
+# Codex usage percent: the rollout for this session (matched by cwd) carries
+# model_context_window in session_meta and total_token_usage in token_count
+# events. Usage = last call (input + cached + output) / window.
+if agent == "codex":
+    import glob as _glob
+    import re as _re2
+
+    cwd = data.get("cwd") or ""
+    rollouts = sorted(
+        _glob.glob(os.path.expanduser("~/.codex/sessions/*/*/*/rollout-*.jsonl")),
+        key=os.path.getmtime,
+        reverse=True,
+    )[:10]
+    for path in rollouts:
+        try:
+            with open(path, "rb") as f:
+                meta = f.read(65536).decode("utf-8", "replace")
+            if cwd and cwd not in meta:
+                continue
+            m = _re2.search(r'"model_context_window": ?([0-9]+)', meta)
+            if not m:
+                continue
+            window = int(m.group(1))
+            with open(path, "rb") as f:
+                f.seek(0, 2)
+                f.seek(max(0, f.tell() - 262144))
+                tail = f.read().decode("utf-8", "replace")
+            last = None
+            for line in reversed(tail.splitlines()):
+                if "total_token_usage" not in line:
+                    continue
+                try:
+                    obj = json.loads(line)
+                except Exception:
+                    continue
+                u = ((obj.get("payload") or {}).get("info") or {})
+                tu = u.get("last_token_usage") or {}
+                used = (tu.get("input_tokens") or 0) + (tu.get("cached_input_tokens") or 0) + (tu.get("output_tokens") or 0)
+                if used:
+                    last = used
+                    break
+            if last and window:
+                pct = min(int(last * 100 / window), 100)
+                args += ["--token", "usage_pct=%d" % pct]
+            break
+        except Exception:
+            continue
+
+
+# Usage percent from the Claude transcript: context-window consumption
+# (input + cache read + cache creation) of the newest assistant record,
+# against the model's context window. This is the same number the TUI
+# statusline shows; local rate-limit (5h/weekly) state is not persisted
+# anywhere on disk, so it cannot be reported.
+tp = data.get("transcript_path")
+if tp and os.path.isfile(tp):
+    window = int(os.environ.get("HERDR_CTX_WINDOW") or 0)
+    if not window:
+        window = 1000000 if "1m" in str(model).lower() else 200000
+    used = None
+    try:
+        with open(tp, "rb") as f:
+            f.seek(0, 2)
+            size = f.tell()
+            f.seek(max(0, size - 2097152))
+            for line in reversed(f.read().decode("utf-8", "replace").splitlines()):
+                if '"usage"' not in line:
+                    continue
+                try:
+                    obj = json.loads(line)
+                except Exception:
+                    continue
+                usage = obj.get("usage")
+                if not isinstance(usage, dict):
+                    usage = (obj.get("message") or {}).get("usage")
+                if not isinstance(usage, dict):
+                    continue
+                inp = usage.get("input_tokens") or 0
+                cr = usage.get("cache_read_input_tokens") or 0
+                cc = usage.get("cache_creation_input_tokens") or 0
+                if (inp or cr or cc) and all(
+                    isinstance(x, int) for x in (inp, cr, cc)
+                ):
+                    used = inp + cr + cc
+                    break
+    except Exception:
+        used = None
+    if used:
+        pct = min(int(used * 100 / window), 100)
+        args += ["--token", "usage_pct=%d" % pct]
+
+print(" ".join(q(a) for a in args))
+PY
+)" || meta_args=""
+fi
+
 case "$phase" in
   working | idle | blocked)
     "$HERDR_BIN_PATH" pane report-agent "$HERDR_PANE_ID" \
       --source "$source" \
       --agent "$agent" \
       --state "$phase" >/dev/null 2>&1 || true
+    if [ -n "$meta_args" ]; then
+      # shellcheck disable=SC2086 # meta_args is deliberately word-split
+      eval "\"\$HERDR_BIN_PATH\" pane report-metadata \"\$HERDR_PANE_ID\" \\
+        --source \"$source\" --agent \"$agent\" --ttl-ms 86400000 \
+        $meta_args" >/dev/null 2>&1 || true
+    fi
     ;;
   release)
     "$HERDR_BIN_PATH" pane release-agent "$HERDR_PANE_ID" \
       --source "$source" \
       --agent "$agent" >/dev/null 2>&1 || true
+    # The pane may be reused by a different agent: drop this agent's
+    # metadata now so stale model/provider/effort/usage cannot outlive it.
+    "$HERDR_BIN_PATH" pane report-metadata "$HERDR_PANE_ID" \
+      --source "$source" --agent "$agent" \
+      --clear-token model --clear-token provider --clear-token effort \
+      --clear-token usage_pct --clear-token task_pct >/dev/null 2>&1 || true
     ;;
 esac

@@ -1,0 +1,54 @@
+{{- /* Normalized palette resolver for the active machine theme.
+
+       Consumed as (see dot_config/eza/theme.yml.tmpl for the pattern):
+         {{ includeTemplate ".chezmoitemplates/theme-palette.tmpl" . | fromJson }}
+
+       Works for BOTH theme kinds in the theme registry:
+         - curated (omarchy-*): themes/<key>/windows_terminal.json carries the
+           full ANSI 16 + bg/fg/cursor/selection; accent comes from colors.toml
+         - generated (gen-*, matugen/wallpaper): windows_terminal.json only;
+           accent is its `blue` entry (matches the registry windows.accent)
+
+       Output keys: bg, fg, cursor, selection, accent, muted,
+       black red green yellow blue magenta cyan white,
+       brightRed brightGreen brightYellow brightBlue brightMagenta brightCyan,
+       brightBlack brightWhite. */ -}}
+{{- $name := (index .machines .machine).theme.name -}}
+{{- $buf := "" -}}
+{{- range $line := splitList "\n" (include (printf ".chezmoitemplates/themes/%s/windows_terminal.json" $name)) -}}
+{{-   if not (hasPrefix "#" (trim $line)) }}{{ $buf = printf "%s%s" $buf $line }}{{ end -}}
+{{- end -}}
+{{- $wt := $buf | fromJson -}}
+{{- $accent := $wt.blue -}}
+{{- $entry := get .themes $name -}}
+{{- if and $entry (ne (default "" $entry.kind) "generated") -}}
+{{-   $colorsToml := include (printf ".chezmoitemplates/themes/%s/colors.toml" $name) -}}
+{{-   range $line := splitList "\n" $colorsToml -}}
+{{-     $m := regexFind `accent\s*=\s*"[^"]+"` (trim $line) -}}
+{{-     if $m -}}{{ $accent = regexReplaceAll `.*"([^"]+)".*` $m "$1" }}{{ end -}}
+{{-   end -}}
+{{- end -}}
+{{- dict
+      "bg" $wt.background
+      "fg" $wt.foreground
+      "cursor" $wt.cursorColor
+      "selection" $wt.selectionBackground
+      "accent" $accent
+      "muted" $wt.brightBlack
+      "black" $wt.black
+      "red" $wt.red
+      "green" $wt.green
+      "yellow" $wt.yellow
+      "blue" $wt.blue
+      "magenta" $wt.purple
+      "cyan" $wt.cyan
+      "white" $wt.white
+      "brightRed" $wt.brightRed
+      "brightGreen" $wt.brightGreen
+      "brightYellow" $wt.brightYellow
+      "brightBlue" $wt.brightBlue
+      "brightMagenta" $wt.brightPurple
+      "brightCyan" $wt.brightCyan
+      "brightBlack" $wt.brightBlack
+      "brightWhite" $wt.brightWhite
+| toJson -}}

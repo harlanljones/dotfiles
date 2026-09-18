@@ -23,6 +23,7 @@
 # pattern set.
 #
 # One-line bootstrap entry point — repository material, never applied.
+dev
 install.sh
 README.md
 AGENTS.md
@@ -71,16 +72,14 @@ bun/**
 .pytest_cache/**
 .unlazy
 .unlazy/**
-# Hermes runtime regenerates its skills index cache under ~/.hermes/skills/.hub;
-# it is machine-local, huge (~47M) and never a skill itself. Same for the
-# curator/usage ledger files Hermes writes into the skills dir.
-.hermes/skills/.hub
-.hermes/skills/.hub/**
-.hermes/skills/.bundled_manifest
-.hermes/skills/.curator_ledger.jsonl
-.hermes/skills/.curator_state
-.hermes/skills/.usage.json
-.hermes/skills/.usage.json.lock
+# The Hermes default-profile skill library is its own git repo
+# (github.com/harlanljones/hermes-skills), cloned/pulled into
+# ~/.hermes/skills by run_once_before_05-sync-hermes-skills. chezmoi no
+# longer manages anything in that tree, including the machine-local
+# runtime state Hermes regenerates there (.hub cache, curator/usage
+# ledgers, locks).
+.hermes/skills
+.hermes/skills/**
 .unlazy-hook-state.json
 **/__pycache__
 **/__pycache__/**

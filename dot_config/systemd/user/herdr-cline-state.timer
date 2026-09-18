@@ -1,0 +1,9 @@
+[Unit]
+Description=Poll Command Code sessions for Herdr metadata reporting
+
+[Timer]
+OnBootSec=1min
+OnUnitActiveSec=30s
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,69 @@
+#!/bin/sh
+# Report Command Code (cline CLI) session metadata to Herdr panes.
+#
+# cmd has no hook system, so nothing inside the agent reports $model /
+# $provider for its panes. This watcher polls ~/.cline/data/sessions and
+# pushes each recent session's tokens to the Herdr pane whose cwd matches
+# the session's (and that has no other agent attached). Triggered by the
+# herdr-cline-state.timer.
+set -eu
+
+SESSIONS_DIR="$HOME/.cline/data/sessions"
+MAX_AGE_SEC=600        # ignore sessions idle longer than this
+TTL_MS=1200000         # 20 min: a bit longer than the poll cadence can drift
+
+command -v herdr >/dev/null 2>&1 || exit 0
+[ -d "$SESSIONS_DIR" ] || exit 0
+
+extract_py='
+import json, sys
+try:
+    d = json.load(open(sys.argv[1]))
+    assert d.get("cwd") and d.get("model") and d.get("provider")
+    print(d["cwd"])
+    print(d["model"])
+    print(d["provider"])
+except Exception:
+    sys.exit(1)
+'
+
+pair_py='
+# Pair each recent session with every Herdr pane that matches its cwd and
+# has no other agent attached, emitting one report line per pane.
+import json, os, sys
+
+panes = json.loads(os.environ.get("CLINE_PANES") or "{}").get("result", {}).get("panes", [])
+by_cwd = {}
+for p in panes:
+    if p.get("agent") in (None, "", "cline"):
+        by_cwd.setdefault(p.get("cwd"), []).append(p["pane_id"])
+
+seen = set()
+lines = sys.stdin.read().split("\n")
+for i in range(0, len(lines) - 2, 3):
+    cwd, model, provider = lines[i], lines[i + 1], lines[i + 2]
+    for pane_id in by_cwd.get(cwd, []):
+        if (cwd, pane_id) in seen:
+            continue
+        seen.add((cwd, pane_id))
+        print(f"{pane_id}\t{model}\t{provider}")
+'
+
+panes=$(herdr pane list 2>/dev/null) || exit 0
+
+now=$(date +%s)
+find "$SESSIONS_DIR" -name '*.json' -newermt "@$((now - MAX_AGE_SEC))" 2>/dev/null |
+while IFS= read -r f; do
+  # Only sessions/<id>/<id>.json carry identity; message stores lack cwd.
+  [ "$(dirname "$f")" = "$SESSIONS_DIR" ] && continue
+  python3 -c "$extract_py" "$f" || true
+done | CLINE_PANES="$panes" python3 -c "$pair_py" |
+while IFS="$(printf '\t')" read -r pane model provider; do
+  [ -n "$pane" ] || continue
+  herdr pane report-metadata "$pane" \
+    --source custom:cline-session \
+    --agent cline \
+    --ttl-ms "$TTL_MS" \
+    --token "model=$model" \
+    --token "provider=$provider" >/dev/null 2>&1 || true
+done

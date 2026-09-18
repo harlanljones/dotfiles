@@ -37,7 +37,8 @@ Every entry in the source tree maps to a home-directory target by a filename pre
 | `private_dot_` | literal file in `~` with `0600` perms | `private_dot_ssh/config` → `~/.ssh/config` |
 | `encrypted_…age` | age-encrypted at rest | `dot_config/opencode/encrypted_opencode.json.age` → `~/.config/opencode/opencode.json` |
 | `executable_` | file becomes an executable | `executable_dots` → `~/.local/bin/dots` |
-| `symlink_` | file becomes a symlink | `symlink_evot` → `~/.local/bin/evot` |
+| `symlink_` | file becomes a symlink | `symlink_project-doc-planner` → a shared skill |
+
 | `run_*.sh.tmpl` | executable apply script (not a dotfile) | see §3 |
 | `*.tmpl` | Go-template rendered at apply time | `dot_config/git/config.tmpl` |
 
@@ -111,8 +112,7 @@ The table below is the orienting summary; the index is the detail.
 | `dot_local/bin/executable_statusline.tmpl` | Shared cross-harness CLI statusline renderer (Claude Code + Cursor) → `~/.local/bin/statusline` |
 | `dot_local/bin/executable_chrome-profile` | **Chrome profile selector** → `~/.local/bin/chrome-profile`. Discovers profiles from Chrome's `Local State` JSON and launches Chrome in the chosen one (interactive `fzf` picker or fuzzy name/email filter). Cross-platform: Linux (`google-chrome-stable`), macOS (direct `.app` binary), WSL2 (Windows `chrome.exe` via `wslpath`). Shell aliases in `55-apps.sh`: `chrome` (picker), `chrome-work` (primeiq.ai), `chrome-personal` (Personal). Requires `jq`; `fzf` for interactive mode. Usage: `chrome-profile [filter] [URLs...]`, `chrome-profile --list` |
 | `dot_agents/`, `dot_claude/`, `dot_cline/`, `dot_codex/`, `dot_gemini/`, `dot_grok/`, `dot_hermes/`, `dot_pi/` | Per-harness config, skills, rules, MCP, hooks |
-| `dot_evotai/` | EVOT LLM provider environment config (`~/.evotai/evot.env`) |
-| `dot_hermes/` | Default-profile Hermes config: `~/.hermes/config.yaml` (settings-only template), `~/.hermes/SOUL.md`, and `~/.hermes/skills/` (default-profile skill library, synced across machines; `.hub/` cache ignored; secrets in `~/.hermes/.env`, never tracked) |
+| `dot_hermes/` | Default-profile Hermes config: `~/.hermes/config.yaml` (settings-only template), `~/.hermes/SOUL.md`; the skill library moved to the [hermes-skills](https://github.com/harlanljones/hermes-skills) repo, cloned/pulled into `~/.hermes/skills/` by `run_once_before_05-sync-hermes-skills` |
 | `.chezmoidata/` | YAML data sources read by `.tmpl`s (`machines`, `agent_skills`, `omarchy_plugins`, `claude_mcp`, `claude_settings`, `codex_projects`, `themes`) |
 | `.chezmoitemplates/themes/<name>/` | Verbatim upstream per-tool theme ports (Windows Terminal, lazygit, delta, fzf, eza, bat, Gemini) included by the themed templates; never applied. Select with `dots theme set <name>` (edits `machines.<machine>.theme.name`), never by editing rendered targets |
 | `docs/` | Recovery guide, Vespasian boot & theming guides, reorganization proposal, and generator scripts (chezmoi-ignored, git-tracked) |
@@ -141,7 +141,7 @@ Each CLI/runtime is owned by exactly one manager. Do not spread a tool across tw
 | pacman / paru (Augustus) | `dot_config/pacman/pkglist.txt` + `aurlist.txt` | native + AUR packages |
 | mise conf.d (Vespasian) | `dot_config/mise/conf.d/vespasian.toml` | atuin, bat, delta, direnv, eza, fd, fzf, lazygit, neovim, ripgrep, starship, zoxide (pacman/brew own these elsewhere) |
 | apt (Vespasian) | `dot_config/apt/pkglist.txt` | age, build-essential, curl, erlang-nox, jq, postgresql, sqlite3, tailscale, unzip |
-| standalone / scripts | `dot_local/bin/`, `~/.fly/bin` | flyctl (Fly.io CLI installer), evot (outpost integration symlink), chrome-profile (Chrome profile selector) |
+| standalone / scripts | `dot_local/bin/`, `~/.fly/bin` | flyctl (Fly.io CLI installer), chrome-profile (Chrome profile selector) |
 
 ## 6. Hard rules for agents
 
@@ -184,28 +184,37 @@ Each CLI/runtime is owned by exactly one manager. Do not spread a tool across tw
 - **After editing any `run_*` hook**, `git gc`/re-apply mentally: `run_onchange_*`
   will re-trigger if contents changed, which may re-run installs.
 - **Hermes is managed separately from the other harnesses.** The *default*
-  profile's config, `SOUL.md` and skill library are synced via `dot_hermes/`
-  (`config.yaml.tmpl`, `dot_SOUL.md`, `dot_hermes/skills/`) so all machines
-  share the same Hermes skills and workflows. Still true and enforced:
+  profile's config and `SOUL.md` are synced via `dot_hermes/`
+  (`config.yaml.tmpl`, `dot_SOUL.md`); the default-profile skill library is
+  its own git repo, `github.com/harlanljones/hermes-skills`, cloned or
+  fast-forwarded into `~/.hermes/skills/` by
+  `run_once_before_05-sync-hermes-skills` (repo URL/ref in
+  `.chezmoidata/hermes_sync.yaml`). Still true and enforced:
   - Secrets live in `~/.hermes/.env`, never tracked.
-  - `.hermes/skills/.hub/` (index cache) and all of `~/.hermes/profiles/` stay
-    unmanaged — project-based profiles (verdict, flipforever) own their own
-    skills/config via their repo `./dev` entrypoints.
-  - `.chezmoidata/hermes_skills.yaml` groups the library into `local`
-    (real dirs, owned here) and `linked` (symlinks into the shared
-    `~/.agents/skills` pool, owned by `agent_skills.yaml`). Keep it in sync
-    when adding or removing skills.
+  - The whole `~/.hermes/skills` tree is chezmoi-ignored — chezmoi neither
+    manages nor deletes it. Runtime state (`.hub/` cache, `.curator_*`,
+    `.usage.json*`, `.locks`, `.bundled_manifest`) is gitignored inside the
+    skills repo and never synced.
+  - All of `~/.hermes/profiles/` stay unmanaged — project-based profiles
+    (verdict, flipforever) own their own skills/config via their repo `./dev`
+    entrypoints.
+  - The skills repo holds portable skill dirs plus `linked-skills.txt`
+    (symlink names into the shared `~/.agents/skills` pool, owned by
+    `agent_skills.yaml`); the sync hook recreates those symlinks per machine.
+    Add a pooled skill in BOTH `agent_skills.yaml` (dotfiles) and
+    `linked-skills.txt` (skills repo).
+  - Skill *content* is edited in `~/.hermes/skills/` and synced by git
+    (commit + push on the editing machine; other machines fast-forward on
+    their next `chezmoi apply`). There is NO `chezmoi re-add` step for skills
+    anymore — it does nothing. The sync hook only fast-forwards: it warns on
+    divergence instead of resetting, so local edits are never destroyed.
   - `~/.hermes/agent-hooks/*` scripts are owned by the repo `./dev`
     entrypoints (verdict, flipforever), never by chezmoi.
   - Profiles, `state.db`, memories, sessions and caches stay unmanaged.
   - Hermes is excluded from the shared cross-harness skills pool
     (`agent_skills.yaml`, `run_onchange_before_09-install-agent-skills.sh`,
     `run_after_23-sync-agent-skills.sh`, `~/.agents/skills`) — it has its own
-    library under `dot_hermes/skills/`; never add it to `agent_skills.yaml`.
-    Hermes manages skill *content* at runtime (`skill_manage`,
-    `hermes skills`); after meaningful drift (skills added/removed/edited
-    interactively), `chezmoi re-add ~/.hermes/skills` and
-    `chezmoi re-add ~/.hermes/config.yaml` on the authoritative machine.
+    library repo above; never add it to `agent_skills.yaml`.
 - **`dots` CLI** is the human-friendly wrapper (`dots status/diff/update/push/doctor`).
   Prefer `dots push` to commit+push; it generates a Conventional Commit message via
   local Ollama and never commits agent work automatically.

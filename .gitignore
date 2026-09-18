@@ -50,7 +50,6 @@ settings.local.json
 .env
 .env.*
 *.env
-!dot_evotai/evot.env
 
 # SSH private material. Only ~/.ssh/config is managed.
 id_rsa
@@ -61,3 +60,10 @@ id_ecdsa
 
 # Local secret-scan reports may contain sensitive matches.
 gitleaks-report.*
+
+# Repo-local Hermes project skills are per-machine symlinks into
+# ~/.hermes/skills (rebuilt idempotently by ./dev); .hermes.md is tracked.
+.hermes/
+
+# Command Code runtime state written at repo root when launched here
+.commandcode/
