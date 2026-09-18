@@ -9,11 +9,16 @@
          - generated (gen-*, matugen/wallpaper): windows_terminal.json only;
            accent is its `blue` entry (matches the registry windows.accent)
 
+       Theme name resolution reuses machine-theme-name.tmpl so machines without
+       theme.name (hadrian) and unknown hosts still render. Registry kind is
+       read via index/hasKey — curated entries have no top-level "kind" key, and
+       missingkey=error would otherwise fail on $entry.kind.
+
        Output keys: bg, fg, cursor, selection, accent, muted,
        black red green yellow blue magenta cyan white,
        brightRed brightGreen brightYellow brightBlue brightMagenta brightCyan,
        brightBlack brightWhite. */ -}}
-{{- $name := (index .machines .machine).theme.name -}}
+{{- $name := includeTemplate ".chezmoitemplates/machine-theme-name.tmpl" . | trim -}}
 {{- $buf := "" -}}
 {{- range $line := splitList "\n" (include (printf ".chezmoitemplates/themes/%s/windows_terminal.json" $name)) -}}
 {{-   if not (hasPrefix "#" (trim $line)) }}{{ $buf = printf "%s%s" $buf $line }}{{ end -}}
@@ -21,7 +26,9 @@
 {{- $wt := $buf | fromJson -}}
 {{- $accent := $wt.blue -}}
 {{- $entry := get .themes $name -}}
-{{- if and $entry (ne (default "" $entry.kind) "generated") -}}
+{{- $kind := "" -}}
+{{- if and $entry (hasKey $entry "kind") }}{{ $kind = index $entry "kind" }}{{ end -}}
+{{- if and $entry (ne $kind "generated") -}}
 {{-   $colorsToml := include (printf ".chezmoitemplates/themes/%s/colors.toml" $name) -}}
 {{-   range $line := splitList "\n" $colorsToml -}}
 {{-     $m := regexFind `accent\s*=\s*"[^"]+"` (trim $line) -}}
