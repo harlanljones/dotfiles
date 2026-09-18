@@ -23,6 +23,11 @@ if [ "$SHELL_KIND" = bash ] && [ -z "${OMARCHY_BASE_LOADED:-}" ]; then
   fi
 
   # mise first: starship and the 20-integrations tools are mise-installed here.
-  command -v mise >/dev/null 2>&1 && eval "$(mise activate bash)"
-  command -v starship >/dev/null 2>&1 && eval "$(starship init bash)"
+  # if/fi (not `cmd && eval`) so a missing binary does not fail `source`.
+  if command -v mise >/dev/null 2>&1; then
+    eval "$(mise activate bash)"
+  fi
+  if command -v starship >/dev/null 2>&1; then
+    eval "$(starship init bash)"
+  fi
 fi
