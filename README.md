@@ -292,7 +292,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   ├── generated
 │   │   └── gen-6bd5de2cd3e4
 │   │       └── windows_terminal.json
-│   ├── hermes_skills.yaml
+│   ├── hermes_sync.yaml
 │   ├── machines.yaml
 │   ├── omarchy_agents.yaml
 │   ├── omarchy_plugins.yaml
@@ -306,8 +306,11 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   ├── littlebigmouse
 │   │   └── Current.xml
 │   ├── machine-theme-name.tmpl
+│   ├── theme-palette.tmpl
 │   └── themes/ (121 files across 13 themes — see .chezmoidata/themes.yaml)
+├── .hermes.md
 ├── .yamllint.yml
+├── dev
 ├── dot_Brewfile
 ├── dot_agents
 │   └── skills
@@ -315,8 +318,10 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 ├── dot_bash_profile
 ├── dot_bashrc
 ├── dot_claude
-│   └── skills
-│       └── symlink_project-doc-planner
+│   ├── skills
+│   │   └── symlink_project-doc-planner
+│   └── themes
+│       └── omarchy.json.tmpl
 ├── dot_cline
 │   ├── data
 │   │   └── settings
@@ -329,26 +334,28 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   ├── private_AGENTS.md
 │   ├── rules
 │   │   └── default.rules
-│   └── skills
-│       ├── dots
-│       │   └── SKILL.md
-│       ├── frontier-sweep
-│       │   └── SKILL.md
-│       ├── grilling
-│       │   ├── SKILL.md
-│       │   └── agents
-│       │       └── openai.yaml
-│       ├── linear-agent-tracking
-│       │   ├── SKILL.md
-│       │   ├── agents
-│       │   │   └── openai.yaml
-│       │   └── references
-│       │       ├── issue-tracker-linear.md
-│       │       └── linear-cli.md
-│       └── project-doc-planner
-│           ├── SKILL.md
-│           └── agents
-│               └── openai.yaml
+│   ├── skills
+│   │   ├── dots
+│   │   │   └── SKILL.md
+│   │   ├── frontier-sweep
+│   │   │   └── SKILL.md
+│   │   ├── grilling
+│   │   │   ├── SKILL.md
+│   │   │   └── agents
+│   │   │       └── openai.yaml
+│   │   ├── linear-agent-tracking
+│   │   │   ├── SKILL.md
+│   │   │   ├── agents
+│   │   │   │   └── openai.yaml
+│   │   │   └── references
+│   │   │       ├── issue-tracker-linear.md
+│   │   │       └── linear-cli.md
+│   │   └── project-doc-planner
+│   │       ├── SKILL.md
+│   │       └── agents
+│   │           └── openai.yaml
+│   └── themes
+│       └── dots.tmTheme.tmpl
 ├── dot_config
 │   ├── 1password
 │   │   └── ssh
@@ -445,11 +452,15 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   │   └── private_codebase-memory.md
 │   │   ├── dot_gitignore
 │   │   ├── encrypted_opencode.json.age
+│   │   ├── plugins
+│   │   │   └── herdr-agent-metadata.js
 │   │   ├── private_AGENTS.md
 │   │   ├── skills
 │   │   │   ├── opencode-go-usage
 │   │   │   │   └── SKILL.md
 │   │   │   └── symlink_project-doc-planner
+│   │   ├── themes
+│   │   │   └── dots.json.tmpl
 │   │   ├── tui.json
 │   │   └── tui.jsonc
 │   ├── pacman
@@ -481,6 +492,10 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   ├── starship.toml.tmpl
 │   ├── systemd
 │   │   └── user
+│   │       ├── dots-theme-agents.path
+│   │       ├── dots-theme-agents.service
+│   │       ├── herdr-cline-state.service
+│   │       ├── herdr-cline-state.timer
 │   │       ├── herdr-outpost-relay.service
 │   │       ├── ollama-omarchy-agents.service
 │   │       └── omarchy-* units (13 — scrapers, relays, daemons)
@@ -492,6 +507,9 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   ├── private_codebase-memory-scout.md
 │   │   └── private_codebase-memory.md
 │   ├── config
+│   │   ├── hooks
+│   │   │   └── herdr-agent-metadata.sh
+│   │   ├── hooks.json
 │   │   ├── mcp_config.json
 │   │   └── skills
 │   │       └── symlink_project-doc-planner
@@ -505,7 +523,9 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │       └── herdr.json
 ├── dot_hermes
 │   ├── SOUL.md
-│   └── config.yaml.tmpl
+│   ├── config.yaml.tmpl
+│   └── skins
+│       └── omarchy.yaml.tmpl
 ├── dot_local
 │   ├── bin
 │   │   ├── cline-safety
@@ -517,8 +537,12 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   ├── executable_dots
 │   │   ├── executable_dots-identity
 │   │   ├── executable_dots-push
+│   │   ├── executable_dots-theme-agents
 │   │   ├── executable_dots-theme-import-aether
 │   │   ├── executable_herdr-agent-lifecycle
+│   │   ├── executable_herdr-cline-state
+│   │   ├── executable_herdr-sync-hermes-plugin
+│   │   ├── executable_herdr-verify
 │   │   ├── executable_lazygit-ollama-commit.sh
 │   │   ├── executable_ollama-commit-msg.sh
 │   │   ├── executable_omarchy-agent-usage-<agent>.tmpl (7 agents)
@@ -561,7 +585,9 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   └── settings.json
 ├── private_dot_ssh
 │   └── config.tmpl
-├── run_* apply hooks (24 — see INDEX.md § Apply hooks for trigger/phase)
+├── run_* apply hooks (25 — see INDEX.md § Apply hooks for trigger/phase)
+├── tests
+│   └── test-dev.sh
 └── theme-assets/ (8 files across 8 wallpaper sets)
 ```
 <!-- END REPO TREE -->
