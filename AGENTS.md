@@ -67,6 +67,7 @@ hook that runs on every machine (gated internally on `.machine`). Gaps in the
 | Order | Script | Trigger | Purpose |
 | --- | --- | --- | --- |
 | 00 | `run_once_before_00-verify-deps.sh.tmpl` | once | Fail early if `git`/`age` missing; warn on optional tools |
+| 05 | `run_once_before_05-sync-hermes-skills.sh.tmpl` | once | Clone/fast-forward hermes-skills into `~/.hermes/skills`; skip when remote unreachable |
 | 09 | `run_onchange_before_09-install-agent-skills.sh.tmpl` | onchange | Install missing cross-harness agent skills (retries without incompatible providers, non-fatal on download error) |
 | 10 | `run_onchange_after_10-install-omarchy-plugins.sh.tmpl` | onchange | Install/update Omarchy desktop plugins |
 | 20 | `run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl` | onchange | Antigravity token/usage collector setup |
