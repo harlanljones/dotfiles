@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**396 tracked entries** across 16 categories.
+**416 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -21,12 +21,12 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Version control](#version-control) | 6 |
 | [Navigation & search](#navigation--search) | 3 |
 | [Toolchain & packages](#toolchain--packages) | 5 |
-| [AI agent harnesses](#ai-agent-harnesses) | 42 |
-| [Background services](#background-services) | 17 |
-| [Custom executables](#custom-executables) | 37 |
+| [AI agent harnesses](#ai-agent-harnesses) | 49 |
+| [Background services](#background-services) | 21 |
+| [Custom executables](#custom-executables) | 41 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Other configuration](#other-configuration) | 159 |
-| [Apply hooks (`run_*`)](#apply-hooks-run) | 24 |
+| [Other configuration](#other-configuration) | 162 |
+| [Apply hooks (`run_*`)](#apply-hooks-run) | 26 |
 | [Chezmoi control files](#chezmoi-control-files) | 12 |
 | [Repository material (not applied)](#repository-material-not-applied) | 31 |
 
@@ -150,6 +150,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | --- | --- | --- | --- |
 | `~/.agents/skills/project-doc-planner` | `dot_agents/skills/symlink_project-doc-planner` | shared skills | symlink |
 | `~/.claude/skills/project-doc-planner` | `dot_claude/skills/symlink_project-doc-planner` | claude code | symlink |
+| `~/.claude/themes/omarchy.json` | `dot_claude/themes/omarchy.json.tmpl` | claude code | template |
 | `~/.cline/data/settings/global-settings.json` | `dot_cline/data/settings/global-settings.json` | cline | — |
 | `~/.cline/skills/project-doc-planner` | `dot_cline/skills/symlink_project-doc-planner` | cline | symlink |
 | `~/.codex/hooks.json` | `dot_codex/hooks.json` | codex | — |
@@ -166,19 +167,24 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.codex/skills/linear-agent-tracking/references/linear-cli.md` | `dot_codex/skills/linear-agent-tracking/references/linear-cli.md` | codex | — |
 | `~/.codex/skills/project-doc-planner/SKILL.md` | `dot_codex/skills/project-doc-planner/SKILL.md` | codex | — |
 | `~/.codex/skills/project-doc-planner/agents/openai.yaml` | `dot_codex/skills/project-doc-planner/agents/openai.yaml` | codex | — |
+| `~/.codex/themes/dots.tmTheme` | `dot_codex/themes/dots.tmTheme.tmpl` | codex | template |
 | `~/.config/opencode/agents/codebase-memory-auditor.md` | `dot_config/opencode/agents/private_codebase-memory-auditor.md` | opencode | private |
 | `~/.config/opencode/agents/codebase-memory-scout.md` | `dot_config/opencode/agents/private_codebase-memory-scout.md` | opencode | private |
 | `~/.config/opencode/agents/codebase-memory.md` | `dot_config/opencode/agents/private_codebase-memory.md` | opencode | private |
 | `~/.config/opencode/.gitignore` | `dot_config/opencode/dot_gitignore` | opencode | — |
 | `~/.config/opencode/opencode.json` | `dot_config/opencode/encrypted_opencode.json.age` | opencode | encrypted |
+| `~/.config/opencode/plugins/herdr-agent-metadata.js` | `dot_config/opencode/plugins/herdr-agent-metadata.js` | opencode | — |
 | `~/.config/opencode/AGENTS.md` | `dot_config/opencode/private_AGENTS.md` | opencode | private |
 | `~/.config/opencode/skills/opencode-go-usage/SKILL.md` | `dot_config/opencode/skills/opencode-go-usage/SKILL.md` | opencode | — |
 | `~/.config/opencode/skills/project-doc-planner` | `dot_config/opencode/skills/symlink_project-doc-planner` | opencode | symlink |
+| `~/.config/opencode/themes/dots.json` | `dot_config/opencode/themes/dots.json.tmpl` | opencode | template |
 | `~/.config/opencode/tui.json` | `dot_config/opencode/tui.json` | opencode | — |
 | `~/.config/opencode/tui.jsonc` | `dot_config/opencode/tui.jsonc` | opencode | — |
 | `~/.gemini/agents/codebase-memory-auditor.md` | `dot_gemini/agents/private_codebase-memory-auditor.md` | gemini | private |
 | `~/.gemini/agents/codebase-memory-scout.md` | `dot_gemini/agents/private_codebase-memory-scout.md` | gemini | private |
 | `~/.gemini/agents/codebase-memory.md` | `dot_gemini/agents/private_codebase-memory.md` | gemini | private |
+| `~/.gemini/config/hooks.json` | `dot_gemini/config/hooks.json` | gemini | — |
+| `~/.gemini/config/hooks/herdr-agent-metadata.sh` | `dot_gemini/config/hooks/herdr-agent-metadata.sh` | gemini | — |
 | `~/.gemini/config/mcp_config.json` | `dot_gemini/config/mcp_config.json` | gemini | — |
 | `~/.gemini/config/skills/project-doc-planner` | `dot_gemini/config/skills/symlink_project-doc-planner` | gemini | symlink |
 | `~/.gemini/settings.json` | `dot_gemini/modify_private_settings.json` | gemini | modify, private |
@@ -188,6 +194,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.grok/hooks/herdr.json` | `dot_grok/hooks/herdr.json` | grok | — |
 | `~/.hermes/SOUL.md` | `dot_hermes/SOUL.md` | hermes | — |
 | `~/.hermes/config.yaml` | `dot_hermes/config.yaml.tmpl` | hermes | template |
+| `~/.hermes/skins/omarchy.yaml` | `dot_hermes/skins/omarchy.yaml.tmpl` | hermes | template |
 | `~/.pi/agent/skills/project-doc-planner` | `dot_pi/agent/skills/symlink_project-doc-planner` | pi | symlink |
 | `~/.grokbot/settings.json` | `private_dot_grokbot/settings.json` | grokbot | private |
 
@@ -197,6 +204,10 @@ agents and the showcase app should read. This page is the same data for humans.
 | --- | --- | --- | --- |
 | `~/.config/environment.d/10-defaults.conf` | `dot_config/environment.d/10-defaults.conf` | session environment | — |
 | `~/.config/environment.d/10-machine.conf` | `dot_config/environment.d/10-machine.conf.tmpl` | session environment | template |
+| `~/.config/systemd/user/dots-theme-agents.path` | `dot_config/systemd/user/dots-theme-agents.path` | user systemd units | — |
+| `~/.config/systemd/user/dots-theme-agents.service` | `dot_config/systemd/user/dots-theme-agents.service` | user systemd units | — |
+| `~/.config/systemd/user/herdr-cline-state.service` | `dot_config/systemd/user/herdr-cline-state.service` | user systemd units | — |
+| `~/.config/systemd/user/herdr-cline-state.timer` | `dot_config/systemd/user/herdr-cline-state.timer` | user systemd units | — |
 | `~/.config/systemd/user/herdr-outpost-relay.service` | `dot_config/systemd/user/herdr-outpost-relay.service` | user systemd units | — |
 | `~/.config/systemd/user/ollama-omarchy-agents.service` | `dot_config/systemd/user/ollama-omarchy-agents.service` | user systemd units | — |
 | `~/.config/systemd/user/omarchy-agents-analysis.service` | `dot_config/systemd/user/omarchy-agents-analysis.service` | user systemd units | — |
@@ -225,8 +236,12 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.local/bin/dots` | `dot_local/bin/executable_dots` | custom executables | executable |
 | `~/.local/bin/dots-identity` | `dot_local/bin/executable_dots-identity` | custom executables | executable |
 | `~/.local/bin/dots-push` | `dot_local/bin/executable_dots-push` | custom executables | executable |
+| `~/.local/bin/dots-theme-agents` | `dot_local/bin/executable_dots-theme-agents` | custom executables | executable |
 | `~/.local/bin/dots-theme-import-aether` | `dot_local/bin/executable_dots-theme-import-aether` | custom executables | executable |
 | `~/.local/bin/herdr-agent-lifecycle` | `dot_local/bin/executable_herdr-agent-lifecycle` | custom executables | executable |
+| `~/.local/bin/herdr-cline-state` | `dot_local/bin/executable_herdr-cline-state` | custom executables | executable |
+| `~/.local/bin/herdr-sync-hermes-plugin` | `dot_local/bin/executable_herdr-sync-hermes-plugin` | custom executables | executable |
+| `~/.local/bin/herdr-verify` | `dot_local/bin/executable_herdr-verify` | custom executables | executable |
 | `~/.local/bin/lazygit-ollama-commit.sh` | `dot_local/bin/executable_lazygit-ollama-commit.sh` | custom executables | executable |
 | `~/.local/bin/ollama-commit-msg.sh` | `dot_local/bin/executable_ollama-commit-msg.sh` | custom executables | executable |
 | `~/.local/bin/omarchy-agent-usage-antigravity` | `dot_local/bin/executable_omarchy-agent-usage-antigravity.tmpl` | custom executables | executable, template |
@@ -281,6 +296,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.chezmoitemplates/gen-palette` | `.chezmoitemplates/gen-palette.tmpl` | — | template |
 | `~/.chezmoitemplates/littlebigmouse/Current.xml` | `.chezmoitemplates/littlebigmouse/Current.xml` | — | — |
 | `~/.chezmoitemplates/machine-theme-name` | `.chezmoitemplates/machine-theme-name.tmpl` | — | template |
+| `~/.chezmoitemplates/theme-palette` | `.chezmoitemplates/theme-palette.tmpl` | — | template |
 | `~/.chezmoitemplates/themes/gen-6bd5de2cd3e4/windows_terminal.json` | `.chezmoitemplates/themes/gen-6bd5de2cd3e4/windows_terminal.json` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/bat.tmTheme` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/bat.tmTheme` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/colors.toml` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/colors.toml` | — | — |
@@ -402,7 +418,9 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.chezmoitemplates/themes/tokyonight-storm/lazygit.yml` | `.chezmoitemplates/themes/tokyonight-storm/lazygit.yml` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-storm/wallpaper.png` | `.chezmoitemplates/themes/tokyonight-storm/wallpaper.png` | — | — |
 | `~/.chezmoitemplates/themes/tokyonight-storm/windows_terminal.json` | `.chezmoitemplates/themes/tokyonight-storm/windows_terminal.json` | — | — |
+| `~/.hermes.md` | `.hermes.md` | — | — |
 | `~/.yamllint.yml` | `.yamllint.yml` | — | — |
+| `~/dev` | `dev` | — | — |
 | `~/.config/apt/pkglist.txt` | `dot_config/apt/pkglist.txt` | — | — |
 | `~/.config/bat/config` | `dot_config/bat/config` | — | — |
 | `~/.config/bat/themes/dots.tmTheme` | `dot_config/bat/themes/dots.tmTheme.tmpl` | — | template |
@@ -413,10 +431,10 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/fzf/theme.sh` | `dot_config/fzf/theme.sh.tmpl` | — | template |
 | `~/.local/share/figlet/README.md` | `dot_local/share/figlet/README.md` | — | — |
 | `~/.local/share/figlet/Roman.flf` | `dot_local/share/figlet/Roman.flf` | — | — |
-| `~/.local/share/omarchy-patches/esemczak.theme-modes-profiles.patch` | `dot_local/share/omarchy-patches/esemczak.theme-modes-profiles.patch` | — | — |
 | `~/.local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch` | `dot_local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch` | — | — |
 | `~/.local/share/wsl-ssh-bridge/main.go` | `dot_local/share/wsl-ssh-bridge/main.go` | — | — |
 | `~/install.sh` | `install.sh` | — | — |
+| `~/tests/test-dev.sh` | `tests/test-dev.sh` | — | — |
 | `~/theme-assets/omarchy-catppuccin-latte/wallpaper.png` | `theme-assets/omarchy-catppuccin-latte/wallpaper.png` | — | — |
 | `~/theme-assets/omarchy-catppuccin/wallpaper.png` | `theme-assets/omarchy-catppuccin/wallpaper.png` | — | — |
 | `~/theme-assets/omarchy-everforest/wallpaper.png` | `theme-assets/omarchy-everforest/wallpaper.png` | — | — |
@@ -431,6 +449,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | Order | Source | Trigger | Phase |
 | ---: | --- | --- | --- |
 | 00 | `run_once_before_00-verify-deps.sh.tmpl` | runs once ever | before |
+| 05 | `run_once_before_05-sync-hermes-skills.sh.tmpl` | runs once ever | before |
 | 09 | `run_onchange_before_09-install-agent-skills.sh.tmpl` | runs when this script's contents change | before |
 | 10 | `run_onchange_after_10-install-omarchy-plugins.sh.tmpl` | runs when this script's contents change | after |
 | 20 | `run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl` | runs when this script's contents change | after |
@@ -446,6 +465,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | 32 | `run_onchange_after_32-setup-omarchy-agent-registrations.sh.tmpl` | runs when this script's contents change | after |
 | 33 | `run_onchange_after_33-augustus-machine-branding.sh.tmpl` | runs when this script's contents change | after |
 | 34 | `run_after_34-augustus-backdrop-split.sh.tmpl` | runs after every apply | after |
+| 35 | `run_after_35-augustus-theme-modes-converge.sh.tmpl` | runs after every apply | after |
 | 40 | `run_onchange_after_40-vespasian-windows-terminal.sh.tmpl` | runs when this script's contents change | after |
 | 41 | `run_onchange_after_41-vespasian-nerd-font.sh.tmpl` | runs when this script's contents change | after |
 | 42 | `run_onchange_after_42-vespasian-theme-state.sh.tmpl` | runs when this script's contents change | after |
@@ -465,7 +485,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `.chezmoidata/claude_settings.yaml` | Controls how chezmoi renders and applies this tree |
 | `.chezmoidata/codex_projects.yaml` | Controls how chezmoi renders and applies this tree |
 | `.chezmoidata/generated/gen-6bd5de2cd3e4/windows_terminal.json` | Controls how chezmoi renders and applies this tree |
-| `.chezmoidata/hermes_skills.yaml` | Controls how chezmoi renders and applies this tree |
+| `.chezmoidata/hermes_sync.yaml` | Controls how chezmoi renders and applies this tree |
 | `.chezmoidata/machines.yaml` | Controls how chezmoi renders and applies this tree |
 | `.chezmoidata/omarchy_agents.yaml` | Controls how chezmoi renders and applies this tree |
 | `.chezmoidata/omarchy_plugins.yaml` | Controls how chezmoi renders and applies this tree |

@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 396,
+    "total": 416,
     "by_category": {
       "shell": 20,
       "prompt": 1,
@@ -13,12 +13,12 @@
       "vcs": 6,
       "navigation": 3,
       "toolchain": 5,
-      "agents": 42,
-      "services": 17,
-      "scripts": 37,
+      "agents": 49,
+      "services": 21,
+      "scripts": 41,
       "security": 2,
-      "other": 159,
-      "hooks": 24,
+      "other": 162,
+      "hooks": 26,
       "chezmoi": 12,
       "repo": 31
     }
@@ -721,6 +721,16 @@
       "subsystem": "claude code"
     },
     {
+      "source": "dot_claude/themes/omarchy.json.tmpl",
+      "target": "~/.claude/themes/omarchy.json",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "template"
+      ],
+      "subsystem": "claude code"
+    },
+    {
       "source": "dot_cline/data/settings/global-settings.json",
       "target": "~/.cline/data/settings/global-settings.json",
       "kind": "dotfile",
@@ -856,6 +866,16 @@
       "subsystem": "codex"
     },
     {
+      "source": "dot_codex/themes/dots.tmTheme.tmpl",
+      "target": "~/.codex/themes/dots.tmTheme",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "template"
+      ],
+      "subsystem": "codex"
+    },
+    {
       "source": "dot_config/opencode/agents/private_codebase-memory-auditor.md",
       "target": "~/.config/opencode/agents/codebase-memory-auditor.md",
       "kind": "dotfile",
@@ -904,6 +924,14 @@
       "subsystem": "opencode"
     },
     {
+      "source": "dot_config/opencode/plugins/herdr-agent-metadata.js",
+      "target": "~/.config/opencode/plugins/herdr-agent-metadata.js",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "opencode"
+    },
+    {
       "source": "dot_config/opencode/private_AGENTS.md",
       "target": "~/.config/opencode/AGENTS.md",
       "kind": "dotfile",
@@ -928,6 +956,16 @@
       "category": "agents",
       "attributes": [
         "symlink"
+      ],
+      "subsystem": "opencode"
+    },
+    {
+      "source": "dot_config/opencode/themes/dots.json.tmpl",
+      "target": "~/.config/opencode/themes/dots.json",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "template"
       ],
       "subsystem": "opencode"
     },
@@ -975,6 +1013,22 @@
       "attributes": [
         "private"
       ],
+      "subsystem": "gemini"
+    },
+    {
+      "source": "dot_gemini/config/hooks.json",
+      "target": "~/.gemini/config/hooks.json",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "gemini"
+    },
+    {
+      "source": "dot_gemini/config/hooks/herdr-agent-metadata.sh",
+      "target": "~/.gemini/config/hooks/herdr-agent-metadata.sh",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
       "subsystem": "gemini"
     },
     {
@@ -1063,6 +1117,16 @@
       "subsystem": "hermes"
     },
     {
+      "source": "dot_hermes/skins/omarchy.yaml.tmpl",
+      "target": "~/.hermes/skins/omarchy.yaml",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "template"
+      ],
+      "subsystem": "hermes"
+    },
+    {
       "source": "dot_pi/agent/skills/symlink_project-doc-planner",
       "target": "~/.pi/agent/skills/project-doc-planner",
       "kind": "dotfile",
@@ -1099,6 +1163,38 @@
         "template"
       ],
       "subsystem": "session environment"
+    },
+    {
+      "source": "dot_config/systemd/user/dots-theme-agents.path",
+      "target": "~/.config/systemd/user/dots-theme-agents.path",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "user systemd units"
+    },
+    {
+      "source": "dot_config/systemd/user/dots-theme-agents.service",
+      "target": "~/.config/systemd/user/dots-theme-agents.service",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "user systemd units"
+    },
+    {
+      "source": "dot_config/systemd/user/herdr-cline-state.service",
+      "target": "~/.config/systemd/user/herdr-cline-state.service",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "user systemd units"
+    },
+    {
+      "source": "dot_config/systemd/user/herdr-cline-state.timer",
+      "target": "~/.config/systemd/user/herdr-cline-state.timer",
+      "kind": "dotfile",
+      "category": "services",
+      "attributes": [],
+      "subsystem": "user systemd units"
     },
     {
       "source": "dot_config/systemd/user/herdr-outpost-relay.service",
@@ -1301,6 +1397,16 @@
       "subsystem": "custom executables"
     },
     {
+      "source": "dot_local/bin/executable_dots-theme-agents",
+      "target": "~/.local/bin/dots-theme-agents",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
       "source": "dot_local/bin/executable_dots-theme-import-aether",
       "target": "~/.local/bin/dots-theme-import-aether",
       "kind": "dotfile",
@@ -1313,6 +1419,36 @@
     {
       "source": "dot_local/bin/executable_herdr-agent-lifecycle",
       "target": "~/.local/bin/herdr-agent-lifecycle",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_herdr-cline-state",
+      "target": "~/.local/bin/herdr-cline-state",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_herdr-sync-hermes-plugin",
+      "target": "~/.local/bin/herdr-sync-hermes-plugin",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_herdr-verify",
+      "target": "~/.local/bin/herdr-verify",
       "kind": "dotfile",
       "category": "scripts",
       "attributes": [
@@ -1751,6 +1887,15 @@
     {
       "source": ".chezmoitemplates/machine-theme-name.tmpl",
       "target": "~/.chezmoitemplates/machine-theme-name",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": [
+        "template"
+      ]
+    },
+    {
+      "source": ".chezmoitemplates/theme-palette.tmpl",
+      "target": "~/.chezmoitemplates/theme-palette",
       "kind": "dotfile",
       "category": "other",
       "attributes": [
@@ -2605,8 +2750,22 @@
       "attributes": []
     },
     {
+      "source": ".hermes.md",
+      "target": "~/.hermes.md",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
       "source": ".yamllint.yml",
       "target": "~/.yamllint.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "dev",
+      "target": "~/dev",
       "kind": "dotfile",
       "category": "other",
       "attributes": []
@@ -2692,13 +2851,6 @@
       "attributes": []
     },
     {
-      "source": "dot_local/share/omarchy-patches/esemczak.theme-modes-profiles.patch",
-      "target": "~/.local/share/omarchy-patches/esemczak.theme-modes-profiles.patch",
-      "kind": "dotfile",
-      "category": "other",
-      "attributes": []
-    },
-    {
       "source": "dot_local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch",
       "target": "~/.local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch",
       "kind": "dotfile",
@@ -2715,6 +2867,13 @@
     {
       "source": "install.sh",
       "target": "~/install.sh",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "tests/test-dev.sh",
+      "target": "~/tests/test-dev.sh",
       "kind": "dotfile",
       "category": "other",
       "attributes": []
@@ -2802,6 +2961,19 @@
       }
     },
     {
+      "source": "run_after_35-augustus-theme-modes-converge.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "always",
+        "trigger_description": "runs after every apply",
+        "phase": "after",
+        "order": 35,
+        "name": "augustus-theme-modes-converge",
+        "template": true
+      }
+    },
+    {
       "source": "run_once_after_24-setup-omarchy-agents.sh.tmpl",
       "kind": "hook",
       "category": "hooks",
@@ -2824,6 +2996,19 @@
         "phase": "before",
         "order": 0,
         "name": "verify-deps",
+        "template": true
+      }
+    },
+    {
+      "source": "run_once_before_05-sync-hermes-skills.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "once",
+        "trigger_description": "runs once ever",
+        "phase": "before",
+        "order": 5,
+        "name": "sync-hermes-skills",
         "template": true
       }
     },
@@ -3124,7 +3309,7 @@
       "role": "Controls how chezmoi renders and applies this tree"
     },
     {
-      "source": ".chezmoidata/hermes_skills.yaml",
+      "source": ".chezmoidata/hermes_sync.yaml",
       "kind": "chezmoi",
       "category": "chezmoi",
       "role": "Controls how chezmoi renders and applies this tree"

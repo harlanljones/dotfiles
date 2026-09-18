@@ -30,20 +30,14 @@ installed_id_for_url() {
   return 0
 }
 
-# The Theme modes plugin is locally patched below. Temporarily reverse that
-# patch before an upstream update so Git sees a clean worktree, then reapply it
-# after all plugin updates have finished.
-theme_modes_dir="$PLUGINS_DIR/esemczak.theme-modes"
-theme_modes_patch="$HOME/.local/share/omarchy-patches/esemczak.theme-modes-profiles.patch"
-if [[ -d "$theme_modes_dir/.git" && -f "$theme_modes_patch" ]] \
-  && git -C "$theme_modes_dir" apply --reverse --check "$theme_modes_patch"; then
-  echo "omarchy plugin: temporarily removing Theme modes profiles patch for update"
-  git -C "$theme_modes_dir" apply --reverse "$theme_modes_patch"
-fi
+# The Theme modes plugin is our fork (harlanljones/omarchy-theme-modes), which
+# carries profiles, Backdrop re-splitting and dots-convergence IPC natively —
+# no local patch to reverse/reapply (retired 2026-09-18 with the stale
+# esemczak.theme-modes-profiles.patch).
 
-# The omalt-tab compact patch is applied below. Temporarily reverse it (like
-# Theme modes above) before an upstream update so Git sees a clean worktree,
-# then reapply it after all plugin updates have finished.
+# The omalt-tab compact patch is applied below. Temporarily reverse it before
+# an upstream update so Git sees a clean worktree, then reapply it after all
+# plugin updates have finished.
 omalt_tab_dir="$PLUGINS_DIR/io.github.codesmith28.omalt-tab"
 omalt_tab_patch="$HOME/.local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch"
 if [[ -d "$omalt_tab_dir/.git" && -f "$omalt_tab_patch" ]] \
@@ -62,28 +56,17 @@ if [[ -n "$id" ]]; then
   omarchy plugin update "$id" --yes || true
 else
   echo "omarchy plugin: installing $url"
-  omarchy plugin add "$url" --enable --yes
+  # Non-fatal: enabling requires a live shell, and a down shell must not
+  # brick the whole sync — the next sync retries the install.
+  omarchy plugin add "$url" --enable --yes \
+    || echo "omarchy plugin: install of $url failed (shell may be down), will retry next sync" >&2
 fi
 {{- end }}
 {{- end }}
-
-# Keep local Theme modes enhancements after its upstream repository is updated.
-if [[ -d "$theme_modes_dir/.git" && -f "$theme_modes_patch" ]]; then
-  if git -C "$theme_modes_dir" apply --reverse --check "$theme_modes_patch"; then
-    echo "omarchy plugin: Theme modes profiles patch already applied"
-  elif git -C "$theme_modes_dir" apply --check "$theme_modes_patch"; then
-    echo "omarchy plugin: applying Theme modes profiles patch"
-    git -C "$theme_modes_dir" apply "$theme_modes_patch"
-  else
-    echo "omarchy plugin: Theme modes profiles patch no longer applies; update the managed patch before continuing" >&2
-    exit 1
-  fi
-fi
 
 # Compact sizing for omalt-tab: 0.85x token set (denser cards for the 4K
-# panel) plus matching test assertions. Same reverse-before-update discipline
-# as Theme modes above so upstream updates apply to a clean tree and the
-# sizing re-applies after.
+# panel) plus matching test assertions. Reverse-before-update (above) lets the
+# upstream update apply to a clean tree and the sizing re-applies after.
 omalt_tab_dir="$PLUGINS_DIR/io.github.codesmith28.omalt-tab"
 omalt_tab_patch="$HOME/.local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch"
 if [[ -d "$omalt_tab_dir/.git" && -f "$omalt_tab_patch" ]]; then
