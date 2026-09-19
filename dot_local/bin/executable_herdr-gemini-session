@@ -1,0 +1,71 @@
+#!/bin/sh
+# Report Gemini CLI session identity to Herdr panes.
+#
+# Gemini CLI has no Herdr integration (screen manifest only), so panes never
+# carry a session id for restore. This SessionStart hook sends the same
+# pane.report_agent_session shape the hook integrations use. Reads the hook
+# JSON on stdin; session id accepted across payload spellings, anything else
+# is ignored silently.
+set -eu
+
+[ "${HERDR_ENV:-}" = "1" ] || exit 0
+[ -n "${HERDR_SOCKET_PATH:-}" ] || exit 0
+[ -n "${HERDR_PANE_ID:-}" ] || exit 0
+command -v python3 >/dev/null 2>&1 || exit 0
+
+hook_input="$(cat 2>/dev/null || true)"
+
+PANE="$HERDR_PANE_ID" SOCKET="$HERDR_SOCKET_PATH" HOOK_INPUT="$hook_input" python3 - <<'PY'
+import json
+import os
+import random
+import socket
+import time
+
+pane_id = os.environ.get("PANE", "")
+socket_path = os.environ.get("SOCKET", "")
+try:
+    data = json.loads(os.environ.get("HOOK_INPUT") or "{}")
+except Exception:
+    data = {}
+if not isinstance(data, dict):
+    data = {}
+
+
+def first_text(*keys):
+    for key in keys:
+        value = data.get(key)
+        if isinstance(value, str) and value:
+            return value
+    return ""
+
+
+session_id = first_text("session_id", "sessionId", "sessionID", "id")
+if not pane_id or not session_id or not socket_path:
+    raise SystemExit(0)
+
+request_id = f"custom:gemini-session:{int(time.time() * 1000)}:{random.randrange(1_000_000):06d}"
+request = {
+    "id": request_id,
+    "method": "pane.report_agent_session",
+    "params": {
+        "pane_id": pane_id,
+        "source": "custom:gemini-session",
+        "agent": "gemini",
+        "seq": time.time_ns(),
+        "agent_session_id": session_id,
+    },
+}
+try:
+    client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    client.settimeout(2)
+    client.connect(socket_path)
+    client.sendall((json.dumps(request) + "\n").encode())
+    try:
+        client.recv(4096)
+    except Exception:
+        pass
+    client.close()
+except Exception:
+    pass
+PY

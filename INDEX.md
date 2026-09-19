@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**415 tracked entries** across 16 categories.
+**418 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -21,9 +21,9 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Version control](#version-control) | 6 |
 | [Navigation & search](#navigation--search) | 3 |
 | [Toolchain & packages](#toolchain--packages) | 5 |
-| [AI agent harnesses](#ai-agent-harnesses) | 49 |
+| [AI agent harnesses](#ai-agent-harnesses) | 50 |
 | [Background services](#background-services) | 21 |
-| [Custom executables](#custom-executables) | 40 |
+| [Custom executables](#custom-executables) | 42 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
 | [Other configuration](#other-configuration) | 162 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 26 |
@@ -174,6 +174,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/opencode/.gitignore` | `dot_config/opencode/dot_gitignore` | opencode | — |
 | `~/.config/opencode/opencode.json` | `dot_config/opencode/encrypted_opencode.json.age` | opencode | encrypted |
 | `~/.config/opencode/plugins/herdr-agent-metadata.js` | `dot_config/opencode/plugins/herdr-agent-metadata.js` | opencode | — |
+| `~/.config/opencode/plugins/herdr-subagents.js` | `dot_config/opencode/plugins/herdr-subagents.js` | opencode | — |
 | `~/.config/opencode/AGENTS.md` | `dot_config/opencode/private_AGENTS.md` | opencode | private |
 | `~/.config/opencode/skills/opencode-go-usage/SKILL.md` | `dot_config/opencode/skills/opencode-go-usage/SKILL.md` | opencode | — |
 | `~/.config/opencode/skills/project-doc-planner` | `dot_config/opencode/skills/symlink_project-doc-planner` | opencode | symlink |
@@ -239,6 +240,8 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.local/bin/dots-theme-import-aether` | `dot_local/bin/executable_dots-theme-import-aether` | custom executables | executable |
 | `~/.local/bin/herdr-agent-lifecycle` | `dot_local/bin/executable_herdr-agent-lifecycle` | custom executables | executable |
 | `~/.local/bin/herdr-cline-state` | `dot_local/bin/executable_herdr-cline-state` | custom executables | executable |
+| `~/.local/bin/herdr-gemini-session` | `dot_local/bin/executable_herdr-gemini-session` | custom executables | executable |
+| `~/.local/bin/herdr-subagents` | `dot_local/bin/executable_herdr-subagents` | custom executables | executable |
 | `~/.local/bin/herdr-sync-hermes-plugin` | `dot_local/bin/executable_herdr-sync-hermes-plugin` | custom executables | executable |
 | `~/.local/bin/herdr-verify` | `dot_local/bin/executable_herdr-verify` | custom executables | executable |
 | `~/.local/bin/lazygit-ollama-commit.sh` | `dot_local/bin/executable_lazygit-ollama-commit.sh` | custom executables | executable |

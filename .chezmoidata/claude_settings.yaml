@@ -69,6 +69,11 @@ claudeSettings:
           - type: "command"
             command: "herdr-agent-lifecycle claude idle"
             timeout: 5
+      - matcher: "*"
+        hooks:
+          - type: "command"
+            command: "test ! -x \"$HOME/.local/bin/herdr-subagents\" || \"$HOME/.local/bin/herdr-subagents\" claude clear-pane"
+            timeout: 5
     SessionEnd:
       - matcher: "*"
         hooks:
@@ -80,6 +85,17 @@ claudeSettings:
         hooks:
           - type: "command"
             command: "test ! -x \"$HOME/.claude/hooks/cbm-subagent-reminder\" || \"$HOME/.claude/hooks/cbm-subagent-reminder\""
+            timeout: 5
+      - matcher: "*"
+        hooks:
+          - type: "command"
+            command: "test ! -x \"$HOME/.local/bin/herdr-subagents\" || \"$HOME/.local/bin/herdr-subagents\" claude start"
+            timeout: 5
+    SubagentStop:
+      - matcher: "*"
+        hooks:
+          - type: "command"
+            command: "test ! -x \"$HOME/.local/bin/herdr-subagents\" || \"$HOME/.local/bin/herdr-subagents\" claude stop"
             timeout: 5
   enabledPlugins:
     frontend-design@claude-plugins-official: true

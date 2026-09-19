@@ -453,7 +453,8 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   ├── dot_gitignore
 │   │   ├── encrypted_opencode.json.age
 │   │   ├── plugins
-│   │   │   └── herdr-agent-metadata.js
+│   │   │   ├── herdr-agent-metadata.js
+│   │   │   └── herdr-subagents.js
 │   │   ├── private_AGENTS.md
 │   │   ├── skills
 │   │   │   ├── opencode-go-usage
@@ -535,6 +536,8 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   ├── executable_dots-theme-import-aether
 │   │   ├── executable_herdr-agent-lifecycle
 │   │   ├── executable_herdr-cline-state
+│   │   ├── executable_herdr-gemini-session
+│   │   ├── executable_herdr-subagents
 │   │   ├── executable_herdr-sync-hermes-plugin
 │   │   ├── executable_herdr-verify
 │   │   ├── executable_lazygit-ollama-commit.sh

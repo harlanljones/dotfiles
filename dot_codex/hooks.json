@@ -31,6 +31,11 @@
                 "command": "'/home/harlan/.local/bin/codebase-memory-mcp' hook-augment",
                 "command_windows": "& '/home/harlan/.local/bin/codebase-memory-mcp' hook-augment",
                 "timeout": 5
+            },
+            {
+                "type": "command",
+                "command": "herdr-subagents codex start",
+                "timeout": 5
             }
         ]
     }
@@ -78,6 +83,11 @@
             {
                 "type": "command",
                 "command": "herdr-agent-lifecycle codex idle",
+                "timeout": 5
+            },
+            {
+                "type": "command",
+                "command": "herdr-subagents codex clear-pane",
                 "timeout": 5
             }
         ]

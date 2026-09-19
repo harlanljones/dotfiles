@@ -1,0 +1,181 @@
+#!/bin/sh
+# Track in-session subagents per Herdr pane without touching root state.
+#
+# Herdr's own hooks deliberately ignore subagent contexts (and opencode's
+# plugin filters child sessions) so a subagent never replaces the pane's
+# root agent session. The price is invisibility: while subagents work, the
+# sidebar shows nothing about them. This sidecar keeps a small roster file
+# and mirrors it as display-only metadata tokens (docs pattern: integrations
+# report lifecycle as semantic state; display customization goes through
+# pane metadata tokens):
+#   subagents=N            live subagent count for this pane (cleared at 0)
+#   subagent_names=a,b,c   short labels, most-recent-first, truncated
+#
+# It never calls report-agent / report_agent_session, so root lifecycle,
+# waits, rollups and restore are exactly as without it.
+#
+# Usage: herdr-subagents <agent-label> start|stop
+# Reads the hook's JSON payload on stdin. Subagent identity is accepted
+# across harness spellings (agent_id/agentId/subagent_id/...); a payload
+# without a subagent id is ignored. Roster lives at
+# ~/.local/state/herdr/subagents.json (pane -> {sub_id: {agent,name,started}});
+# entries older than 6h are pruned on every run as a backstop for missed
+# stop events.
+set -eu
+
+agent="${1:?agent label required}"
+action="${2:?start|stop required}"
+
+[ "${HERDR_ENV:-}" = "1" ] || exit 0
+[ -n "${HERDR_SOCKET_PATH:-}" ] || exit 0
+[ -n "${HERDR_PANE_ID:-}" ] || exit 0
+command -v python3 >/dev/null 2>&1 || exit 0
+
+hook_input="$(cat 2>/dev/null || true)"
+
+pane="${HERDR_PANE_ID}"
+ROSTER_DIR="$HOME/.local/state/herdr"
+ROSTER_FILE="$ROSTER_DIR/subagents.json"
+SOURCE="custom:${agent}-subagents"
+TTL_MS=1200000
+
+# Event gate: subagent start/stop maintain the roster; clear-pane drops the
+# whole pane roster (wired to main-turn/session end, whose subagents are
+# done by definition). Main-session firings (no agent_id anywhere) must not
+# touch per-subagent entries.
+case "$action" in
+  start|stop|clear-pane) ;;
+  *) exit 0 ;;
+esac
+
+HOOK_INPUT="$hook_input" HERDR_PANE="$pane" ROSTER_FILE="$ROSTER_FILE" \
+ACTION="$action" AGENT="$agent" SOURCE="$SOURCE" TTL_MS="$TTL_MS" \
+python3 - <<'PY'
+import json
+import os
+import socket
+import sys
+import tempfile
+import time
+
+pane = os.environ.get("HERDR_PANE", "")
+roster_path = os.environ.get("ROSTER_FILE", "")
+action = os.environ.get("ACTION", "")
+agent = os.environ.get("AGENT", "")
+source = os.environ.get("SOURCE", "")
+ttl_ms = int(os.environ.get("TTL_MS") or 1200000)
+socket_path = os.environ.get("HERDR_SOCKET_PATH", "")
+try:
+    data = json.loads(os.environ.get("HOOK_INPUT") or "{}")
+except Exception:
+    data = {}
+if not isinstance(data, dict):
+    data = {}
+
+
+def first_text(*keys):
+    for key in keys:
+        value = data.get(key)
+        if isinstance(value, str) and value:
+            return value
+    return ""
+
+
+sub_id = (
+    first_text("agent_id", "agentId", "subagent_id", "subagentId",
+               "thread_id", "threadId")
+    or first_text("session_id", "sessionId")
+)
+if not pane:
+    raise SystemExit(0)
+
+name = first_text("agent_type", "agentType", "subagent_type", "subagentType",
+                  "task_type", "taskType", "name", "label") or "subagent"
+name = "".join(c if (c.isalnum() or c in "-_ ") else "" for c in name).strip()[:24] or "subagent"
+
+now = time.time()
+STALE_SEC = 6 * 3600
+MAX_SUBS = 8
+roster = {}
+if roster_path:
+    try:
+        with open(roster_path, encoding="utf-8") as f:
+            loaded = json.load(f)
+        if isinstance(loaded, dict):
+            roster = loaded
+    except Exception:
+        roster = {}
+
+pane_roster = roster.get(pane)
+if not isinstance(pane_roster, dict):
+    pane_roster = {}
+
+# Drop stale entries first so a missed stop cannot pin the count forever.
+for sid in [s for s, e in pane_roster.items()
+            if not isinstance(e, dict) or now - float(e.get("started", 0)) > STALE_SEC]:
+    del pane_roster[sid]
+
+if action == "start":
+    if not sub_id:
+        raise SystemExit(0)
+    pane_roster[sub_id] = {"agent": agent, "name": name, "started": now}
+    # Bound the roster; evict oldest first.
+    while len(pane_roster) > MAX_SUBS:
+        oldest = min(pane_roster, key=lambda s: float(pane_roster[s].get("started", 0)))
+        del pane_roster[oldest]
+elif action == "stop":
+    if not sub_id:
+        raise SystemExit(0)
+    pane_roster.pop(sub_id, None)
+elif action == "clear-pane":
+    pane_roster.clear()
+
+if pane_roster:
+    roster[pane] = pane_roster
+else:
+    roster.pop(pane, None)
+# Drop other panes' stale entries opportunistically.
+for other in [p for p, entries in roster.items()
+              if not isinstance(entries, dict) or not entries]:
+    del roster[other]
+
+if roster_path:
+    try:
+        os.makedirs(os.path.dirname(roster_path), exist_ok=True)
+        fd, tmp = tempfile.mkstemp(dir=os.path.dirname(roster_path) or ".",
+                                   prefix=".subagents.")
+        with os.fdopen(fd, "w", encoding="utf-8") as f:
+            json.dump(roster, f)
+        os.chmod(tmp, 0o600)
+        os.replace(tmp, roster_path)
+    except Exception:
+        pass
+
+count = len(pane_roster)
+names = ",".join(e.get("name", "subagent")
+                 for _, e in sorted(pane_roster.items(),
+                                    key=lambda kv: float(kv[1].get("started", 0)),
+                                    reverse=True))[:120]
+
+request_id = f"{source}:{int(now * 1000)}"
+tparams = {"pane_id": pane, "source": source, "ttl_ms": ttl_ms}
+if count > 0:
+    tparams["tokens"] = {"subagents": str(count), "subagent_names": names or str(count)}
+else:
+    # tokens accept null values: null clears a previously set token.
+    tparams["tokens"] = {"subagents": None, "subagent_names": None}
+request = {"id": request_id, "method": "pane.report_metadata", "params": tparams}
+
+try:
+    client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    client.settimeout(2)
+    client.connect(socket_path)
+    client.sendall((json.dumps(request) + "\n").encode())
+    try:
+        client.recv(4096)
+    except Exception:
+        pass
+    client.close()
+except Exception:
+    pass
+PY

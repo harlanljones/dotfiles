@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 415,
+    "total": 418,
     "by_category": {
       "shell": 20,
       "prompt": 1,
@@ -13,9 +13,9 @@
       "vcs": 6,
       "navigation": 3,
       "toolchain": 5,
-      "agents": 49,
+      "agents": 50,
       "services": 21,
-      "scripts": 40,
+      "scripts": 42,
       "security": 2,
       "other": 162,
       "hooks": 26,
@@ -932,6 +932,14 @@
       "subsystem": "opencode"
     },
     {
+      "source": "dot_config/opencode/plugins/herdr-subagents.js",
+      "target": "~/.config/opencode/plugins/herdr-subagents.js",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [],
+      "subsystem": "opencode"
+    },
+    {
       "source": "dot_config/opencode/private_AGENTS.md",
       "target": "~/.config/opencode/AGENTS.md",
       "kind": "dotfile",
@@ -1423,6 +1431,26 @@
     {
       "source": "dot_local/bin/executable_herdr-cline-state",
       "target": "~/.local/bin/herdr-cline-state",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_herdr-gemini-session",
+      "target": "~/.local/bin/herdr-gemini-session",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_herdr-subagents",
+      "target": "~/.local/bin/herdr-subagents",
       "kind": "dotfile",
       "category": "scripts",
       "attributes": [
