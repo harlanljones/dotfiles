@@ -142,7 +142,7 @@ Each CLI/runtime is owned by exactly one manager. Do not spread a tool across tw
 | Homebrew (macOS) | `dot_Brewfile` | brews + casks (Ghostty, JetBrainsMono Nerd Font, …) |
 | pacman / paru (Augustus) | `dot_config/pacman/pkglist.txt` + `aurlist.txt` | native + AUR packages |
 | mise conf.d (Vespasian) | `dot_config/mise/conf.d/vespasian.toml` | atuin, bat, delta, direnv, eza, fd, fzf, lazygit, neovim, ripgrep, starship, zoxide (pacman/brew own these elsewhere) |
-| apt (Vespasian) | `dot_config/apt/pkglist.txt` | age, build-essential, curl, erlang-nox, jq, postgresql, sqlite3, tailscale, unzip |
+| apt (Vespasian) | `dot_config/apt/pkglist.txt` | age, build-essential, curl, erlang-nox, figlet, jq, postgresql, sqlite3, tailscale, unzip |
 | standalone / scripts | `dot_local/bin/`, `~/.fly/bin` | flyctl (Fly.io CLI installer), chrome-profile (Chrome profile selector) |
 
 ## 6. Hard rules for agents
