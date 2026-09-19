@@ -81,28 +81,17 @@ recipient = "age1hf4200nhdqg0l3xs68v4gef6mn0nuvmh72573m3nfj8kqpcs7pnsmfkuw6"
 {{- end -}}
 {{- end -}}
 
-{{/* 3.3 Machine-role feature booleans, exposed to templates alongside
-     .machine. Resolution:
-       .machine  — resolved machine key, always one of augustus / hadrian /
-                   vespasian / unknown (or a freeform wizard answer).
-       .role     — "work" or "personal", from the `type` field in
-                   .chezmoidata/machines.yaml; personal for unregistered hosts.
-       .headless — true when there is no local Linux/macOS desktop session to
-                   configure (WSL hosts, unregistered hosts). Gate GUI-only
-                   config on this rather than inferring from .machine.
-       .isCI     — running in a CI environment (env CI=true).
-       .isSSH    — connected over SSH (env SSH_CONNECTION set).
-       .isWSL    — running under WSL (kernel reports "microsoft").
-     The `unknown` entry in .chezmoidata/machines.yaml also guarantees every
-     `index .machines .machine` in templates resolves to a dict. */ -}}
-{{- $mach := "" -}}
-{{- if hasKey .machines $machine }}{{ $mach = index .machines $machine }}{{ else }}{{ $mach = index .machines "unknown" }}{{ end -}}
-{{- $role := "personal" -}}
-{{- if hasKey $mach "type" }}{{ $role = index $mach "type" }}{{ end -}}
-{{- $headless := false -}}
-{{- if hasKey $mach "headless" }}{{ $headless = index $mach "headless" }}{{ end -}}
-{{/* .chezmoi.kernel is populated from /proc only on Linux; on darwin it is
-     an empty map, so guard the lookup or the whole config fails to render. */ -}}
+{{/* 3.3 Environment booleans, exposed to templates alongside .machine.
+     .machine — resolved machine key, always one of augustus / hadrian /
+                vespasian / unknown (or a freeform wizard answer).
+     .isCI    — running in a CI environment (env CI=true).
+     .isSSH   — connected over SSH (env SSH_CONNECTION set).
+     .isWSL   — running under WSL (kernel reports "microsoft").
+     Per-machine attributes (type, headless, theme, ...) are NOT computed
+     here: chezmoi renders this file before it loads .chezmoidata, so
+     .machines is undefined during `chezmoi init`. Templates read them from
+     .chezmoidata/machines.yaml instead, e.g. `(index .machines .machine).type`;
+     its `unknown` entry keeps that lookup safe for any machine name. */ -}}
 {{- $isWSL := and (eq .chezmoi.os "linux") (hasKey .chezmoi.kernel "osrelease") (contains "microsoft" (lower .chezmoi.kernel.osrelease)) -}}
 
 [onepassword]
@@ -113,8 +102,6 @@ command = "op.exe"
 
 [data]
 machine = '{{ $machine }}'
-role = '{{ $role }}'
-headless = {{ $headless }}
 isCI = {{ (env "CI" | not | not) }}
 isSSH = {{ (env "SSH_CONNECTION" | not | not) }}
 isWSL = {{ $isWSL }}
