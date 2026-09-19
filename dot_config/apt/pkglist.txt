@@ -2,6 +2,7 @@ age
 build-essential
 curl
 erlang-nox
+figlet
 jq
 postgresql
 sqlite3

@@ -125,8 +125,8 @@ _mini_font() {
 
 render_wordmark() {
   local name=$1 target_lines=${2:-27} target_cols=${3:-95} wordmark
-  # Use Roman FIGlet when height >= 34 AND width >= 92 to avoid vertical overflow or wrapping
-  if (( target_lines >= 34 && target_cols >= 92 )) && command -v figlet >/dev/null 2>&1; then
+  # Use Roman FIGlet when height >= 30 AND width >= 92 to avoid vertical overflow or wrapping
+  if (( target_lines >= 30 && target_cols >= 92 )) && command -v figlet >/dev/null 2>&1; then
     wordmark=$(figlet -w 200 -f "$HOME/.local/share/figlet/Roman.flf" "$name" 2>/dev/null) || true
   fi
   if [[ -n "${wordmark:-}" ]]; then
