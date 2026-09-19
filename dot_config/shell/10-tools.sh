@@ -12,4 +12,9 @@ export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
 export FZF_DEFAULT_OPTS='--height=40% --layout=reverse --border --info=inline'
 
 export PAGER=less
-command -v bat >/dev/null 2>&1 && export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+# Use if/fi (not `cmd && export`) so a missing bat does not make `source`
+# return non-zero — bash/zsh treat the last command's status as the source
+# status, which breaks docs/check-shell-modules.sh dual-shell smoke tests.
+if command -v bat >/dev/null 2>&1; then
+  export MANPAGER="sh -c 'col -bx | bat -l man -p'"
+fi

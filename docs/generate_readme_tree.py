@@ -50,7 +50,8 @@ SKIP = (
 # families that drown the tree at full depth. The line notes the file count
 # and (where helpful) points at the manifest that owns the family.
 COLLAPSED = {
-    "dot_hermes/skills": "skills/ ({n} files across {groups} skill groups — see .chezmoidata/hermes_skills.yaml)",
+    # dot_hermes/skills moved to the hermes-skills git repo (synced by
+    # run_once_before_05-sync-hermes-skills); no longer a tracked subtree.
     ".chezmoitemplates/themes": "themes/ ({n} files across {groups} themes — see .chezmoidata/themes.yaml)",
     ".chezmoitemplates/aether-adapters": "aether-adapters/ ({n} files — per-tool theme adapters)",
     "theme-assets": "theme-assets/ ({n} files across {groups} wallpaper sets)",
