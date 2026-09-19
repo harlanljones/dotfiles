@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 416,
+    "total": 415,
     "by_category": {
       "shell": 20,
       "prompt": 1,
@@ -15,10 +15,10 @@
       "toolchain": 5,
       "agents": 49,
       "services": 21,
-      "scripts": 41,
+      "scripts": 40,
       "security": 2,
-      "other": 163,
-      "hooks": 25,
+      "other": 162,
+      "hooks": 26,
       "chezmoi": 12,
       "repo": 31
     }
@@ -1099,34 +1099,6 @@
       "subsystem": "grok"
     },
     {
-      "source": "dot_hermes/SOUL.md",
-      "target": "~/.hermes/SOUL.md",
-      "kind": "dotfile",
-      "category": "agents",
-      "attributes": [],
-      "subsystem": "hermes"
-    },
-    {
-      "source": "dot_hermes/config.yaml.tmpl",
-      "target": "~/.hermes/config.yaml",
-      "kind": "dotfile",
-      "category": "agents",
-      "attributes": [
-        "template"
-      ],
-      "subsystem": "hermes"
-    },
-    {
-      "source": "dot_hermes/skins/omarchy.yaml.tmpl",
-      "target": "~/.hermes/skins/omarchy.yaml",
-      "kind": "dotfile",
-      "category": "agents",
-      "attributes": [
-        "template"
-      ],
-      "subsystem": "hermes"
-    },
-    {
       "source": "dot_pi/agent/skills/symlink_project-doc-planner",
       "target": "~/.pi/agent/skills/project-doc-planner",
       "kind": "dotfile",
@@ -1145,6 +1117,38 @@
         "private"
       ],
       "subsystem": "grokbot"
+    },
+    {
+      "source": "private_dot_hermes/SOUL.md",
+      "target": "~/.hermes/SOUL.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "private"
+      ],
+      "subsystem": "hermes"
+    },
+    {
+      "source": "private_dot_hermes/config.yaml.tmpl",
+      "target": "~/.hermes/config.yaml",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "private",
+        "template"
+      ],
+      "subsystem": "hermes"
+    },
+    {
+      "source": "private_dot_hermes/skins/omarchy.yaml.tmpl",
+      "target": "~/.hermes/skins/omarchy.yaml",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "private",
+        "template"
+      ],
+      "subsystem": "hermes"
     },
     {
       "source": "dot_config/environment.d/10-defaults.conf",
@@ -1325,16 +1329,6 @@
         "executable"
       ],
       "subsystem": "cline git interceptor"
-    },
-    {
-      "source": "dot_local/bin/executable_agent-console-home",
-      "target": "~/.local/bin/agent-console-home",
-      "kind": "dotfile",
-      "category": "scripts",
-      "attributes": [
-        "executable"
-      ],
-      "subsystem": "custom executables"
     },
     {
       "source": "dot_local/bin/executable_backdrop-split",
@@ -2851,13 +2845,6 @@
       "attributes": []
     },
     {
-      "source": "dot_local/share/omarchy-patches/esemczak.theme-modes-profiles.patch",
-      "target": "~/.local/share/omarchy-patches/esemczak.theme-modes-profiles.patch",
-      "kind": "dotfile",
-      "category": "other",
-      "attributes": []
-    },
-    {
       "source": "dot_local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch",
       "target": "~/.local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch",
       "kind": "dotfile",
@@ -2964,6 +2951,19 @@
         "phase": "after",
         "order": 34,
         "name": "augustus-backdrop-split",
+        "template": true
+      }
+    },
+    {
+      "source": "run_after_35-augustus-theme-modes-converge.sh.tmpl",
+      "kind": "hook",
+      "category": "hooks",
+      "hook": {
+        "trigger": "always",
+        "trigger_description": "runs after every apply",
+        "phase": "after",
+        "order": 35,
+        "name": "augustus-theme-modes-converge",
         "template": true
       }
     },

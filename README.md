@@ -521,16 +521,10 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   └── hooks
 │       ├── executable_herdr-agent-state.sh
 │       └── herdr.json
-├── dot_hermes
-│   ├── SOUL.md
-│   ├── config.yaml.tmpl
-│   └── skins
-│       └── omarchy.yaml.tmpl
 ├── dot_local
 │   ├── bin
 │   │   ├── cline-safety
 │   │   │   └── executable_git
-│   │   ├── executable_agent-console-home
 │   │   ├── executable_backdrop-split
 │   │   ├── executable_chrome-profile
 │   │   ├── executable_cursor
@@ -571,7 +565,6 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │       │   ├── README.md
 │       │   └── Roman.flf
 │       ├── omarchy-patches
-│       │   ├── esemczak.theme-modes-profiles.patch
 │       │   └── io.github.codesmith28.omalt-tab-compact.patch
 │       └── wsl-ssh-bridge
 │           └── main.go
@@ -583,9 +576,14 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 ├── install.sh
 ├── private_dot_grokbot
 │   └── settings.json
+├── private_dot_hermes
+│   ├── SOUL.md
+│   ├── config.yaml.tmpl
+│   └── skins
+│       └── omarchy.yaml.tmpl
 ├── private_dot_ssh
 │   └── config.tmpl
-├── run_* apply hooks (25 — see INDEX.md § Apply hooks for trigger/phase)
+├── run_* apply hooks (26 — see INDEX.md § Apply hooks for trigger/phase)
 ├── tests
 │   └── test-dev.sh
 └── theme-assets/ (8 files across 8 wallpaper sets)

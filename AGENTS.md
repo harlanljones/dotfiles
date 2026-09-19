@@ -83,6 +83,7 @@ hook that runs on every machine (gated internally on `.machine`). Gaps in the
 | 32 | `run_onchange_after_32-setup-omarchy-agent-registrations.sh.tmpl` | onchange (augustus) | Register configured agents and collect initial Omarchy leaderboard usage |
 | 33 | `run_onchange_after_33-augustus-machine-branding.sh.tmpl` | onchange (augustus) | Write Omarchy screensaver/about branding art from the machine identity |
 | 34 | `run_after_34-augustus-backdrop-split.sh.tmpl` | after (augustus) | Re-split current theme background across monitors via Backdrop |
+| 35 | `run_after_35-augustus-theme-modes-converge.sh.tmpl` | after (augustus) | Converge Theme modes light/dark slots from the dots theme registry via state-file merge (widget stays the actuator) |
 | 40 | `run_onchange_after_40-vespasian-windows-terminal.sh.tmpl` | onchange (vespasian) | Write the Tokyo Night Windows Terminal fragment (scheme + Ubuntu profile update) |
 | 41 | `run_onchange_after_41-vespasian-nerd-font.sh.tmpl` | onchange (vespasian) | Per-user install of the pinned JetBrainsMono Nerd Font on Windows |
 | 42 | `run_onchange_after_42-vespasian-theme-state.sh.tmpl` | onchange (vespasian) | Rebuild bat's theme cache; set Claude Code theme to `dark-ansi`/`light-ansi` per the selected theme |
@@ -112,8 +113,8 @@ The table below is the orienting summary; the index is the detail.
 | `dot_local/bin/cline-safety/` | `git` interceptor that refuses `commit`/`push` under Cline |
 | `dot_local/bin/executable_statusline.tmpl` | Shared cross-harness CLI statusline renderer (Claude Code + Cursor) → `~/.local/bin/statusline` |
 | `dot_local/bin/executable_chrome-profile` | **Chrome profile selector** → `~/.local/bin/chrome-profile`. Discovers profiles from Chrome's `Local State` JSON and launches Chrome in the chosen one (interactive `fzf` picker or fuzzy name/email filter). Cross-platform: Linux (`google-chrome-stable`), macOS (direct `.app` binary), WSL2 (Windows `chrome.exe` via `wslpath`). Shell aliases in `55-apps.sh`: `chrome` (picker), `chrome-work` (primeiq.ai), `chrome-personal` (Personal). Requires `jq`; `fzf` for interactive mode. Usage: `chrome-profile [filter] [URLs...]`, `chrome-profile --list` |
-| `dot_agents/`, `dot_claude/`, `dot_cline/`, `dot_codex/`, `dot_gemini/`, `dot_grok/`, `dot_hermes/`, `dot_pi/` | Per-harness config, skills, rules, MCP, hooks |
-| `dot_hermes/` | Default-profile Hermes config: `~/.hermes/config.yaml` (settings-only template), `~/.hermes/SOUL.md`; the skill library moved to the [hermes-skills](https://github.com/harlanljones/hermes-skills) repo, cloned/pulled into `~/.hermes/skills/` by `run_once_before_05-sync-hermes-skills` |
+| `dot_agents/`, `dot_claude/`, `dot_cline/`, `dot_codex/`, `dot_gemini/`, `dot_grok/`, `private_dot_hermes/`, `dot_pi/` | Per-harness config, skills, rules, MCP, hooks |
+| `private_dot_hermes/` | Default-profile Hermes config (`0700`, secrets-adjacent): `~/.hermes/config.yaml` (settings-only template), `~/.hermes/SOUL.md`; the skill library moved to the [hermes-skills](https://github.com/harlanljones/hermes-skills) repo, cloned/pulled into `~/.hermes/skills/` by `run_once_before_05-sync-hermes-skills` |
 | `.chezmoidata/` | YAML data sources read by `.tmpl`s (`machines`, `agent_skills`, `omarchy_plugins`, `claude_mcp`, `claude_settings`, `codex_projects`, `themes`) |
 | `.chezmoitemplates/themes/<name>/` | Verbatim upstream per-tool theme ports (Windows Terminal, lazygit, delta, fzf, eza, bat, Gemini) included by the themed templates; never applied. Select with `dots theme set <name>` (edits `machines.<machine>.theme.name`), never by editing rendered targets |
 | `docs/` | Recovery guide, Vespasian boot & theming guides, reorganization proposal, and generator scripts (chezmoi-ignored, git-tracked) |
@@ -185,7 +186,7 @@ Each CLI/runtime is owned by exactly one manager. Do not spread a tool across tw
 - **After editing any `run_*` hook**, `git gc`/re-apply mentally: `run_onchange_*`
   will re-trigger if contents changed, which may re-run installs.
 - **Hermes is managed separately from the other harnesses.** The *default*
-  profile's config and `SOUL.md` are synced via `dot_hermes/`
+  profile's config and `SOUL.md` are synced via `private_dot_hermes/`
   (`config.yaml.tmpl`, `dot_SOUL.md`); the default-profile skill library is
   its own git repo, `github.com/harlanljones/hermes-skills`, cloned or
   fast-forwarded into `~/.hermes/skills/` by

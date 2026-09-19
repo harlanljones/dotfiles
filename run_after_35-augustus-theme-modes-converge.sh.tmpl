@@ -1,0 +1,109 @@
+{{ if eq .machine "augustus" -}}
+#!/usr/bin/env bash
+# Converge the Theme modes widget's light/dark slots from the dots theme
+# registry, so `dots theme set` also steers the Omarchy desktop theme.
+# Runs after every apply but is a cheap no-op when the matching slot already
+# names the registry's Omarchy slug. Only the slot matching the registry
+# entry's appearance is touched, and only the state file is written — the
+# widget stays the actuator (it applies the slot on the next mode switch or
+# profile select), which also avoids `omarchy theme set` resetting a custom
+# background. The hook re-converges every sync, so a widget save between
+# syncs can only win temporarily.
+#
+# Mechanism: JSON merge of ~/.local/state/omarchy/settings/theme-modes.json
+# (active profile's slot + top-level slot, everything else preserved,
+# atomic tmp+mv keeping the file's permissions). No shell IPC involved:
+# Quickshell's IpcHandler rejects QML-declared setter params (Variant
+# unusable across IPC), so the fork exposes no setters by design.
+# Generated (matugen) registry entries have no Omarchy slug and are skipped.
+{{- $tname := (index .machines .machine).theme.name }}
+{{- $t := index .themes $tname }}
+set -euo pipefail
+
+DOTS_THEME="{{ $tname }}"
+DESIRED_SLUG="{{ if and $t $t.source (hasKey $t.source "kind") }}{{ if eq $t.source.kind "omarchy-public-theme" }}{{ $t.source.name }}{{ end }}{{ end }}"
+DESIRED_APPEARANCE="{{ if $t }}{{ $t.appearance }}{{ end }}"
+
+if [[ -z "$DESIRED_SLUG" ]]; then
+	echo "run_after_35: dots theme '$DOTS_THEME' has no Omarchy slug (generated theme?), skipping modes convergence"
+	exit 0
+fi
+if [[ ! "$DESIRED_SLUG" =~ ^[a-z0-9-]+$ ]]; then
+	echo "run_after_35: refusing unexpected Omarchy slug '$DESIRED_SLUG'" >&2
+	exit 0
+fi
+if [[ "$DESIRED_APPEARANCE" != "light" && "$DESIRED_APPEARANCE" != "dark" ]]; then
+	echo "run_after_35: dots theme '$DOTS_THEME' has unknown appearance '$DESIRED_APPEARANCE', skipping" >&2
+	exit 0
+fi
+
+STATE_FILE="${THEME_MODES_STATE_FILE:-$HOME/.local/state/omarchy/settings/theme-modes.json}"
+if [[ ! -f "$STATE_FILE" ]]; then
+	echo "run_after_35: no theme-modes state yet (widget never ran?), skipping" >&2
+	exit 0
+fi
+
+DESIRED_SLUG="$DESIRED_SLUG" DESIRED_APPEARANCE="$DESIRED_APPEARANCE" STATE_FILE="$STATE_FILE" DOTS_THEME="$DOTS_THEME" python3 <<'PY'
+import json
+import os
+import stat
+import sys
+import tempfile
+
+slug = os.environ["DESIRED_SLUG"]
+appearance = os.environ["DESIRED_APPEARANCE"]
+path = os.environ["STATE_FILE"]
+slot = "darkTheme" if appearance == "dark" else "lightTheme"
+
+try:
+    with open(path) as f:
+        state = json.load(f)
+except (OSError, ValueError) as e:
+    print(f"run_after_35: cannot parse theme-modes state, skipping: {e}", file=sys.stderr)
+    sys.exit(0)
+if not isinstance(state, dict):
+    print("run_after_35: theme-modes state is not an object, skipping", file=sys.stderr)
+    sys.exit(0)
+
+active = state.get("activeProfile")
+profiles = state.get("profiles")
+changed = []
+
+if state.get(slot) != slug:
+    state[slot] = slug
+    changed.append(slot)
+if isinstance(profiles, list):
+    for p in profiles:
+        if isinstance(p, dict) and p.get("id") == active and p.get(slot) != slug:
+            p[slot] = slug
+            changed.append(f"profiles/{active}.{slot}")
+
+if not changed:
+    sys.exit(0)
+
+mode = os.open(path, os.O_RDONLY)
+try:
+    perms = stat.S_IMODE(os.fstat(mode).st_mode)
+finally:
+    os.close(mode)
+d = os.path.dirname(path) or "."
+fd, tmp = tempfile.mkstemp(dir=d, prefix=".theme-modes.")
+try:
+    with os.fdopen(fd, "w") as f:
+        json.dump(state, f, indent=2)
+        f.write("\n")
+    os.chmod(tmp, perms)
+    os.replace(tmp, path)
+except OSError as e:
+    try:
+        os.unlink(tmp)
+    except OSError:
+        pass
+    print(f"run_after_35: failed to write theme-modes state: {e}", file=sys.stderr)
+    sys.exit(1)
+
+print(f"run_after_35: theme-modes {', '.join(changed)} -> '{slug}'"
+      f" (dots theme '{os.environ.get('DOTS_THEME', '')}');"
+      " widget applies it on the next mode switch or profile select")
+PY
+{{- end }}

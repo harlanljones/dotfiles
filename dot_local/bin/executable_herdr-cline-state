@@ -1,37 +1,58 @@
 #!/bin/sh
 # Report Command Code (cline CLI) session metadata to Herdr panes.
 #
-# cmd has no hook system, so nothing inside the agent reports $model /
-# $provider for its panes. This watcher polls ~/.cline/data/sessions and
-# pushes each recent session's tokens to the Herdr pane whose cwd matches
-# the session's (and that has no other agent attached). Triggered by the
-# herdr-cline-state.timer.
+# cmd has no hook system, so nothing inside the agent reports activity for
+# its panes: without session reports Herdr shows cline panes permanently
+# idle, never thinking/in-progress. This watcher polls
+# ~/.cline/data/sessions every 30s (herdr-cline-state.timer) and, per recent
+# session, pushes to the Herdr pane whose cwd matches (and that has no other
+# agent attached):
+#   - display tokens (model/provider) via report-metadata (as before), plus
+#   - a pane.report_agent_session lifecycle report over the Herdr socket,
+#     mirroring what hook-driven agents send: agent_session_id identifies the
+#     cline session, seq carries the session files' newest mtime so the
+#     server sees activity advance while the agent is thinking and age out
+#     when it goes quiet.
 set -eu
 
 SESSIONS_DIR="$HOME/.cline/data/sessions"
 MAX_AGE_SEC=600        # ignore sessions idle longer than this
+ACTIVE_SEC=180         # lifecycle reports only for sessions active within this
 TTL_MS=1200000         # 20 min: a bit longer than the poll cadence can drift
+SOCKET_PATH="${HERDR_SOCKET_PATH:-$HOME/.config/herdr/herdr.sock}"
 
 command -v herdr >/dev/null 2>&1 || exit 0
+command -v python3 >/dev/null 2>&1 || exit 0
 [ -d "$SESSIONS_DIR" ] || exit 0
 
 extract_py='
-import json, sys
+import json, os, sys
 try:
     d = json.load(open(sys.argv[1]))
-    assert d.get("cwd") and d.get("model") and d.get("provider")
+    assert d.get("cwd") and d.get("model") and d.get("provider") and d.get("session_id")
+    sib = os.path.join(os.path.dirname(sys.argv[1]), d.get("session_id", "") + ".messages.json")
+    mtime = os.path.getmtime(sys.argv[1])
+    if os.path.isfile(sib):
+        mtime = max(mtime, os.path.getmtime(sib))
     print(d["cwd"])
     print(d["model"])
     print(d["provider"])
+    print(d["session_id"])
+    print(int(mtime * 1e9))
 except Exception:
     sys.exit(1)
 '
 
 pair_py='
 # Pair each recent session with every Herdr pane that matches its cwd and
-# has no other agent attached, emitting one report line per pane.
-import json, os, sys
+# has no other agent attached, emitting one report line per pane. The
+# trailing active flag marks sessions with file activity inside ACTIVE_SEC;
+# only those earn lifecycle (thinking/in-progress) reports, while display
+# tokens go out for every recent session.
+import json, os, sys, time
 
+now = int(os.environ.get("CLINE_NOW") or time.time())
+active_sec = int(os.environ.get("CLINE_ACTIVE_SEC") or 180)
 panes = json.loads(os.environ.get("CLINE_PANES") or "{}").get("result", {}).get("panes", [])
 by_cwd = {}
 for p in panes:
@@ -40,13 +61,59 @@ for p in panes:
 
 seen = set()
 lines = sys.stdin.read().split("\n")
-for i in range(0, len(lines) - 2, 3):
-    cwd, model, provider = lines[i], lines[i + 1], lines[i + 2]
+for i in range(0, len(lines) - 4, 5):
+    cwd, model, provider, session_id, mtime_ns = lines[i:i + 5]
+    if not cwd or not session_id:
+        continue
+    try:
+        active = 1 if now - int(int(mtime_ns) // 1e9) < active_sec else 0
+    except ValueError:
+        active = 0
     for pane_id in by_cwd.get(cwd, []):
-        if (cwd, pane_id) in seen:
+        if (session_id, pane_id) in seen:
             continue
-        seen.add((cwd, pane_id))
-        print(f"{pane_id}\t{model}\t{provider}")
+        seen.add((session_id, pane_id))
+        print(f"{pane_id}\t{model}\t{provider}\t{session_id}\t{active}")
+'
+
+# Best-effort pane.report_agent_session over the Herdr socket, shaped like
+# the hook integrations send it: seq is poll time (a liveness heartbeat),
+# so the server sees the session as live while its files keep changing and
+# ages it out once they go quiet. Env: PANE, SESSION_ID.
+session_py='
+import json, os, random, socket, time
+
+pane_id = os.environ.get("PANE")
+session_id = os.environ.get("SESSION_ID")
+socket_path = os.environ.get("HERDR_SOCKET", "")
+if not pane_id or not session_id or not socket_path:
+    raise SystemExit(0)
+
+seq = time.time_ns()
+request_id = f"custom:cline-session:{int(time.time() * 1000)}:{random.randrange(1_000_000):06d}"
+request = {
+    "id": request_id,
+    "method": "pane.report_agent_session",
+    "params": {
+        "pane_id": pane_id,
+        "source": "custom:cline-session",
+        "agent": "cline",
+        "seq": seq,
+        "agent_session_id": session_id,
+    },
+}
+try:
+    client = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+    client.settimeout(2)
+    client.connect(socket_path)
+    client.sendall((json.dumps(request) + "\n").encode())
+    try:
+        client.recv(4096)
+    except Exception:
+        pass
+    client.close()
+except Exception:
+    pass
 '
 
 panes=$(herdr pane list 2>/dev/null) || exit 0
@@ -57,8 +124,8 @@ while IFS= read -r f; do
   # Only sessions/<id>/<id>.json carry identity; message stores lack cwd.
   [ "$(dirname "$f")" = "$SESSIONS_DIR" ] && continue
   python3 -c "$extract_py" "$f" || true
-done | CLINE_PANES="$panes" python3 -c "$pair_py" |
-while IFS="$(printf '\t')" read -r pane model provider; do
+done | CLINE_NOW="$now" CLINE_ACTIVE_SEC="$ACTIVE_SEC" CLINE_PANES="$panes" python3 -c "$pair_py" |
+while IFS="$(printf '\t')" read -r pane model provider session_id active; do
   [ -n "$pane" ] || continue
   herdr pane report-metadata "$pane" \
     --source custom:cline-session \
@@ -66,4 +133,8 @@ while IFS="$(printf '\t')" read -r pane model provider; do
     --ttl-ms "$TTL_MS" \
     --token "model=$model" \
     --token "provider=$provider" >/dev/null 2>&1 || true
+  if [ "$active" = "1" ]; then
+    PANE="$pane" SESSION_ID="$session_id" \
+      HERDR_SOCKET="$SOCKET_PATH" python3 -c "$session_py" >/dev/null 2>&1 || true
+  fi
 done

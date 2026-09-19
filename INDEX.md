@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**416 tracked entries** across 16 categories.
+**415 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -23,10 +23,10 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Toolchain & packages](#toolchain--packages) | 5 |
 | [AI agent harnesses](#ai-agent-harnesses) | 49 |
 | [Background services](#background-services) | 21 |
-| [Custom executables](#custom-executables) | 41 |
+| [Custom executables](#custom-executables) | 40 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Other configuration](#other-configuration) | 163 |
-| [Apply hooks (`run_*`)](#apply-hooks-run) | 25 |
+| [Other configuration](#other-configuration) | 162 |
+| [Apply hooks (`run_*`)](#apply-hooks-run) | 26 |
 | [Chezmoi control files](#chezmoi-control-files) | 12 |
 | [Repository material (not applied)](#repository-material-not-applied) | 31 |
 
@@ -192,11 +192,11 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.gemini/skills/project-doc-planner` | `dot_gemini/skills/symlink_project-doc-planner` | gemini | symlink |
 | `~/.grok/hooks/herdr-agent-state.sh` | `dot_grok/hooks/executable_herdr-agent-state.sh` | grok | executable |
 | `~/.grok/hooks/herdr.json` | `dot_grok/hooks/herdr.json` | grok | — |
-| `~/.hermes/SOUL.md` | `dot_hermes/SOUL.md` | hermes | — |
-| `~/.hermes/config.yaml` | `dot_hermes/config.yaml.tmpl` | hermes | template |
-| `~/.hermes/skins/omarchy.yaml` | `dot_hermes/skins/omarchy.yaml.tmpl` | hermes | template |
 | `~/.pi/agent/skills/project-doc-planner` | `dot_pi/agent/skills/symlink_project-doc-planner` | pi | symlink |
 | `~/.grokbot/settings.json` | `private_dot_grokbot/settings.json` | grokbot | private |
+| `~/.hermes/SOUL.md` | `private_dot_hermes/SOUL.md` | hermes | private |
+| `~/.hermes/config.yaml` | `private_dot_hermes/config.yaml.tmpl` | hermes | private, template |
+| `~/.hermes/skins/omarchy.yaml` | `private_dot_hermes/skins/omarchy.yaml.tmpl` | hermes | private, template |
 
 ## Background services
 
@@ -229,7 +229,6 @@ agents and the showcase app should read. This page is the same data for humans.
 | Target | Source | Subsystem | Attributes |
 | --- | --- | --- | --- |
 | `~/.local/bin/cline-safety/git` | `dot_local/bin/cline-safety/executable_git` | cline git interceptor | executable |
-| `~/.local/bin/agent-console-home` | `dot_local/bin/executable_agent-console-home` | custom executables | executable |
 | `~/.local/bin/backdrop-split` | `dot_local/bin/executable_backdrop-split` | custom executables | executable |
 | `~/.local/bin/chrome-profile` | `dot_local/bin/executable_chrome-profile` | custom executables | executable |
 | `~/.local/bin/cursor` | `dot_local/bin/executable_cursor` | custom executables | executable |
@@ -431,7 +430,6 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/fzf/theme.sh` | `dot_config/fzf/theme.sh.tmpl` | — | template |
 | `~/.local/share/figlet/README.md` | `dot_local/share/figlet/README.md` | — | — |
 | `~/.local/share/figlet/Roman.flf` | `dot_local/share/figlet/Roman.flf` | — | — |
-| `~/.local/share/omarchy-patches/esemczak.theme-modes-profiles.patch` | `dot_local/share/omarchy-patches/esemczak.theme-modes-profiles.patch` | — | — |
 | `~/.local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch` | `dot_local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch` | — | — |
 | `~/.local/share/wsl-ssh-bridge/main.go` | `dot_local/share/wsl-ssh-bridge/main.go` | — | — |
 | `~/install.sh` | `install.sh` | — | — |
@@ -466,6 +464,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | 32 | `run_onchange_after_32-setup-omarchy-agent-registrations.sh.tmpl` | runs when this script's contents change | after |
 | 33 | `run_onchange_after_33-augustus-machine-branding.sh.tmpl` | runs when this script's contents change | after |
 | 34 | `run_after_34-augustus-backdrop-split.sh.tmpl` | runs after every apply | after |
+| 35 | `run_after_35-augustus-theme-modes-converge.sh.tmpl` | runs after every apply | after |
 | 40 | `run_onchange_after_40-vespasian-windows-terminal.sh.tmpl` | runs when this script's contents change | after |
 | 41 | `run_onchange_after_41-vespasian-nerd-font.sh.tmpl` | runs when this script's contents change | after |
 | 42 | `run_onchange_after_42-vespasian-theme-state.sh.tmpl` | runs when this script's contents change | after |
