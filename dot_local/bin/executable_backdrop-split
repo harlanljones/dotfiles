@@ -69,11 +69,13 @@ if [[ -z "$hash" ]]; then
 	echo "backdrop-split: no current background set, skipping" >&2
 	exit 0
 fi
-src="$(find "$HOME/.config/omarchy/themes" -maxdepth 3 -type f -name "${hash}.*" 2>/dev/null | head -1)"
+src="$(find "$HOME/.config/omarchy/themes" "$HOME/.cache/omarchy/theme-modes/verified-images" -maxdepth 3 -type f -name "${hash}.*" 2>/dev/null | head -1)"
 if [[ -z "$src" ]]; then
 	echo "backdrop-split: no file for background hash $hash, skipping" >&2
 	exit 0
 fi
+# Theme-modes profile backgrounds live as verified cache copies, not theme
+# files; key manual tiles to the same hash either way (dimensions decide).
 
 out_dir="$HOME/.config/omarchy/backdrop/segments"
 tiles_dir="$HOME/.config/omarchy/backdrop/tiles"
