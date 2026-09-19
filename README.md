@@ -101,13 +101,11 @@ Templates render only the files needed for the current operating system.
 ### Machine identity, role, and unknown hosts
 
 `.chezmoi.toml.tmpl` resolves the machine once and exposes it to every
-template, together with derived feature booleans:
+template, together with derived environment booleans:
 
 | Variable | Meaning |
 | :--- | :--- |
 | `.machine` | Resolved machine key: `augustus`, `hadrian`, `vespasian`, `unknown`, or a validated freeform wizard answer (lowercase letters, digits and dashes only). |
-| `.role` | `work` or `personal`, from the `type` field in `machines.yaml`. |
-| `.headless` | True when there is no local desktop session to configure (WSL, unregistered hosts). |
 | `.isCI` | Running in CI (`CI=true` in the environment). |
 | `.isSSH` | Connected over SSH (`SSH_CONNECTION` set). |
 | `.isWSL` | Running under WSL (kernel reports `microsoft`). |
