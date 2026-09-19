@@ -10,7 +10,8 @@
 # It also reports sidebar metadata tokens ($model, $provider, $effort,
 # $usage_pct) via `pane report-metadata`, so the sidebar rows in
 # config.toml.tmpl have real values to render. usage_pct is context-window
-# usage from the Claude transcript tail. Unreported tokens simply don't render - rows collapse gracefully.
+# usage from the hook payload or transcript tail. Unreported tokens simply
+# don't render - rows collapse gracefully.
 #
 # Usage: herdr-agent-lifecycle <agent-label> working|idle|blocked|release
 # Reads the hook's JSON payload on stdin (used for metadata extraction and to
@@ -136,6 +137,15 @@ if not effort:
         effort = ""
 if effort:
     args += ["--token", "effort=%s" % effort]
+
+# Claude-compatible hooks may already include the percentage that the agent's
+# own statusline uses. Prefer it when present so we do not need to reconstruct
+# a provider-specific context window from the transcript.
+context_window = data.get("context_window")
+if isinstance(context_window, dict):
+    used_percentage = context_window.get("used_percentage")
+    if isinstance(used_percentage, (int, float)):
+        args += ["--token", "usage_pct=%d" % min(max(int(used_percentage), 0), 100)]
 
 # Codex usage percent: the rollout for this session (matched by cwd) carries
 # model_context_window in session_meta and total_token_usage in token_count

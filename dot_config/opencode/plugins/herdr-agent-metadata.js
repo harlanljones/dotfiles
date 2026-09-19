@@ -1,11 +1,13 @@
-// User plugin: reports $model / $provider / $effort sidebar tokens to Herdr.
+// User plugin: reports $model / $provider / $effort / $usage_pct sidebar
+// tokens to Herdr.
 //
 // The herdr-installed herdr-agent-state.js owns session identity and state;
 // this file deliberately lives beside it (the integration header says to add
 // custom plugins beside it, not to edit it) because the bundled integration
-// reports no metadata tokens. Fired on chat.params, which carries the model
-// and provider actually selected for the turn. TTL is long: turns are the
-// only reporting opportunity and the tokens should outlive idle stretches.
+// reports no metadata tokens. Model/provider/effort are reported on
+// chat.params; usage_pct is reported when the corresponding assistant message
+// is updated, using the model's actual context limit. TTL is long so the
+// values outlive idle stretches.
 
 import net from "node:net";
 
@@ -15,6 +17,8 @@ const TTL_MS = 86400000;
 
 let reportSeq = Date.now() * 1000;
 let requestChain = Promise.resolve();
+let activeSessionID;
+let activeContextWindow;
 
 function request(method, params) {
   const pending = requestChain.then(() => requestOnce(method, params));
@@ -68,6 +72,20 @@ function tokenFrom(value) {
   return undefined;
 }
 
+function contextUsagePercent(info) {
+  if (!info?.tokens || !activeContextWindow) return undefined;
+  const tokens = info.tokens;
+  const used =
+    Number(tokens.total) ||
+    Number(tokens.input || 0) +
+      Number(tokens.output || 0) +
+      Number(tokens.reasoning || 0) +
+      Number(tokens.cache?.read || 0) +
+      Number(tokens.cache?.write || 0);
+  if (!Number.isFinite(used) || used <= 0) return undefined;
+  return Math.min(Math.floor((used * 100) / activeContextWindow), 100);
+}
+
 export const HerdrAgentMetadataPlugin = async () => {
   if (
     process.env.HERDR_ENV !== "1" ||
@@ -79,6 +97,8 @@ export const HerdrAgentMetadataPlugin = async () => {
 
   return {
     "chat.params": async (input) => {
+      activeSessionID = input?.sessionID;
+      activeContextWindow = Number(input?.model?.limit?.context) || undefined;
       const tokens = {};
       const modelID = tokenFrom(input?.model);
       const providerID = tokenFrom(input?.provider);
@@ -94,6 +114,23 @@ export const HerdrAgentMetadataPlugin = async () => {
         return;
       }
       await request("pane.report_metadata", { ttl_ms: TTL_MS, tokens });
+    },
+    event: async ({ event }) => {
+      if (event?.type !== "message.updated") return;
+      const info = event.properties?.info;
+      if (
+        info?.role !== "assistant" ||
+        !info.sessionID ||
+        info.sessionID !== activeSessionID
+      ) {
+        return;
+      }
+      const usagePct = contextUsagePercent(info);
+      if (usagePct === undefined) return;
+      await request("pane.report_metadata", {
+        ttl_ms: TTL_MS,
+        tokens: { usage_pct: String(usagePct) },
+      });
     },
   };
 };

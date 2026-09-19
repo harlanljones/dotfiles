@@ -1,0 +1,13 @@
+chezmoi:modify-template
+{{- /* Keep Grok's own settings live-owned while adding the managed statusline
+       bridge that reports its native context percentage to Herdr. */ -}}
+{{- $live := dict -}}
+{{- if and (hasKey .chezmoi "stdin") .chezmoi.stdin -}}
+{{-   $live = fromToml .chezmoi.stdin -}}
+{{- end -}}
+{{- $statusLine := dict
+      "type" "command"
+      "command" "~/.grok/hooks/herdr-agent-metadata.sh" -}}
+{{- $base := dict "ui" (dict "status_line" $statusLine) -}}
+{{- $out := mustMergeOverwrite (dict) (deepCopy $live) (deepCopy $base) -}}
+{{ toToml $out }}
