@@ -11,6 +11,9 @@
 #                                       never destroy local commits
 # Then recreates the `linked` symlinks into the shared ~/.agents/skills pool.
 # Managed by chezmoi; runs once per machine (state-tracked).
+#
+# When the remote is unreachable or unauthenticated (typical in CI smoke
+# apply), skip sync with exit 0 so template/apply validation still passes.
 
 set -euo pipefail
 
@@ -18,10 +21,18 @@ skills_dir="$HOME/.hermes/skills"
 repo_url="{{ .hermesSkills.repo }}"
 ref="{{ .hermesSkills.ref }}"
 
+# Never prompt for credentials; fail fast offline / without a token.
+export GIT_TERMINAL_PROMPT=0
+export GIT_ASKPASS=echo
+
 if ! command -v git >/dev/null 2>&1; then
   printf 'hermes-skills-sync: git not found; skill library not synced\n' >&2
   exit 0
 fi
+
+remote_reachable() {
+  git ls-remote --exit-code "$repo_url" "$ref" >/dev/null 2>&1
+}
 
 git_sync() {
   if [[ -d "$skills_dir/.git" ]]; then
@@ -61,6 +72,15 @@ link_pool_skills() {
     ln -sfn "../../.agents/skills/$name" "$skills_dir/$name"
   done < "$list"
 }
+
+if ! remote_reachable; then
+  printf 'hermes-skills-sync: remote unreachable or unauthenticated (%s @ %s); skipping sync\n' \
+    "$repo_url" "$ref" >&2
+  if [[ -d "$skills_dir" ]]; then
+    link_pool_skills || true
+  fi
+  exit 0
+fi
 
 git_sync
 link_pool_skills
