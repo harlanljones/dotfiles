@@ -130,13 +130,41 @@ if [[ "$MODE" == "reset" ]]; then
 	exit 0
 fi
 
+# Publish a rendered segment under a content-hashed name, assign it, and
+# prune stale segments for that monitor. Content addressing defeats
+# Backdrop's QML image cache: rewriting the same path with new bytes keeps
+# showing the previous pixmap (Image { cache: true } is keyed by URL), so a
+# changed image must arrive under a changed URL. Same content reuses the same
+# name, keeping headless runs idempotent.
+# Usage: publish_seg <monitor-name> <rendered-tmpfile>
+publish_seg() {
+	local name="$1" tmp="$2" h seg old
+	h="$(sha1sum "$tmp" | cut -c1-12)"
+	seg="$out_dir/${name}-${h}.png"
+	chmod 644 "$tmp"
+	if [[ -e "$seg" ]]; then
+		rm -f "$tmp"
+	else
+		mv -f "$tmp" "$seg"
+	fi
+	shopt -s nullglob
+	for old in "$out_dir/${name}-"*.png "$out_dir/${name}.png" "$out_dir/.${name}."*.png; do
+		[[ "$old" == "$seg" ]] || rm -f "$old"
+	done
+	shopt -u nullglob
+	# Deliberately without -q: -q fakes success when the IPC target is gone.
+	if ! omarchy-shell background setForScreen "$name" "$seg"; then
+		echo "backdrop-split: setForScreen $name failed" >&2
+		return 1
+	fi
+}
+
 # Render explicit per-monitor source-pixel crops.
 # stdin lines: name|srcX|srcY|srcW|srcH|nativeW|nativeH
 render_crops() {
-	local status=0 name sx sy sw2 sh2 mw mh seg tmp
+	local status=0 name sx sy sw2 sh2 mw mh tmp
 	while IFS='|' read -r name sx sy sw2 sh2 mw mh; do
 		[[ -z "$name" ]] && continue
-		seg="$out_dir/${name}.png"
 		tmp="$(mktemp "$out_dir/.${name}.XXXXXX.png")"
 		if ! magick "$src" \
 			-crop "${sw2}x${sh2}+${sx}+${sy}" +repage \
@@ -148,13 +176,7 @@ render_crops() {
 			status=1
 			continue
 		fi
-		chmod 644 "$tmp"
-		mv -f "$tmp" "$seg"
-		# Deliberately without -q: -q fakes success when the IPC target is gone.
-		if ! omarchy-shell background setForScreen "$name" "$seg"; then
-			echo "backdrop-split: setForScreen $name failed" >&2
-			status=1
-		fi
+		publish_seg "$name" "$tmp" || status=1
 	done
 	return "$status"
 }
@@ -256,14 +278,14 @@ PYPLAN
 	canvas="$(grep '^CANVAS|' <<<"$plan" | cut -d'|' -f2,3 | tr '|' 'x')"
 	cw="${canvas%x*}" ch="${canvas#*x}"
 
-	# Idempotent: same background + same layout -> byte-identical outputs.
+	# Idempotent: same background + same layout -> byte-identical outputs
+	# (and therefore identical content-hashed names — no display churn).
 	# Writes are atomic (tmp + mv): the shell may reload the QML plugin at any
 	# moment (e.g. during a concurrent `chezmoi apply`), and a half-written or
 	# missing segment file crashes the backdrop plugin and gets it auto-disabled.
-	local status=0 name ox oy ow oh mw mh seg tmp
+	local status=0 name ox oy ow oh mw mh tmp
 	while IFS='|' read -r name ox oy ow oh mw mh; do
 		[[ "$name" == "CANVAS" ]] && continue
-		seg="$out_dir/${name}.png"
 		tmp="$(mktemp "$out_dir/.${name}.XXXXXX.png")"
 		if ! magick "$pre" \
 			-resize "${cw}x${ch}^" -gravity center -extent "${cw}x${ch}" \
@@ -276,13 +298,7 @@ PYPLAN
 			status=1
 			continue
 		fi
-		chmod 644 "$tmp"
-		mv -f "$tmp" "$seg"
-		# Deliberately without -q: -q fakes success when the IPC target is gone.
-		if ! omarchy-shell background setForScreen "$name" "$seg"; then
-			echo "backdrop-split: setForScreen $name failed" >&2
-			status=1
-		fi
+		publish_seg "$name" "$tmp" || status=1
 	done <<<"$plan"
 
 	return "$status"
