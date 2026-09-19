@@ -83,7 +83,7 @@ hook that runs on every machine (gated internally on `.machine`). Gaps in the
 | 32 | `run_onchange_after_32-setup-omarchy-agent-registrations.sh.tmpl` | onchange (augustus) | Register configured agents and collect initial Omarchy leaderboard usage |
 | 33 | `run_onchange_after_33-augustus-machine-branding.sh.tmpl` | onchange (augustus) | Write Omarchy screensaver/about branding art from the machine identity |
 | 34 | `run_after_34-augustus-backdrop-split.sh.tmpl` | after (augustus) | Re-split current theme background across monitors via Backdrop |
-| 35 | `run_after_35-augustus-theme-modes-converge.sh.tmpl` | after (augustus) | Converge Theme modes light/dark slots from the dots theme registry via fork IPC |
+| 35 | `run_after_35-augustus-theme-modes-converge.sh.tmpl` | after (augustus) | Converge Theme modes light/dark slots from the dots theme registry via state-file merge (widget stays the actuator) |
 | 40 | `run_onchange_after_40-vespasian-windows-terminal.sh.tmpl` | onchange (vespasian) | Write the Tokyo Night Windows Terminal fragment (scheme + Ubuntu profile update) |
 | 41 | `run_onchange_after_41-vespasian-nerd-font.sh.tmpl` | onchange (vespasian) | Per-user install of the pinned JetBrainsMono Nerd Font on Windows |
 | 42 | `run_onchange_after_42-vespasian-theme-state.sh.tmpl` | onchange (vespasian) | Rebuild bat's theme cache; set Claude Code theme to `dark-ansi`/`light-ansi` per the selected theme |

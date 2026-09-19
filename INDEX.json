@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 416,
+    "total": 415,
     "by_category": {
       "shell": 20,
       "prompt": 1,
@@ -15,7 +15,7 @@
       "toolchain": 5,
       "agents": 49,
       "services": 21,
-      "scripts": 41,
+      "scripts": 40,
       "security": 2,
       "other": 162,
       "hooks": 26,
@@ -1329,16 +1329,6 @@
         "executable"
       ],
       "subsystem": "cline git interceptor"
-    },
-    {
-      "source": "dot_local/bin/executable_agent-console-home",
-      "target": "~/.local/bin/agent-console-home",
-      "kind": "dotfile",
-      "category": "scripts",
-      "attributes": [
-        "executable"
-      ],
-      "subsystem": "custom executables"
     },
     {
       "source": "dot_local/bin/executable_backdrop-split",

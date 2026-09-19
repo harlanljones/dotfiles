@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**416 tracked entries** across 16 categories.
+**415 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -23,7 +23,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Toolchain & packages](#toolchain--packages) | 5 |
 | [AI agent harnesses](#ai-agent-harnesses) | 49 |
 | [Background services](#background-services) | 21 |
-| [Custom executables](#custom-executables) | 41 |
+| [Custom executables](#custom-executables) | 40 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
 | [Other configuration](#other-configuration) | 162 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 26 |
@@ -229,7 +229,6 @@ agents and the showcase app should read. This page is the same data for humans.
 | Target | Source | Subsystem | Attributes |
 | --- | --- | --- | --- |
 | `~/.local/bin/cline-safety/git` | `dot_local/bin/cline-safety/executable_git` | cline git interceptor | executable |
-| `~/.local/bin/agent-console-home` | `dot_local/bin/executable_agent-console-home` | custom executables | executable |
 | `~/.local/bin/backdrop-split` | `dot_local/bin/executable_backdrop-split` | custom executables | executable |
 | `~/.local/bin/chrome-profile` | `dot_local/bin/executable_chrome-profile` | custom executables | executable |
 | `~/.local/bin/cursor` | `dot_local/bin/executable_cursor` | custom executables | executable |

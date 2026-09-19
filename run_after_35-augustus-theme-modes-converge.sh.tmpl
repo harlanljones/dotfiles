@@ -4,13 +4,18 @@
 # registry, so `dots theme set` also steers the Omarchy desktop theme.
 # Runs after every apply but is a cheap no-op when the matching slot already
 # names the registry's Omarchy slug. Only the slot matching the registry
-# entry's appearance is touched — the user's mode (manual/schedule/battery)
-# is never flipped; the desktop follows the next time that mode is active.
+# entry's appearance is touched, and only the state file is written — the
+# widget stays the actuator (it applies the slot on the next mode switch or
+# profile select), which also avoids `omarchy theme set` resetting a custom
+# background. The hook re-converges every sync, so a widget save between
+# syncs can only win temporarily.
 #
-# Needs the fork's setter IPC (setLightTheme/setDarkTheme on the
-# esemczak.theme-modes target) and Backdrop re-splitting, both carried by
-# harlanljones/omarchy-theme-modes. Generated (matugen) registry entries
-# have no Omarchy slug and are skipped.
+# Mechanism: JSON merge of ~/.local/state/omarchy/settings/theme-modes.json
+# (active profile's slot + top-level slot, everything else preserved,
+# atomic tmp+mv keeping the file's permissions). No shell IPC involved:
+# Quickshell's IpcHandler rejects QML-declared setter params (Variant
+# unusable across IPC), so the fork exposes no setters by design.
+# Generated (matugen) registry entries have no Omarchy slug and are skipped.
 {{- $tname := (index .machines .machine).theme.name }}
 {{- $t := index .themes $tname }}
 set -euo pipefail
@@ -31,38 +36,74 @@ if [[ "$DESIRED_APPEARANCE" != "light" && "$DESIRED_APPEARANCE" != "dark" ]]; th
 	echo "run_after_35: dots theme '$DOTS_THEME' has unknown appearance '$DESIRED_APPEARANCE', skipping" >&2
 	exit 0
 fi
-for cmd in omarchy-shell jq; do
-	command -v "$cmd" >/dev/null 2>&1 || {
-		echo "run_after_35: missing '$cmd', skipping modes convergence" >&2
-		exit 0
-	}
-done
 
-status="$(omarchy-shell esemczak.theme-modes status 2>/dev/null || true)"
-if [[ -z "$status" ]] || ! jq -e . >/dev/null 2>&1 <<<"$status"; then
-	echo "run_after_35: theme-modes IPC unavailable (plugin off or shell down), skipping" >&2
+STATE_FILE="${THEME_MODES_STATE_FILE:-$HOME/.local/state/omarchy/settings/theme-modes.json}"
+if [[ ! -f "$STATE_FILE" ]]; then
+	echo "run_after_35: no theme-modes state yet (widget never ran?), skipping" >&2
 	exit 0
 fi
 
-if [[ "$DESIRED_APPEARANCE" == "dark" ]]; then
-	slot="darkTheme"
-	setter="setDarkTheme"
-else
-	slot="lightTheme"
-	setter="setLightTheme"
-fi
-current="$(jq -r --arg slot "$slot" '.[$slot] // ""' <<<"$status")"
-mode="$(jq -r '.mode // ""' <<<"$status")"
-if [[ "$current" == "$DESIRED_SLUG" ]]; then
-	exit 0
-fi
+DESIRED_SLUG="$DESIRED_SLUG" DESIRED_APPEARANCE="$DESIRED_APPEARANCE" STATE_FILE="$STATE_FILE" DOTS_THEME="$DOTS_THEME" python3 <<'PY'
+import json
+import os
+import stat
+import sys
+import tempfile
 
-echo "run_after_35: theme-modes $slot: '${current:-none}' -> '$DESIRED_SLUG' (dots theme '$DOTS_THEME')"
-if ! omarchy-shell "esemczak.theme-modes" "$setter" "$DESIRED_SLUG" >/dev/null 2>&1; then
-	echo "run_after_35: modes convergence IPC failed (non-fatal)" >&2
-	exit 0
-fi
-if [[ "$mode" != "$DESIRED_APPEARANCE" ]]; then
-	echo "run_after_35: mode is '$mode'; desktop follows '$DESIRED_SLUG' when $DESIRED_APPEARANCE mode is active"
-fi
+slug = os.environ["DESIRED_SLUG"]
+appearance = os.environ["DESIRED_APPEARANCE"]
+path = os.environ["STATE_FILE"]
+slot = "darkTheme" if appearance == "dark" else "lightTheme"
+
+try:
+    with open(path) as f:
+        state = json.load(f)
+except (OSError, ValueError) as e:
+    print(f"run_after_35: cannot parse theme-modes state, skipping: {e}", file=sys.stderr)
+    sys.exit(0)
+if not isinstance(state, dict):
+    print("run_after_35: theme-modes state is not an object, skipping", file=sys.stderr)
+    sys.exit(0)
+
+active = state.get("activeProfile")
+profiles = state.get("profiles")
+changed = []
+
+if state.get(slot) != slug:
+    state[slot] = slug
+    changed.append(slot)
+if isinstance(profiles, list):
+    for p in profiles:
+        if isinstance(p, dict) and p.get("id") == active and p.get(slot) != slug:
+            p[slot] = slug
+            changed.append(f"profiles/{active}.{slot}")
+
+if not changed:
+    sys.exit(0)
+
+mode = os.open(path, os.O_RDONLY)
+try:
+    perms = stat.S_IMODE(os.fstat(mode).st_mode)
+finally:
+    os.close(mode)
+d = os.path.dirname(path) or "."
+fd, tmp = tempfile.mkstemp(dir=d, prefix=".theme-modes.")
+try:
+    with os.fdopen(fd, "w") as f:
+        json.dump(state, f, indent=2)
+        f.write("\n")
+    os.chmod(tmp, perms)
+    os.replace(tmp, path)
+except OSError as e:
+    try:
+        os.unlink(tmp)
+    except OSError:
+        pass
+    print(f"run_after_35: failed to write theme-modes state: {e}", file=sys.stderr)
+    sys.exit(1)
+
+print(f"run_after_35: theme-modes {', '.join(changed)} -> '{slug}'"
+      f" (dots theme '{os.environ.get('DOTS_THEME', '')}');"
+      " widget applies it on the next mode switch or profile select")
+PY
 {{- end }}

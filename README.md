@@ -525,7 +525,6 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   ├── bin
 │   │   ├── cline-safety
 │   │   │   └── executable_git
-│   │   ├── executable_agent-console-home
 │   │   ├── executable_backdrop-split
 │   │   ├── executable_chrome-profile
 │   │   ├── executable_cursor
