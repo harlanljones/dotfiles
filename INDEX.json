@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 418,
+    "total": 420,
     "by_category": {
       "shell": 20,
       "prompt": 1,
@@ -13,7 +13,7 @@
       "vcs": 6,
       "navigation": 3,
       "toolchain": 5,
-      "agents": 50,
+      "agents": 52,
       "services": 21,
       "scripts": 42,
       "security": 2,
@@ -1089,6 +1089,16 @@
       "subsystem": "gemini"
     },
     {
+      "source": "dot_grok/hooks/executable_herdr-agent-metadata.sh",
+      "target": "~/.grok/hooks/herdr-agent-metadata.sh",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "grok"
+    },
+    {
       "source": "dot_grok/hooks/executable_herdr-agent-state.sh",
       "target": "~/.grok/hooks/herdr-agent-state.sh",
       "kind": "dotfile",
@@ -1104,6 +1114,16 @@
       "kind": "dotfile",
       "category": "agents",
       "attributes": [],
+      "subsystem": "grok"
+    },
+    {
+      "source": "dot_grok/modify_config.toml",
+      "target": "~/.grok/config.toml",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "modify"
+      ],
       "subsystem": "grok"
     },
     {

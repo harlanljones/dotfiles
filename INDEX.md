@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**418 tracked entries** across 16 categories.
+**420 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -21,7 +21,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Version control](#version-control) | 6 |
 | [Navigation & search](#navigation--search) | 3 |
 | [Toolchain & packages](#toolchain--packages) | 5 |
-| [AI agent harnesses](#ai-agent-harnesses) | 50 |
+| [AI agent harnesses](#ai-agent-harnesses) | 52 |
 | [Background services](#background-services) | 21 |
 | [Custom executables](#custom-executables) | 42 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
@@ -191,8 +191,10 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.gemini/settings.json` | `dot_gemini/modify_private_settings.json` | gemini | modify, private |
 | `~/.gemini/GEMINI.md` | `dot_gemini/private_GEMINI.md` | gemini | private |
 | `~/.gemini/skills/project-doc-planner` | `dot_gemini/skills/symlink_project-doc-planner` | gemini | symlink |
+| `~/.grok/hooks/herdr-agent-metadata.sh` | `dot_grok/hooks/executable_herdr-agent-metadata.sh` | grok | executable |
 | `~/.grok/hooks/herdr-agent-state.sh` | `dot_grok/hooks/executable_herdr-agent-state.sh` | grok | executable |
 | `~/.grok/hooks/herdr.json` | `dot_grok/hooks/herdr.json` | grok | — |
+| `~/.grok/config.toml` | `dot_grok/modify_config.toml` | grok | modify |
 | `~/.pi/agent/skills/project-doc-planner` | `dot_pi/agent/skills/symlink_project-doc-planner` | pi | symlink |
 | `~/.grokbot/settings.json` | `private_dot_grokbot/settings.json` | grokbot | private |
 | `~/.hermes/SOUL.md` | `private_dot_hermes/SOUL.md` | hermes | private |
