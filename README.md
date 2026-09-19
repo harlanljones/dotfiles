@@ -521,11 +521,6 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   └── hooks
 │       ├── executable_herdr-agent-state.sh
 │       └── herdr.json
-├── dot_hermes
-│   ├── SOUL.md
-│   ├── config.yaml.tmpl
-│   └── skins
-│       └── omarchy.yaml.tmpl
 ├── dot_local
 │   ├── bin
 │   │   ├── cline-safety
@@ -582,6 +577,11 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 ├── install.sh
 ├── private_dot_grokbot
 │   └── settings.json
+├── private_dot_hermes
+│   ├── SOUL.md
+│   ├── config.yaml.tmpl
+│   └── skins
+│       └── omarchy.yaml.tmpl
 ├── private_dot_ssh
 │   └── config.tmpl
 ├── run_* apply hooks (26 — see INDEX.md § Apply hooks for trigger/phase)

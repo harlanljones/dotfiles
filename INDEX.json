@@ -1099,34 +1099,6 @@
       "subsystem": "grok"
     },
     {
-      "source": "dot_hermes/SOUL.md",
-      "target": "~/.hermes/SOUL.md",
-      "kind": "dotfile",
-      "category": "agents",
-      "attributes": [],
-      "subsystem": "hermes"
-    },
-    {
-      "source": "dot_hermes/config.yaml.tmpl",
-      "target": "~/.hermes/config.yaml",
-      "kind": "dotfile",
-      "category": "agents",
-      "attributes": [
-        "template"
-      ],
-      "subsystem": "hermes"
-    },
-    {
-      "source": "dot_hermes/skins/omarchy.yaml.tmpl",
-      "target": "~/.hermes/skins/omarchy.yaml",
-      "kind": "dotfile",
-      "category": "agents",
-      "attributes": [
-        "template"
-      ],
-      "subsystem": "hermes"
-    },
-    {
       "source": "dot_pi/agent/skills/symlink_project-doc-planner",
       "target": "~/.pi/agent/skills/project-doc-planner",
       "kind": "dotfile",
@@ -1145,6 +1117,38 @@
         "private"
       ],
       "subsystem": "grokbot"
+    },
+    {
+      "source": "private_dot_hermes/SOUL.md",
+      "target": "~/.hermes/SOUL.md",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "private"
+      ],
+      "subsystem": "hermes"
+    },
+    {
+      "source": "private_dot_hermes/config.yaml.tmpl",
+      "target": "~/.hermes/config.yaml",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "private",
+        "template"
+      ],
+      "subsystem": "hermes"
+    },
+    {
+      "source": "private_dot_hermes/skins/omarchy.yaml.tmpl",
+      "target": "~/.hermes/skins/omarchy.yaml",
+      "kind": "dotfile",
+      "category": "agents",
+      "attributes": [
+        "private",
+        "template"
+      ],
+      "subsystem": "hermes"
     },
     {
       "source": "dot_config/environment.d/10-defaults.conf",

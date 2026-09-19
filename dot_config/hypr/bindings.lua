@@ -79,17 +79,3 @@ hl.layer_rule({ match = { namespace = "reprieve-toast" }, no_anim = true, animat
 -- omaplug-shortcut-start: bobbynicholas.omaland
 o.bind("SUPER + SHIFT + L", "Omaplug: bobbynicholas.omaland", "omarchy-shell shell toggle bobbynicholas.omaland")
 -- omaplug-shortcut-end: bobbynicholas.omaland
-
--- Super+` (was: toggle scratchpad) now seeds the agent console in ~ instead of ~/Work.
-o.rebind("SUPER + grave", "Agent console (~)", os.getenv("HOME") .. "/.local/bin/agent-console-home")
-
--- Omarchy's qconsole seeds the scratchpad with `omarchy-agent` (hermes --yolo in
--- ~/Work). The rebind above also spawns an agent, so an empty-scratchpad toggle
--- raced both seeds and two hermes windows appeared at once. Workspace rules for
--- the same workspace merge with last-write-wins, so re-declaring the rule here
--- replaces the seed command with our script, which serializes the spawners via
--- its lock file and lands the agent in ~.
-hl.workspace_rule({
-  workspace = "special:scratchpad",
-  on_created_empty = os.getenv("HOME") .. "/.local/bin/agent-console-home",
-})

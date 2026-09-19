@@ -192,11 +192,11 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.gemini/skills/project-doc-planner` | `dot_gemini/skills/symlink_project-doc-planner` | gemini | symlink |
 | `~/.grok/hooks/herdr-agent-state.sh` | `dot_grok/hooks/executable_herdr-agent-state.sh` | grok | executable |
 | `~/.grok/hooks/herdr.json` | `dot_grok/hooks/herdr.json` | grok | — |
-| `~/.hermes/SOUL.md` | `dot_hermes/SOUL.md` | hermes | — |
-| `~/.hermes/config.yaml` | `dot_hermes/config.yaml.tmpl` | hermes | template |
-| `~/.hermes/skins/omarchy.yaml` | `dot_hermes/skins/omarchy.yaml.tmpl` | hermes | template |
 | `~/.pi/agent/skills/project-doc-planner` | `dot_pi/agent/skills/symlink_project-doc-planner` | pi | symlink |
 | `~/.grokbot/settings.json` | `private_dot_grokbot/settings.json` | grokbot | private |
+| `~/.hermes/SOUL.md` | `private_dot_hermes/SOUL.md` | hermes | private |
+| `~/.hermes/config.yaml` | `private_dot_hermes/config.yaml.tmpl` | hermes | private, template |
+| `~/.hermes/skins/omarchy.yaml` | `private_dot_hermes/skins/omarchy.yaml.tmpl` | hermes | private, template |
 
 ## Background services
 
