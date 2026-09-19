@@ -47,7 +47,22 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install chezmoi
-        run: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+        run: |
+          set -euo pipefail
+          export PATH="$HOME/.local/bin:$PATH"
+          # get.chezmoi.io occasionally resets; the old `sh -c "$(curl …)"` form
+          # can exit 0 with an empty script when curl fails, leaving no binary.
+          for attempt in 1 2 3; do
+            if curl -fsSL get.chezmoi.io | sh -s -- -b "$HOME/.local/bin" \
+              && command -v chezmoi >/dev/null; then
+              chezmoi --version
+              exit 0
+            fi
+            echo "chezmoi install attempt ${attempt} failed; retrying..."
+            sleep $((attempt * 2))
+          done
+          echo "::error::chezmoi install failed after 3 attempts"
+          exit 1
 
       - name: Install age
         run: sudo apt-get update && sudo apt-get install -y age
@@ -197,7 +212,20 @@ jobs:
           sudo mv /tmp/actionlint /usr/local/bin/actionlint
 
       - name: Install chezmoi (renders scripts for shellcheck)
-        run: sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
+        run: |
+          set -euo pipefail
+          export PATH="$HOME/.local/bin:$PATH"
+          for attempt in 1 2 3; do
+            if curl -fsSL get.chezmoi.io | sh -s -- -b "$HOME/.local/bin" \
+              && command -v chezmoi >/dev/null; then
+              chezmoi --version
+              exit 0
+            fi
+            echo "chezmoi install attempt ${attempt} failed; retrying..."
+            sleep $((attempt * 2))
+          done
+          echo "::error::chezmoi install failed after 3 attempts"
+          exit 1
 
       - name: Shellcheck all managed scripts
         run: |
@@ -286,9 +314,22 @@ jobs:
 
       - name: Install tools (chezmoi, age, zsh, gitleaks)
         run: |
+          set -euo pipefail
           sudo apt-get update
           sudo apt-get install -y age zsh shellcheck
-          curl -fsLS get.chezmoi.io | sh -s -- -b "$HOME/.local/bin"
+          export PATH="$HOME/.local/bin:$PATH"
+          for attempt in 1 2 3; do
+            if curl -fsSL get.chezmoi.io | sh -s -- -b "$HOME/.local/bin" \
+              && command -v chezmoi >/dev/null; then
+              break
+            fi
+            echo "chezmoi install attempt ${attempt} failed; retrying..."
+            sleep $((attempt * 2))
+            if [ "$attempt" -eq 3 ]; then
+              echo "::error::chezmoi install failed after 3 attempts"
+              exit 1
+            fi
+          done
           curl -fsSL -o /tmp/gitleaks.tar.gz \
             "https://github.com/gitleaks/gitleaks/releases/download/v${GITLEAKS_VERSION}/gitleaks_${GITLEAKS_VERSION}_linux_x64.tar.gz"
           tar xzf /tmp/gitleaks.tar.gz -C /tmp gitleaks
