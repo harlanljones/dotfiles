@@ -156,12 +156,15 @@ cloudflare_scan() {
   dir=$(mktemp -d "$CACHE_DIR/cf.XXXXXX")
   case "$what" in
     workers)
-      local tag wname i=0
-      while read -r tag wname; do
-        [[ -n "$tag" ]] || continue
-        (cf "$acct/builds/workers/$tag/builds?per_page=1" | jq -r --arg n "$wname" '
-          (.result // [] | if type == "object" then (.builds // []) else . end | .[0]) as $b
-          | if $b == null then "none 0 \($n)"
+      # Workers with CI builds report the latest build's outcome; plain-deployed
+      # workers have no pass/fail signal, so they report their last deploy time.
+      local wid mod i=0
+      while read -r wid mod; do
+        [[ -n "$wid" ]] || continue
+        (cf "$acct/builds/workers/$wid/builds?per_page=1" | jq -r --arg n "$wid" --arg m "$mod" '
+          ($m | sub("\\.[0-9]+"; "") | try fromdateiso8601 catch 0) as $mt
+          | (.result // [] | if type == "object" then (.builds // []) else . end | .[0]) as $b
+          | if $b == null then "ok \($mt) \($n)"
             else (if ($b.status // "") | test("queued|initializing|running|pending") then "pending"
                   elif ($b.build_outcome // $b.status // "") | test("^fail|terminat|error") then "fail"
                   else "ok" end)
@@ -169,11 +172,11 @@ cloudflare_scan() {
               + " " + $n end' >"$dir/$i" 2>/dev/null) &
         i=$((i + 1))
         (( i % 8 == 0 )) && wait
-      done < <(cf "$acct/workers/scripts" | jq -r '.result[]? | "\(.tag) \(.id)"')
+      done < <(cf "$acct/workers/scripts" | jq -r '.result[]? | "\(.id) \(.modified_on)"')
       wait
       ;;
     pages)
-      cf "$acct/pages/projects?per_page=50" | jq -r '
+      cf "$acct/pages/projects" | jq -r '
         .result[]? | .name as $n | .latest_deployment as $d
         | if $d == null then "none 0 \($n)"
           else ($d.latest_stage.status // "") as $s
