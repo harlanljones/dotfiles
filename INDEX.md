@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**420 tracked entries** across 16 categories.
+**422 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -23,9 +23,9 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Toolchain & packages](#toolchain--packages) | 5 |
 | [AI agent harnesses](#ai-agent-harnesses) | 52 |
 | [Background services](#background-services) | 21 |
-| [Custom executables](#custom-executables) | 42 |
+| [Custom executables](#custom-executables) | 43 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Other configuration](#other-configuration) | 162 |
+| [Other configuration](#other-configuration) | 163 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 26 |
 | [Chezmoi control files](#chezmoi-control-files) | 12 |
 | [Repository material (not applied)](#repository-material-not-applied) | 31 |
@@ -236,6 +236,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.local/bin/chrome-profile` | `dot_local/bin/executable_chrome-profile` | custom executables | executable |
 | `~/.local/bin/cursor` | `dot_local/bin/executable_cursor` | custom executables | executable |
 | `~/.local/bin/dots` | `dot_local/bin/executable_dots` | custom executables | executable |
+| `~/.local/bin/dots-cloud-status` | `dot_local/bin/executable_dots-cloud-status` | custom executables | executable |
 | `~/.local/bin/dots-identity` | `dot_local/bin/executable_dots-identity` | custom executables | executable |
 | `~/.local/bin/dots-push` | `dot_local/bin/executable_dots-push` | custom executables | executable |
 | `~/.local/bin/dots-theme-agents` | `dot_local/bin/executable_dots-theme-agents` | custom executables | executable |
@@ -429,6 +430,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/bat/config` | `dot_config/bat/config` | — | — |
 | `~/.config/bat/themes/dots.tmTheme` | `dot_config/bat/themes/dots.tmTheme.tmpl` | — | template |
 | `~/.config/delta/theme.gitconfig` | `dot_config/delta/theme.gitconfig.tmpl` | — | template |
+| `~/.config/dots/cloud-services` | `dot_config/dots/cloud-services` | — | — |
 | `~/.config/eza/theme.yml` | `dot_config/eza/theme.yml.tmpl` | — | template |
 | `~/.config/fastfetch/augustus.jpg` | `dot_config/fastfetch/augustus.jpg` | — | — |
 | `~/.config/fastfetch/config.jsonc` | `dot_config/fastfetch/config.jsonc.tmpl` | — | template |

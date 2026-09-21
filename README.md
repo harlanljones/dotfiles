@@ -373,6 +373,8 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   ├── chrome-flags.conf
 │   ├── delta
 │   │   └── theme.gitconfig.tmpl
+│   ├── dots
+│   │   └── cloud-services
 │   ├── environment.d
 │   │   ├── 10-defaults.conf
 │   │   └── 10-machine.conf.tmpl
@@ -530,6 +532,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   ├── executable_chrome-profile
 │   │   ├── executable_cursor
 │   │   ├── executable_dots
+│   │   ├── executable_dots-cloud-status
 │   │   ├── executable_dots-identity
 │   │   ├── executable_dots-push
 │   │   ├── executable_dots-theme-agents

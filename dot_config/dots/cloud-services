@@ -1,0 +1,32 @@
+# Cloud services probed by dots-cloud-status for the splash "Cloud Workflows"
+# card. One per line: <kind> <name> <target>. Blank lines and # comments ignored.
+#
+#   site    <name> <https url>       public endpoint; 2xx/3xx counts as up
+#   edge    <name> <https url>       herdr-outpost dashboard (Cloudflare Worker)
+#   tunnel  <name> <https url>       herdr-outpost relay via Cloudflare Tunnel
+#   daemon  <name> <systemd --user unit>   checked live by the splash
+#   repo    <name> <owner/repo>      GitHub Actions workflows (latest run each)
+#   job     <name> <owner/repo:branch:path>   last push of a job's output file
+
+daemon  agents   omarchy-agents.service
+daemon  hermes   hermes-gateway.service
+daemon  relay    herdr-outpost-relay.service
+
+edge    herdr    https://herdr.harlanljones.com
+tunnel  relay    https://relay.harlanljones.com
+
+job     collector  harlanljones/harlanljones:profile-cards:skills.svg
+repo    profile    harlanljones/harlanljones
+
+site    home          https://harlanljones.com
+site    agents        https://agents.harlanljones.com
+site    herdr         https://herdr.harlanljones.com
+site    urban-signal  https://urban-signal.harlanljones.com
+site    ferritedb     https://ferritedb.harlanljones.com
+site    schemedb      https://schemedb.harlanljones.com
+site    mlb           https://mlb.harlanljones.com
+site    sp500         https://sp500.harlanljones.com
+site    film-lab      https://film-lab.harlanljones.com
+site    arbkit        https://arbkit.harlanljones.com
+site    photos        https://photos.harlanljones.com
+site    jev-roster    https://jev-roster-shapes.pages.dev

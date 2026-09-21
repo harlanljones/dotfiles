@@ -1,0 +1,122 @@
+#!/usr/bin/env bash
+# dots-cloud-status - Probe my cloud services and cache the results for the
+# dots-identity splash "Cloud Workflows" card.
+#
+# The splash runs on every terminal launch, so it never touches the network:
+# it reads the cache written here and, when the cache is stale, starts this
+# script detached in the background. Services are listed in
+# ~/.config/dots/cloud-services (sites, herdr-outpost edge + tunnel, the GCP
+# profile collector's last push, GitHub Actions workflow health).
+#
+#   dots-cloud-status          refresh the cache (quietly skips if one is running)
+#   dots-cloud-status --print  refresh, then print the cache
+#
+# Cache: ${XDG_CACHE_HOME:-~/.cache}/dots/cloud-status, key=value lines.
+# Every probe degrades to "?" (no gh auth, offline, missing tool) rather than failing.
+
+set -uo pipefail
+
+for _p in "$HOME/.local/share/mise/shims" "$HOME/.local/bin"; do
+  case ":${PATH}:" in *":$_p:"*) ;; *) PATH="$_p:$PATH" ;; esac
+done
+export PATH
+
+CONF="${XDG_CONFIG_HOME:-$HOME/.config}/dots/cloud-services"
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/dots"
+CACHE="$CACHE_DIR/cloud-status"
+LOCK="$CACHE_DIR/cloud-status.lock"
+mkdir -p "$CACHE_DIR"
+
+# mkdir is an atomic lock on every platform (macOS has no flock). A lock older
+# than 5 minutes belongs to a crashed run.
+if ! mkdir "$LOCK" 2>/dev/null; then
+  if [[ -n "$(find "$LOCK" -maxdepth 0 -mmin +5 2>/dev/null)" ]]; then
+    rm -rf "$LOCK" && mkdir "$LOCK" 2>/dev/null || exit 0
+  else
+    exit 0
+  fi
+fi
+trap 'rm -rf "$LOCK"' EXIT
+
+[[ -f "$CONF" ]] || { echo "dots-cloud-status: no $CONF" >&2; exit 1; }
+
+# http_code <url> -> "<code> <seconds>" ("000 0" on failure)
+http_code() {
+  curl -s -o /dev/null -m 6 -w '%{http_code} %{time_total}' "$1" 2>/dev/null || echo "000 0"
+}
+is_up() { [[ "$1" =~ ^[23] ]]; }
+# timeout(1) isn't on stock macOS (Hadrian); run unbounded there rather than fail.
+bounded() { if command -v timeout >/dev/null 2>&1; then timeout 10 "$@"; else "$@"; fi; }
+
+tmp=$(mktemp "$CACHE_DIR/cloud-status.XXXXXX")
+out() { printf '%s=%s\n' "$1" "$2" >>"$tmp"; }
+out updated "$(date +%s)"
+
+# ---- sites: probe in parallel, then tally.
+site_dir=$(mktemp -d "$CACHE_DIR/sites.XXXXXX")
+while read -r kind name target _; do
+  [[ "$kind" == site ]] || continue
+  (http_code "$target" >"$site_dir/$name") &
+done < <(grep -vE '^\s*(#|$)' "$CONF")
+wait
+up=0 total=0 slow_name="" slow_t=0 down=""
+for f in "$site_dir"/*; do
+  [[ -e "$f" ]] || continue
+  read -r code t <"$f"
+  total=$((total + 1))
+  if is_up "$code"; then
+    up=$((up + 1))
+    if awk -v a="$t" -v b="$slow_t" 'BEGIN{exit !(a>b)}'; then slow_t=$t; slow_name=$(basename "$f"); fi
+  else
+    down+="${down:+,}$(basename "$f")"
+  fi
+done
+rm -rf "$site_dir"
+out sites_up "$up"
+out sites_total "$total"
+out sites_down "${down:--}"
+out sites_slowest "${slow_name:--}"
+out sites_slowest_s "$(printf '%.1f' "$slow_t")"
+
+# ---- herdr-outpost edge + tunnel, the collector's last push, Actions health.
+while read -r kind name target _; do
+  case "$kind" in
+    edge | tunnel)
+      read -r code _ < <(http_code "$target")
+      out "${kind}_code" "$code"
+      ;;
+    job)
+      if command -v gh >/dev/null 2>&1; then
+        IFS=: read -r repo branch path <<<"$target"
+        ts=$(bounded gh api "repos/$repo/commits?sha=$branch&path=$path&per_page=1" \
+          --jq '.[0].commit.committer.date | fromdateiso8601' 2>/dev/null)
+        out job_last "${ts:-?}"
+      else
+        out job_last "?"
+      fi
+      ;;
+    repo)
+      # Latest run per workflow: "<passing> <total> <newest epoch> <failing names>"
+      if command -v gh >/dev/null 2>&1; then
+        summary=$(bounded gh run list -R "$target" --limit 40 \
+          --json workflowName,conclusion,createdAt --jq '
+            group_by(.workflowName) | map(max_by(.createdAt)) as $l
+            | "\([$l[] | select(.conclusion == "success")] | length) \($l | length) \(
+                [$l[].createdAt | fromdateiso8601] | max) \(
+                [$l[] | select(.conclusion != "success" and .conclusion != "") | .workflowName] | join(",") | if . == "" then "-" else gsub(" "; "_") end)"' \
+          2>/dev/null)
+        read -r pass wtotal newest failing <<<"${summary:-? ? ? -}"
+      else
+        pass="?" wtotal="?" newest="?" failing="-"
+      fi
+      out actions_pass "$pass"
+      out actions_total "$wtotal"
+      out actions_newest "$newest"
+      out actions_failing "$failing"
+      ;;
+  esac
+done < <(grep -vE '^\s*(#|$)' "$CONF")
+
+mv "$tmp" "$CACHE"
+[[ "${1:-}" == "--print" ]] && cat "$CACHE"
+exit 0

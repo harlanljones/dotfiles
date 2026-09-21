@@ -8,7 +8,7 @@
 # In a git project: renders a compact, high-density 4-line developer HUD.
 # Outside a project (e.g. $HOME on terminal launch): renders a rich command center
 # with responsive wordmark (Roman FIGlet on tall displays, 3-row mini-font on
-# standard/split windows), system telemetry, recent workspaces, agent fleet status,
+# standard/split windows), system telemetry, recent workspaces, cloud workflow status,
 # and quick actions — engineered to strictly fit within standard window bounds
 # without vertical scrolling or line wrapping.
 #
@@ -546,34 +546,121 @@ else
     c2_rows+=("$(format_card_row "  ${DIM}• none${NC}")")
   done
 
-  # Card 3 rows (Agent Fleet & Governance)
-  agent_status="inactive"
-  if command -v systemctl >/dev/null 2>&1 && systemctl --user is-active omarchy-agents.service >/dev/null 2>&1; then
-    agent_status="active"
+  # Card 3 rows (Cloud Workflows). Network state comes from the cache written
+  # by dots-cloud-status; a stale cache (>10 min) triggers a detached refresh
+  # so the splash itself never waits on the network. Daemons are checked live.
+  cloud_conf="${XDG_CONFIG_HOME:-$HOME/.config}/dots/cloud-services"
+  cloud_cache="${XDG_CACHE_HOME:-$HOME/.cache}/dots/cloud-status"
+  now_s=$(date +%s)
+  cs_updated=0
+  if [[ -f "$cloud_cache" ]]; then
+    while IFS='=' read -r k v; do
+      [[ "$k" =~ ^[a-z_]+$ ]] && printf -v "cs_$k" '%s' "$v"
+    done <"$cloud_cache"
   fi
-  status_fmt="${DIM}[${NC}${agent_status}${DIM}]${NC}"
-  if [[ "$agent_status" == "active" && "$COLOR_ON" == 1 ]]; then
-    status_fmt="${DIM}[${GREEN}active${NC}${DIM}]${NC}"
+  cache_age=$(( now_s - ${cs_updated:-0} ))
+  if (( cache_age > 600 )) && command -v dots-cloud-status >/dev/null 2>&1; then
+    if command -v setsid >/dev/null 2>&1; then
+      (setsid dots-cloud-status >/dev/null 2>&1 &)
+    else
+      (nohup dots-cloud-status >/dev/null 2>&1 &)
+    fi
   fi
 
-  drift_color="$GREEN"
-  if [[ "$drift_n" =~ ^[0-9]+$ ]] && (( drift_n > 0 )); then
-    drift_color="$YELLOW"
+  ago() {
+    local s=$1
+    [[ "$s" =~ ^[0-9]+$ ]] || { printf '?'; return; }
+    s=$(( now_s - s ))
+    if (( s < 3600 )); then printf '%dm ago' $(( s / 60 ))
+    elif (( s < 172800 )); then printf '%dh ago' $(( s / 3600 ))
+    else printf '%dd ago' $(( s / 86400 )); fi
+  }
+  dot() {  # dot <ok|warn|off>
+    case "$1" in
+      ok) printf '%s●%s' "$GREEN" "$NC" ;;
+      warn) printf '%s▲%s' "$YELLOW" "$NC" ;;
+      *) printf '%s○%s' "$DIM" "$NC" ;;
+    esac
+  }
+  up_code() { [[ "${1:-}" =~ ^[23] ]]; }
+
+  # Daemons: only units installed on this machine.
+  daemons=""
+  if command -v systemctl >/dev/null 2>&1 && [[ -f "$cloud_conf" ]]; then
+    while read -r kind name unit _; do
+      [[ "$kind" == daemon ]] || continue
+      [[ "$(systemctl --user show -p LoadState --value "$unit" 2>/dev/null)" == loaded ]] || continue
+      if systemctl --user is-active "$unit" >/dev/null 2>&1; then st=ok; else st=off; fi
+      daemons+="${daemons:+ }$name $(dot "$st")"
+    done < <(grep -vE '^\s*(#|$)' "$cloud_conf")
+  fi
+  [[ -z "$daemons" ]] && daemons="${DIM}none on this machine${NC}"
+
+  if [[ -z "${cs_edge_code:-}" ]]; then
+    outpost="${DIM}probing…${NC}"
+  else
+    up_code "$cs_edge_code" && e=ok || e=warn
+    up_code "${cs_tunnel_code:-}" && t=ok || t=warn
+    outpost="edge $(dot "$e") tunnel $(dot "$t")"
+    [[ "$t" == warn ]] && outpost+=" ${DIM}${cs_tunnel_code}${NC}"
   fi
 
-  skills_count=$(find "$HOME/.agents/skills" -mindepth 1 -maxdepth 1 2>/dev/null | wc -l || echo 0)
+  # The collector runs nightly; more than 26h since its last push means it missed a run.
+  if (( ${cs_updated:-0} == 0 )); then
+    collector="profile-collector ${DIM}probing…${NC}"
+  elif [[ "${cs_job_last:-?}" =~ ^[0-9]+$ ]]; then
+    (( now_s - cs_job_last < 93600 )) && j=ok || j=warn
+    collector="profile-collector $(dot "$j") $(ago "$cs_job_last")"
+  else
+    collector="profile-collector ${DIM}?${NC}"
+  fi
+
+  if (( ${cs_updated:-0} == 0 )); then
+    actions="${DIM}probing…${NC}"
+  elif [[ "${cs_actions_total:-?}" =~ ^[0-9]+$ ]]; then
+    if [[ "${cs_actions_failing:--}" == "-" ]]; then
+      actions="${cs_actions_pass}/${cs_actions_total} passing $(dot ok) $(ago "$cs_actions_newest")"
+    else
+      failing="${cs_actions_failing//_/ }"
+      (( ${#failing} > 16 )) && failing="${failing:0:15}…"
+      actions="${cs_actions_pass}/${cs_actions_total} $(dot warn) ${YELLOW}${failing}${NC}"
+    fi
+  else
+    actions="${DIM}? (gh not authed)${NC}"
+  fi
+
+  if [[ "${cs_sites_total:-?}" =~ ^[0-9]+$ ]]; then
+    if [[ "${cs_sites_down:--}" == "-" ]]; then
+      sites="${cs_sites_up}/${cs_sites_total} up $(dot ok) slowest ${cs_sites_slowest} ${cs_sites_slowest_s}s"
+    else
+      down="${cs_sites_down//,/ }"
+      (( ${#down} > 18 )) && down="${down:0:17}…"
+      sites="${cs_sites_up}/${cs_sites_total} up $(dot warn) ${YELLOW}${down}${NC}"
+    fi
+  else
+    sites="${DIM}probing…${NC}"
+  fi
+
+  cloud_title="Cloud Workflows"
+  if (( cache_age > 3600 && cs_updated > 0 )); then
+    cloud_title+=" · $(ago "$cs_updated")"
+  fi
 
   c3_rows=()
-  c3_rows+=("$(format_card_row "$(printf '%sDaemon:%s  omarchy-agents %s' "$DIM" "$NC" "$status_fmt")")")
-  c3_rows+=("$(format_card_row "$(printf '%sHarness:%s Claude · Codex · Gemini · Hermes' "$DIM" "$NC")")")
-  c3_rows+=("$(format_card_row "$(printf '%sFleet:%s   Pi · Grok · Cline · Herdr' "$DIM" "$NC")")")
-  c3_rows+=("$(format_card_row "$(printf '%sSkills:%s  %d shared skills in ~/.agents' "$DIM" "$NC" "$skills_count")")")
-  c3_rows+=("$(format_card_row "$(printf '%sDrift:%s   %s%s unapplied files%s (dots diff)' "$DIM" "$NC" "$drift_color" "$drift_s" "$NC")")")
+  c3_rows+=("$(format_card_row "$(printf '%sDaemons:%s %s' "$DIM" "$NC" "$daemons")")")
+  c3_rows+=("$(format_card_row "$(printf '%sOutpost:%s %s' "$DIM" "$NC" "$outpost")")")
+  c3_rows+=("$(format_card_row "$(printf '%sGCP:%s     %s' "$DIM" "$NC" "$collector")")")
+  c3_rows+=("$(format_card_row "$(printf '%sActions:%s %s' "$DIM" "$NC" "$actions")")")
+  c3_rows+=("$(format_card_row "$(printf '%sSites:%s   %s' "$DIM" "$NC" "$sites")")")
 
   # Card 4 rows (Quick Actions)
   c4_rows=()
   c4_rows+=("$(format_card_row "$(printf '• %s%-10s%s → Jump to source repo' "$CYAN" "dots cd" "$NC")")")
-  c4_rows+=("$(format_card_row "$(printf '• %s%-10s%s → Inspect drift diffs' "$CYAN" "dots diff" "$NC")")")
+  drift_color="$GREEN"
+  if [[ "$drift_n" =~ ^[0-9]+$ ]] && (( drift_n > 0 )); then
+    drift_color="$YELLOW"
+  fi
+  c4_rows+=("$(format_card_row "$(printf '• %s%-10s%s → Inspect %s%s drifted%s' "$CYAN" "dots diff" "$NC" "$drift_color" "$drift_s" "$NC")")")
   c4_rows+=("$(format_card_row "$(printf '• %s%-10s%s → Reconcile dotfiles' "$CYAN" "dots sync" "$NC")")")
   c4_rows+=("$(format_card_row "$(printf '• %s%-10s%s → Commit with Ollama' "$CYAN" "dots push" "$NC")")")
   c4_rows+=("$(format_card_row "$(printf '• %s%-10s%s → Full system spec' "$CYAN" "fastfetch" "$NC")")")
@@ -594,7 +681,7 @@ else
     done
     printf '  %s  %s\n\n' "$(card_bot)" "$(card_bot)"
 
-    printf '  %s  %s\n' "$(card_top "󱚝" "Agent Fleet & Governance")" "$(card_top "󰌌" "Quick Actions")"
+    printf '  %s  %s\n' "$(card_top "󰅟" "$cloud_title")" "$(card_top "󰌌" "Quick Actions")"
     for i in {0..4}; do
       printf '  %s  %s\n' "${c3_rows[$i]}" "${c4_rows[$i]}"
     done
