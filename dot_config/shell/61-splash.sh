@@ -13,5 +13,14 @@
 # typical including the project-context probe).
 
 [[ $- == *i* ]] || return 0
-command -v dots-identity >/dev/null 2>&1 && dots-identity 2>/dev/null
+command -v dots-identity >/dev/null 2>&1 || return 0
+dots-identity 2>/dev/null
+
+# `clear` wipes the banner; redraw it afterwards. Only the typed command is
+# wrapped (Ctrl+L still just clears), and args pass through (e.g. `clear -x`).
+clear() {
+  command clear "$@" || return
+  dots-identity 2>/dev/null
+  return 0
+}
 return 0

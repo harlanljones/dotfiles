@@ -176,14 +176,23 @@ general:
   show_all_in_taskbar: false
 
 gaps:
-  # Matches Augustus's Hyprland gaps_in=2/gaps_out=5 ratio. Zebar reserves its
-  # own space via dockToEdge (see zpack.json), so GlazeWM's work area already
-  # excludes the bar — outer_gap.top only needs the same small margin as the
-  # other edges, not extra clearance for the bar itself.
+  # Matches Augustus's Hyprland gaps_in=2/gaps_out=5 ratio. outer_gap.top
+  # clears the bar itself (44px bar height, see zpack.json, + the 8px margin)
+  # and is the SINGLE source of truth for bar clearance: Zebar's dockToEdge
+  # stays disabled because its work-area reservation is unreliable (missing
+  # on mixed-DPI monitors, e.g. the 150% 4K panel) and otherwise double-
+  # counts with this gap (104px of dead space). The single-window override
+  # must repeat outer_gap, otherwise a lone tiling window stretches under
+  # the bar.
   scale_with_dpi: true
   inner_gap: '4px'
   outer_gap:
-    top: '8px'
+    top: '52px'
+    right: '8px'
+    bottom: '8px'
+    left: '8px'
+  single_window_outer_gap:
+    top: '52px'
     right: '8px'
     bottom: '8px'
     left: '8px'
@@ -435,7 +444,12 @@ cat <<'ZEBAR_SETTINGS' > "$zebar_conf_dir/settings.json"
 }
 ZEBAR_SETTINGS
 
-# zpack.json — widget pack manifest
+# zpack.json — widget pack manifest. NOTE: dockToEdge stays disabled. Its
+# work-area reservation is unreliable on mixed-DPI setups (no reservation is
+# registered on the 150% 4K panel) and it double-counts with GlazeWM's
+# outer_gap.top on the monitors where it does work (104px dead space). Bar
+# clearance comes from outer_gap.top alone; zOrder keeps the bar above
+# windows. Keep this file comment-free: Zebar parses it as strict JSON.
 cat <<'ZBAR_PACK' > "$zebar_conf_dir/dots/zpack.json"
 {
   "$schema": "https://github.com/glzr-io/zebar/raw/v3.0.0/resources/zpack-schema.json",
@@ -446,10 +460,10 @@ cat <<'ZBAR_PACK' > "$zebar_conf_dir/dots/zpack.json"
     {
       "name": "bar",
       "htmlPath": "./index.html",
-      "zOrder": "normal",
+      "zOrder": "top_most",
       "shownInTaskbar": false,
       "focused": false,
-      "resizable": true,
+      "resizable": false,
       "transparent": true,
       "includeFiles": ["*.html", "*.css"],
       "presets": [
@@ -461,7 +475,7 @@ cat <<'ZBAR_PACK' > "$zebar_conf_dir/dots/zpack.json"
           "width": "100%",
           "height": "44px",
           "monitorSelection": { "type": "all" },
-          "dockToEdge": { "enabled": true, "edge": "top", "windowMargin": "0px" }
+          "dockToEdge": { "enabled": false, "edge": "top", "windowMargin": "8px" }
         }
       ]
     }

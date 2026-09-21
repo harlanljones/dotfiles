@@ -48,3 +48,6 @@ if [ -f '/home/harlan/google-cloud-sdk/path.bash.inc' ]; then . '/home/harlan/go
 
 # The next line enables shell command completion for gcloud.
 if [ -f '/home/harlan/google-cloud-sdk/completion.bash.inc' ]; then . '/home/harlan/google-cloud-sdk/completion.bash.inc'; fi
+. "$HOME/.cargo/env"
+export OPENSSL_LIB_DIR=/usr/lib/x86_64-linux-gnu
+export OPENSSL_INCLUDE_DIR=/usr/include
