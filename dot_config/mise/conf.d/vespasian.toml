@@ -11,6 +11,10 @@ delta = "latest"
 direnv = "latest"
 eza = "latest"
 fd = "latest"
+# fastfetch: system-info renderer for `dots-identity`. On Augustus pacman owns
+# it (dot_config/pacman/pkglist.txt); Ubuntu's archive has no fastfetch
+# package, so mise (aqua:fastfetch-cli/fastfetch) owns it here.
+fastfetch = "latest"
 fzf = "latest"
 lazygit = "latest"
 neovim = "latest"

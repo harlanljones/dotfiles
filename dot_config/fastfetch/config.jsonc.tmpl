@@ -4,6 +4,14 @@
 {{- if eq .machine "augustus" }}
     "type": "kitty",
     "source": "~/.config/fastfetch/augustus.jpg",
+{{- else if eq .machine "vespasian" }}
+    {{/* Inline graphics misplace over the WSL pipe (fastfetch can't query cursor position there), so Vespasian uses pre-rendered truecolor half-block art: always aligned, no terminal queries. Source portrait: marble bust of Vespasian, Statens Museum for Kunst, CC0 (https://commons.wikimedia.org/wiki/File:Vespasian_Bust.jpg); vespasian.jpg is the head crop, vespasian.txt its ANSI rendering. */}}
+    "type": "file-raw",
+    "source": "~/.config/fastfetch/vespasian.txt",
+{{- else }}
+    "type": "auto",
+    "source": "~/.config/fastfetch/augustus.jpg",
+{{- end }}
     "height": 18,
     "preserveAspectRatio": true,
     "padding": {
@@ -11,14 +19,6 @@
       "right": 4,
       "left": 1
     }
-{{- else }}
-    "type": "auto",
-    "padding": {
-      "top": 0,
-      "right": 4,
-      "left": 1
-    }
-{{- end }}
   },
   "display": {
     "disableLinewrap": true
@@ -76,7 +76,11 @@
       "type": "command",
       "key": "\ue900 OS",
       "keyColor": "blue",
+{{- if eq .machine "augustus" }}
       "text": "version=$(omarchy-version 2>/dev/null || cat /etc/os-release | grep PRETTY_NAME | cut -d= -f2 | tr -d '\"') && echo \"Omarchy $version\""
+{{- else }}
+      "text": "cat /etc/os-release | grep PRETTY_NAME | cut -d= -f2 | tr -d '\"'"
+{{- end }}
     },
     {
       "type": "kernel",
@@ -102,13 +106,13 @@
       "type": "command",
       "key": "│ ├󰈸",
       "keyColor": "blue",
-      "text": "drift=$(timeout 1 dots status 2>/dev/null | grep -cE '^[[:space:]]*[MADRU?]{1,2}[[:space:]]|^[[:space:]]*(modified|added|removed|deleted|renamed):' || echo 0); echo \"Chezmoi Drift: $drift unapplied\""
+      "text": "drift=$(timeout 1 dots status 2>/dev/null | grep -cE '^[[:space:]]*[MADRU?]{1,2}[[:space:]]|^[[:space:]]*(modified|added|removed|deleted|renamed):' || true); echo \"Chezmoi Drift: $drift unapplied\""
     },
     {
       "type": "command",
       "key": "└ └󰸌",
       "keyColor": "blue",
-      "text": "theme=$(omarchy-theme-current 2>/dev/null || echo 'Tokyo Night'); echo -e \"$theme \\e[38m●\\e[37m●\\e[36m●\\e[35m●\\e[34m●\\e[33m●\\e[32m●\\e[31m●\""
+      "text": "theme=$(omarchy-theme-current 2>/dev/null || dots theme current 2>/dev/null || echo 'Tokyo Night'); printf '%s \\033[38m●\\033[37m●\\033[36m●\\033[35m●\\033[34m●\\033[33m●\\033[32m●\\033[31m●\\033[0m\\n' \"$theme\""
     },
     {
       "type": "custom",
