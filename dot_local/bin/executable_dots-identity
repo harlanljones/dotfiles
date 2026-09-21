@@ -417,6 +417,32 @@ else
     printf "%s" "$1" | sed "s/${esc}\[[0-9;]*[a-zA-Z]//g"
   }
 
+  # trunc_visible <text> <max>: cut to max visible chars, passing ANSI
+  # escape sequences through untouched (they are zero-width). Callers append
+  # "…" when truncation occurred. Byte-safe under UTF-8 locales: bash
+  # substrings split on characters, and every card glyph is 1 cell wide.
+  trunc_visible() {
+    local text=$1 max=$2 out="" vis=0 i=0 esc=$'\033'
+    local n=${#text}
+    while (( i < n )); do
+      local ch=${text:i:1}
+      if [[ $ch == "$esc" ]]; then
+        local j=$i
+        while (( j < n )); do
+          out+="${text:j:1}"
+          (( j++ ))
+          [[ ${text:j-1:1} == [a-zA-Z] ]] && break
+        done
+        i=$j
+      else
+        (( vis >= max )) && break
+        out+="$ch"
+        (( vis++, i++ ))
+      fi
+    done
+    printf '%s' "$out"
+  }
+
   target_w=40
 
   card_top() {
@@ -452,6 +478,15 @@ else
     local clean
     clean=$(strip_ansi "$content")
     local vlen=${#clean}
+    # Backstop: never let a long value push the closing │ out of alignment.
+    # truncate_visible keeps colors intact; the reset clears a color that was
+    # cut mid-segment so padding/borders stay neutral.
+    if (( vlen > target_w )); then
+      content="$(trunc_visible "$content" $(( target_w - 1 )))…"
+      if (( COLOR_ON == 1 )); then content+="$NC"; fi
+      clean=$(strip_ansi "$content")
+      vlen=${#clean}
+    fi
     local pad=0
     if (( vlen < target_w )); then
       pad=$(( target_w - vlen ))
@@ -475,6 +510,12 @@ else
 
   gpu_line=$(lspci 2>/dev/null | grep -iE 'vga|3d|display' | grep -o '\[[^]]*\]' | tr -d '[]' | sort -r | sed 's/GeForce //g; s/Graphics //g; s/ SUPER/S/g' | paste -sd, - | sed 's/,/ + /g' || echo "")
   [[ -z "$gpu_line" ]] && gpu_line="Integrated Graphics"
+
+  # Card labels occupy 9 cols ("Host:    "), leaving 31 for the value.
+  # DMI product names and multi-GPU lists routinely exceed that, so shorten
+  # here (format_card_row also hard-caps as a backstop).
+  (( ${#host_line} > 31 )) && host_line="${host_line:0:30}…"
+  (( ${#gpu_line} > 31 )) && gpu_line="${gpu_line:0:30}…"
 
   disp_count=0
   if command -v hyprctl >/dev/null 2>&1; then
@@ -535,7 +576,7 @@ else
     fi
     b_paren="(${branch})"
     time_ago=$(git -C "$d" log -1 --format="%cr" 2>/dev/null || echo "recently")
-    time_ago=$(printf '%s' "$time_ago" | sed 's/ hours ago/h ago/; s/ hour ago/h ago/; s/ days ago/d ago/; s/ day ago/d ago/; s/ weeks ago/w ago/; s/ week ago/w ago/; s/ months ago/m ago/; s/ month ago/m ago/')
+    time_ago=$(printf '%s' "$time_ago" | sed 's/ seconds\? ago/s ago/; s/ minutes\? ago/m ago/; s/ hours\? ago/h ago/; s/ days\? ago/d ago/; s/ weeks\? ago/w ago/; s/ months\? ago/m ago/')
     row_txt=$(printf "%s%d.%s  %s%-13s%s %s%-11s%s %8s" \
       "$CYAN" "$idx" "$NC" "$BOLD" "$name" "$NC" "$DIM" "$b_paren" "$NC" "$time_ago")
     c2_rows+=("$(format_card_row "$row_txt")")
@@ -596,14 +637,28 @@ else
   fi
   [[ -z "$daemons" ]] && daemons="${DIM}none on this machine${NC}"
 
+  # Net row: outpost edge/tunnel dots + site rollup in one row so the card
+  # stays at 5 rows. Both are HTTP reachability (same failure domain).
   if [[ -z "${cs_edge_code:-}" ]]; then
-    outpost="${DIM}probing…${NC}"
+    net_edge="${DIM}probing…${NC}"
   else
     up_code "$cs_edge_code" && e=ok || e=warn
     up_code "${cs_tunnel_code:-}" && t=ok || t=warn
-    outpost="edge $(dot "$e") tunnel $(dot "$t")"
-    [[ "$t" == warn ]] && outpost+=" ${DIM}${cs_tunnel_code}${NC}"
+    net_edge="edge $(dot "$e") tunnel $(dot "$t")"
   fi
+
+  if [[ "${cs_sites_total:-?}" =~ ^[0-9]+$ ]]; then
+    if [[ "${cs_sites_down:--}" == "-" ]]; then
+      net_sites="${cs_sites_up}/${cs_sites_total} $(dot ok)"
+    else
+      down="${cs_sites_down//,/ }"
+      (( ${#down} > 10 )) && down="${down:0:9}…"
+      net_sites="${cs_sites_up}/${cs_sites_total} $(dot warn) ${YELLOW}${down}${NC}"
+    fi
+  else
+    net_sites="${DIM}probing…${NC}"
+  fi
+  net="${net_edge} ${DIM}·${NC} ${net_sites}"
 
   # The collector runs nightly; more than 26h since its last push means it missed a run.
   if (( ${cs_updated:-0} == 0 )); then
@@ -634,24 +689,31 @@ else
     printf '%s' "$s"
   }
 
+  # cf_compact <prefix> <letter>: merged Workers/Pages cell — "W 20/20 ●",
+  # "W 19/20 ▲ name", or "?" when the refresher couldn't reach Cloudflare.
+  # Red names truncate at 10 chars so the merged row fits the 40-col card.
+  cf_compact() {
+    local p=$1 L=$2
+    local v_ok="cs_${p}_ok" v_fail="cs_${p}_fail" v_pend="cs_${p}_pending" v_red="cs_${p}_red"
+    local ok="${!v_ok:-?}" fail="${!v_fail:-0}" pending="${!v_pend:-0}" red="${!v_red:--}"
+    [[ "$ok" =~ ^[0-9]+$ ]] || { printf '?'; return; }
+    local total=$(( ok + fail + pending ))
+    local s="$L $ok/$total"
+    [[ "$pending" != 0 ]] && s+=" ${DIM}${pending}⏳${NC}"
+    if [[ "$red" != "-" ]]; then
+      (( ${#red} > 10 )) && red="${red:0:9}…"
+      s+=" $(dot warn) ${YELLOW}${red//_/ }${NC}"
+    else
+      s+=" $(dot ok)"
+    fi
+    printf '%s' "$s"
+  }
+
   if (( ${cs_updated:-0} == 0 )); then
-    actions="${DIM}probing…${NC}"; workers="$actions"; pages="$actions"
+    actions="${DIM}probing…${NC}"; cf="$actions"
   else
     actions="$(status_row actions)"
-    workers="$(status_row workers)"
-    pages="$(status_row pages)"
-  fi
-
-  if [[ "${cs_sites_total:-?}" =~ ^[0-9]+$ ]]; then
-    if [[ "${cs_sites_down:--}" == "-" ]]; then
-      sites="${cs_sites_up}/${cs_sites_total} up $(dot ok) slowest ${cs_sites_slowest} ${cs_sites_slowest_s}s"
-    else
-      down="${cs_sites_down//,/ }"
-      (( ${#down} > 18 )) && down="${down:0:17}…"
-      sites="${cs_sites_up}/${cs_sites_total} up $(dot warn) ${YELLOW}${down}${NC}"
-    fi
-  else
-    sites="${DIM}probing…${NC}"
+    cf="$(cf_compact workers W) ${DIM}·${NC} $(cf_compact pages P)"
   fi
 
   cloud_title="Cloud Workflows"
@@ -661,12 +723,10 @@ else
 
   c3_rows=()
   c3_rows+=("$(format_card_row "$(printf '%sDaemons:%s %s' "$DIM" "$NC" "$daemons")")")
-  c3_rows+=("$(format_card_row "$(printf '%sOutpost:%s %s' "$DIM" "$NC" "$outpost")")")
+  c3_rows+=("$(format_card_row "$(printf '%sNet:%s      %s' "$DIM" "$NC" "$net")")")
   c3_rows+=("$(format_card_row "$(printf '%sGCP:%s     %s' "$DIM" "$NC" "$collector")")")
   c3_rows+=("$(format_card_row "$(printf '%sActions:%s %s' "$DIM" "$NC" "$actions")")")
-  c3_rows+=("$(format_card_row "$(printf '%sWorkers:%s %s' "$DIM" "$NC" "$workers")")")
-  c3_rows+=("$(format_card_row "$(printf '%sPages:%s   %s' "$DIM" "$NC" "$pages")")")
-  c3_rows+=("$(format_card_row "$(printf '%sSites:%s   %s' "$DIM" "$NC" "$sites")")")
+  c3_rows+=("$(format_card_row "$(printf '%sCF:%s       %s' "$DIM" "$NC" "$cf")")")
 
   # Card 4 rows (Quick Actions)
   c4_rows=()
