@@ -2862,6 +2862,16 @@
       "attributes": []
     },
     {
+      "source": "dot_config/dots/encrypted_private_cloudflare.env.age",
+      "target": "~/.config/dots/cloudflare.env",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": [
+        "encrypted",
+        "private"
+      ]
+    },
+    {
       "source": "dot_config/eza/theme.yml.tmpl",
       "target": "~/.config/eza/theme.yml",
       "kind": "dotfile",
@@ -2889,13 +2899,6 @@
     {
       "source": "dot_config/fastfetch/vespasian.jpg",
       "target": "~/.config/fastfetch/vespasian.jpg",
-      "kind": "dotfile",
-      "category": "other",
-      "attributes": []
-    },
-    {
-      "source": "dot_config/fastfetch/vespasian.txt",
-      "target": "~/.config/fastfetch/vespasian.txt",
       "kind": "dotfile",
       "category": "other",
       "attributes": []

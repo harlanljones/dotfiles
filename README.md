@@ -374,7 +374,8 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   ├── delta
 │   │   └── theme.gitconfig.tmpl
 │   ├── dots
-│   │   └── cloud-services
+│   │   ├── cloud-services
+│   │   └── encrypted_private_cloudflare.env.age
 │   ├── environment.d
 │   │   ├── 10-defaults.conf
 │   │   └── 10-machine.conf.tmpl
@@ -383,8 +384,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   ├── fastfetch
 │   │   ├── augustus.jpg
 │   │   ├── config.jsonc.tmpl
-│   │   ├── vespasian.jpg
-│   │   └── vespasian.txt
+│   │   └── vespasian.jpg
 │   ├── fzf
 │   │   └── theme.sh.tmpl
 │   ├── gh
