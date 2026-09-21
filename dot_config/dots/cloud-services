@@ -5,8 +5,12 @@
 #   edge    <name> <https url>       herdr-outpost dashboard (Cloudflare Worker)
 #   tunnel  <name> <https url>       herdr-outpost relay via Cloudflare Tunnel
 #   daemon  <name> <systemd --user unit>   checked live by the splash
-#   repo    <name> <owner/repo>      GitHub Actions workflows (latest run each)
+#   actions <owner> <days>           GitHub Actions across owned repos pushed in the
+#                                    last <days>: newest commit per branch, red if
+#                                    any workflow on it failed (GitHub's rollup)
 #   job     <name> <owner/repo:branch:path>   last push of a job's output file
+#   cloudflare <workers|pages>       latest Workers Build / Pages deployment per
+#                                    project; token in ~/.config/dots/cloudflare.env
 
 daemon  agents   omarchy-agents.service
 daemon  hermes   hermes-gateway.service
@@ -16,7 +20,10 @@ edge    herdr    https://herdr.harlanljones.com
 tunnel  relay    https://relay.harlanljones.com
 
 job     collector  harlanljones/harlanljones:profile-cards:skills.svg
-repo    profile    harlanljones/harlanljones
+actions harlanljones 14
+
+cloudflare workers
+cloudflare pages
 
 site    home          https://harlanljones.com
 site    agents        https://agents.harlanljones.com

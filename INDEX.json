@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 422,
+    "total": 424,
     "by_category": {
       "shell": 20,
       "prompt": 1,
@@ -17,7 +17,7 @@
       "services": 21,
       "scripts": 43,
       "security": 2,
-      "other": 163,
+      "other": 165,
       "hooks": 26,
       "chezmoi": 12,
       "repo": 31
@@ -2885,6 +2885,20 @@
       "attributes": [
         "template"
       ]
+    },
+    {
+      "source": "dot_config/fastfetch/vespasian.jpg",
+      "target": "~/.config/fastfetch/vespasian.jpg",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "dot_config/fastfetch/vespasian.txt",
+      "target": "~/.config/fastfetch/vespasian.txt",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
     },
     {
       "source": "dot_config/fzf/theme.sh.tmpl",

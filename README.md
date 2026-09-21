@@ -194,7 +194,7 @@ two of these, or an apply will fight your package manager:
 
 | Manager | Manifest | Owns |
 | --- | --- | --- |
-| mise | `~/.config/mise/config.toml` (+ `conf.d/vespasian.toml` on WSL) | bun, chezmoi, claude, codex, copilot, gemini, gh, go, node, opencode, pi, pnpm, python, ruby, terraform, tflint, uv; on Vespasian also the CLI utilities (atuin, bat, delta, eza, fd, fzf, lazygit, neovim, ripgrep, starship, zoxide) |
+| mise | `~/.config/mise/config.toml` (+ `conf.d/vespasian.toml` on WSL) | bun, chezmoi, claude, codex, copilot, gemini, gh, go, node, opencode, pi, pnpm, python, ruby, terraform, tflint, uv; on Vespasian also the CLI utilities (atuin, bat, delta, eza, fd, fastfetch, fzf, lazygit, neovim, ripgrep, starship, zoxide) |
 | npm/bun | root `package.json` + `bun.lock` | @magnitudedev/cli, @nanonets/graft, @schpet/linear-cli, cline, freebuff, supabase, wrangler |
 | Homebrew (macOS) | `~/.Brewfile` | brews + casks (Ghostty, JetBrainsMono Nerd Font, …) |
 | pacman/paru (Augustus) | `dot_config/pacman/pkglist.txt` + `aurlist.txt` | native + AUR packages |
@@ -382,7 +382,9 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   └── theme.yml.tmpl
 │   ├── fastfetch
 │   │   ├── augustus.jpg
-│   │   └── config.jsonc.tmpl
+│   │   ├── config.jsonc.tmpl
+│   │   ├── vespasian.jpg
+│   │   └── vespasian.txt
 │   ├── fzf
 │   │   └── theme.sh.tmpl
 │   ├── gh

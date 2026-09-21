@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**422 tracked entries** across 16 categories.
+**424 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -25,7 +25,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Background services](#background-services) | 21 |
 | [Custom executables](#custom-executables) | 43 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Other configuration](#other-configuration) | 163 |
+| [Other configuration](#other-configuration) | 165 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 26 |
 | [Chezmoi control files](#chezmoi-control-files) | 12 |
 | [Repository material (not applied)](#repository-material-not-applied) | 31 |
@@ -434,6 +434,8 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/eza/theme.yml` | `dot_config/eza/theme.yml.tmpl` | — | template |
 | `~/.config/fastfetch/augustus.jpg` | `dot_config/fastfetch/augustus.jpg` | — | — |
 | `~/.config/fastfetch/config.jsonc` | `dot_config/fastfetch/config.jsonc.tmpl` | — | template |
+| `~/.config/fastfetch/vespasian.jpg` | `dot_config/fastfetch/vespasian.jpg` | — | — |
+| `~/.config/fastfetch/vespasian.txt` | `dot_config/fastfetch/vespasian.txt` | — | — |
 | `~/.config/fzf/theme.sh` | `dot_config/fzf/theme.sh.tmpl` | — | template |
 | `~/.local/share/figlet/README.md` | `dot_local/share/figlet/README.md` | — | — |
 | `~/.local/share/figlet/Roman.flf` | `dot_local/share/figlet/Roman.flf` | — | — |

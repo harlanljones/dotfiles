@@ -615,18 +615,31 @@ else
     collector="profile-collector ${DIM}?${NC}"
   fi
 
-  if (( ${cs_updated:-0} == 0 )); then
-    actions="${DIM}probing…${NC}"
-  elif [[ "${cs_actions_total:-?}" =~ ^[0-9]+$ ]]; then
-    if [[ "${cs_actions_failing:--}" == "-" ]]; then
-      actions="${cs_actions_pass}/${cs_actions_total} passing $(dot ok) $(ago "$cs_actions_newest")"
+  # status_row <prefix>: "ok/total ● newest" or "ok/total ▲ red-name"; "?" when
+  # the refresher couldn't reach the source (no gh auth / no CF token).
+  status_row() {
+    local p=$1
+    local v_ok="cs_${p}_ok" v_fail="cs_${p}_fail" v_pend="cs_${p}_pending" v_red="cs_${p}_red" v_new="cs_${p}_newest"
+    local ok="${!v_ok:-?}" fail="${!v_fail:-0}" pending="${!v_pend:-0}" red="${!v_red:--}" newest="${!v_new:-0}"
+    [[ "$ok" =~ ^[0-9]+$ ]] || { printf '%s?%s' "$DIM" "$NC"; return; }
+    local total=$(( ok + fail + pending ))
+    local s="$ok/$total"
+    [[ "$pending" != 0 ]] && s+=" ${DIM}${pending}⏳${NC}"
+    if [[ "$red" != "-" ]]; then
+      (( ${#red} > 18 )) && red="${red:0:17}…"
+      s+=" $(dot warn) ${YELLOW}${red//_/ }${NC}"
     else
-      failing="${cs_actions_failing//_/ }"
-      (( ${#failing} > 16 )) && failing="${failing:0:15}…"
-      actions="${cs_actions_pass}/${cs_actions_total} $(dot warn) ${YELLOW}${failing}${NC}"
+      s+=" $(dot ok) $(ago "$newest")"
     fi
+    printf '%s' "$s"
+  }
+
+  if (( ${cs_updated:-0} == 0 )); then
+    actions="${DIM}probing…${NC}"; workers="$actions"; pages="$actions"
   else
-    actions="${DIM}? (gh not authed)${NC}"
+    actions="$(status_row actions)"
+    workers="$(status_row workers)"
+    pages="$(status_row pages)"
   fi
 
   if [[ "${cs_sites_total:-?}" =~ ^[0-9]+$ ]]; then
@@ -651,6 +664,8 @@ else
   c3_rows+=("$(format_card_row "$(printf '%sOutpost:%s %s' "$DIM" "$NC" "$outpost")")")
   c3_rows+=("$(format_card_row "$(printf '%sGCP:%s     %s' "$DIM" "$NC" "$collector")")")
   c3_rows+=("$(format_card_row "$(printf '%sActions:%s %s' "$DIM" "$NC" "$actions")")")
+  c3_rows+=("$(format_card_row "$(printf '%sWorkers:%s %s' "$DIM" "$NC" "$workers")")")
+  c3_rows+=("$(format_card_row "$(printf '%sPages:%s   %s' "$DIM" "$NC" "$pages")")")
   c3_rows+=("$(format_card_row "$(printf '%sSites:%s   %s' "$DIM" "$NC" "$sites")")")
 
   # Card 4 rows (Quick Actions)
@@ -682,7 +697,10 @@ else
     printf '  %s  %s\n\n' "$(card_bot)" "$(card_bot)"
 
     printf '  %s  %s\n' "$(card_top "󰅟" "$cloud_title")" "$(card_top "󰌌" "Quick Actions")"
-    for i in {0..4}; do
+    while (( ${#c4_rows[@]} < ${#c3_rows[@]} )); do
+      c4_rows+=("$(format_card_row "")")
+    done
+    for i in "${!c3_rows[@]}"; do
       printf '  %s  %s\n' "${c3_rows[$i]}" "${c4_rows[$i]}"
     done
     printf '  %s  %s\n' "$(card_bot)" "$(card_bot)"

@@ -6,7 +6,12 @@
 # it reads the cache written here and, when the cache is stale, starts this
 # script detached in the background. Services are listed in
 # ~/.config/dots/cloud-services (sites, herdr-outpost edge + tunnel, the GCP
-# profile collector's last push, GitHub Actions workflow health).
+# profile collector's last push, GitHub Actions per branch, Cloudflare Workers
+# builds and Pages deployments).
+#
+# Cloudflare needs ~/.config/dots/cloudflare.env (age-encrypted in chezmoi):
+#   CLOUDFLARE_API_TOKEN=...   user-scoped; Workers Scripts Read, Workers CI Read, Pages Read
+#   CLOUDFLARE_ACCOUNT_ID=...  optional; defaults to the token's first account
 #
 #   dots-cloud-status          refresh the cache (quietly skips if one is running)
 #   dots-cloud-status --print  refresh, then print the cache
@@ -22,6 +27,7 @@ done
 export PATH
 
 CONF="${XDG_CONFIG_HOME:-$HOME/.config}/dots/cloud-services"
+CF_ENV="${XDG_CONFIG_HOME:-$HOME/.config}/dots/cloudflare.env"
 CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/dots"
 CACHE="$CACHE_DIR/cloud-status"
 LOCK="$CACHE_DIR/cloud-status.lock"
@@ -78,6 +84,107 @@ out sites_down "${down:--}"
 out sites_slowest "${slow_name:--}"
 out sites_slowest_s "$(printf '%.1f' "$slow_t")"
 
+# ---- GitHub Actions: newest commit per branch in every recently pushed repo.
+# GitHub's commit rollup: the latest run of each workflow on that commit; any
+# failure/timed_out/startup_failure is red, anything unfinished is pending.
+# cancelled is neutral (concurrency cancellations would otherwise cry wolf).
+actions_scan() {
+  local owner=$1 days=$2 cut repos dir
+  if ! command -v gh >/dev/null 2>&1; then out actions_ok "?"; return; fi
+  cut=$(( $(date +%s) - days * 86400 ))
+  repos=$(bounded gh api "user/repos?affiliation=owner&sort=pushed&per_page=100" --jq "
+    .[] | select(.fork | not) | select(.owner.login == \"$owner\")
+    | select((.pushed_at | fromdateiso8601) > $cut) | .full_name" 2>/dev/null) || repos=""
+  if [[ -z "$repos" ]]; then out actions_ok "?"; return; fi
+  dir=$(mktemp -d "$CACHE_DIR/actions.XXXXXX")
+  local r i=0
+  while read -r r; do
+    (bounded gh api "repos/$r/actions/runs?per_page=100" --jq "
+      [.workflow_runs[] | select((.created_at | fromdateiso8601) > $cut)]
+      | group_by(.head_branch)[]
+      | max_by(.created_at) as \$head
+      | [.[] | select(.head_sha == \$head.head_sha)] | group_by(.workflow_id) | map(max_by(.created_at)) as \$runs
+      | (if any(\$runs[]; .conclusion == \"failure\" or .conclusion == \"timed_out\" or .conclusion == \"startup_failure\") then \"fail\"
+         elif any(\$runs[]; .status != \"completed\") then \"pending\" else \"ok\" end)
+        + \" \" + (\$head.created_at | fromdateiso8601 | tostring) + \" $r@\" + \$head.head_branch" \
+      >"$dir/$i" 2>/dev/null) &
+    i=$((i + 1))
+    (( i % 8 == 0 )) && wait
+  done <<<"$repos"
+  wait
+  tally "$dir" actions
+}
+
+# tally <dir of "state epoch name" lines> <prefix>: counts per state, newest
+# activity, and the newest red item's name (short: repo@branch without owner).
+tally() {
+  local dir=$1 prefix=$2 ok=0 fail=0 pending=0 none=0 newest=0 red="-" red_t=0 state t name
+  while read -r state t name; do
+    case "$state" in
+      ok) ok=$((ok + 1)) ;;
+      fail) fail=$((fail + 1)); if (( t > red_t )); then red_t=$t; red=${name#*/}; fi ;;
+      pending) pending=$((pending + 1)) ;;
+      *) none=$((none + 1)) ;;
+    esac
+    [[ "$t" =~ ^[0-9]+$ ]] && (( t > newest )) && newest=$t
+  done < <(cat "$dir"/* 2>/dev/null)
+  rm -rf "$dir"
+  out "${prefix}_ok" "$ok"
+  out "${prefix}_fail" "$fail"
+  out "${prefix}_pending" "$pending"
+  out "${prefix}_none" "$none"
+  out "${prefix}_newest" "$newest"
+  out "${prefix}_red" "$red"
+}
+
+# ---- Cloudflare: latest Workers Build per Worker, latest deployment per Pages project.
+cf() {
+  curl -s -m 10 -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" "https://api.cloudflare.com/client/v4$1" 2>/dev/null
+}
+cloudflare_scan() {
+  local what=$1 dir
+  if [[ ! -f "$CF_ENV" ]] || ! command -v jq >/dev/null 2>&1; then out "${what}_ok" "?"; return; fi
+  # shellcheck disable=SC1090
+  CLOUDFLARE_API_TOKEN="" CLOUDFLARE_ACCOUNT_ID=""
+  source "$CF_ENV"
+  if [[ -z "$CLOUDFLARE_API_TOKEN" ]]; then out "${what}_ok" "?"; return; fi
+  if [[ -z "$CLOUDFLARE_ACCOUNT_ID" ]]; then
+    CLOUDFLARE_ACCOUNT_ID=$(cf /accounts | jq -r '.result[0].id // empty')
+    [[ -n "$CLOUDFLARE_ACCOUNT_ID" ]] || { out "${what}_ok" "?"; return; }
+  fi
+  local acct="/accounts/$CLOUDFLARE_ACCOUNT_ID"
+  dir=$(mktemp -d "$CACHE_DIR/cf.XXXXXX")
+  case "$what" in
+    workers)
+      local tag wname i=0
+      while read -r tag wname; do
+        [[ -n "$tag" ]] || continue
+        (cf "$acct/builds/workers/$tag/builds?per_page=1" | jq -r --arg n "$wname" '
+          (.result // [] | if type == "object" then (.builds // []) else . end | .[0]) as $b
+          | if $b == null then "none 0 \($n)"
+            else (if ($b.status // "") | test("queued|initializing|running|pending") then "pending"
+                  elif ($b.build_outcome // $b.status // "") | test("^fail|terminat|error") then "fail"
+                  else "ok" end)
+              + " " + ((($b.created_on // $b.created_at // "") | sub("\\.[0-9]+"; "") | try fromdateiso8601 catch 0) | tostring)
+              + " " + $n end' >"$dir/$i" 2>/dev/null) &
+        i=$((i + 1))
+        (( i % 8 == 0 )) && wait
+      done < <(cf "$acct/workers/scripts" | jq -r '.result[]? | "\(.tag) \(.id)"')
+      wait
+      ;;
+    pages)
+      cf "$acct/pages/projects?per_page=50" | jq -r '
+        .result[]? | .name as $n | .latest_deployment as $d
+        | if $d == null then "none 0 \($n)"
+          else ($d.latest_stage.status // "") as $s
+            | (if $s == "failure" then "fail" elif ($s | test("active|queued|idle")) then "pending" else "ok" end)
+              + " " + ((($d.created_on // "") | sub("\\.[0-9]+"; "") | try fromdateiso8601 catch 0) | tostring)
+              + " " + $n end' >"$dir/pages" 2>/dev/null
+      ;;
+  esac
+  tally "$dir" "$what"
+}
+
 # ---- herdr-outpost edge + tunnel, the collector's last push, Actions health.
 while read -r kind name target _; do
   case "$kind" in
@@ -95,24 +202,12 @@ while read -r kind name target _; do
         out job_last "?"
       fi
       ;;
-    repo)
-      # Latest run per workflow: "<passing> <total> <newest epoch> <failing names>"
-      if command -v gh >/dev/null 2>&1; then
-        summary=$(bounded gh run list -R "$target" --limit 40 \
-          --json workflowName,conclusion,createdAt --jq '
-            group_by(.workflowName) | map(max_by(.createdAt)) as $l
-            | "\([$l[] | select(.conclusion == "success")] | length) \($l | length) \(
-                [$l[].createdAt | fromdateiso8601] | max) \(
-                [$l[] | select(.conclusion != "success" and .conclusion != "") | .workflowName] | join(",") | if . == "" then "-" else gsub(" "; "_") end)"' \
-          2>/dev/null)
-        read -r pass wtotal newest failing <<<"${summary:-? ? ? -}"
-      else
-        pass="?" wtotal="?" newest="?" failing="-"
-      fi
-      out actions_pass "$pass"
-      out actions_total "$wtotal"
-      out actions_newest "$newest"
-      out actions_failing "$failing"
+    actions)
+      # "actions <owner> <days>": the owner lands in $name, the window in $target.
+      actions_scan "$name" "${target:-14}"
+      ;;
+    cloudflare)
+      cloudflare_scan "$name"
       ;;
   esac
 done < <(grep -vE '^\s*(#|$)' "$CONF")
