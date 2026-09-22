@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 424,
+    "total": 425,
     "by_category": {
       "shell": 20,
       "prompt": 1,
@@ -17,10 +17,10 @@
       "services": 21,
       "scripts": 43,
       "security": 2,
-      "other": 165,
+      "other": 167,
       "hooks": 26,
       "chezmoi": 12,
-      "repo": 31
+      "repo": 30
     }
   },
   "categories": [
@@ -2816,6 +2816,13 @@
       "attributes": []
     },
     {
+      "source": "DECISIONS.md",
+      "target": "~/DECISIONS.md",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
       "source": "dev",
       "target": "~/dev",
       "kind": "dotfile",
@@ -2943,6 +2950,13 @@
     {
       "source": "install.sh",
       "target": "~/install.sh",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "lib/dots-ui.sh",
+      "target": "~/lib/dots-ui.sh",
       "kind": "dotfile",
       "category": "other",
       "attributes": []
@@ -3587,12 +3601,6 @@
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"
-    },
-    {
-      "source": "dotfiles-showcase",
-      "kind": "repo",
-      "category": "repo",
-      "role": "Submodule \u2014 the showcase web app; never applied"
     },
     {
       "source": "package.json",
