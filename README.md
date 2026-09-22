@@ -308,6 +308,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   └── themes/ (121 files across 13 themes — see .chezmoidata/themes.yaml)
 ├── .hermes.md
 ├── .yamllint.yml
+├── DECISIONS.md
 ├── dev
 ├── dot_Brewfile
 ├── dot_agents
@@ -582,6 +583,8 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │           └── symlink_project-doc-planner
 ├── dot_zshrc
 ├── install.sh
+├── lib
+│   └── dots-ui.sh
 ├── private_dot_grokbot
 │   └── settings.json
 ├── private_dot_hermes
