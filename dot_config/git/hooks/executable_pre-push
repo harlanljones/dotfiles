@@ -13,21 +13,22 @@ fi
 zero=0000000000000000000000000000000000000000
 ranges=()
 
-while read -r old_rev new_rev _ref; do
-	# Ref deletion: nothing new is pushed.
-	if [[ "$new_rev" == "$zero" ]]; then
+while read -r _local_ref local_sha _remote_ref remote_sha; do
+	# Ref deletion: git zeroes the LOCAL sha (field 2) and sends "(delete)" as
+	# the local ref; nothing new is pushed.
+	if [[ "$local_sha" == "$zero" ]]; then
 		continue
 	fi
-	if [[ "$old_rev" == "$zero" ]]; then
-		# New branch: scan commits not already reachable from an existing ref.
+	# Remote sha zero means the ref does not exist remotely yet (new branch or
+	# first push), so scan every commit that is not already on the remote.
+	# NOT "--not --all": that excludes the ref being pushed too, since its own
+	# commits are reachable from the local branch, which scans nothing at all.
+	if [[ "$remote_sha" == "$zero" ]]; then
 		# git-log ranges, not bare SHAs: gitleaks hands --log-opts straight to
-		# git log, which handles "--not --all" natively.
-		# Edge case: in a mixed push (update + new branch), commits already
-		# reachable from another local unpushed ref are skipped by "--not --all"
-		# and go unscanned until that ref is pushed.
-		ranges+=("$new_rev --not --all")
+		# git log, which handles "--not --remotes" natively.
+		ranges+=("$local_sha --not --remotes")
 	else
-		ranges+=("$old_rev..$new_rev")
+		ranges+=("$remote_sha..$local_sha")
 	fi
 done
 
@@ -37,5 +38,15 @@ if [[ ${#ranges[@]} -eq 0 ]]; then
 fi
 
 echo "pre-push: running gitleaks on outgoing commits"
-gitleaks detect --source . --log-opts="${ranges[*]}" --no-banner --redact --exit-code 1 ||
-	{ echo "pre-push: gitleaks failed" >&2; exit 1; }
+# One invocation per range: joining several ranges into a single --log-opts lets
+# git's "--not" negate the LATER revisions too, which silently scanned nothing on
+# a multi-ref push (git push --all / git push origin a b).
+status=0
+for range in "${ranges[@]}"; do
+	gitleaks detect --source . --log-opts="$range" --no-banner --redact --exit-code 1 || status=1
+done
+
+if [[ "$status" -ne 0 ]]; then
+	echo "pre-push: gitleaks failed" >&2
+	exit 1
+fi
