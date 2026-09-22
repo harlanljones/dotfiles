@@ -22,19 +22,14 @@ for _p in "$HOME/.local/share/mise/shims" "$HOME/.local/bin" "$HOME/.cache/.bun/
 done
 export PATH
 
-# ──────────────────────────────────────────────────────────────────────────
-# Styling & UI Helpers
-# ──────────────────────────────────────────────────────────────────────────
-
-if [[ -t 1 ]] && command -v tput >/dev/null 2>&1 && [[ "$(tput colors 2>/dev/null || echo 0)" -ge 8 ]]; then
-  BOLD=$(tput bold); DIM=$(tput dim); RESET=$(tput sgr0)
-  BLUE=$(tput setaf 4); GREEN=$(tput setaf 2); YELLOW=$(tput setaf 3); RED=$(tput setaf 1); CYAN=$(tput setaf 6)
-else
-  BOLD=""; DIM=""; RESET=""; BLUE=""; GREEN=""; YELLOW=""; RED=""; CYAN=""
-fi
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
 
 NON_INTERACTIVE=false
 DRY_RUN=false
+
+# shellcheck source=lib/dots-ui.sh
+source "$SCRIPT_DIR/lib/dots-ui.sh"
 
 for arg in "$@"; do
   case "$arg" in
@@ -57,65 +52,8 @@ EOF
   esac
 done
 
-banner() {
-  printf '\n%s%s======================================================%s\n' "$BOLD" "$CYAN" "$RESET"
-  printf '%s%s   Dotfiles Setup & Onboarding Wizard%s\n' "$BOLD" "$CYAN" "$RESET"
-  printf '%s%s======================================================%s\n' "$BOLD" "$CYAN" "$RESET"
-  printf '%s  Inspects system info, clarifies machine profile and settings,%s\n' "$DIM" "$RESET"
-  printf '%s  and provisions runtimes, AI agents, and chezmoi dotfiles.%s\n\n' "$DIM" "$RESET"
-}
-
-step()    { printf '\n%s%s[%s/7] %s%s\n' "$BOLD" "$BLUE" "$1" "$2" "$RESET"; }
-info()    { printf '  %sℹ%s %s\n' "$CYAN" "$RESET" "$1"; }
-success() { printf '  %s✓%s %s\n' "$GREEN" "$RESET" "$1"; }
-warn()    { printf '  %s⚠%s %s\n' "$YELLOW" "$RESET" "$1"; }
-err()     { printf '  %s✖%s %s\n' "$RED" "$RESET" "$1" >&2; }
-
-confirm() {
-  local prompt="$1" default="${2:-Y}" reply=""
-  if [[ "$NON_INTERACTIVE" == "true" ]]; then
-    [[ "$default" =~ ^[Yy] ]] && return 0 || return 1
-  fi
-  if [[ "$default" =~ ^[Yy] ]]; then
-    printf '  %s? %s [Y/n]: %s' "$YELLOW" "$prompt" "$RESET"
-  else
-    printf '  %s? %s [y/N]: %s' "$YELLOW" "$prompt" "$RESET"
-  fi
-  read -r reply || true
-  reply="${reply:-$default}"
-  [[ "$reply" =~ ^[Yy] ]]
-}
-
-ask_choice() {
-  local prompt="$1" default_val="$2" chosen=""
-  shift 2
-  local options=("$@")
-  if [[ "$NON_INTERACTIVE" == "true" ]]; then
-    echo "$default_val"
-    return 0
-  fi
-  printf '  %s? %s%s\n' "$YELLOW" "$prompt" "$RESET"
-  for i in "${!options[@]}"; do
-    local num=$((i + 1))
-    local marker=" "
-    [[ "${options[$i]}" == "$default_val" ]] && marker="*"
-    printf '    %s%s %s) %s%s\n' "$DIM" "$marker" "$num" "${options[$i]}" "$RESET"
-  done
-  printf '  Select [1-%s] (default: %s): ' "${#options[@]}" "$default_val"
-  read -r chosen || true
-  if [[ -z "$chosen" ]]; then
-    echo "$default_val"
-  elif [[ "$chosen" =~ ^[0-9]+$ ]] && (( chosen >= 1 && chosen <= ${#options[@]} )); then
-    echo "${options[$((chosen - 1))]}"
-  else
-    echo "$chosen"
-  fi
-}
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-cd "$SCRIPT_DIR"
-
-banner
+ui_banner "Dotfiles Setup & Onboarding Wizard" \
+  "Inspects system info, clarifies machine profile and settings, and provisions runtimes, AI agents, and chezmoi dotfiles."
 
 # ──────────────────────────────────────────────────────────────────────────
 # 1. System Inspection & Machine Clarification
@@ -145,13 +83,13 @@ elif [[ "$SYS_OS" == "Darwin" ]]; then
   DISTRO_NAME="macOS $(sw_vers -productVersion 2>/dev/null || true)"
 fi
 
-printf '  %-16s %s%s%s\n' "Operating System:" "$BOLD" "$SYS_OS" "$RESET"
-printf '  %-16s %s\n' "Distribution:" "$DISTRO_NAME"
-printf '  %-16s %s\n' "Architecture:" "$SYS_ARCH"
-printf '  %-16s %s\n' "Kernel:" "$SYS_KERNEL"
-printf '  %-16s %s\n' "Hostname:" "$SYS_HOST"
+ui_kv "Operating System:" "$BOLD$SYS_OS$RESET"
+ui_kv "Distribution:" "$DISTRO_NAME"
+ui_kv "Architecture:" "$SYS_ARCH"
+ui_kv "Kernel:" "$SYS_KERNEL"
+ui_kv "Hostname:" "$SYS_HOST"
 if [[ "$IS_WSL" == "true" ]]; then
-  printf '  %-16s %sYes (Windows Subsystem for Linux)%s\n' "WSL Environment:" "$GREEN" "$RESET"
+  ui_kv "WSL Environment:" "${GREEN}Yes (Windows Subsystem for Linux)${RESET}"
 fi
 
 # Detect recommended machine role
@@ -179,8 +117,7 @@ case "$CHOICE_OUTPUT" in
   hadrian*)  SELECTED_MACHINE="hadrian" ;;
   vespasian*) SELECTED_MACHINE="vespasian" ;;
   custom*)
-    printf '  Enter custom machine name: '
-    read -r SELECTED_MACHINE || SELECTED_MACHINE="custom"
+    SELECTED_MACHINE="$(ask_input "Custom machine name" "custom")"
     ;;
   *) SELECTED_MACHINE="${CHOICE_OUTPUT%% *}" ;;
 esac
@@ -299,8 +236,7 @@ if [[ -f "$KEY_FILE" ]]; then
   success "Age private key found at $KEY_FILE"
   if [[ -n "$OP_BIN" ]]; then
     if confirm "Back up this age private key to 1Password?" "N"; then
-      printf '  Enter 1Password vault name (leave blank for default vault): '
-      read -r OP_VAULT || OP_VAULT=""
+      OP_VAULT="$(ask_input "1Password vault name (blank for default vault)" "")"
       vault_args=()
       if [[ -n "$OP_VAULT" ]]; then
         vault_args=("--vault=$OP_VAULT")
@@ -343,9 +279,7 @@ else
           OP_BIN="$(get_op_cmd)"
         fi
       fi
-      printf '  Enter 1Password item name or URI [chezmoi-age-key]: '
-      read -r OP_URI || OP_URI=""
-      OP_URI="${OP_URI:-chezmoi-age-key}"
+      OP_URI="$(ask_input "1Password item name or URI" "chezmoi-age-key")"
       if [[ "$DRY_RUN" == "false" && -n "$OP_BIN" ]]; then
         if [[ "$OP_URI" == op://* ]]; then
           "$OP_BIN" read "$OP_URI" > "$KEY_FILE" 2>/dev/null || true
@@ -362,11 +296,7 @@ else
       fi
       ;;
     manual*)
-      printf '  Enter age secret key (starts with AGE-SECRET-KEY-1...): '
-      stty -echo 2>/dev/null || true
-      read -r USER_AGE_KEY || USER_AGE_KEY=""
-      stty echo 2>/dev/null || true
-      printf '\n'
+      USER_AGE_KEY="$(ask_secret "Age secret key (AGE-SECRET-KEY-1...)")"
       if [[ "$USER_AGE_KEY" =~ ^AGE-SECRET-KEY-1 ]]; then
         if [[ "$DRY_RUN" == "false" ]]; then
           printf '%s\n' "$USER_AGE_KEY" > "$KEY_FILE"
@@ -416,7 +346,7 @@ if check_cmd mise; then
   if confirm "Install/update all tools declared in mise configuration?" "Y"; then
     if [[ "$DRY_RUN" == "false" ]]; then
       eval "$("$HOME/.local/bin/mise" activate bash 2>/dev/null || true)"
-      mise install
+      ui_spin "Installing mise tools" mise install
     fi
     success "Mise tools provisioned."
   fi
@@ -453,7 +383,7 @@ fi
 if check_cmd bun; then
   if confirm "Install global agent CLIs via Bun (cline, grok, wrangler, supabase, etc.)?" "Y"; then
     if [[ "$DRY_RUN" == "false" ]]; then
-      bun install -g cline @xai-official/grok wrangler supabase freebuff @nanonets/graft @magnitudedev/cli
+      ui_spin "Installing global agent CLIs" bun install -g cline @xai-official/grok wrangler supabase freebuff @nanonets/graft @magnitudedev/cli
     fi
     success "Global agent CLIs installed."
   fi
@@ -508,10 +438,8 @@ fi
 # ──────────────────────────────────────────────────────────────────────────
 # Summary & Next Steps
 # ──────────────────────────────────────────────────────────────────────────
-printf '\n%s%s======================================================%s\n' "$BOLD" "$GREEN" "$RESET"
-printf '%s%s   Setup Complete!%s\n' "$BOLD" "$GREEN" "$RESET"
-printf '%s%s======================================================%s\n' "$BOLD" "$GREEN" "$RESET"
-printf '  Profile: %s%s%s | Theme: %s%s%s\n\n' "$BOLD" "$SELECTED_MACHINE" "$RESET" "$BOLD" "$SELECTED_THEME" "$RESET"
+ui_summary "Setup Complete!" "Profile=$SELECTED_MACHINE" "Theme=$SELECTED_THEME"
+printf '\n'
 printf '  %sNext steps:%s\n' "$BOLD" "$RESET"
 printf '  1. Restart your terminal or run: %sexec bash%s\n' "$CYAN" "$RESET"
 printf '  2. Run health diagnostics:       %sdots doctor%s\n' "$CYAN" "$RESET"

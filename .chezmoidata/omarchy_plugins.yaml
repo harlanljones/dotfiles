@@ -27,8 +27,6 @@ omarchyPlugins:
     enabled: true
   - url: https://github.com/crmne/omarchy-hyprmoncfg.git
     enabled: true
-  - url: https://github.com/esemczak/omarchy-theme-modes.git
-    enabled: false
   - url: https://github.com/hzerrad/hzerrad.bottleneck.git
     enabled: true
   - url: https://github.com/imRYiUK/omarchy-workspace-profiles.git

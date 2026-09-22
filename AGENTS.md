@@ -109,6 +109,7 @@ The table below is the orienting summary; the index is the detail.
 | --- | --- |
 | `dot_config/shell/` | **Shell configuration.** Modules shared by bash and zsh, sourced in numeric order by both rc loaders; see its own `README.md`. Add shell config here, never to `dot_bashrc`/`dot_zshrc` |
 | `dot_config/` | All per-tool configs under `~/.config` (starship, ghostty, git, nvim, hypr, mise, opencode, omarchy, systemd/user, herdr, zoxide, btop, atuin, …) |
+| `lib/dots-ui.sh` | Shared TUI helpers (gum with tput fallback) sourced by `setup.sh` and `dots register`; repo material, chezmoi-ignored, never applied |
 | `dot_local/bin/` | Custom scripts, usage collectors, scrapers, agent hooks (installed to `~/.local/bin`) |
 | `dot_local/bin/cline-safety/` | `git` interceptor that refuses `commit`/`push` under Cline |
 | `dot_local/bin/executable_statusline.tmpl` | Shared cross-harness CLI statusline renderer (Claude Code + Cursor) → `~/.local/bin/statusline` |
@@ -217,7 +218,7 @@ Each CLI/runtime is owned by exactly one manager. Do not spread a tool across tw
     (`agent_skills.yaml`, `run_onchange_before_09-install-agent-skills.sh`,
     `run_after_23-sync-agent-skills.sh`, `~/.agents/skills`) — it has its own
     library repo above; never add it to `agent_skills.yaml`.
-- **`dots` CLI** is the human-friendly wrapper (`dots status/diff/update/push/doctor`).
+- **`dots` CLI** is the human-friendly wrapper (`dots status/diff/update/push/doctor`; `dots register` registers a new machine: machines.yaml entry, hostname map, age key).
   Prefer `dots push` to commit+push; it generates a Conventional Commit message via
   local Ollama and never commits agent work automatically.
 
