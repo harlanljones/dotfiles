@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 424,
+    "total": 426,
     "by_category": {
       "shell": 20,
       "prompt": 1,
@@ -17,7 +17,7 @@
       "services": 21,
       "scripts": 43,
       "security": 2,
-      "other": 165,
+      "other": 167,
       "hooks": 26,
       "chezmoi": 12,
       "repo": 31
@@ -2816,6 +2816,13 @@
       "attributes": []
     },
     {
+      "source": "DECISIONS.md",
+      "target": "~/DECISIONS.md",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
       "source": "dev",
       "target": "~/dev",
       "kind": "dotfile",
@@ -2943,6 +2950,13 @@
     {
       "source": "install.sh",
       "target": "~/install.sh",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "lib/dots-ui.sh",
+      "target": "~/lib/dots-ui.sh",
       "kind": "dotfile",
       "category": "other",
       "attributes": []

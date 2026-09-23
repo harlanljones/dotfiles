@@ -79,3 +79,6 @@ hl.layer_rule({ match = { namespace = "reprieve-toast" }, no_anim = true, animat
 -- omaplug-shortcut-start: bobbynicholas.omaland
 o.bind("SUPER + SHIFT + L", "Omaplug: bobbynicholas.omaland", "omarchy-shell shell toggle bobbynicholas.omaland")
 -- omaplug-shortcut-end: bobbynicholas.omaland
+
+-- Keychron knob: switch between the USB headphones and LG monitor speakers.
+o.bind("F13", "Switch headphones and speakers", "keychron-audio-toggle --headphones alsa_output.usb-TTGK_Technology_Co._Ltd_KM-HIFI-384KHZ-00.analog-stereo --monitor alsa_output.pci-0000_01_00.1.playback.3.0", { locked = true })

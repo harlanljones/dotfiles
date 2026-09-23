@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**424 tracked entries** across 16 categories.
+**426 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -25,7 +25,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Background services](#background-services) | 21 |
 | [Custom executables](#custom-executables) | 43 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Other configuration](#other-configuration) | 165 |
+| [Other configuration](#other-configuration) | 167 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 26 |
 | [Chezmoi control files](#chezmoi-control-files) | 12 |
 | [Repository material (not applied)](#repository-material-not-applied) | 31 |
@@ -425,6 +425,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.chezmoitemplates/themes/tokyonight-storm/windows_terminal.json` | `.chezmoitemplates/themes/tokyonight-storm/windows_terminal.json` | — | — |
 | `~/.hermes.md` | `.hermes.md` | — | — |
 | `~/.yamllint.yml` | `.yamllint.yml` | — | — |
+| `~/DECISIONS.md` | `DECISIONS.md` | — | — |
 | `~/dev` | `dev` | — | — |
 | `~/.config/apt/pkglist.txt` | `dot_config/apt/pkglist.txt` | — | — |
 | `~/.config/bat/config` | `dot_config/bat/config` | — | — |
@@ -442,6 +443,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch` | `dot_local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch` | — | — |
 | `~/.local/share/wsl-ssh-bridge/main.go` | `dot_local/share/wsl-ssh-bridge/main.go` | — | — |
 | `~/install.sh` | `install.sh` | — | — |
+| `~/lib/dots-ui.sh` | `lib/dots-ui.sh` | — | — |
 | `~/tests/test-dev.sh` | `tests/test-dev.sh` | — | — |
 | `~/theme-assets/omarchy-catppuccin-latte/wallpaper.png` | `theme-assets/omarchy-catppuccin-latte/wallpaper.png` | — | — |
 | `~/theme-assets/omarchy-catppuccin/wallpaper.png` | `theme-assets/omarchy-catppuccin/wallpaper.png` | — | — |

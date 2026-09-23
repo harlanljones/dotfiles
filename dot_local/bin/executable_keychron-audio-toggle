@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+"""Switch PipeWire/PulseAudio between two explicitly named output sinks."""
+
+import argparse
+import json
+import shutil
+import subprocess
+import sys
+
+
+def pactl(*args):
+    return subprocess.run(
+        ["pactl", *args], check=True, capture_output=True, text=True, timeout=5
+    ).stdout.strip()
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--headphones", help="Exact USB-headphone sink name")
+    parser.add_argument("--monitor", help="Exact LG-monitor sink name")
+    parser.add_argument("--list", action="store_true", help="List available sinks")
+    args = parser.parse_args()
+
+    sinks = json.loads(pactl("-f", "json", "list", "sinks"))
+    if args.list:
+        for sink in sinks:
+            print(f'{sink["name"]}\t{sink.get("description", "")}')
+        return
+
+    if not args.headphones or not args.monitor:
+        parser.error("--headphones and --monitor are required")
+    by_name = {sink["name"]: sink for sink in sinks}
+    missing = [name for name in (args.headphones, args.monitor) if name not in by_name]
+    if missing:
+        raise RuntimeError("Audio output unavailable: " + ", ".join(missing))
+
+    current = pactl("get-default-sink")
+    target = args.monitor if current == args.headphones else args.headphones
+    pactl("set-default-sink", target)
+
+    for stream in json.loads(pactl("-f", "json", "list", "sink-inputs")):
+        try:
+            pactl("move-sink-input", str(stream["index"]), target)
+        except subprocess.CalledProcessError:
+            # An application may close its stream between listing and moving it.
+            pass
+
+    description = by_name[target].get("description", target)
+    if shutil.which("notify-send"):
+        subprocess.run(
+            ["notify-send", "Audio output", description],
+            check=False, capture_output=True, timeout=5,
+        )
+    print(description)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except (OSError, RuntimeError, subprocess.CalledProcessError, subprocess.TimeoutExpired, json.JSONDecodeError) as exc:
+        print(f"Audio switch failed: {exc}", file=sys.stderr)
+        sys.exit(1)
