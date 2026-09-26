@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**426 tracked entries** across 16 categories.
+**430 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -23,12 +23,12 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Toolchain & packages](#toolchain--packages) | 5 |
 | [AI agent harnesses](#ai-agent-harnesses) | 52 |
 | [Background services](#background-services) | 21 |
-| [Custom executables](#custom-executables) | 43 |
+| [Custom executables](#custom-executables) | 44 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
 | [Other configuration](#other-configuration) | 167 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 26 |
 | [Chezmoi control files](#chezmoi-control-files) | 12 |
-| [Repository material (not applied)](#repository-material-not-applied) | 31 |
+| [Repository material (not applied)](#repository-material-not-applied) | 34 |
 
 ---
 
@@ -247,6 +247,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.local/bin/herdr-subagents` | `dot_local/bin/executable_herdr-subagents` | custom executables | executable |
 | `~/.local/bin/herdr-sync-hermes-plugin` | `dot_local/bin/executable_herdr-sync-hermes-plugin` | custom executables | executable |
 | `~/.local/bin/herdr-verify` | `dot_local/bin/executable_herdr-verify` | custom executables | executable |
+| `~/.local/bin/keychron-audio-toggle` | `dot_local/bin/executable_keychron-audio-toggle` | custom executables | executable |
 | `~/.local/bin/lazygit-ollama-commit.sh` | `dot_local/bin/executable_lazygit-ollama-commit.sh` | custom executables | executable |
 | `~/.local/bin/ollama-commit-msg.sh` | `dot_local/bin/executable_ollama-commit-msg.sh` | custom executables | executable |
 | `~/.local/bin/omarchy-agent-usage-antigravity` | `dot_local/bin/executable_omarchy-agent-usage-antigravity.tmpl` | custom executables | executable, template |
@@ -525,6 +526,9 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/dotfiles-gap-action-plan.md` | Recovery guide and repository maintenance scripts |
 | `docs/generate_index.py` | Recovery guide and repository maintenance scripts |
 | `docs/generate_readme_tree.py` | Recovery guide and repository maintenance scripts |
+| `docs/keychron/README.md` | Recovery guide and repository maintenance scripts |
+| `docs/keychron/q3-he-8k-keymap-2026-09-22.json` | Recovery guide and repository maintenance scripts |
+| `docs/keychron/vespasian-handoff.md` | Recovery guide and repository maintenance scripts |
 | `docs/optional-agent-skill-packs-implementation-plan.md` | Recovery guide and repository maintenance scripts |
 | `docs/optional-agent-skill-packs-ux-proposal.md` | Recovery guide and repository maintenance scripts |
 | `docs/recovery.md` | Recovery guide and repository maintenance scripts |

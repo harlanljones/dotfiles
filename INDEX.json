@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 426,
+    "total": 430,
     "by_category": {
       "shell": 20,
       "prompt": 1,
@@ -15,12 +15,12 @@
       "toolchain": 5,
       "agents": 52,
       "services": 21,
-      "scripts": 43,
+      "scripts": 44,
       "security": 2,
       "other": 167,
       "hooks": 26,
       "chezmoi": 12,
-      "repo": 31
+      "repo": 34
     }
   },
   "categories": [
@@ -1501,6 +1501,16 @@
     {
       "source": "dot_local/bin/executable_herdr-verify",
       "target": "~/.local/bin/herdr-verify",
+      "kind": "dotfile",
+      "category": "scripts",
+      "attributes": [
+        "executable"
+      ],
+      "subsystem": "custom executables"
+    },
+    {
+      "source": "dot_local/bin/executable_keychron-audio-toggle",
+      "target": "~/.local/bin/keychron-audio-toggle",
       "kind": "dotfile",
       "category": "scripts",
       "attributes": [
@@ -3544,6 +3554,24 @@
     },
     {
       "source": "docs/generate_readme_tree.py",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/keychron/README.md",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/keychron/q3-he-8k-keymap-2026-09-22.json",
+      "kind": "repo",
+      "category": "repo",
+      "role": "Recovery guide and repository maintenance scripts"
+    },
+    {
+      "source": "docs/keychron/vespasian-handoff.md",
       "kind": "repo",
       "category": "repo",
       "role": "Recovery guide and repository maintenance scripts"

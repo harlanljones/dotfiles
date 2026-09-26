@@ -25,10 +25,11 @@ export PATH
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-NON_INTERACTIVE=false
+export NON_INTERACTIVE=false
 DRY_RUN=false
 
 # shellcheck source=lib/dots-ui.sh
+# shellcheck disable=SC1091
 source "$SCRIPT_DIR/lib/dots-ui.sh"
 
 for arg in "$@"; do
