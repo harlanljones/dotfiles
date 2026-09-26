@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**429 tracked entries** across 16 categories.
+**430 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -28,7 +28,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Other configuration](#other-configuration) | 167 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 26 |
 | [Chezmoi control files](#chezmoi-control-files) | 12 |
-| [Repository material (not applied)](#repository-material-not-applied) | 33 |
+| [Repository material (not applied)](#repository-material-not-applied) | 34 |
 
 ---
 
@@ -538,5 +538,6 @@ agents and the showcase app should read. This page is the same data for humans.
 | `docs/test_shell_modules.py` | Recovery guide and repository maintenance scripts |
 | `docs/vespasian-boot.md` | Recovery guide and repository maintenance scripts |
 | `docs/vespasian-theming.md` | Recovery guide and repository maintenance scripts |
+| `dotfiles-showcase` | Submodule — the showcase web app; never applied |
 | `package.json` | Runtime CLI deps installed outside mise |
 | `setup.sh` | Interactive new machine onboarding & setup wizard |
