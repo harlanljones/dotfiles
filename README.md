@@ -546,6 +546,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   ├── executable_herdr-subagents
 │   │   ├── executable_herdr-sync-hermes-plugin
 │   │   ├── executable_herdr-verify
+│   │   ├── executable_keychron-audio-toggle
 │   │   ├── executable_lazygit-ollama-commit.sh
 │   │   ├── executable_ollama-commit-msg.sh
 │   │   ├── executable_omarchy-agent-usage-<agent>.tmpl (7 agents)
