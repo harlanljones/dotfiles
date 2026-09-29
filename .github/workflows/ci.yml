@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-      - 'feat/**'
-      - 'fix/**'
-      - 'chore/**'
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -28,7 +25,8 @@ env:
   SHELLCHECK_VERSION: 0.10.0
 
 jobs:
-  # Matrix legs exercise each resolved machine on a plain ubuntu runner:
+  # Exercises each resolved Linux machine sequentially in one runner to eliminate
+  # matrix toolchain re-install overhead and 1-minute job rounding penalties:
   #   augustus  — the template's Linux fallback (no hostname match), asserted
   #               rather than trusted;
   #   vespasian — pinned via sed on the rendered config, exercising WSL-only
@@ -37,12 +35,8 @@ jobs:
   #               Omarchy-only files are NOT in the apply plan (the fallback
   #               must not leak desktop config onto an unregistered machine).
   validate-linux:
-    name: Validate (Linux, ${{ matrix.machine }})
+    name: "Validate (Linux: augustus, vespasian, unknown)"
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        machine: [augustus, vespasian, unknown]
     steps:
       - uses: actions/checkout@v4
 
@@ -52,60 +46,47 @@ jobs:
       - name: Install age
         run: sudo apt-get update && sudo apt-get install -y age
 
-      - name: Render config and pin machine=${{ matrix.machine }}
+      - name: Validate Linux configurations
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          chezmoi execute-template --source "$GITHUB_WORKSPACE" -f .chezmoi.toml.tmpl > "$RUNNER_TEMP/chezmoi.toml"
-          if [ "${{ matrix.machine }}" = augustus ]; then
-            # The runner is not a registered hostname and not WSL, so the
-            # Linux fallback must already resolve to augustus. Assert it.
-            grep -q "^machine = 'augustus'$" "$RUNNER_TEMP/chezmoi.toml"
-          else
-            sed -E "s/^machine = '.*'$/machine = '${{ matrix.machine }}'/" \
-              "$RUNNER_TEMP/chezmoi.toml" > "$RUNNER_TEMP/chezmoi-pinned.toml"
-            grep -q "^machine = '${{ matrix.machine }}'$" "$RUNNER_TEMP/chezmoi-pinned.toml"
-            mv "$RUNNER_TEMP/chezmoi-pinned.toml" "$RUNNER_TEMP/chezmoi.toml"
-          fi
+          for machine in augustus vespasian unknown; do
+            echo "::group::Validating $machine"
+            chezmoi execute-template --source "$GITHUB_WORKSPACE" -f .chezmoi.toml.tmpl > "$RUNNER_TEMP/chezmoi.toml"
+            if [ "$machine" = augustus ]; then
+              grep -q "^machine = 'augustus'$" "$RUNNER_TEMP/chezmoi.toml"
+            else
+              sed -E "s/^machine = '.*'$/machine = '$machine'/" \
+                "$RUNNER_TEMP/chezmoi.toml" > "$RUNNER_TEMP/chezmoi-pinned.toml"
+              grep -q "^machine = '$machine'$" "$RUNNER_TEMP/chezmoi-pinned.toml"
+              mv "$RUNNER_TEMP/chezmoi-pinned.toml" "$RUNNER_TEMP/chezmoi.toml"
+            fi
 
-      - name: Dry-run apply as ${{ matrix.machine }} (encrypted entries excluded -- no age key in CI)
-        # machine=unknown is safe to render end-to-end: the `unknown` entry in
-        # .chezmoidata/machines.yaml backs every `index .machines .machine`.
-        run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          chezmoi apply --config "$RUNNER_TEMP/chezmoi.toml" --source "$GITHUB_WORKSPACE" --dry-run --exclude encrypted
+            chezmoi apply --config "$RUNNER_TEMP/chezmoi.toml" --source "$GITHUB_WORKSPACE" --dry-run --exclude encrypted
 
-      # 2.6 unknown-machine fallback: with machine=unknown the Omarchy-only
-      # config must be chezmoi-ignored, so the apply plan (`chezmoi managed`)
-      # must not contain any of it, and .chezmoiignore.tmpl must still render
-      # with the Omarchy-only trees listed (listing == excluded).
-      - name: Assert unknown machine excludes Omarchy-only targets
-        if: matrix.machine == 'unknown'
-        run: |
-          export PATH="$HOME/.local/bin:$PATH"
-          set -euo pipefail
-          managed=$(chezmoi managed --config "$RUNNER_TEMP/chezmoi.toml" --source "$GITHUB_WORKSPACE" --exclude encrypted)
-          leaked=$(printf '%s\n' "$managed" | grep -E '^\.config/(omarchy|pacman|btop)(/|$)' || true)
-          if [ -n "$leaked" ]; then
-            echo "::error::machine=unknown leaked Omarchy-only targets into the apply plan:"
-            printf '%s\n' "$leaked"
-            exit 1
-          fi
-          printf '%s\n' "$managed" | grep -q '^\.bashrc$' \
-            || { echo "::error::machine=unknown did not apply .bashrc"; exit 1; }
-          chezmoi execute-template --config "$RUNNER_TEMP/chezmoi.toml" \
-            --source "$GITHUB_WORKSPACE" -f .chezmoiignore.tmpl > "$RUNNER_TEMP/ignore.txt"
-          for tree in .config/omarchy .config/pacman .config/btop; do
-            grep -qx "$tree" "$RUNNER_TEMP/ignore.txt" \
-              || { echo "::error::.chezmoiignore does not exclude $tree under machine=unknown"; exit 1; }
+            if [ "$machine" = unknown ]; then
+              managed=$(chezmoi managed --config "$RUNNER_TEMP/chezmoi.toml" --source "$GITHUB_WORKSPACE" --exclude encrypted)
+              leaked=$(printf '%s\n' "$managed" | grep -E '^\.config/(omarchy|pacman|btop)(/|$)' || true)
+              if [ -n "$leaked" ]; then
+                echo "::error::machine=unknown leaked Omarchy-only targets into the apply plan:"
+                printf '%s\n' "$leaked"
+                exit 1
+              fi
+              printf '%s\n' "$managed" | grep -q '^\.bashrc$' \
+                || { echo "::error::machine=unknown did not apply .bashrc"; exit 1; }
+              chezmoi execute-template --config "$RUNNER_TEMP/chezmoi.toml" \
+                --source "$GITHUB_WORKSPACE" -f .chezmoiignore.tmpl > "$RUNNER_TEMP/ignore.txt"
+              for tree in .config/omarchy .config/pacman .config/btop; do
+                grep -qx "$tree" "$RUNNER_TEMP/ignore.txt" \
+                  || { echo "::error::.chezmoiignore does not exclude $tree under machine=unknown"; exit 1; }
+              done
+              echo "ok: machine=unknown excludes Omarchy-only targets and keeps .bashrc"
+            fi
+            echo "::endgroup::"
           done
-          echo "ok: machine=unknown excludes Omarchy-only targets and keeps .bashrc"
 
       - name: Verify dependency gate script renders and runs
         run: |
           export PATH="$HOME/.local/bin:$PATH"
-          # Reuse the pinned config from the render step so [data].machine is
-          # present; bare execute-template has no .machine and fails after the
-          # gating refactor.
           chezmoi execute-template --config "$RUNNER_TEMP/chezmoi.toml" --source "$GITHUB_WORKSPACE" < run_once_before_00-verify-deps.sh.tmpl > /tmp/verify-deps.sh
           sh -n /tmp/verify-deps.sh && sh /tmp/verify-deps.sh
 
