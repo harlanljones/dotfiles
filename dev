@@ -86,7 +86,7 @@ ensure_project_skills() {
   # Broken links (e.g. skill moved between category dirs) — repair from anywhere.
   for s in "${cats[@]%%:*}" "${sd[@]}"; do
     if [ -L ".hermes/skills/$s" ] && [ ! -e ".hermes/skills/$s/SKILL.md" ]; then
-      t="$(find "$HOME/.hermes/skills" -maxdepth 2 -type d -name "$s" 2>/dev/null | head -1)"
+      t="$(find "$HOME/.hermes/skills" -maxdepth 2 \( -type d -o -type l \) -name "$s" 2>/dev/null | head -1)"
       [ -n "$t" ] && ln -sfn "$t" ".hermes/skills/$s"
     fi
   done

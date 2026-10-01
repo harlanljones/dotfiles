@@ -144,6 +144,14 @@ settings.local.json
 .config/delta
 .config/delta/**
 {{- end }}
+{{- if eq .machine "augustus" }}
+# Omarchy owns these two on Augustus: upstream omarchy-theme-set-claude and
+# omarchy-theme-set-hermes rewrite them on every theme set, and chezmoi
+# managing the same paths produced the drift that killed
+# dots-theme-agents.service. Other machines keep the dots-derived templates.
+.claude/themes/omarchy.json
+.hermes/skins/omarchy.yaml
+{{- end }}
 {{- if eq .machine "vespasian" }}
 # WSL Ubuntu has no Omarchy desktop, but it does have WSLg and a systemd user
 # manager. Keep Linux GUI/portable service config separate from Omarchy-only

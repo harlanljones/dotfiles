@@ -81,3 +81,7 @@ omarchyPlugins:
     enabled: true
   - url: https://github.com/mtolhuys/omarchy-news-radar.git
     enabled: true
+  - url: https://github.com/zaki2993/zakarch.storage.git
+    enabled: true
+  - url: https://github.com/0xSero/omarchy-local-ai.git
+    enabled: true

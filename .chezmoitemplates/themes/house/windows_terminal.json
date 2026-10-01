@@ -1,0 +1,23 @@
+{
+    "background": "#110402",
+    "black": "#090201",
+    "blue": "#387eff",
+    "brightBlack": "#7d5952",
+    "brightBlue": "#71a3fd",
+    "brightCyan": "#a5fff4",
+    "brightGreen": "#9cfeba",
+    "brightPurple": "#ff92e4",
+    "brightRed": "#ff8988",
+    "brightWhite": "#fdf9f8",
+    "brightYellow": "#fef8eb",
+    "cursorColor": "#f0e5e3",
+    "cyan": "#17e8d9",
+    "foreground": "#f0e5e3",
+    "green": "#11e97e",
+    "name": "Omarchy House",
+    "purple": "#f451d3",
+    "red": "#fe3f50",
+    "selectionBackground": "#511a3d",
+    "white": "#d4c7c5",
+    "yellow": "#ffe5b3"
+}

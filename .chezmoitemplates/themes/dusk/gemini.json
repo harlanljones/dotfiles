@@ -1,0 +1,40 @@
+{
+  "name": "Omarchy Dusk",
+  "type": "custom",
+  "text": {
+    "primary": "#e7e7f0",
+    "secondary": "#9b99a8",
+    "response": "#e7e7f0"
+  },
+  "background": {
+    "primary": "#0e0821",
+    "diff": {
+      "added": "#351e3f",
+      "removed": "#341831"
+    }
+  },
+  "border": {
+    "default": "#422e5f",
+    "focused": "#c98fff"
+  },
+  "ui": {
+    "comment": "#625c89",
+    "symbol": "#9b99a8",
+    "gradient": ["#919afe", "#c98fff", "#ffa28f"]
+  },
+  "Background": "#0e0821",
+  "Foreground": "#e7e7f0",
+  "LightBlue": "#ffa28f",
+  "AccentBlue": "#c98fff",
+  "AccentPurple": "#c98fff",
+  "AccentCyan": "#ffa28f",
+  "AccentGreen": "#ffc390",
+  "AccentYellow": "#ff94dd",
+  "AccentRed": "#fe6f83",
+  "DiffAdded": "#351e3f",
+  "DiffRemoved": "#341831",
+  "Comment": "#625c89",
+  "Gray": "#9b99a8",
+  "DarkGray": "#0b0619",
+  "GradientColors": ["#919afe", "#c98fff", "#ffa28f"]
+}

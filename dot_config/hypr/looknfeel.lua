@@ -53,43 +53,49 @@ hl.config({
 -- Written by Omaland. Safe to hand-edit: Omaland re-reads this block
 -- every time it opens, and only ever rewrites what's between the fences.
 hl.config({
+  animations = {
+    workspace_wraparound = true,
+  },
+
   decoration = {
-    rounding = 16,
+    active_opacity = 0.9,
+    inactive_opacity = 0.7,
+    rounding = 0,
 
     blur = {
-      enabled = false,
-    },
-
-    glow = {
+      brightness = 1.5,
+      contrast = 1,
       enabled = true,
-      range = 10,
-      render_power = 3,
+      passes = 3,
+      vibrancy = 0,
+      vibrancy_darkness = 0,
     },
 
     shadow = {
       enabled = false,
+      range = 6,
     },
   },
 
   general = {
-    border_size = 0,
+    border_size = 2,
     gaps_out = 4,
   },
 })
 
-hl.animation({ leaf = "global", enabled = true, speed = 6.67, bezier = "default" })
-hl.animation({ leaf = "border", enabled = true, speed = 3.59, bezier = "easeOutQuint" })
-hl.animation({ leaf = "windows", enabled = true, speed = 2.53, bezier = "easeOutQuint" })
-hl.animation({ leaf = "windowsIn", enabled = true, speed = 2.73, bezier = "easeOutQuint", style = "popin 87%" })
-hl.animation({ leaf = "windowsOut", enabled = true, speed = 0.99, bezier = "linear", style = "popin 87%" })
-hl.animation({ leaf = "fadeIn", enabled = true, speed = 1.15, bezier = "almostLinear" })
-hl.animation({ leaf = "fadeOut", enabled = true, speed = 0.97, bezier = "almostLinear" })
-hl.animation({ leaf = "fade", enabled = true, speed = 2.02, bezier = "quick" })
+hl.animation({ leaf = "global", enabled = true, speed = 4.55, bezier = "default" })
+hl.animation({ leaf = "border", enabled = true, speed = 2.45, bezier = "easeOutQuint" })
+hl.animation({ leaf = "windows", enabled = true, speed = 1.72, bezier = "easeOutQuint" })
+hl.animation({ leaf = "windowsIn", enabled = true, speed = 1.86, bezier = "easeOutQuint", style = "popin 87%" })
+hl.animation({ leaf = "windowsOut", enabled = true, speed = 0.68, bezier = "linear", style = "popin 87%" })
+hl.animation({ leaf = "fadeIn", enabled = true, speed = 0.79, bezier = "almostLinear" })
+hl.animation({ leaf = "fadeOut", enabled = true, speed = 0.66, bezier = "almostLinear" })
+hl.animation({ leaf = "fade", enabled = true, speed = 1.38, bezier = "quick" })
 hl.animation({ leaf = "fadeSwitch", enabled = false })
-hl.animation({ leaf = "layers", enabled = true, speed = 2.54, bezier = "easeOutQuint" })
-hl.animation({ leaf = "layersIn", enabled = true, speed = 2.67, bezier = "easeOutQuint", style = "fade" })
-hl.animation({ leaf = "layersOut", enabled = true, speed = 1, bezier = "linear", style = "fade" })
-hl.animation({ leaf = "fadeLayersIn", enabled = true, speed = 1.19, bezier = "almostLinear" })
-hl.animation({ leaf = "fadeLayersOut", enabled = true, speed = 0.93, bezier = "almostLinear" })
+hl.animation({ leaf = "layers", enabled = true, speed = 1.73, bezier = "easeOutQuint" })
+hl.animation({ leaf = "layersIn", enabled = true, speed = 1.82, bezier = "easeOutQuint", style = "fade" })
+hl.animation({ leaf = "layersOut", enabled = true, speed = 0.68, bezier = "linear", style = "fade" })
+hl.animation({ leaf = "fadeLayersIn", enabled = true, speed = 0.81, bezier = "almostLinear" })
+hl.animation({ leaf = "fadeLayersOut", enabled = true, speed = 0.63, bezier = "almostLinear" })
 hl.animation({ leaf = "workspaces", enabled = false })
 -- <<< omaland managed block <<<

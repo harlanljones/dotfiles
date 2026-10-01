@@ -63,17 +63,18 @@ if ! omarchy-shell background assignments >/dev/null 2>&1; then
 	exit 0
 fi
 
-# Resolve the current theme background file from its hash.
-hash="$(omarchy theme bg current 2>/dev/null | tr -d '[:space:]' || true)"
-if [[ -z "$hash" ]]; then
-	echo "backdrop-split: no current background set, skipping" >&2
+# Resolve the current theme background file from the live symlink. Omarchy's
+# `theme bg current` returns a display title these days (and themes ship
+# numbered split sets), so the symlink is the only stable source of truth.
+src="$(readlink -f "$HOME/.local/state/omarchy/current/background" 2>/dev/null || true)"
+if [[ -z "$src" || ! -f "$src" ]]; then
+	echo "backdrop-split: no current background file, skipping" >&2
 	exit 0
 fi
-src="$(find "$HOME/.config/omarchy/themes" "$HOME/.cache/omarchy/theme-modes/verified-images" -maxdepth 3 -type f -name "${hash}.*" 2>/dev/null | head -1)"
-if [[ -z "$src" ]]; then
-	echo "backdrop-split: no file for background hash $hash, skipping" >&2
-	exit 0
-fi
+# Key manual tiles to the background's content hash, not its path or
+# display name: the same artwork under a new name reuses its tiles, and a
+# changed artwork never does.
+hash="$(sha1sum -- "$src" | cut -d' ' -f1)"
 # Theme-modes profile backgrounds live as verified cache copies, not theme
 # files; key manual tiles to the same hash either way (dimensions decide).
 

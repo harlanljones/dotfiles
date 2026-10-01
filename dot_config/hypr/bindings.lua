@@ -82,3 +82,8 @@ o.bind("SUPER + SHIFT + L", "Omaplug: bobbynicholas.omaland", "omarchy-shell she
 
 -- Keychron knob: switch between the USB headphones and LG monitor speakers.
 o.bind("F13", "Switch headphones and speakers", "keychron-audio-toggle --headphones alsa_output.usb-TTGK_Technology_Co._Ltd_KM-HIFI-384KHZ-00.analog-stereo --monitor alsa_output.pci-0000_01_00.1.playback.3.0", { locked = true })
+
+-- omaplug-shortcut-start: sero.local-ai
+hl.unbind("SUPER + SHIFT + O")
+o.bind("SUPER + SHIFT + O", "Omaplug: sero.local-ai", "omarchy-shell shell toggle sero.local-ai")
+-- omaplug-shortcut-end: sero.local-ai

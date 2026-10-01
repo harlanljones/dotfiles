@@ -1,0 +1,16 @@
+schemaVersion: 1
+id: house
+label: "Omarchy House"
+appearance: dark
+importedAt: "2026-09-30T00:00:00Z"
+bridgeVersion: "1"
+source:
+  kind: omarchy-public-theme
+  name: "house"
+  repo: "https://github.com/basecamp/omarchy/tree/master/themes/house"
+  colorsSha256: "manual"
+wallpaper:
+  kind: omarchy-public-background
+  originalFile: "background.jpg"
+  repo: "https://github.com/basecamp/omarchy/tree/master/themes/house/backgrounds"
+  note: As in local theme

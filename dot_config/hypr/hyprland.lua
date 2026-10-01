@@ -28,7 +28,6 @@ require("default.hypr.toggles")
 -- Add any other personal Hyprland configuration below.
 -- o.window("qemu", { workspace = "5" })
 
-
 -- >>> omaland managed block >>>
 -- Written by Omaland. Safe to hand-edit: Omaland re-reads this block
 -- every time it opens, and only ever rewrites what's between the fences.

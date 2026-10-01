@@ -21,7 +21,8 @@
 set -euo pipefail
 
 DOTS_THEME="{{ $tname }}"
-DESIRED_SLUG="{{ if and $t $t.source (hasKey $t.source "kind") }}{{ if eq $t.source.kind "omarchy-public-theme" }}{{ $t.source.name }}{{ end }}{{ end }}"
+{{- $isOmarchyTheme := and $t $t.source (hasKey $t.source "kind") (or (eq $t.source.kind "omarchy-public-theme") (eq $t.source.kind "omarchy-colors-toml")) }}
+DESIRED_SLUG="{{ if $isOmarchyTheme }}{{ $t.source.name }}{{ end }}"
 DESIRED_APPEARANCE="{{ if $t }}{{ $t.appearance }}{{ end }}"
 
 if [[ -z "$DESIRED_SLUG" ]]; then

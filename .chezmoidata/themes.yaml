@@ -125,3 +125,29 @@ themes:
     windows:
       accent: "#d87186"
       colorPrevalence: true
+  house:
+    label: "Omarchy House"
+    appearance: dark
+    format: omarchy-v4
+    source:
+      kind: omarchy-public-theme
+      name: "house"
+      repo: "https://github.com/basecamp/omarchy/tree/master/themes/house"
+      colorsSha256: "manual"
+      importedAt: "2026-09-30T00:00:00Z"
+    windows:
+      accent: "#f451d3"
+      colorPrevalence: true
+  dusk:
+    label: "Omarchy Dusk"
+    appearance: dark
+    format: omarchy-v4
+    source:
+      kind: omarchy-colors-toml
+      name: "dusk"
+      repo: "https://github.com/basecamp/omarchy/tree/master/themes/dusk"
+      colorsSha256: "8be53d7a89c3b755a4587924b99181c9fad5c1fb9ff9ee6d4124478717381b49"
+      importedAt: "2026-10-01T17:22:00Z"
+    windows:
+      accent: "#c98fff"
+      colorPrevalence: true
