@@ -153,7 +153,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.claude/themes/omarchy.json` | `dot_claude/themes/omarchy.json.tmpl` | claude code | template |
 | `~/.cline/data/settings/global-settings.json` | `dot_cline/data/settings/global-settings.json` | cline | — |
 | `~/.cline/skills/project-doc-planner` | `dot_cline/skills/symlink_project-doc-planner` | cline | symlink |
-| `~/.codex/hooks.json` | `dot_codex/hooks.json` | codex | — |
+| `~/.codex/hooks.json` | `dot_codex/hooks.json.tmpl` | codex | template |
 | `~/.codex/config.toml` | `dot_codex/modify_private_config.toml` | codex | modify, private |
 | `~/.codex/AGENTS.md` | `dot_codex/private_AGENTS.md` | codex | private |
 | `~/.codex/rules/default.rules` | `dot_codex/rules/default.rules` | codex | — |
@@ -186,7 +186,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.gemini/agents/codebase-memory.md` | `dot_gemini/agents/private_codebase-memory.md` | gemini | private |
 | `~/.gemini/config/hooks.json` | `dot_gemini/config/hooks.json` | gemini | — |
 | `~/.gemini/config/hooks/herdr-agent-metadata.sh` | `dot_gemini/config/hooks/herdr-agent-metadata.sh` | gemini | — |
-| `~/.gemini/config/mcp_config.json` | `dot_gemini/config/mcp_config.json` | gemini | — |
+| `~/.gemini/config/mcp_config.json` | `dot_gemini/config/mcp_config.json.tmpl` | gemini | template |
 | `~/.gemini/config/skills/project-doc-planner` | `dot_gemini/config/skills/symlink_project-doc-planner` | gemini | symlink |
 | `~/.gemini/settings.json` | `dot_gemini/modify_private_settings.json` | gemini | modify, private |
 | `~/.gemini/GEMINI.md` | `dot_gemini/private_GEMINI.md` | gemini | private |

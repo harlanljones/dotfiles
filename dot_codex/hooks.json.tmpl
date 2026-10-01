@@ -4,7 +4,7 @@
     {
         "hooks": [
             {
-                "command": "{ test ! -r '/home/harlan/.codex/herdr-agent-state.sh' || bash '/home/harlan/.codex/herdr-agent-state.sh' session >/dev/null; } && printf '%s\\n' '{}'",
+"command": "{ test ! -r '{{ .chezmoi.homeDir }}/.codex/herdr-agent-state.sh' || bash '{{ .chezmoi.homeDir }}/.codex/herdr-agent-state.sh' session >/dev/null; } && printf '%s\\n' '{}'",
                 "timeout": 10,
                 "type": "command"
             }
@@ -15,8 +15,8 @@
         "hooks": [
             {
                 "type": "command",
-                "command": "'/home/harlan/.local/bin/codebase-memory-mcp' hook-augment",
-                "command_windows": "& '/home/harlan/.local/bin/codebase-memory-mcp' hook-augment",
+                "command": "'{{ .chezmoi.homeDir }}/.local/bin/codebase-memory-mcp' hook-augment",
+                "command_windows": "& '{{ .chezmoi.homeDir }}/.local/bin/codebase-memory-mcp' hook-augment",
                 "timeout": 5
             }
         ]
@@ -28,8 +28,8 @@
         "hooks": [
             {
                 "type": "command",
-                "command": "'/home/harlan/.local/bin/codebase-memory-mcp' hook-augment",
-                "command_windows": "& '/home/harlan/.local/bin/codebase-memory-mcp' hook-augment",
+                "command": "'{{ .chezmoi.homeDir }}/.local/bin/codebase-memory-mcp' hook-augment",
+                "command_windows": "& '{{ .chezmoi.homeDir }}/.local/bin/codebase-memory-mcp' hook-augment",
                 "timeout": 5
             },
             {

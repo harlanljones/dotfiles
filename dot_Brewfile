@@ -10,6 +10,7 @@
 brew "age"
 brew "direnv"
 brew "eza"
+brew "figlet"
 brew "fzf"
 brew "gh"
 brew "lazygit"

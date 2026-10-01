@@ -32,7 +32,7 @@
     }
   },
   "mcpServers": {
-    "codebase-memory-mcp": {"command":"/home/harlan/.local/bin/codebase-memory-mcp","args":[]}
+    "codebase-memory-mcp": {"command":"{{ .chezmoi.homeDir }}/.local/bin/codebase-memory-mcp","args":[]}
   },
   "hooks": {
     "BeforeTool": [
@@ -52,7 +52,7 @@
         "hooks": [
             {
                 "type": "command",
-                "command": "'/home/harlan/.local/bin/codebase-memory-mcp' hook-augment --dialect gemini",
+                "command": "'{{ .chezmoi.homeDir }}/.local/bin/codebase-memory-mcp' hook-augment --dialect gemini",
                 "timeout": 5000
             }
         ]

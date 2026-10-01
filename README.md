@@ -328,7 +328,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   └── skills
 │       └── symlink_project-doc-planner
 ├── dot_codex
-│   ├── hooks.json
+│   ├── hooks.json.tmpl
 │   ├── modify_private_config.toml
 │   ├── private_AGENTS.md
 │   ├── rules
@@ -514,7 +514,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   ├── hooks
 │   │   │   └── herdr-agent-metadata.sh
 │   │   ├── hooks.json
-│   │   ├── mcp_config.json
+│   │   ├── mcp_config.json.tmpl
 │   │   └── skills
 │   │       └── symlink_project-doc-planner
 │   ├── modify_private_settings.json
