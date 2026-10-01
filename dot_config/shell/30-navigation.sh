@@ -44,7 +44,13 @@ if [ "$SHELL_KIND" = zsh ]; then
   zle -N zp-widget
   bindkey '\ez' zp-widget
   bindkey '\ex' zj-widget
-  compdef _zoxide zj
+  # `compdef` exists only after the zsh completion system (compinit) has been
+  # initialized; this repo never runs compinit itself, so register the
+  # completion only when something else has -- avoids "command not found"
+  # noise on every new shell.
+  if whence -w compdef >/dev/null 2>&1; then
+    compdef _zoxide zj
+  fi
 else
   bind -x '"\ez": zp'
   bind -x '"\ex": zj'

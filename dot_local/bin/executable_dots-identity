@@ -124,14 +124,26 @@ _mini_font() {
 }
 
 render_wordmark() {
-  local name=$1 target_lines=${2:-27} target_cols=${3:-95} wordmark
-  # Use Roman FIGlet when height >= 30 AND width >= 92 to avoid vertical overflow or wrapping
-  if (( target_lines >= 30 && target_cols >= 92 )) && command -v figlet >/dev/null 2>&1; then
-    wordmark=$(figlet -w 200 -f "$HOME/.local/share/figlet/Roman.flf" "$name" 2>/dev/null) || true
+  local name=$1 target_lines=${2:-27} target_cols=${3:-95} wordmark wm_width
+  # Roman FIGlet wordmark whenever the window can actually hold it: enough
+  # rows, and the wordmark's real rendered width (measured from the art, not
+  # a fixed 92-col guess) fits. The old fixed 30-row/92-col gate hid the
+  # wordmark on every laptop-sized window even for short names like "hadrian"
+  # (~70 cols wide).
+  if (( target_lines >= 26 )) && command -v figlet >/dev/null 2>&1; then
+    # Roman.flf pads the art with trailing blank rows that would push the
+    # banner off short windows -- drop them.
+    wordmark=$(figlet -w 200 -f "$HOME/.local/share/figlet/Roman.flf" "$name" 2>/dev/null \
+      | awk '{ lines[++n] = $0 }
+             END { while (n > 0 && lines[n] ~ /^[[:space:]]*$/) n--; for (i = 1; i <= n; i++) print lines[i] }') || wordmark=''
   fi
   if [[ -n "${wordmark:-}" ]]; then
-    printf '%s\n' "$wordmark"
-    return
+    wm_width=$(printf '%s\n' "$wordmark" | awk 'length($0) > m { m = length($0) } END { print m + 0 }')
+    if (( wm_width + 2 <= target_cols )); then
+      printf '%s\n' "$wordmark"
+      return
+    fi
+    wordmark=''
   fi
   local upper row1='' row2='' row3='' ch art
   upper=$(printf '%s' "$name" | tr '[:lower:]' '[:upper:]')
