@@ -305,7 +305,7 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   └── Current.xml
 │   ├── machine-theme-name.tmpl
 │   ├── theme-palette.tmpl
-│   └── themes/ (121 files across 13 themes — see .chezmoidata/themes.yaml)
+│   └── themes/ (143 files across 15 themes — see .chezmoidata/themes.yaml)
 ├── .hermes.md
 ├── .yamllint.yml
 ├── DECISIONS.md
@@ -446,6 +446,8 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │   │   ├── defaults
 │   │   │   └── agent.tmpl
 │   │   └── hooks
+│   │       ├── post-boot.d
+│   │       │   └── executable_backdrop-split
 │   │       └── theme-set.d
 │   │           └── executable_backdrop-split
 │   ├── opencode
@@ -599,6 +601,6 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 ├── run_* apply hooks (26 — see INDEX.md § Apply hooks for trigger/phase)
 ├── tests
 │   └── test-dev.sh
-└── theme-assets/ (8 files across 8 wallpaper sets)
+└── theme-assets/ (9 files across 9 wallpaper sets)
 ```
 <!-- END REPO TREE -->

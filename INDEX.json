@@ -3,13 +3,13 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 431,
+    "total": 455,
     "by_category": {
       "shell": 20,
       "prompt": 1,
       "terminal": 7,
       "editor": 19,
-      "desktop": 11,
+      "desktop": 12,
       "vcs": 6,
       "navigation": 3,
       "toolchain": 5,
@@ -17,7 +17,7 @@
       "services": 21,
       "scripts": 44,
       "security": 2,
-      "other": 168,
+      "other": 191,
       "hooks": 26,
       "chezmoi": 12,
       "repo": 34
@@ -559,6 +559,16 @@
       "category": "desktop",
       "attributes": [
         "template"
+      ],
+      "subsystem": "omarchy"
+    },
+    {
+      "source": "dot_config/omarchy/hooks/post-boot.d/executable_backdrop-split",
+      "target": "~/.config/omarchy/hooks/post-boot.d/backdrop-split",
+      "kind": "dotfile",
+      "category": "desktop",
+      "attributes": [
+        "executable"
       ],
       "subsystem": "omarchy"
     },
@@ -1969,8 +1979,162 @@
       ]
     },
     {
+      "source": ".chezmoitemplates/themes/dusk/bat.tmTheme",
+      "target": "~/.chezmoitemplates/themes/dusk/bat.tmTheme",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/dusk/colors.toml",
+      "target": "~/.chezmoitemplates/themes/dusk/colors.toml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/dusk/delta.gitconfig",
+      "target": "~/.chezmoitemplates/themes/dusk/delta.gitconfig",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/dusk/eza.yml",
+      "target": "~/.chezmoitemplates/themes/dusk/eza.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/dusk/fzf.sh",
+      "target": "~/.chezmoitemplates/themes/dusk/fzf.sh",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/dusk/gemini.json",
+      "target": "~/.chezmoitemplates/themes/dusk/gemini.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/dusk/lazygit.yml",
+      "target": "~/.chezmoitemplates/themes/dusk/lazygit.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/dusk/manifest.yaml",
+      "target": "~/.chezmoitemplates/themes/dusk/manifest.yaml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/dusk/nvim.lua",
+      "target": "~/.chezmoitemplates/themes/dusk/nvim.lua",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/dusk/windows_terminal.json",
+      "target": "~/.chezmoitemplates/themes/dusk/windows_terminal.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/dusk/zebar.css",
+      "target": "~/.chezmoitemplates/themes/dusk/zebar.css",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
       "source": ".chezmoitemplates/themes/gen-6bd5de2cd3e4/windows_terminal.json",
       "target": "~/.chezmoitemplates/themes/gen-6bd5de2cd3e4/windows_terminal.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/house/bat.tmTheme",
+      "target": "~/.chezmoitemplates/themes/house/bat.tmTheme",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/house/colors.toml",
+      "target": "~/.chezmoitemplates/themes/house/colors.toml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/house/delta.gitconfig",
+      "target": "~/.chezmoitemplates/themes/house/delta.gitconfig",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/house/eza.yml",
+      "target": "~/.chezmoitemplates/themes/house/eza.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/house/fzf.sh",
+      "target": "~/.chezmoitemplates/themes/house/fzf.sh",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/house/gemini.json",
+      "target": "~/.chezmoitemplates/themes/house/gemini.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/house/lazygit.yml",
+      "target": "~/.chezmoitemplates/themes/house/lazygit.yml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/house/manifest.yaml",
+      "target": "~/.chezmoitemplates/themes/house/manifest.yaml",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/house/nvim.lua",
+      "target": "~/.chezmoitemplates/themes/house/nvim.lua",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/house/windows_terminal.json",
+      "target": "~/.chezmoitemplates/themes/house/windows_terminal.json",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": ".chezmoitemplates/themes/house/zebar.css",
+      "target": "~/.chezmoitemplates/themes/house/zebar.css",
       "kind": "dotfile",
       "category": "other",
       "attributes": []
@@ -2985,6 +3149,13 @@
     {
       "source": "tests/test-dev.sh",
       "target": "~/tests/test-dev.sh",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "theme-assets/dusk/wallpaper.png",
+      "target": "~/theme-assets/dusk/wallpaper.png",
       "kind": "dotfile",
       "category": "other",
       "attributes": []

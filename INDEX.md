@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**431 tracked entries** across 16 categories.
+**455 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -17,7 +17,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Prompt](#prompt) | 1 |
 | [Terminal & multiplexer](#terminal--multiplexer) | 7 |
 | [Editors](#editors) | 19 |
-| [Desktop & window manager](#desktop--window-manager) | 11 |
+| [Desktop & window manager](#desktop--window-manager) | 12 |
 | [Version control](#version-control) | 6 |
 | [Navigation & search](#navigation--search) | 3 |
 | [Toolchain & packages](#toolchain--packages) | 5 |
@@ -25,7 +25,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Background services](#background-services) | 21 |
 | [Custom executables](#custom-executables) | 44 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Other configuration](#other-configuration) | 168 |
+| [Other configuration](#other-configuration) | 191 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 26 |
 | [Chezmoi control files](#chezmoi-control-files) | 12 |
 | [Repository material (not applied)](#repository-material-not-applied) | 34 |
@@ -112,6 +112,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/hypr/monitors.lua` | `dot_config/hypr/monitors.lua` | hyprland | — |
 | `~/.config/omarchy/shell.json` | `dot_config/omarchy/create_private_shell.json.tmpl` | omarchy | create, private, template |
 | `~/.config/omarchy/defaults/agent` | `dot_config/omarchy/defaults/agent.tmpl` | omarchy | template |
+| `~/.config/omarchy/hooks/post-boot.d/backdrop-split` | `dot_config/omarchy/hooks/post-boot.d/executable_backdrop-split` | omarchy | executable |
 | `~/.config/omarchy/hooks/theme-set.d/backdrop-split` | `dot_config/omarchy/hooks/theme-set.d/executable_backdrop-split` | omarchy | executable |
 | `~/.local/share/applications/cursor-desktop.desktop` | `dot_local/share/applications/cursor-desktop.desktop` | desktop entries | — |
 
@@ -303,7 +304,29 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.chezmoitemplates/littlebigmouse/Current.xml` | `.chezmoitemplates/littlebigmouse/Current.xml` | — | — |
 | `~/.chezmoitemplates/machine-theme-name` | `.chezmoitemplates/machine-theme-name.tmpl` | — | template |
 | `~/.chezmoitemplates/theme-palette` | `.chezmoitemplates/theme-palette.tmpl` | — | template |
+| `~/.chezmoitemplates/themes/dusk/bat.tmTheme` | `.chezmoitemplates/themes/dusk/bat.tmTheme` | — | — |
+| `~/.chezmoitemplates/themes/dusk/colors.toml` | `.chezmoitemplates/themes/dusk/colors.toml` | — | — |
+| `~/.chezmoitemplates/themes/dusk/delta.gitconfig` | `.chezmoitemplates/themes/dusk/delta.gitconfig` | — | — |
+| `~/.chezmoitemplates/themes/dusk/eza.yml` | `.chezmoitemplates/themes/dusk/eza.yml` | — | — |
+| `~/.chezmoitemplates/themes/dusk/fzf.sh` | `.chezmoitemplates/themes/dusk/fzf.sh` | — | — |
+| `~/.chezmoitemplates/themes/dusk/gemini.json` | `.chezmoitemplates/themes/dusk/gemini.json` | — | — |
+| `~/.chezmoitemplates/themes/dusk/lazygit.yml` | `.chezmoitemplates/themes/dusk/lazygit.yml` | — | — |
+| `~/.chezmoitemplates/themes/dusk/manifest.yaml` | `.chezmoitemplates/themes/dusk/manifest.yaml` | — | — |
+| `~/.chezmoitemplates/themes/dusk/nvim.lua` | `.chezmoitemplates/themes/dusk/nvim.lua` | — | — |
+| `~/.chezmoitemplates/themes/dusk/windows_terminal.json` | `.chezmoitemplates/themes/dusk/windows_terminal.json` | — | — |
+| `~/.chezmoitemplates/themes/dusk/zebar.css` | `.chezmoitemplates/themes/dusk/zebar.css` | — | — |
 | `~/.chezmoitemplates/themes/gen-6bd5de2cd3e4/windows_terminal.json` | `.chezmoitemplates/themes/gen-6bd5de2cd3e4/windows_terminal.json` | — | — |
+| `~/.chezmoitemplates/themes/house/bat.tmTheme` | `.chezmoitemplates/themes/house/bat.tmTheme` | — | — |
+| `~/.chezmoitemplates/themes/house/colors.toml` | `.chezmoitemplates/themes/house/colors.toml` | — | — |
+| `~/.chezmoitemplates/themes/house/delta.gitconfig` | `.chezmoitemplates/themes/house/delta.gitconfig` | — | — |
+| `~/.chezmoitemplates/themes/house/eza.yml` | `.chezmoitemplates/themes/house/eza.yml` | — | — |
+| `~/.chezmoitemplates/themes/house/fzf.sh` | `.chezmoitemplates/themes/house/fzf.sh` | — | — |
+| `~/.chezmoitemplates/themes/house/gemini.json` | `.chezmoitemplates/themes/house/gemini.json` | — | — |
+| `~/.chezmoitemplates/themes/house/lazygit.yml` | `.chezmoitemplates/themes/house/lazygit.yml` | — | — |
+| `~/.chezmoitemplates/themes/house/manifest.yaml` | `.chezmoitemplates/themes/house/manifest.yaml` | — | — |
+| `~/.chezmoitemplates/themes/house/nvim.lua` | `.chezmoitemplates/themes/house/nvim.lua` | — | — |
+| `~/.chezmoitemplates/themes/house/windows_terminal.json` | `.chezmoitemplates/themes/house/windows_terminal.json` | — | — |
+| `~/.chezmoitemplates/themes/house/zebar.css` | `.chezmoitemplates/themes/house/zebar.css` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/bat.tmTheme` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/bat.tmTheme` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/colors.toml` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/colors.toml` | — | — |
 | `~/.chezmoitemplates/themes/omarchy-catppuccin-latte/delta.gitconfig` | `.chezmoitemplates/themes/omarchy-catppuccin-latte/delta.gitconfig` | — | — |
@@ -447,6 +470,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/install.sh` | `install.sh` | — | — |
 | `~/lib/dots-ui.sh` | `lib/dots-ui.sh` | — | — |
 | `~/tests/test-dev.sh` | `tests/test-dev.sh` | — | — |
+| `~/theme-assets/dusk/wallpaper.png` | `theme-assets/dusk/wallpaper.png` | — | — |
 | `~/theme-assets/omarchy-catppuccin-latte/wallpaper.png` | `theme-assets/omarchy-catppuccin-latte/wallpaper.png` | — | — |
 | `~/theme-assets/omarchy-catppuccin/wallpaper.png` | `theme-assets/omarchy-catppuccin/wallpaper.png` | — | — |
 | `~/theme-assets/omarchy-everforest/wallpaper.png` | `theme-assets/omarchy-everforest/wallpaper.png` | — | — |
