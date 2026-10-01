@@ -3,7 +3,7 @@
   "schemaVersion": 1,
   "generator": "docs/generate_index.py",
   "summary": {
-    "total": 430,
+    "total": 431,
     "by_category": {
       "shell": 20,
       "prompt": 1,
@@ -17,7 +17,7 @@
       "services": 21,
       "scripts": 44,
       "security": 2,
-      "other": 167,
+      "other": 168,
       "hooks": 26,
       "chezmoi": 12,
       "repo": 34
@@ -2943,6 +2943,13 @@
     {
       "source": "dot_local/share/figlet/Roman.flf",
       "target": "~/.local/share/figlet/Roman.flf",
+      "kind": "dotfile",
+      "category": "other",
+      "attributes": []
+    },
+    {
+      "source": "dot_local/share/figlet/small.flf",
+      "target": "~/.local/share/figlet/small.flf",
       "kind": "dotfile",
       "category": "other",
       "attributes": []

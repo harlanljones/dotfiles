@@ -9,7 +9,7 @@
 Machine-readable equivalent: [`INDEX.json`](INDEX.json) — that is the file
 agents and the showcase app should read. This page is the same data for humans.
 
-**430 tracked entries** across 16 categories.
+**431 tracked entries** across 16 categories.
 
 | Category | Entries |
 | --- | ---: |
@@ -25,7 +25,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | [Background services](#background-services) | 21 |
 | [Custom executables](#custom-executables) | 44 |
 | [Credentials & SSH](#credentials--ssh) | 2 |
-| [Other configuration](#other-configuration) | 167 |
+| [Other configuration](#other-configuration) | 168 |
 | [Apply hooks (`run_*`)](#apply-hooks-run) | 26 |
 | [Chezmoi control files](#chezmoi-control-files) | 12 |
 | [Repository material (not applied)](#repository-material-not-applied) | 34 |
@@ -441,6 +441,7 @@ agents and the showcase app should read. This page is the same data for humans.
 | `~/.config/fzf/theme.sh` | `dot_config/fzf/theme.sh.tmpl` | — | template |
 | `~/.local/share/figlet/README.md` | `dot_local/share/figlet/README.md` | — | — |
 | `~/.local/share/figlet/Roman.flf` | `dot_local/share/figlet/Roman.flf` | — | — |
+| `~/.local/share/figlet/small.flf` | `dot_local/share/figlet/small.flf` | — | — |
 | `~/.local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch` | `dot_local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch` | — | — |
 | `~/.local/share/wsl-ssh-bridge/main.go` | `dot_local/share/wsl-ssh-bridge/main.go` | — | — |
 | `~/install.sh` | `install.sh` | — | — |

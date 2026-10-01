@@ -573,7 +573,8 @@ The index file `INDEX.md` is generated automatically by `docs/generate_index.py`
 │       │   └── cursor-desktop.desktop
 │       ├── figlet
 │       │   ├── README.md
-│       │   └── Roman.flf
+│       │   ├── Roman.flf
+│       │   └── small.flf
 │       ├── omarchy-patches
 │       │   └── io.github.codesmith28.omalt-tab-compact.patch
 │       └── wsl-ssh-bridge
