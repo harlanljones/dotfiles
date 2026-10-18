@@ -23,6 +23,10 @@ flatpak
 libratbag
 tailscale
 
+# backdrop-split --interactive tile picker
+python-pillow
+tk
+
 # Dotfiles tooling
 git-lfs
 yadm

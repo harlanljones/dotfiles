@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Omarchy theme-set hook: re-split the new theme's background across the
+# monitors and re-assign the segments. Receives the snake-cased theme name
+# as $1 (unused here — backdrop-split reads the fresh background itself).
+"$HOME/.local/bin/backdrop-split" "$@"
