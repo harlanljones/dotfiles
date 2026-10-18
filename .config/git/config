@@ -27,4 +27,44 @@
 	enabled = true           # Record and reuse conflict resolutions
 	autoupdate = true        # Apply stored conflict resolutions automatically
 [include]
-	path = identity          # user.name/email, rendered by yadm bootstrap from 1Password
+	path = identity          # user.name/email/signingkey, rendered by yadm bootstrap from 1Password
+
+# Sign commits with the 1Password Agents vault key (op-ssh-sign asks 1Password).
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = /opt/1Password/op-ssh-sign
+	allowedSignersFile = ~/.config/git/allowed_signers  # rendered by yadm bootstrap
+[commit]
+	gpgsign = true
+
+# Use gh (from mise) for HTTPS GitHub credentials.
+[credential "https://github.com"]
+	helper =
+	helper = !~/.local/share/mise/shims/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !~/.local/share/mise/shims/gh auth git-credential
+
+# Global hooks: Conventional Commit check and gitleaks before push. This turns
+# off each repo's own .git/hooks; a repo that sets its own core.hooksPath
+# (like the yadm repo) keeps it.
+[core]
+	fsmonitor = true
+	untrackedCache = true
+	hooksPath = ~/.config/git/hooks
+	pager = delta
+[status]
+	showUntrackedFiles = normal
+[advice]
+	statusUoption = false
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+[merge]
+	conflictstyle = zdiff3
+
+# Untracked machine-local overrides; git skips the include if it's missing.
+[include]
+	path = ~/.gitconfig.local

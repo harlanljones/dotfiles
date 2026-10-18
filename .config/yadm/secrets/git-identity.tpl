@@ -2,3 +2,4 @@
 [user]
 	name = {{ op://Agents/git-identity/name }}
 	email = {{ op://Agents/git-identity/email }}
+	signingkey = {{ op://Agents/SSH Key/public key }}

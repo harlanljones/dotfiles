@@ -1,0 +1,2 @@
+# Global gitignore (core.excludesFile defaults to this path).
+**/.claude/settings.local.json

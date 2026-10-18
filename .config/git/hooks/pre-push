@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Gitleaks pre-push hook: scan outgoing commits before they leave the machine.
+# Wired via core.hooksPath in ~/.config/git/config, so it applies to every
+# repo except those that set their own core.hooksPath (the yadm repo does).
+set -euo pipefail
+
+# Degrade gracefully: a machine without gitleaks still pushes, with a warning.
+if ! command -v gitleaks >/dev/null 2>&1; then
+	echo "pre-push: gitleaks not installed; skipping secret scan (see ~/.config/mise/config.toml)" >&2
+	exit 0
+fi
+
+zero=0000000000000000000000000000000000000000
+ranges=()
+
+while read -r _local_ref local_sha _remote_ref remote_sha; do
+	# Ref deletion: git zeroes the LOCAL sha (field 2) and sends "(delete)" as
+	# the local ref; nothing new is pushed.
+	if [[ "$local_sha" == "$zero" ]]; then
+		continue
+	fi
+	# Remote sha zero means the ref does not exist remotely yet (new branch or
+	# first push), so scan every commit that is not already on the remote.
+	# NOT "--not --all": that excludes the ref being pushed too, since its own
+	# commits are reachable from the local branch, which scans nothing at all.
+	if [[ "$remote_sha" == "$zero" ]]; then
+		# git-log ranges, not bare SHAs: gitleaks hands --log-opts straight to
+		# git log, which handles "--not --remotes" natively.
+		ranges+=("$local_sha --not --remotes")
+	else
+		ranges+=("$remote_sha..$local_sha")
+	fi
+done
+
+# No-op-safe: zero-diff or ref-deletion-only push leaves nothing to scan.
+if [[ ${#ranges[@]} -eq 0 ]]; then
+	exit 0
+fi
+
+echo "pre-push: running gitleaks on outgoing commits"
+# One invocation per range: joining several ranges into a single --log-opts lets
+# git's "--not" negate the LATER revisions too, which silently scanned nothing on
+# a multi-ref push (git push --all / git push origin a b).
+status=0
+for range in "${ranges[@]}"; do
+	gitleaks git --log-opts="$range" --no-banner --redact --exit-code 1 || status=1
+done
+
+if [[ "$status" -ne 0 ]]; then
+	echo "pre-push: gitleaks failed" >&2
+	exit 1
+fi
