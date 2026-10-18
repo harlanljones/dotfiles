@@ -27,3 +27,6 @@ require("default.hypr.toggles")
 
 -- Add any other personal Hyprland configuration below.
 -- o.window("qemu", { workspace = "5" })
+
+-- OOTP 27 (Proton) breaks when the tiler resizes its window at startup; give it the whole monitor.
+o.window("^steam_app_4045750$", { fullscreen = true })
