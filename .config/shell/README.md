@@ -13,6 +13,7 @@ zoxide, fzf, the default aliases) and ends with a loader that sources every
 | `30-navigation.sh` | `zj` / `zp` zoxide pickers on Alt-X / Alt-Z |
 | `40-aliases.sh` | Listing, git, yadm, mise and agent aliases; `opr` |
 | `60-prompt.sh` | Starship prompt turns red after a failed command |
+| `61-splash.sh` | fastfetch banner on every interactive shell; `clear` redraws it |
 | `70-cloud.sh` | gcloud configuration switching |
 | `80-local.sh` | Sources the untracked `local.sh` last |
 

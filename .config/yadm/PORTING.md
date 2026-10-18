@@ -31,7 +31,7 @@ Rules while porting:
 - [x] **drop** `~/.bash_profile` <sub>`dot_bash_profile`</sub> — stock is fine; no cargo here (2026-10-18)
 - [x] **done** `~/.bashrc` <sub>`dot_bashrc`</sub> — stock Omarchy .bashrc plus a module loader; installer leftovers dropped (2026-10-18)
 - [x] **done** `~/.config/environment.d/10-defaults.conf` <sub>`dot_config/environment.d/10-defaults.conf`</sub> — ported (2026-10-18)
-- [ ] **rewrite** `~/.config/environment.d/10-machine.conf` (template → esh `##template.esh` or plain file) <sub>`dot_config/environment.d/10-machine.conf.tmpl`</sub>
+- [x] **drop** `~/.config/environment.d/10-machine.conf` (template → esh `##template.esh` or plain file) <sub>`dot_config/environment.d/10-machine.conf.tmpl`</sub> — only dots-identity read it (2026-10-18)
 - [x] **done** `~/.config/shell/00-env.sh` <sub>`dot_config/shell/00-env.sh`</sub> — EDITOR/VISUAL=nvim; PATH handled by Omarchy and mise (2026-10-18)
 - [x] **drop** `~/.config/shell/05-omarchy-detect.sh` <sub>`dot_config/shell/05-omarchy-detect.sh`</sub> — stock .bashrc loads Omarchy's rc (2026-10-18)
 - [x] **done** `~/.config/shell/10-tools.sh` <sub>`dot_config/shell/10-tools.sh`</sub> — ported; MANPAGER left to Omarchy (2026-10-18)
@@ -43,7 +43,7 @@ Rules while porting:
 - [ ] **port** `~/.config/shell/50-agents.sh` <sub>`dot_config/shell/50-agents.sh`</sub>
 - [x] **drop** `~/.config/shell/55-apps.sh` <sub>`dot_config/shell/55-apps.sh`</sub> — WebKit fix not wanted; ft and chrome-profile not installed (2026-10-18)
 - [x] **done** `~/.config/shell/60-prompt.sh` <sub>`dot_config/shell/60-prompt.sh`</sub> — bash branch only (2026-10-18)
-- [ ] **port** `~/.config/shell/61-splash.sh` <sub>`dot_config/shell/61-splash.sh`</sub>
+- [x] **done** `~/.config/shell/61-splash.sh` <sub>`dot_config/shell/61-splash.sh`</sub> — fastfetch banner instead of dots-identity (2026-10-18)
 - [x] **drop** `~/.config/shell/65-theme.sh` <sub>`dot_config/shell/65-theme.sh`</sub> — Vespasian only (2026-10-18)
 - [x] **done** `~/.config/shell/70-cloud.sh` <sub>`dot_config/shell/70-cloud.sh`</sub> — gcp switchers; SDK and flyctl paths dropped (2026-10-18)
 - [x] **drop** `~/.config/shell/75-tool-paths.sh` <sub>`dot_config/shell/75-tool-paths.sh`</sub> — opencode and grok live in ~/.local/bin (2026-10-18)
@@ -182,7 +182,7 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 - [ ] **port** `~/.local/bin/cursor` <sub>`dot_local/bin/executable_cursor`</sub>
 - [ ] **drop** `~/.local/bin/dots` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots`</sub>
 - [ ] **drop** `~/.local/bin/dots-cloud-status` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-cloud-status`</sub>
-- [ ] **drop** `~/.local/bin/dots-identity` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-identity`</sub>
+- [x] **drop** `~/.local/bin/dots-identity` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-identity`</sub> — replaced by fastfetch (2026-10-18)
 - [ ] **drop** `~/.local/bin/dots-push` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-push`</sub>
 - [ ] **drop** `~/.local/bin/dots-theme-agents` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-theme-agents`</sub>
 - [ ] **drop** `~/.local/bin/dots-theme-import-aether` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-theme-import-aether`</sub>
