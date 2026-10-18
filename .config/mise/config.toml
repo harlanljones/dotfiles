@@ -22,6 +22,7 @@ codex = "latest"
 gemini = { version = "latest", allow_builds = ["@github/keytar", "node-pty"] }
 gh = "latest"
 gitleaks = "latest"
+"npm:@xai-official/grok" = "latest"
 "npm:playwright" = "latest"
 
 [settings]

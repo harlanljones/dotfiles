@@ -260,11 +260,11 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 
 ## Grok
 
-- [ ] **rewrite** `~/.grok/config.toml` (`modify_` merge → jq/yq step in bootstrap) <sub>`dot_grok/modify_config.toml`</sub>
+- [x] **skip** `~/.grok/config.toml` (`modify_` merge → jq/yq step in bootstrap) <sub>`dot_grok/modify_config.toml`</sub> — only held herdr's status-line bridge (2026-10-18)
 - [x] **skip** `~/.grok/hooks/herdr-agent-metadata.sh` <sub>`dot_grok/hooks/executable_herdr-agent-metadata.sh`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [x] **skip** `~/.grok/hooks/herdr-agent-state.sh` <sub>`dot_grok/hooks/executable_herdr-agent-state.sh`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [x] **skip** `~/.grok/hooks/herdr.json` <sub>`dot_grok/hooks/herdr.json`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
-- [ ] **port** `~/.grokbot/settings.json` (chmod 600/700 in bootstrap) <sub>`private_dot_grokbot/settings.json`</sub>
+- [x] **skip** `~/.grokbot/settings.json` (chmod 600/700 in bootstrap) <sub>`private_dot_grokbot/settings.json`</sub> — desktop app not installed; Grok CLI comes from mise (2026-10-18)
 
 ## OpenCode
 
