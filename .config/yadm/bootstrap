@@ -8,7 +8,7 @@
 # accepts --dry-run.)
 #
 # Steps: repo config (hooks, excludes) -> Git LFS -> packages -> mise ->
-# Omarchy plugins and their patches -> secrets from 1Password -> print the
+# mouse DPI -> Omarchy plugins and their patches -> secrets from 1Password -> print the
 # manual steps in SETUP.md.
 set -euo pipefail
 
@@ -97,6 +97,16 @@ install_packages() {
     return
   fi
   run omarchy pkg add "${pkgs[@]}"
+}
+
+# Mouse DPI lives in the mouse's onboard memory, so re-assert it here.
+set_mouse_dpi() {
+  step "Mouse DPI"
+  if ! command -v mouse-dpi >/dev/null 2>&1; then
+    warn "mouse-dpi not on PATH; skipping"
+    return
+  fi
+  run mouse-dpi || warn "mouse-dpi failed"
 }
 
 install_mise_tools() {
@@ -216,6 +226,7 @@ configure_repo
 setup_lfs
 install_packages
 install_mise_tools
+set_mouse_dpi
 install_omarchy_plugins
 provision_secrets
 
