@@ -18,6 +18,10 @@ edk2-ovmf
 qemu-system-x86
 virtiofsd
 
+# Shell
+atuin
+direnv
+
 # System and networking
 flatpak
 libratbag
