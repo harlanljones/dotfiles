@@ -268,19 +268,19 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 
 ## OpenCode
 
-- [ ] **port** `~/.config/opencode/.gitignore` <sub>`dot_config/opencode/dot_gitignore`</sub>
-- [ ] **port** `~/.config/opencode/AGENTS.md` (chmod 600/700 in bootstrap) <sub>`dot_config/opencode/private_AGENTS.md`</sub>
-- [ ] **port** `~/.config/opencode/agents/codebase-memory-auditor.md` (chmod 600/700 in bootstrap) <sub>`dot_config/opencode/agents/private_codebase-memory-auditor.md`</sub>
-- [ ] **port** `~/.config/opencode/agents/codebase-memory-scout.md` (chmod 600/700 in bootstrap) <sub>`dot_config/opencode/agents/private_codebase-memory-scout.md`</sub>
-- [ ] **port** `~/.config/opencode/agents/codebase-memory.md` (chmod 600/700 in bootstrap) <sub>`dot_config/opencode/agents/private_codebase-memory.md`</sub>
-- [ ] **rewrite** `~/.config/opencode/opencode.json` (encrypted → `secrets.list` + op:// template) <sub>`dot_config/opencode/encrypted_opencode.json.age`</sub>
+- [x] **done** `~/.config/opencode/.gitignore` <sub>`dot_config/opencode/dot_gitignore`</sub> — ported (2026-10-18)
+- [x] **done** `~/.config/opencode/AGENTS.md` (chmod 600/700 in bootstrap) <sub>`dot_config/opencode/private_AGENTS.md`</sub> — codebase-memory installer writes it (2026-10-18)
+- [x] **done** `~/.config/opencode/agents/codebase-memory-auditor.md` (chmod 600/700 in bootstrap) <sub>`dot_config/opencode/agents/private_codebase-memory-auditor.md`</sub> — codebase-memory installer writes it (2026-10-18)
+- [x] **done** `~/.config/opencode/agents/codebase-memory-scout.md` (chmod 600/700 in bootstrap) <sub>`dot_config/opencode/agents/private_codebase-memory-scout.md`</sub> — codebase-memory installer writes it (2026-10-18)
+- [x] **done** `~/.config/opencode/agents/codebase-memory.md` (chmod 600/700 in bootstrap) <sub>`dot_config/opencode/agents/private_codebase-memory.md`</sub> — codebase-memory installer writes it (2026-10-18)
+- [x] **done** `~/.config/opencode/opencode.json` (encrypted → `secrets.list` + op:// template) <sub>`dot_config/opencode/encrypted_opencode.json.age`</sub> — Augustus's was age-encrypted and unreadable; started fresh from Omarchy's, plus the codebase-memory MCP (2026-10-18)
 - [x] **skip** `~/.config/opencode/plugins/herdr-agent-metadata.js` <sub>`dot_config/opencode/plugins/herdr-agent-metadata.js`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [x] **skip** `~/.config/opencode/plugins/herdr-subagents.js` <sub>`dot_config/opencode/plugins/herdr-subagents.js`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [x] **skip** `~/.config/opencode/skills/opencode-go-usage/SKILL.md` <sub>`dot_config/opencode/skills/opencode-go-usage/SKILL.md`</sub> — skills left to Tern (2026-10-18)
 - [x] **skip** `~/.config/opencode/skills/project-doc-planner` (keep as symlink) <sub>`dot_config/opencode/skills/symlink_project-doc-planner`</sub> — skills left to Tern (2026-10-18)
-- [ ] **rewrite** `~/.config/opencode/themes/dots.json` (template → esh `##template.esh` or plain file) <sub>`dot_config/opencode/themes/dots.json.tmpl`</sub>
-- [ ] **port** `~/.config/opencode/tui.json` <sub>`dot_config/opencode/tui.json`</sub>
-- [ ] **port** `~/.config/opencode/tui.jsonc` <sub>`dot_config/opencode/tui.jsonc`</sub>
+- [x] **drop** `~/.config/opencode/themes/dots.json` (template → esh `##template.esh` or plain file) <sub>`dot_config/opencode/themes/dots.json.tmpl`</sub> — the system theme follows the terminal, which Omarchy themes (2026-10-18)
+- [x] **drop** `~/.config/opencode/tui.json` <sub>`dot_config/opencode/tui.json`</sub> — same as the system theme setting already in place (2026-10-18)
+- [x] **drop** `~/.config/opencode/tui.jsonc` <sub>`dot_config/opencode/tui.jsonc`</sub> — dots theme and herdr plugin not needed (2026-10-18)
 
 ## Hermes
 

@@ -1,5 +1,8 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "theme": "system",
-  "autoupdate": false
+  "autoupdate": false,
+  "mcp": {
+    "codebase-memory-mcp": {"command":["/home/harlan/.local/bin/codebase-memory-mcp"],"type":"local"}
+  }
 }
