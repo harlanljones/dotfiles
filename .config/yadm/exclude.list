@@ -1,0 +1,17 @@
+# Paths that must never be committed. bootstrap copies these into the repo's
+# info/exclude. This is a convenience: the gitleaks hooks and a review before
+# every push are the real guards for this public repo.
+.ssh/id_*
+.claude/.credentials.json
+.claude.json
+.config/1Password/*
+!.config/1Password/ssh/
+.config/1Password/ssh/*
+!.config/1Password/ssh/agent.toml
+.config/chromium/
+.config/tern/account.lock
+.cache/
+.local/state/
+.local/share/keyrings/
+.local/share/tern/
+.config/yadm/notes/

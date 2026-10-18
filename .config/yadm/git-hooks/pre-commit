@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+# Block commits that stage secrets. This repo is public, so fail closed when
+# gitleaks is unavailable rather than letting the commit through unscanned.
+set -euo pipefail
+
+gitleaks_bin=$(command -v gitleaks || true)
+if [[ -z $gitleaks_bin && -x $HOME/.local/share/mise/shims/gitleaks ]]; then
+  gitleaks_bin=$HOME/.local/share/mise/shims/gitleaks
+fi
+
+if [[ -z $gitleaks_bin ]]; then
+  echo "pre-commit: gitleaks not found; refusing to commit (install it with: mise install gitleaks)" >&2
+  exit 1
+fi
+
+exec "$gitleaks_bin" git --no-banner --pre-commit --staged --redact

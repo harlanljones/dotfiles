@@ -1,0 +1,33 @@
+# Packages added on top of Omarchy's base and other lists. bootstrap installs
+# them with `omarchy pkg add` (sync repos only; AUR packages go in SETUP.md).
+
+# Desktop apps
+1password
+1password-cli
+claude-desktop
+ghostty
+openai-codex-desktop
+zen-browser-bin
+
+# Games
+minecraft-launcher
+steam
+
+# Virtualization
+edk2-ovmf
+qemu-system-x86
+virtiofsd
+
+# System and networking
+flatpak
+libratbag
+tailscale
+
+# Dotfiles tooling
+git-lfs
+yadm
+
+# Installed by the Omarchy installer for this hardware or boot setup; not
+# needed in this list, kept here for reference:
+#   efibootmgr intel-ucode lib32-vulkan-intel mkinitcpio omarchy
+#   omarchy-keyring omarchy-settings sudo

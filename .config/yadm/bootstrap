@@ -1,0 +1,189 @@
+#!/usr/bin/env bash
+# yadm bootstrap: brings a machine in line with this repo. Safe to re-run.
+#
+#   yadm bootstrap              apply everything
+#   DRY_RUN=1 yadm bootstrap    print what would happen, change nothing
+#   SKIP_PKGS=1 yadm bootstrap  skip package installs
+# (yadm doesn't pass arguments to bootstrap; running this file directly also
+# accepts --dry-run.)
+#
+# Steps: repo config (hooks, excludes) -> Git LFS -> packages -> mise ->
+# secrets from 1Password -> print the manual steps in SETUP.md.
+set -euo pipefail
+
+dry_run=0
+[[ -n ${DRY_RUN:-} || ${1:-} == --dry-run ]] && dry_run=1
+
+yadm_dir=${XDG_CONFIG_HOME:-$HOME/.config}/yadm
+repo=$(yadm introspect repo)
+marker="# yadm-auto-excludes"
+# The only 1Password vault secrets may come from.
+op_vault=Agents
+# This repo is public: commits to it use GitHub's noreply address.
+author_email=141967479+harlanljones@users.noreply.github.com
+
+step() { printf '\n==> %s\n' "$*"; }
+warn() { printf 'warning: %s\n' "$*" >&2; }
+
+run() {
+  if ((dry_run)); then
+    printf 'would run: %s\n' "$*"
+  else
+    "$@"
+  fi
+}
+
+# Non-comment, non-blank lines of a file.
+entries() {
+  [[ -f $1 ]] || return 0
+  grep -v -e '^[[:space:]]*#' -e '^[[:space:]]*$' "$1" || true
+}
+
+# Home-relative path with no absolute prefix and no . or .. components.
+valid_rel_path() {
+  local path=$1
+  [[ -n $path && $path != /* && "/$path/" != */../* && "/$path/" != */./* ]]
+}
+
+configure_repo() {
+  step "Repo config: hooks and excludes"
+  run yadm gitconfig core.hooksPath "$yadm_dir/git-hooks"
+  run yadm gitconfig user.email "$author_email"
+
+  # Repo config and info/exclude don't travel with a clone, so regenerate the
+  # managed block on every run. yadm owns everything below its marker.
+  local exclude="$repo/info/exclude"
+  local block
+  block=$(
+    echo "# BEGIN bootstrap-managed (from exclude.list and secrets.list targets)"
+    entries "$yadm_dir/exclude.list"
+    entries "$yadm_dir/secrets.list" | cut -f2
+    echo "# END bootstrap-managed"
+  )
+
+  if ((dry_run)); then
+    printf 'would write managed block to %s:\n%s\n' "$exclude" "$block"
+    return
+  fi
+
+  mkdir -p "$(dirname "$exclude")"
+  local tail=""
+  [[ -f $exclude ]] && tail=$(awk -v m="$marker" 'found || $0 == m { found = 1; print }' "$exclude")
+  printf '%s\n%s\n' "$block" "$tail" >"$exclude"
+}
+
+setup_lfs() {
+  step "Git LFS"
+  if ! command -v git-lfs >/dev/null 2>&1; then
+    warn "git-lfs not installed; theme images stay as pointer files (install with: omarchy pkg add git-lfs)"
+    return
+  fi
+  # Our tracked hooks already call LFS, so only the filters are needed here.
+  run yadm lfs install --local --skip-repo
+  run yadm lfs pull || warn "git lfs pull failed (no remote yet?); run 'yadm lfs pull' later"
+}
+
+install_packages() {
+  step "Packages"
+  if [[ -n ${SKIP_PKGS:-} ]]; then
+    echo "SKIP_PKGS set; skipping"
+    return
+  fi
+  local -a pkgs
+  mapfile -t pkgs < <(entries "$yadm_dir/packages.txt" | awk '{ print $1 }')
+  if ((${#pkgs[@]} == 0)); then
+    echo "packages.txt is empty; skipping"
+    return
+  fi
+  run omarchy pkg add "${pkgs[@]}"
+}
+
+install_mise_tools() {
+  step "mise tools"
+  if ! command -v mise >/dev/null 2>&1; then
+    warn "mise not installed; skipping"
+    return
+  fi
+  run mise install
+}
+
+# secrets.list: <template><TAB><target>, both relative to $HOME. Templates hold
+# only op://Agents/... references; rendered targets are never tracked.
+provision_secrets() {
+  step "Secrets from 1Password"
+  local -a pairs=()
+  local -A seen=()
+  local line tpl target extra
+
+  while IFS= read -r line; do
+    IFS=$'\t' read -r tpl target extra <<<"$line"
+    if [[ -n ${extra:-} ]] || ! valid_rel_path "${tpl:-}" || ! valid_rel_path "${target:-}"; then
+      warn "secrets.list: rejecting malformed line: $line"
+      return 1
+    fi
+    if [[ -n ${seen[$target]:-} ]]; then
+      warn "secrets.list: duplicate target: $target"
+      return 1
+    fi
+    seen[$target]=1
+    pairs+=("$tpl"$'\t'"$target")
+  done < <(entries "$yadm_dir/secrets.list")
+
+  if ((${#pairs[@]} == 0)); then
+    echo "secrets.list is empty; skipping 1Password"
+    return
+  fi
+
+  if ! command -v op >/dev/null 2>&1; then
+    warn "1Password CLI (op) not installed; skipping secrets, existing files left as they are"
+    return
+  fi
+  if ((!dry_run)) && ! op vault get "$op_vault" >/dev/null 2>&1; then
+    warn "1Password is locked or not signed in; skipping secrets, existing files left as they are"
+    return
+  fi
+
+  local pair src dest tmp
+  for pair in "${pairs[@]}"; do
+    src=$HOME/${pair%%$'\t'*}
+    dest=$HOME/${pair#*$'\t'}
+
+    if [[ ! -f $src ]]; then
+      warn "template missing: $src"
+      continue
+    fi
+    if grep -oE 'op://[^/[:space:]"'\''}]+' "$src" | grep -qv "^op://$op_vault\$"; then
+      warn "template references a vault other than $op_vault; skipping: $src"
+      continue
+    fi
+    if ((dry_run)); then
+      printf 'would inject: %s -> %s\n' "$src" "$dest"
+      continue
+    fi
+
+    # Render beside the target and rename only on success, so a failed or
+    # denied inject never replaces a working file.
+    (
+      umask 077
+      mkdir -p "$(dirname "$dest")"
+      tmp=$(mktemp "$dest.XXXXXX")
+      if op inject --in-file "$src" --out-file "$tmp" --force >/dev/null; then
+        chmod 600 "$tmp"
+        mv -f "$tmp" "$dest"
+        echo "rendered $dest"
+      else
+        rm -f "$tmp"
+        echo "warning: inject failed for $dest; existing file left as it is" >&2
+      fi
+    )
+  done
+}
+
+configure_repo
+setup_lfs
+install_packages
+install_mise_tools
+provision_secrets
+
+step "Manual steps (see $yadm_dir/SETUP.md)"
+cat "$yadm_dir/SETUP.md"

@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Scan outgoing commits for secrets, then hand off to Git LFS so LFS objects
+# are uploaded. Fails closed when gitleaks or git-lfs is unavailable.
+set -euo pipefail
+
+remote=$1
+refs=$(cat)
+zero=0000000000000000000000000000000000000000
+
+gitleaks_bin=$(command -v gitleaks || true)
+if [[ -z $gitleaks_bin && -x $HOME/.local/share/mise/shims/gitleaks ]]; then
+  gitleaks_bin=$HOME/.local/share/mise/shims/gitleaks
+fi
+
+if [[ -z $gitleaks_bin ]]; then
+  echo "pre-push: gitleaks not found; refusing to push (install it with: mise install gitleaks)" >&2
+  exit 1
+fi
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  # Ref deletions carry no commits to scan.
+  [[ -z ${local_sha:-} || $local_sha == "$zero" ]] && continue
+
+  if [[ $remote_sha == "$zero" ]]; then
+    range="$local_sha --not --remotes=$remote"
+  else
+    range="$remote_sha..$local_sha"
+  fi
+
+  if ! "$gitleaks_bin" git --no-banner --redact --log-opts="$range"; then
+    echo "pre-push: gitleaks flagged commits on $local_ref; push aborted" >&2
+    exit 1
+  fi
+done <<<"$refs"
+
+if ! command -v git-lfs >/dev/null 2>&1; then
+  echo "pre-push: git-lfs not found; refusing to push without uploading LFS objects" >&2
+  exit 2
+fi
+
+printf '%s\n' "$refs" | git lfs pre-push "$@"
