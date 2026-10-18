@@ -23,6 +23,15 @@
 -- Disable a default binding without replacing it.
 -- hl.unbind("SUPER + SHIFT + B")
 
+-- Dismiss all live notifications and clear history (mirrors the bar widget's right-click).
+o.bind("SUPER + ALT + N", "Clear notifications", "omarchy-shell notifications dismissAll && omarchy-shell notifications clear")
+
+-- Theme modes: panel, automatic/manual switching, and manual light/dark toggle.
+o.bind("SUPER + CTRL + ALT + L", "Theme modes", "omarchy-shell shell toggle esemczak.theme-modes")
+o.bind("SUPER + ALT + SHIFT + L", "Theme modes: automatic/manual", [=[bash -lc 'status=$(omarchy-shell esemczak.theme-modes status) || exit; if jq -e ".manualOverride" >/dev/null <<<"$status"; then omarchy-shell esemczak.theme-modes followAutomatic; else omarchy-shell esemczak.theme-modes toggleMode; fi']=])
+o.bind("SUPER + CTRL + ALT + SHIFT + L", "Theme modes: toggle light/dark", [=[bash -lc 'status=$(omarchy-shell esemczak.theme-modes status) || exit; if jq -e ".manualOverride" >/dev/null <<<"$status"; then omarchy-shell esemczak.theme-modes toggleMode; else notify-send --app-name="Theme modes" "Manual mode required" "Switch to manual mode before toggling light and dark."; fi']=])
+o.bind("SUPER + CTRL + ALT + P", "Theme modes: next profile", "omarchy-shell esemczak.theme-modes nextProfile")
+
 -- Logitech MX Keys examples:
 -- o.bind("SUPER + SHIFT + S", nil, "omarchy-capture-screenshot")
 -- o.bind("SUPER + H", nil, "voxtype record toggle")
@@ -46,3 +55,11 @@ do
 end
 
 require("default.hypr.require_optional").module("hypr.omachord") -- Oma Chord managed loader
+
+-- omaplug-shortcut-start: bobbynicholas.omaland
+o.bind("SUPER + SHIFT + L", "Omaplug: bobbynicholas.omaland", "omarchy-shell shell toggle bobbynicholas.omaland")
+-- omaplug-shortcut-end: bobbynicholas.omaland
+
+-- Keychron knob: switch between the USB headphones and the LG monitor speakers.
+-- Sink names live in ~/.config/keychron-audio-toggle/sinks (rendered from 1Password).
+o.bind("F13", "Switch headphones and speakers", "keychron-audio-toggle", { locked = true })

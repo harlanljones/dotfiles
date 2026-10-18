@@ -121,7 +121,7 @@ Rules while porting:
 
 ## Hyprland
 
-- [ ] **port** `~/.config/hypr/bindings.lua` <sub>`dot_config/hypr/bindings.lua`</sub> — omalt-tab loader ported 2026-10-18; theme-modes binds still to review (X Native and Reprieve binds dropped with their plugins)
+- [x] **done** `~/.config/hypr/bindings.lua` <sub>`dot_config/hypr/bindings.lua`</sub> — ported 2026-10-18: notifications, theme modes, Omaland, Keychron knob, omalt-tab loader; X Native, Reprieve and Local AI binds dropped with their plugins
 - [ ] **port** `~/.config/hypr/hyprland.lua` <sub>`dot_config/hypr/hyprland.lua`</sub>
 - [ ] **drop** `~/.config/hypr/hyprmoncfg-monitors.lua` (superseded by this machine's monitors.lua) <sub>`dot_config/hypr/hyprmoncfg-monitors.lua`</sub>
 - [ ] **port** `~/.config/hypr/input.lua` <sub>`dot_config/hypr/input.lua`</sub>
@@ -192,7 +192,7 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 - [ ] **port** `~/.local/bin/herdr-subagents` <sub>`dot_local/bin/executable_herdr-subagents`</sub>
 - [ ] **port** `~/.local/bin/herdr-sync-hermes-plugin` <sub>`dot_local/bin/executable_herdr-sync-hermes-plugin`</sub>
 - [ ] **port** `~/.local/bin/herdr-verify` <sub>`dot_local/bin/executable_herdr-verify`</sub>
-- [ ] **port** `~/.local/bin/keychron-audio-toggle` <sub>`dot_local/bin/executable_keychron-audio-toggle`</sub>
+- [x] **done** `~/.local/bin/keychron-audio-toggle` <sub>`dot_local/bin/executable_keychron-audio-toggle`</sub> — ported 2026-10-18; sink names now come from a 1Password-rendered config
 - [ ] **port** `~/.local/bin/lazygit-ollama-commit.sh` <sub>`dot_local/bin/executable_lazygit-ollama-commit.sh`</sub>
 - [ ] **port** `~/.local/bin/ollama-commit-msg.sh` <sub>`dot_local/bin/executable_ollama-commit-msg.sh`</sub>
 - [ ] **rewrite** `~/.local/bin/omarchy-agent` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent.tmpl`</sub>
