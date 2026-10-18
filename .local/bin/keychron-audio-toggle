@@ -1,0 +1,91 @@
+#!/usr/bin/env python3
+"""Switch PipeWire/PulseAudio between two named output sinks.
+
+Sink names come from --headphones/--monitor, or else from
+~/.config/keychron-audio-toggle/sinks (lines of headphones=<sink> and
+monitor=<sink>), which yadm bootstrap renders from 1Password because the
+names identify specific hardware.
+"""
+
+import argparse
+import json
+import os
+import shutil
+import subprocess
+import sys
+
+CONFIG = os.path.join(
+    os.environ.get("XDG_CONFIG_HOME") or os.path.expanduser("~/.config"),
+    "keychron-audio-toggle",
+    "sinks",
+)
+
+
+def read_config():
+    names = {}
+    try:
+        with open(CONFIG) as f:
+            for line in f:
+                key, sep, value = line.strip().partition("=")
+                if sep and not key.startswith("#"):
+                    names[key.strip()] = value.strip()
+    except FileNotFoundError:
+        pass
+    return names
+
+
+def pactl(*args):
+    return subprocess.run(
+        ["pactl", *args], check=True, capture_output=True, text=True, timeout=5
+    ).stdout.strip()
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--headphones", help="Exact USB-headphone sink name")
+    parser.add_argument("--monitor", help="Exact LG-monitor sink name")
+    parser.add_argument("--list", action="store_true", help="List available sinks")
+    args = parser.parse_args()
+
+    sinks = json.loads(pactl("-f", "json", "list", "sinks"))
+    if args.list:
+        for sink in sinks:
+            print(f'{sink["name"]}\t{sink.get("description", "")}')
+        return
+
+    config = read_config()
+    args.headphones = args.headphones or config.get("headphones")
+    args.monitor = args.monitor or config.get("monitor")
+    if not args.headphones or not args.monitor:
+        parser.error(f"--headphones and --monitor are required (or set them in {CONFIG})")
+    by_name = {sink["name"]: sink for sink in sinks}
+    missing = [name for name in (args.headphones, args.monitor) if name not in by_name]
+    if missing:
+        raise RuntimeError("Audio output unavailable: " + ", ".join(missing))
+
+    current = pactl("get-default-sink")
+    target = args.monitor if current == args.headphones else args.headphones
+    pactl("set-default-sink", target)
+
+    for stream in json.loads(pactl("-f", "json", "list", "sink-inputs")):
+        try:
+            pactl("move-sink-input", str(stream["index"]), target)
+        except subprocess.CalledProcessError:
+            # An application may close its stream between listing and moving it.
+            pass
+
+    description = by_name[target].get("description", target)
+    if shutil.which("notify-send"):
+        subprocess.run(
+            ["notify-send", "Audio output", description],
+            check=False, capture_output=True, timeout=5,
+        )
+    print(description)
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except (OSError, RuntimeError, subprocess.CalledProcessError, subprocess.TimeoutExpired, json.JSONDecodeError) as exc:
+        print(f"Audio switch failed: {exc}", file=sys.stderr)
+        sys.exit(1)
