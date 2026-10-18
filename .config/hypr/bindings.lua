@@ -27,3 +27,22 @@
 -- o.bind("SUPER + SHIFT + S", nil, "omarchy-capture-screenshot")
 -- o.bind("SUPER + H", nil, "voxtype record toggle")
 -- o.bind("SUPER + PERIOD", nil, "omarchy-shell shell toggle omarchy.emojis")
+
+-- Alt+Tab window switcher: omalt-tab (Omarchy shell plugin) owns these
+-- bindings. Its hypr/bindings.lua defines an "omalt-tab" submap (Tab cycle,
+-- home-row workspace jump, Enter commit, Esc cancel) and unbinds the plain
+-- Alt+Tab defaults itself. Load it when installed; otherwise the Omarchy
+-- defaults stay in effect. This must run after the Omarchy defaults it
+-- overrides, which it does because hypr/bindings.lua loads after them.
+hl.unbind("ALT + TAB")
+hl.unbind("ALT + SHIFT + TAB")
+do
+  local omalt = os.getenv("HOME") .. "/.config/omarchy/plugins/io.github.codesmith28.omalt-tab/hypr/bindings.lua"
+  local f = io.open(omalt, "r")
+  if f then
+    f:close()
+    dofile(omalt)
+  end
+end
+
+require("default.hypr.require_optional").module("hypr.omachord") -- Oma Chord managed loader
