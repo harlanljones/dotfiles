@@ -59,6 +59,8 @@ with `yadm status` / `yadm diff` before taking the repo's version with
 - Local patches live in `~/.local/share/omarchy-patches/` and are applied with
   `omarchy-plugin-patches apply`. Before `omarchy plugin update`, run
   `omarchy-plugin-patches revert`, then `apply` again afterward.
+  If a plugin misbehaves after its files change (patching, updating), run
+  `omarchy restart shell`: many hot reloads in a row can leave it stuck.
 - Enabling many plugins makes the shell slow to answer IPC; if an `omarchy
   plugin` command says the shell is not responding, retry with
   `OMARCHY_SHELL_IPC_TIMEOUT=30s`.
