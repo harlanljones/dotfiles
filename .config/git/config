@@ -46,11 +46,12 @@
 	helper =
 	helper = !~/.local/share/mise/shims/gh auth git-credential
 
+# No core.fsmonitor: it starts a permanent daemon per repo, and lazy.nvim and
+# Omarchy plugins keep ~100 repos busy in the background.
 # Global hooks: Conventional Commit check and gitleaks before push. This turns
 # off each repo's own .git/hooks; a repo that sets its own core.hooksPath
 # (like the yadm repo) keeps it.
 [core]
-	fsmonitor = true
 	untrackedCache = true
 	hooksPath = ~/.config/git/hooks
 	pager = delta
