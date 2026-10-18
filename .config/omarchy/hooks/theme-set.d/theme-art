@@ -1,0 +1,41 @@
+#!/bin/bash
+
+# Omarchy theme-set hook: make the splash art follow the new theme.
+# - Branding (About screen, screensaver, fastfetch logo): copy the theme's own
+#   branding/{about,screensaver}.txt, or render this machine's name with figlet
+#   when the theme has none.
+# - bat: rebuild its cache so the freshly rendered omarchy.tmTheme is used.
+
+theme_dir="$HOME/.local/state/omarchy/current/theme"
+brand_dir="$HOME/.config/omarchy/branding"
+fonts="${XDG_DATA_HOME:-$HOME/.local/share}/figlet"
+
+name=$(cat /proc/sys/kernel/hostname 2>/dev/null)
+name=${name^}
+
+wordmark() {
+  local font="$fonts/$1.flf"
+  if command -v figlet >/dev/null 2>&1 && [[ -r $font ]]; then
+    figlet -w 200 -f "$font" "$name"
+  else
+    printf '%s\n' "$name"
+  fi
+}
+
+mkdir -p "$brand_dir"
+for art in about:Roman screensaver:small; do
+  file=${art%%:*}
+  tmp="$brand_dir/.$file.txt.tmp"
+  if [[ -r $theme_dir/branding/$file.txt ]]; then
+    cp "$theme_dir/branding/$file.txt" "$tmp"
+  else
+    wordmark "${art#*:}" >"$tmp"
+  fi
+  mv -f "$tmp" "$brand_dir/$file.txt"
+done
+
+if command -v bat >/dev/null 2>&1; then
+  bat cache --build >/dev/null 2>&1
+fi
+
+exit 0

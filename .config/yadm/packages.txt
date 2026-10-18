@@ -21,6 +21,7 @@ virtiofsd
 # Shell
 atuin
 direnv
+figlet
 
 # System and networking
 flatpak

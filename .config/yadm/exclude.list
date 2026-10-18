@@ -16,6 +16,7 @@
 .local/share/tern/
 .config/yadm/notes/
 .config/shell/local.sh
+.config/omarchy/branding/
 .config/omarchy/plugins/
 .config/omarchy/backdrop/segments/
 .config/omarchy/hooks/*/anothadev.omachord

@@ -62,6 +62,8 @@
 	diffFilter = delta --color-only
 [delta]
 	navigate = true
+[include]
+	path = ~/.local/state/omarchy/current/theme/delta.gitconfig  # theme-synced delta colors
 [merge]
 	conflictstyle = zdiff3
 

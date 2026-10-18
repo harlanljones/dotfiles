@@ -14,6 +14,7 @@ zoxide, fzf, the default aliases) and ends with a loader that sources every
 | `40-aliases.sh` | Listing, git, yadm, mise and agent aliases; `opr` |
 | `60-prompt.sh` | Starship prompt turns red after a failed command |
 | `61-splash.sh` | fastfetch banner on every interactive shell; `clear` redraws it |
+| `65-theme.sh` | fzf colors from the current Omarchy theme |
 | `70-cloud.sh` | gcloud configuration switching |
 | `80-local.sh` | Sources the untracked `local.sh` last |
 
@@ -32,3 +33,24 @@ zoxide, fzf, the default aliases) and ends with a loader that sources every
 Untracked and sourced last, for anything machine-specific or private. If an
 installer appends to `~/.bashrc`, move the block here so `~/.bashrc` stays
 close to stock and `yadm diff` shows the stray append.
+
+## Theme sync
+
+`~/.config/omarchy/themed/*.tpl` are rendered from the active theme's
+`colors.toml` into `~/.local/state/omarchy/current/theme/` on every
+`omarchy theme set`; a theme that ships its own copy of a file wins.
+
+| Rendered file | Used by |
+| --- | --- |
+| `starship.toml` | `STARSHIP_CONFIG` (10-tools.sh) |
+| `bat.tmTheme` | `~/.config/bat/themes/omarchy.tmTheme` link, `BAT_THEME=omarchy` |
+| `delta.gitconfig` | `[include]` in `~/.config/git/config` |
+| `eza-theme.yml` | `~/.config/eza/theme.yml` link |
+| `fzf.sh` | 65-theme.sh |
+| `lazygit.yml` | `LG_CONFIG_FILE` (10-tools.sh, environment.d) |
+| `fastfetch.jsonc` | `~/.config/fastfetch/config.jsonc` link |
+
+The theme-set hook `~/.config/omarchy/hooks/theme-set.d/theme-art` copies the
+theme's `branding/{about,screensaver}.txt` into `~/.config/omarchy/branding/`
+(or renders the machine name with figlet when the theme has none) and rebuilds
+bat's theme cache.

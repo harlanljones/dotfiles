@@ -88,24 +88,24 @@ Rules while porting:
 
 ## Terminals and CLI tools
 
-- [ ] **port** `~/.config/atuin/config.toml` <sub>`dot_config/atuin/config.toml`</sub>
-- [ ] **port** `~/.config/bat/config` <sub>`dot_config/bat/config`</sub>
-- [ ] **rewrite** `~/.config/bat/themes/dots.tmTheme` (template → esh `##template.esh` or plain file) <sub>`dot_config/bat/themes/dots.tmTheme.tmpl`</sub>
-- [ ] **rewrite** `~/.config/btop/btop.conf` (template → esh `##template.esh` or plain file) <sub>`dot_config/btop/btop.conf.tmpl`</sub>
-- [ ] **rewrite** `~/.config/btop/themes/dots.theme` (template → esh `##template.esh` or plain file) <sub>`dot_config/btop/themes/dots.theme.tmpl`</sub>
-- [ ] **rewrite** `~/.config/delta/theme.gitconfig` (template → esh `##template.esh` or plain file) <sub>`dot_config/delta/theme.gitconfig.tmpl`</sub>
-- [ ] **rewrite** `~/.config/eza/theme.yml` (template → esh `##template.esh` or plain file) <sub>`dot_config/eza/theme.yml.tmpl`</sub>
-- [ ] **port** `~/.config/fastfetch/augustus.jpg` <sub>`dot_config/fastfetch/augustus.jpg`</sub>
-- [ ] **rewrite** `~/.config/fastfetch/config.jsonc` (template → esh `##template.esh` or plain file) <sub>`dot_config/fastfetch/config.jsonc.tmpl`</sub>
-- [ ] **drop** `~/.config/fastfetch/vespasian.jpg` (WSL/Windows only) <sub>`dot_config/fastfetch/vespasian.jpg`</sub>
-- [ ] **rewrite** `~/.config/fzf/theme.sh` (template → esh `##template.esh` or plain file) <sub>`dot_config/fzf/theme.sh.tmpl`</sub>
-- [ ] **rewrite** `~/.config/ghostty/config` (template → esh `##template.esh` or plain file) <sub>`dot_config/ghostty/config.tmpl`</sub>
-- [ ] **port** `~/.config/ripgrep/rc` <sub>`dot_config/ripgrep/rc`</sub>
-- [ ] **rewrite** `~/.config/starship.toml` (template → esh `##template.esh` or plain file) <sub>`dot_config/starship.toml.tmpl`</sub>
-- [ ] **port** `~/.config/zoxide/config.toml` <sub>`dot_config/zoxide/config.toml`</sub>
-- [ ] **port** `~/.local/share/figlet/README.md` <sub>`dot_local/share/figlet/README.md`</sub>
-- [ ] **port** `~/.local/share/figlet/Roman.flf` <sub>`dot_local/share/figlet/Roman.flf`</sub>
-- [ ] **port** `~/.local/share/figlet/small.flf` <sub>`dot_local/share/figlet/small.flf`</sub>
+- [x] **done** `~/.config/atuin/config.toml` <sub>`dot_config/atuin/config.toml`</sub> — ported (2026-10-18)
+- [x] **drop** `~/.config/bat/config` <sub>`dot_config/bat/config`</sub> — theme now comes from BAT_THEME=omarchy (2026-10-18)
+- [x] **done** `~/.config/bat/themes/dots.tmTheme` (template → esh `##template.esh` or plain file) <sub>`dot_config/bat/themes/dots.tmTheme.tmpl`</sub> — now a theme-synced Omarchy template (themed/bat.tmTheme.tpl) (2026-10-18)
+- [x] **drop** `~/.config/btop/btop.conf` (template → esh `##template.esh` or plain file) <sub>`dot_config/btop/btop.conf.tmpl`</sub> — identical apart from the theme, which Omarchy already syncs (2026-10-18)
+- [x] **drop** `~/.config/btop/themes/dots.theme` (template → esh `##template.esh` or plain file) <sub>`dot_config/btop/themes/dots.theme.tmpl`</sub> — Omarchy themes btop itself (2026-10-18)
+- [x] **done** `~/.config/delta/theme.gitconfig` (template → esh `##template.esh` or plain file) <sub>`dot_config/delta/theme.gitconfig.tmpl`</sub> — now themed/delta.gitconfig.tpl (2026-10-18)
+- [x] **done** `~/.config/eza/theme.yml` (template → esh `##template.esh` or plain file) <sub>`dot_config/eza/theme.yml.tmpl`</sub> — now themed/eza-theme.yml.tpl (2026-10-18)
+- [x] **drop** `~/.config/fastfetch/augustus.jpg` <sub>`dot_config/fastfetch/augustus.jpg`</sub> — no images; ASCII art per theme instead (2026-10-18)
+- [x] **done** `~/.config/fastfetch/config.jsonc` (template → esh `##template.esh` or plain file) <sub>`dot_config/fastfetch/config.jsonc.tmpl`</sub> — Augustus layout is now themed/fastfetch.jsonc.tpl; themes can ship their own (2026-10-18)
+- [x] **drop** `~/.config/fastfetch/vespasian.jpg` (WSL/Windows only) <sub>`dot_config/fastfetch/vespasian.jpg`</sub> — dropped (2026-10-18)
+- [x] **done** `~/.config/fzf/theme.sh` (template → esh `##template.esh` or plain file) <sub>`dot_config/fzf/theme.sh.tmpl`</sub> — now themed/fzf.sh.tpl (2026-10-18)
+- [x] **drop** `~/.config/ghostty/config` (template → esh `##template.esh` or plain file) <sub>`dot_config/ghostty/config.tmpl`</sub> — Omarchy's stock config matches; single-instance tweak not wanted (2026-10-18)
+- [x] **done** `~/.config/ripgrep/rc` <sub>`dot_config/ripgrep/rc`</sub> — ported (2026-10-18)
+- [x] **done** `~/.config/starship.toml` (template → esh `##template.esh` or plain file) <sub>`dot_config/starship.toml.tmpl`</sub> — Augustus prompt is now themed/starship.toml.tpl (2026-10-18)
+- [x] **done** `~/.config/zoxide/config.toml` <sub>`dot_config/zoxide/config.toml`</sub> — zoxide ignores config files; ported as _ZO_* variables (2026-10-18)
+- [x] **done** `~/.local/share/figlet/README.md` <sub>`dot_local/share/figlet/README.md`</sub> — ported (2026-10-18)
+- [x] **done** `~/.local/share/figlet/Roman.flf` <sub>`dot_local/share/figlet/Roman.flf`</sub> — ported; used by the theme-art hook (2026-10-18)
+- [x] **done** `~/.local/share/figlet/small.flf` <sub>`dot_local/share/figlet/small.flf`</sub> — ported; used by the theme-art hook (2026-10-18)
 
 ## herdr
 

@@ -16,3 +16,17 @@ export PAGER=less
 # zoxide reads its settings from the environment (it has no config file).
 export _ZO_RESOLVE_SYMLINKS=1
 export _ZO_EXCLUDE_DIRS="$HOME:*/.git:*/.git/*:*/node_modules:*/node_modules/*:*/.venv:*/.venv/*:*/target:*/target/*:/tmp:/tmp/*:/mnt:/mnt/*"
+
+# Theme-synced configs, rendered from ~/.config/omarchy/themed/*.tpl on every
+# `omarchy theme set` (see ~/.config/shell/README.md).
+_omarchy_theme="$HOME/.local/state/omarchy/current/theme"
+if [ -r "$_omarchy_theme/starship.toml" ]; then
+  export STARSHIP_CONFIG="$_omarchy_theme/starship.toml"
+fi
+if [ -r "$_omarchy_theme/bat.tmTheme" ]; then
+  export BAT_THEME=omarchy
+fi
+if [ -r "$_omarchy_theme/lazygit.yml" ]; then
+  export LG_CONFIG_FILE="$HOME/.config/lazygit/config.yml,$_omarchy_theme/lazygit.yml"
+fi
+unset _omarchy_theme
