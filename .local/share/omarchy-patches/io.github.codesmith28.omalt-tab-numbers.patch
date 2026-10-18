@@ -1,0 +1,137 @@
+Numbers for workspaces in omalt-tab: 1-9 and 0 jump to workspaces 1-10, and
+home-row keys a s d f g h j k l jump to the Nth window in the workspace
+(upstream has these the other way round). Window badges and header hints
+show the new keys. Applied by `omarchy-plugin-patches apply`.
+
+diff --git i/AltTabOverlay.qml w/AltTabOverlay.qml
+index cec9a00..69bcf30 100644
+--- i/AltTabOverlay.qml
++++ w/AltTabOverlay.qml
+@@ -95,7 +95,7 @@ Item {
+     property bool isOpening: false
+ 
+     readonly property string socketPath: (Quickshell.env("XDG_RUNTIME_DIR") || "/run/user/1000") + "/omalt-tab.sock"
+-    readonly property var wsLetters: ["a", "s", "d", "f", "g", "h", "j", "k", "l", ";"]
++    readonly property var wsLetters: ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"]
+ 
+     // In-memory check for Hyprland bindings hook to avoid unnecessary process spawns
+     FileView {
+@@ -780,14 +780,15 @@ Item {
+                         root.selectedIndex = root.mruList.length - 1;
+                         root.updateSelectionFromIndex();
+                     }
+-                } else if (event.key >= Qt.Key_1 && event.key <= Qt.Key_9) {
+-                    root.jumpWindow(event.key - Qt.Key_0);
++                } else if (event.key >= Qt.Key_0 && event.key <= Qt.Key_9) {
++                    root.jumpWorkspace(String(event.key - Qt.Key_0));
+                 } else if (event.key === Qt.Key_Print || event.key === Qt.Key_SysReq || ((event.key === Qt.Key_S || event.key === Qt.Key_Print) && (event.modifiers & Qt.MetaModifier))) {
+                     root.takeScreenshot();
+                 } else if (event.text && event.text.length === 1) {
+                     var ch = event.text.toLowerCase();
+-                    if ("asdfghjkl;".indexOf(ch) !== -1) {
+-                        root.jumpWorkspace(ch);
++                    var winIdx = "asdfghjkl".indexOf(ch);
++                    if (winIdx !== -1) {
++                        root.jumpWindow(winIdx + 1);
+                     }
+                 }
+                 event.accepted = true;
+diff --git i/components/HeaderBar.qml w/components/HeaderBar.qml
+index ef75021..5c3fac1 100644
+--- i/components/HeaderBar.qml
++++ w/components/HeaderBar.qml
+@@ -173,7 +173,7 @@ Item {
+             Text {
+                 id: txtWs
+                 anchors.centerIn: parent
+-                text: "WS [A-Z]"
++                text: "WS [1-0]"
+                 color: Color.foreground
+                 font.family: Style.font.resolvedFamily || Style.font.family
+                 font.pixelSize: Dimensions.header.shortcutFontSize
+@@ -195,7 +195,7 @@ Item {
+             Text {
+                 id: txtWin
+                 anchors.centerIn: parent
+-                text: "Win [1-9]"
++                text: "Win [A-L]"
+                 color: Color.foreground
+                 font.family: Style.font.resolvedFamily || Style.font.family
+                 font.pixelSize: Dimensions.header.shortcutFontSize
+diff --git i/components/WindowTile.qml w/components/WindowTile.qml
+index 68689a7..487dad5 100644
+--- i/components/WindowTile.qml
++++ w/components/WindowTile.qml
+@@ -111,7 +111,7 @@ Rectangle {
+             id: txtIndex
+             anchors.centerIn: parent
+             textFormat: Text.PlainText
+-            text: root.winData ? root.winData.wsIndex : "1"
++            text: root.winData ? ("ASDFGHJKL".charAt(root.winData.wsIndex - 1) || root.winData.wsIndex) : "A"
+             color: root.isSelected ? Color.background : Color.accent
+             font.pixelSize: Math.max(9, Math.min(Dimensions.windowTile.indexBadgeFontSize, Math.round(parent.height * 0.55)))
+             font.bold: true
+@@ -218,7 +218,7 @@ Rectangle {
+                         // Index number badge
+                         Text {
+                             textFormat: Text.PlainText
+-                            text: tabPill.modelData.wsIndex
++                            text: "ASDFGHJKL".charAt(tabPill.modelData.wsIndex - 1) || tabPill.modelData.wsIndex
+                             color: tabPill.isThisTabSelected
+                                 ? Color.background
+                                 : (tabPill.isThisTileWindow ? Color.accent : Color.foreground)
+diff --git i/hypr/bindings.lua w/hypr/bindings.lua
+index e33e1e6..80dbc65 100644
+--- i/hypr/bindings.lua
++++ w/hypr/bindings.lua
+@@ -123,16 +123,16 @@ hl.define_submap("omalt-tab", function()
+         bind_action(dir, dir:lower())
+     end
+ 
+-    -- Home row workspace keys: asdfghjkl;
+-    local ws_keys = { "a", "s", "d", "f", "g", "h", "j", "k", "l", "semicolon" }
+-    local ws_letters = { "a", "s", "d", "f", "g", "h", "j", "k", "l", ";" }
+-    for idx, k in ipairs(ws_keys) do
+-        bind_action(k, "workspace " .. ws_letters[idx])
++    -- Number keys jump to workspaces 1-10 (0 is workspace 10)
++    for i = 1, 10 do
++        local key = tostring(i % 10)
++        bind_action(key, "workspace " .. key)
+     end
+ 
+-    -- Window numbers: 1-9
+-    for i = 1, 9 do
+-        bind_action(tostring(i), "window " .. i)
++    -- Home row keys jump to the Nth window in the workspace: asdfghjkl
++    local win_keys = { "a", "s", "d", "f", "g", "h", "j", "k", "l" }
++    for idx, k in ipairs(win_keys) do
++        bind_action(k, "window " .. idx)
+     end
+ 
+     -- Explicit release binds (guarded by dynamic read_dev_mode())
+diff --git i/js/Navigation.js w/js/Navigation.js
+index eafcc53..5779cb6 100644
+--- i/js/Navigation.js
++++ w/js/Navigation.js
+@@ -2,7 +2,7 @@
+ 
+ .pragma library
+ 
+-var DEFAULT_HOME_ROW_LETTERS = ["a", "s", "d", "f", "g", "h", "j", "k", "l", ";"];
++var DEFAULT_HOME_ROW_LETTERS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
+ 
+ /**
+  * Cycle index with wrap-around.
+diff --git i/js/WindowModel.js w/js/WindowModel.js
+index 17b0711..dfab574 100644
+--- i/js/WindowModel.js
++++ w/js/WindowModel.js
+@@ -3,7 +3,7 @@
+ .pragma library
+ .import "Utils.js" as Utils
+ 
+-var DEFAULT_HOME_ROW_LETTERS = ["a", "s", "d", "f", "g", "h", "j", "k", "l", ";"];
++var DEFAULT_HOME_ROW_LETTERS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "0"];
+ 
+ /**
+  * Sanitizes arbitrary text strings from Hyprland window snapshots to prevent
