@@ -38,6 +38,11 @@ vpl-gpu-rt
 cups-browsed
 cups-pdf
 
+# Containers and Kubernetes
+kubectl
+podman
+podman-compose
+
 # Build tools and CLI helpers (languages come from mise)
 dotnet-runtime-9.0
 ninja

@@ -67,24 +67,24 @@ Rules while porting:
 
 ## Neovim
 
-- [ ] **port** `~/.config/nvim/init.lua` <sub>`dot_config/nvim/init.lua`</sub>
-- [ ] **port** `~/.config/nvim/lazy-lock.json` <sub>`dot_config/nvim/lazy-lock.json`</sub>
-- [ ] **port** `~/.config/nvim/lazyvim.json` <sub>`dot_config/nvim/lazyvim.json`</sub>
-- [ ] **port** `~/.config/nvim/lua/config/autocmds.lua` <sub>`dot_config/nvim/lua/config/autocmds.lua`</sub>
-- [ ] **port** `~/.config/nvim/lua/config/keymaps.lua` <sub>`dot_config/nvim/lua/config/keymaps.lua`</sub>
-- [ ] **port** `~/.config/nvim/lua/config/lazy.lua` <sub>`dot_config/nvim/lua/config/lazy.lua`</sub>
-- [ ] **port** `~/.config/nvim/lua/config/options.lua` <sub>`dot_config/nvim/lua/config/options.lua`</sub>
-- [ ] **port** `~/.config/nvim/lua/plugins/blink-cmp.lua` <sub>`dot_config/nvim/lua/plugins/blink-cmp.lua`</sub>
-- [ ] **port** `~/.config/nvim/lua/plugins/copilot-lualine.lua` <sub>`dot_config/nvim/lua/plugins/copilot-lualine.lua`</sub>
-- [ ] **port** `~/.config/nvim/lua/plugins/copilot.lua` <sub>`dot_config/nvim/lua/plugins/copilot.lua`</sub>
-- [ ] **port** `~/.config/nvim/lua/plugins/dashboard-dots-identity.lua` <sub>`dot_config/nvim/lua/plugins/dashboard-dots-identity.lua`</sub>
-- [ ] **port** `~/.config/nvim/lua/plugins/example.lua` <sub>`dot_config/nvim/lua/plugins/example.lua`</sub>
-- [ ] **port** `~/.config/nvim/lua/plugins/faster-smear-cursor.lua` <sub>`dot_config/nvim/lua/plugins/faster-smear-cursor.lua`</sub>
-- [ ] **port** `~/.config/nvim/lua/plugins/herdr-nvim.lua` <sub>`dot_config/nvim/lua/plugins/herdr-nvim.lua`</sub>
-- [ ] **port** `~/.config/nvim/lua/plugins/html-preview.lua` <sub>`dot_config/nvim/lua/plugins/empty_html-preview.lua`</sub>
-- [ ] **port** `~/.config/nvim/lua/plugins/mini-animate-disable-cursor.lua` <sub>`dot_config/nvim/lua/plugins/mini-animate-disable-cursor.lua`</sub>
-- [ ] **rewrite** `~/.config/nvim/lua/plugins/theme.lua` (template → esh `##template.esh` or plain file) <sub>`dot_config/nvim/lua/plugins/theme.lua.tmpl`</sub>
-- [ ] **port** `~/.config/nvim/lua/plugins/vim-be-good.lua` <sub>`dot_config/nvim/lua/plugins/vim-be-good.lua`</sub>
+- [x] **drop** `~/.config/nvim/init.lua` <sub>`dot_config/nvim/init.lua`</sub> — Omarchy-owned (2026-10-18)
+- [x] **done** `~/.config/nvim/lazy-lock.json` <sub>`dot_config/nvim/lazy-lock.json`</sub> — regenerated for the new plugin set (2026-10-18)
+- [x] **done** `~/.config/nvim/lazyvim.json` <sub>`dot_config/nvim/lazyvim.json`</sub> — 31 extras; toml dropped, docker+helm added, typescript.tsc is now tsgo, chezmoi and Copilot dropped (2026-10-18)
+- [x] **drop** `~/.config/nvim/lua/config/autocmds.lua` <sub>`dot_config/nvim/lua/config/autocmds.lua`</sub> — Omarchy-owned (2026-10-18)
+- [ ] **port** `~/.config/nvim/lua/config/keymaps.lua` <sub>`dot_config/nvim/lua/config/keymaps.lua`</sub> — deferred: Ollama commit keys go with the AI agents group; CopilotChat key dropped (2026-10-18)
+- [x] **drop** `~/.config/nvim/lua/config/lazy.lua` <sub>`dot_config/nvim/lua/config/lazy.lua`</sub> — Omarchy-owned (2026-10-18)
+- [x] **drop** `~/.config/nvim/lua/config/options.lua` <sub>`dot_config/nvim/lua/config/options.lua`</sub> — Omarchy-owned (2026-10-18)
+- [x] **done** `~/.config/nvim/lua/plugins/blink-cmp.lua` <sub>`dot_config/nvim/lua/plugins/blink-cmp.lua`</sub> — super-tab only (2026-10-18)
+- [x] **drop** `~/.config/nvim/lua/plugins/copilot-lualine.lua` <sub>`dot_config/nvim/lua/plugins/copilot-lualine.lua`</sub> — no Copilot (2026-10-18)
+- [x] **drop** `~/.config/nvim/lua/plugins/copilot.lua` <sub>`dot_config/nvim/lua/plugins/copilot.lua`</sub> — no Copilot (2026-10-18)
+- [x] **done** `~/.config/nvim/lua/plugins/dashboard-dots-identity.lua` <sub>`dot_config/nvim/lua/plugins/dashboard-dots-identity.lua`</sub> — replaced by dashboard-theme-art.lua (theme-synced ASCII art) (2026-10-18)
+- [x] **drop** `~/.config/nvim/lua/plugins/example.lua` <sub>`dot_config/nvim/lua/plugins/example.lua`</sub> — identical to Omarchy's (2026-10-18)
+- [x] **done** `~/.config/nvim/lua/plugins/faster-smear-cursor.lua` <sub>`dot_config/nvim/lua/plugins/faster-smear-cursor.lua`</sub> — ported (2026-10-18)
+- [ ] **port** `~/.config/nvim/lua/plugins/herdr-nvim.lua` <sub>`dot_config/nvim/lua/plugins/herdr-nvim.lua`</sub> — deferred to the herdr group (2026-10-18)
+- [x] **done** `~/.config/nvim/lua/plugins/html-preview.lua` <sub>`dot_config/nvim/lua/plugins/empty_html-preview.lua`</sub> — ported (2026-10-18)
+- [x] **done** `~/.config/nvim/lua/plugins/mini-animate-disable-cursor.lua` <sub>`dot_config/nvim/lua/plugins/mini-animate-disable-cursor.lua`</sub> — ported (2026-10-18)
+- [x] **drop** `~/.config/nvim/lua/plugins/theme.lua` (template → esh `##template.esh` or plain file) <sub>`dot_config/nvim/lua/plugins/theme.lua.tmpl`</sub> — Omarchy links the theme (2026-10-18)
+- [x] **done** `~/.config/nvim/lua/plugins/vim-be-good.lua` <sub>`dot_config/nvim/lua/plugins/vim-be-good.lua`</sub> — ported (2026-10-18)
 
 ## Terminals and CLI tools
 
