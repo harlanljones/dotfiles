@@ -39,6 +39,9 @@ vpl-gpu-rt
 cups-browsed
 cups-pdf
 
+# Local models (NVIDIA GPU)
+ollama-cuda
+
 # Containers and Kubernetes
 kubectl
 podman

@@ -41,7 +41,7 @@ Rules while porting:
 - [x] **done** `~/.config/shell/30-navigation.sh` <sub>`dot_config/shell/30-navigation.sh`</sub> — bash only (2026-10-18)
 - [x] **done** `~/.config/shell/40-aliases.sh` <sub>`dot_config/shell/40-aliases.sh`</sub> — dots aliases became ys/yd; Omarchy's cx (Claude) and cy (Codex) kept (2026-10-18)
 - [x] **drop** `~/.config/shell/45-omarchy-portable-aliases.sh` <sub>`dot_config/shell/45-omarchy-portable-aliases.sh`</sub> — zsh/macOS only (2026-10-18)
-- [ ] **port** `~/.config/shell/50-agents.sh` <sub>`dot_config/shell/50-agents.sh`</sub>
+- [x] **skip** `~/.config/shell/50-agents.sh` <sub>`dot_config/shell/50-agents.sh`</sub> — cline wrapper; Cline not installed (2026-10-18)
 - [x] **drop** `~/.config/shell/55-apps.sh` <sub>`dot_config/shell/55-apps.sh`</sub> — WebKit fix not wanted; ft and chrome-profile not installed (2026-10-18)
 - [x] **done** `~/.config/shell/60-prompt.sh` <sub>`dot_config/shell/60-prompt.sh`</sub> — bash branch only (2026-10-18)
 - [x] **done** `~/.config/shell/61-splash.sh` <sub>`dot_config/shell/61-splash.sh`</sub> — fastfetch banner instead of dots-identity (2026-10-18)
@@ -50,7 +50,7 @@ Rules while porting:
 - [x] **drop** `~/.config/shell/75-tool-paths.sh` <sub>`dot_config/shell/75-tool-paths.sh`</sub> — opencode and grok live in ~/.local/bin (2026-10-18)
 - [x] **done** `~/.config/shell/80-local.sh` <sub>`dot_config/shell/80-local.sh`</sub> — ported; local.sh excluded (2026-10-18)
 - [x] **done** `~/.config/shell/README.md` <sub>`dot_config/shell/README.md`</sub> — rewritten for the bash-only layout (2026-10-18)
-- [ ] **drop** `~/.zshrc` (macOS only) <sub>`dot_zshrc`</sub>
+- [x] **drop** `~/.zshrc` (macOS only) <sub>`dot_zshrc`</sub> — macOS only (2026-10-18)
 
 ## Git and GitHub
 
@@ -63,8 +63,8 @@ Rules while porting:
 
 ## SSH and 1Password
 
-- [ ] **port** `~/.config/1password/ssh/agent.toml` <sub>`dot_config/1password/ssh/agent.toml`</sub>
-- [ ] **rewrite** `~/.ssh/config` (template → esh `##template.esh` or plain file; chmod 600/700 in bootstrap) <sub>`private_dot_ssh/config.tmpl`</sub>
+- [x] **done** `~/.config/1password/ssh/agent.toml` <sub>`dot_config/1password/ssh/agent.toml`</sub> — now ~/.config/1Password/ssh/agent.toml (Agents vault only) (2026-10-18)
+- [x] **done** `~/.ssh/config` (template → esh `##template.esh` or plain file; chmod 600/700 in bootstrap) <sub>`private_dot_ssh/config.tmpl`</sub> — ported as a plain file (1Password agent) (2026-10-18)
 
 ## Neovim
 
@@ -72,7 +72,7 @@ Rules while porting:
 - [x] **done** `~/.config/nvim/lazy-lock.json` <sub>`dot_config/nvim/lazy-lock.json`</sub> — regenerated for the new plugin set (2026-10-18)
 - [x] **done** `~/.config/nvim/lazyvim.json` <sub>`dot_config/nvim/lazyvim.json`</sub> — 31 extras; toml dropped, docker+helm added, typescript.tsc is now tsgo, chezmoi and Copilot dropped (2026-10-18)
 - [x] **drop** `~/.config/nvim/lua/config/autocmds.lua` <sub>`dot_config/nvim/lua/config/autocmds.lua`</sub> — Omarchy-owned (2026-10-18)
-- [ ] **port** `~/.config/nvim/lua/config/keymaps.lua` <sub>`dot_config/nvim/lua/config/keymaps.lua`</sub> — deferred: Ollama commit keys go with the AI agents group; CopilotChat key dropped (2026-10-18)
+- [x] **skip** `~/.config/nvim/lua/config/keymaps.lua` <sub>`dot_config/nvim/lua/config/keymaps.lua`</sub> — Ollama commit keys skipped; CopilotChat key dropped (2026-10-18)
 - [x] **drop** `~/.config/nvim/lua/config/lazy.lua` <sub>`dot_config/nvim/lua/config/lazy.lua`</sub> — Omarchy-owned (2026-10-18)
 - [x] **drop** `~/.config/nvim/lua/config/options.lua` <sub>`dot_config/nvim/lua/config/options.lua`</sub> — Omarchy-owned (2026-10-18)
 - [x] **done** `~/.config/nvim/lua/plugins/blink-cmp.lua` <sub>`dot_config/nvim/lua/plugins/blink-cmp.lua`</sub> — super-tab only (2026-10-18)
@@ -139,7 +139,7 @@ time, AppImage, alias manager, resume, local-ai, umarchy, omabudget,
 omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 `harlan.fan-control` and `harlan.agent-leaderboard` plugins were never in it.
 
-- [ ] **port** `~/.config/chrome-flags.conf` <sub>`dot_config/chrome-flags.conf`</sub>
+- [x] **drop** `~/.config/chrome-flags.conf` <sub>`dot_config/chrome-flags.conf`</sub> — Chrome not installed (2026-10-18)
 - [x] **done** `~/.config/omarchy/defaults/agent` (template → esh `##template.esh` or plain file) <sub>`dot_config/omarchy/defaults/agent.tmpl`</sub> — already tracked from this machine
 - [x] **done** `~/.config/omarchy/hooks/post-boot.d/backdrop-split` <sub>`dot_config/omarchy/hooks/post-boot.d/executable_backdrop-split`</sub> — ported 2026-10-18, longer IPC timeout
 - [x] **done** `~/.config/omarchy/hooks/theme-set.d/backdrop-split` <sub>`dot_config/omarchy/hooks/theme-set.d/executable_backdrop-split`</sub> — ported 2026-10-18
@@ -155,38 +155,38 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 
 ## systemd user units
 
-- [ ] **port** `~/.config/systemd/user/dots-theme-agents.path` <sub>`dot_config/systemd/user/dots-theme-agents.path`</sub>
-- [ ] **port** `~/.config/systemd/user/dots-theme-agents.service` <sub>`dot_config/systemd/user/dots-theme-agents.service`</sub>
+- [x] **drop** `~/.config/systemd/user/dots-theme-agents.path` <sub>`dot_config/systemd/user/dots-theme-agents.path`</sub> — agent themes now follow Omarchy's theme templates (2026-10-18)
+- [x] **drop** `~/.config/systemd/user/dots-theme-agents.service` <sub>`dot_config/systemd/user/dots-theme-agents.service`</sub> — agent themes now follow Omarchy's theme templates (2026-10-18)
 - [x] **skip** `~/.config/systemd/user/herdr-cline-state.service` <sub>`dot_config/systemd/user/herdr-cline-state.service`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [x] **skip** `~/.config/systemd/user/herdr-cline-state.timer` <sub>`dot_config/systemd/user/herdr-cline-state.timer`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [x] **skip** `~/.config/systemd/user/herdr-outpost-relay.service` <sub>`dot_config/systemd/user/herdr-outpost-relay.service`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
-- [ ] **port** `~/.config/systemd/user/ollama-omarchy-agents.service` <sub>`dot_config/systemd/user/ollama-omarchy-agents.service`</sub>
-- [ ] **port** `~/.config/systemd/user/omarchy-agents-analysis.service` <sub>`dot_config/systemd/user/omarchy-agents-analysis.service`</sub>
-- [ ] **port** `~/.config/systemd/user/omarchy-agents-analysis.timer` <sub>`dot_config/systemd/user/omarchy-agents-analysis.timer`</sub>
-- [ ] **port** `~/.config/systemd/user/omarchy-agents-dashboard.service` <sub>`dot_config/systemd/user/omarchy-agents-dashboard.service`</sub>
-- [ ] **port** `~/.config/systemd/user/omarchy-agents-tunnel.service` <sub>`dot_config/systemd/user/omarchy-agents-tunnel.service`</sub>
+- [x] **skip** `~/.config/systemd/user/ollama-omarchy-agents.service` <sub>`dot_config/systemd/user/ollama-omarchy-agents.service`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `~/.config/systemd/user/omarchy-agents-analysis.service` <sub>`dot_config/systemd/user/omarchy-agents-analysis.service`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `~/.config/systemd/user/omarchy-agents-analysis.timer` <sub>`dot_config/systemd/user/omarchy-agents-analysis.timer`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `~/.config/systemd/user/omarchy-agents-dashboard.service` <sub>`dot_config/systemd/user/omarchy-agents-dashboard.service`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `~/.config/systemd/user/omarchy-agents-tunnel.service` <sub>`dot_config/systemd/user/omarchy-agents-tunnel.service`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
 - [ ] **port** `~/.config/systemd/user/omarchy-camera-reset.service` <sub>`dot_config/systemd/user/omarchy-camera-reset.service`</sub>
-- [ ] **port** `~/.config/systemd/user/omarchy-cline-usage-scrape.service` <sub>`dot_config/systemd/user/omarchy-cline-usage-scrape.service`</sub>
-- [ ] **port** `~/.config/systemd/user/omarchy-cline-usage-scrape.timer` <sub>`dot_config/systemd/user/omarchy-cline-usage-scrape.timer`</sub>
-- [ ] **port** `~/.config/systemd/user/omarchy-cursor-usage-scrape.service` <sub>`dot_config/systemd/user/omarchy-cursor-usage-scrape.service`</sub>
-- [ ] **port** `~/.config/systemd/user/omarchy-cursor-usage-scrape.timer` <sub>`dot_config/systemd/user/omarchy-cursor-usage-scrape.timer`</sub>
-- [ ] **drop** `~/.config/systemd/user/omarchy-drift-capture.path` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_config/systemd/user/omarchy-drift-capture.path`</sub>
-- [ ] **drop** `~/.config/systemd/user/omarchy-drift-capture.service` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_config/systemd/user/omarchy-drift-capture.service`</sub>
-- [ ] **port** `~/.config/systemd/user/omarchy-opencode-go-usage-scrape.service` <sub>`dot_config/systemd/user/omarchy-opencode-go-usage-scrape.service`</sub>
-- [ ] **port** `~/.config/systemd/user/omarchy-opencode-go-usage-scrape.timer` <sub>`dot_config/systemd/user/omarchy-opencode-go-usage-scrape.timer`</sub>
+- [x] **skip** `~/.config/systemd/user/omarchy-cline-usage-scrape.service` <sub>`dot_config/systemd/user/omarchy-cline-usage-scrape.service`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `~/.config/systemd/user/omarchy-cline-usage-scrape.timer` <sub>`dot_config/systemd/user/omarchy-cline-usage-scrape.timer`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `~/.config/systemd/user/omarchy-cursor-usage-scrape.service` <sub>`dot_config/systemd/user/omarchy-cursor-usage-scrape.service`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `~/.config/systemd/user/omarchy-cursor-usage-scrape.timer` <sub>`dot_config/systemd/user/omarchy-cursor-usage-scrape.timer`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **drop** `~/.config/systemd/user/omarchy-drift-capture.path` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_config/systemd/user/omarchy-drift-capture.path`</sub> — replaced by yadm and the post-update drift hook (2026-10-18)
+- [x] **drop** `~/.config/systemd/user/omarchy-drift-capture.service` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_config/systemd/user/omarchy-drift-capture.service`</sub> — replaced by yadm and the post-update drift hook (2026-10-18)
+- [x] **skip** `~/.config/systemd/user/omarchy-opencode-go-usage-scrape.service` <sub>`dot_config/systemd/user/omarchy-opencode-go-usage-scrape.service`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `~/.config/systemd/user/omarchy-opencode-go-usage-scrape.timer` <sub>`dot_config/systemd/user/omarchy-opencode-go-usage-scrape.timer`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
 
 ## ~/.local/bin scripts
 
 - [x] **done** `~/.local/bin/backdrop-split` <sub>`dot_local/bin/executable_backdrop-split`</sub> — ported 2026-10-18
-- [ ] **port** `~/.local/bin/chrome-profile` <sub>`dot_local/bin/executable_chrome-profile`</sub>
-- [ ] **port** `~/.local/bin/cline-safety/git` <sub>`dot_local/bin/cline-safety/executable_git`</sub>
+- [x] **drop** `~/.local/bin/chrome-profile` <sub>`dot_local/bin/executable_chrome-profile`</sub> — Chrome not installed (2026-10-18)
+- [x] **drop** `~/.local/bin/cline-safety/git` <sub>`dot_local/bin/cline-safety/executable_git`</sub> — Cline not installed (2026-10-18)
 - [x] **drop** `~/.local/bin/cursor` <sub>`dot_local/bin/executable_cursor`</sub> — Cursor's own CLI shim; not needed with cursor-bin (2026-10-18)
-- [ ] **drop** `~/.local/bin/dots` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots`</sub>
-- [ ] **drop** `~/.local/bin/dots-cloud-status` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-cloud-status`</sub>
+- [x] **drop** `~/.local/bin/dots` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots`</sub> — chezmoi CLI; yadm replaces it (2026-10-18)
+- [x] **drop** `~/.local/bin/dots-cloud-status` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-cloud-status`</sub> — fed the old dots-identity splash (2026-10-18)
 - [x] **drop** `~/.local/bin/dots-identity` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-identity`</sub> — replaced by fastfetch (2026-10-18)
-- [ ] **drop** `~/.local/bin/dots-push` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-push`</sub>
-- [ ] **drop** `~/.local/bin/dots-theme-agents` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-theme-agents`</sub>
-- [ ] **drop** `~/.local/bin/dots-theme-import-aether` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-theme-import-aether`</sub>
+- [x] **skip** `~/.local/bin/dots-push` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-push`</sub> — Ollama commit helpers skipped; ollama-cuda installed (2026-10-18)
+- [x] **drop** `~/.local/bin/dots-theme-agents` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-theme-agents`</sub> — agent themes now follow Omarchy's theme templates (2026-10-18)
+- [x] **drop** `~/.local/bin/dots-theme-import-aether` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-theme-import-aether`</sub> — old dots palette tooling (2026-10-18)
 - [x] **skip** `~/.local/bin/herdr-agent-lifecycle` <sub>`dot_local/bin/executable_herdr-agent-lifecycle`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [x] **skip** `~/.local/bin/herdr-cline-state` <sub>`dot_local/bin/executable_herdr-cline-state`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [x] **skip** `~/.local/bin/herdr-gemini-session` <sub>`dot_local/bin/executable_herdr-gemini-session`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
@@ -194,33 +194,33 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 - [x] **skip** `~/.local/bin/herdr-sync-hermes-plugin` <sub>`dot_local/bin/executable_herdr-sync-hermes-plugin`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [x] **skip** `~/.local/bin/herdr-verify` <sub>`dot_local/bin/executable_herdr-verify`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [x] **done** `~/.local/bin/keychron-audio-toggle` <sub>`dot_local/bin/executable_keychron-audio-toggle`</sub> — ported 2026-10-18; sink names now come from a 1Password-rendered config
-- [ ] **port** `~/.local/bin/lazygit-ollama-commit.sh` <sub>`dot_local/bin/executable_lazygit-ollama-commit.sh`</sub>
-- [ ] **port** `~/.local/bin/ollama-commit-msg.sh` <sub>`dot_local/bin/executable_ollama-commit-msg.sh`</sub>
-- [ ] **rewrite** `~/.local/bin/omarchy-agent` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent.tmpl`</sub>
-- [ ] **rewrite** `~/.local/bin/omarchy-agent-usage-antigravity` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent-usage-antigravity.tmpl`</sub>
-- [ ] **rewrite** `~/.local/bin/omarchy-agent-usage-cline` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent-usage-cline.tmpl`</sub>
-- [ ] **rewrite** `~/.local/bin/omarchy-agent-usage-codex` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent-usage-codex.tmpl`</sub>
-- [ ] **rewrite** `~/.local/bin/omarchy-agent-usage-cursor` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent-usage-cursor.tmpl`</sub>
-- [ ] **rewrite** `~/.local/bin/omarchy-agent-usage-opencode` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent-usage-opencode.tmpl`</sub>
-- [ ] **rewrite** `~/.local/bin/omarchy-agent-usage-pi` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent-usage-pi.tmpl`</sub>
-- [ ] **rewrite** `~/.local/bin/omarchy-agent-usage-update` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent-usage-update.tmpl`</sub>
+- [x] **skip** `~/.local/bin/lazygit-ollama-commit.sh` <sub>`dot_local/bin/executable_lazygit-ollama-commit.sh`</sub> — Ollama commit helpers skipped; ollama-cuda installed (2026-10-18)
+- [x] **skip** `~/.local/bin/ollama-commit-msg.sh` <sub>`dot_local/bin/executable_ollama-commit-msg.sh`</sub> — Ollama commit helpers skipped; ollama-cuda installed (2026-10-18)
+- [x] **drop** `~/.local/bin/omarchy-agent` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent.tmpl`</sub> — Omarchy 4 ships omarchy-agent (2026-10-18)
+- [x] **skip** `~/.local/bin/omarchy-agent-usage-antigravity` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent-usage-antigravity.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `~/.local/bin/omarchy-agent-usage-cline` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent-usage-cline.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `~/.local/bin/omarchy-agent-usage-codex` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent-usage-codex.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `~/.local/bin/omarchy-agent-usage-cursor` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent-usage-cursor.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `~/.local/bin/omarchy-agent-usage-opencode` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent-usage-opencode.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `~/.local/bin/omarchy-agent-usage-pi` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent-usage-pi.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `~/.local/bin/omarchy-agent-usage-update` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent-usage-update.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
 - [ ] **port** `~/.local/bin/omarchy-camera-reset` <sub>`dot_local/bin/executable_omarchy-camera-reset`</sub>
-- [ ] **rewrite** `~/.local/bin/omarchy-cline-usage-login` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-cline-usage-login.tmpl`</sub>
-- [ ] **rewrite** `~/.local/bin/omarchy-cline-usage-override` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-cline-usage-override.tmpl`</sub>
-- [ ] **rewrite** `~/.local/bin/omarchy-cline-usage-scrape` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-cline-usage-scrape.tmpl`</sub>
-- [ ] **rewrite** `~/.local/bin/omarchy-cursor-statusline` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-cursor-statusline.tmpl`</sub>
-- [ ] **rewrite** `~/.local/bin/omarchy-cursor-usage-override` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-cursor-usage-override.tmpl`</sub>
-- [ ] **rewrite** `~/.local/bin/omarchy-cursor-usage-scrape` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-cursor-usage-scrape.tmpl`</sub>
-- [ ] **rewrite** `~/.local/bin/omarchy-default-agent` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-default-agent.tmpl`</sub>
-- [ ] **drop** `~/.local/bin/omarchy-dotfiles-sync` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_omarchy-dotfiles-sync`</sub>
-- [ ] **drop** `~/.local/bin/omarchy-drift-capture` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_omarchy-drift-capture`</sub>
-- [ ] **rewrite** `~/.local/bin/omarchy-opencode-go-usage-login` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-opencode-go-usage-login.tmpl`</sub>
-- [ ] **rewrite** `~/.local/bin/omarchy-opencode-go-usage-override` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-opencode-go-usage-override.tmpl`</sub>
-- [ ] **rewrite** `~/.local/bin/omarchy-opencode-go-usage-scrape` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-opencode-go-usage-scrape.tmpl`</sub>
+- [x] **skip** `~/.local/bin/omarchy-cline-usage-login` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-cline-usage-login.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `~/.local/bin/omarchy-cline-usage-override` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-cline-usage-override.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `~/.local/bin/omarchy-cline-usage-scrape` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-cline-usage-scrape.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **drop** `~/.local/bin/omarchy-cursor-statusline` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-cursor-statusline.tmpl`</sub> — Cursor CLI uses ~/.local/bin/statusline (2026-10-18)
+- [x] **skip** `~/.local/bin/omarchy-cursor-usage-override` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-cursor-usage-override.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `~/.local/bin/omarchy-cursor-usage-scrape` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-cursor-usage-scrape.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **drop** `~/.local/bin/omarchy-default-agent` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-default-agent.tmpl`</sub> — Omarchy 4 ships omarchy-default-agent (2026-10-18)
+- [x] **drop** `~/.local/bin/omarchy-dotfiles-sync` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_omarchy-dotfiles-sync`</sub> — chezmoi capture; yadm tracks files in place (2026-10-18)
+- [x] **drop** `~/.local/bin/omarchy-drift-capture` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_omarchy-drift-capture`</sub> — replaced by yadm and the post-update drift hook (2026-10-18)
+- [x] **skip** `~/.local/bin/omarchy-opencode-go-usage-login` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-opencode-go-usage-login.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `~/.local/bin/omarchy-opencode-go-usage-override` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-opencode-go-usage-override.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `~/.local/bin/omarchy-opencode-go-usage-scrape` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-opencode-go-usage-scrape.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
 - [x] **drop** `~/.local/bin/piper` — dropped: piper not installed, no mise Python
 - [x] **drop** `~/.local/bin/ratbagctl` — dropped: no mise Python on this machine
 - [x] **rewrite** `~/.local/bin/statusline` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_statusline.tmpl`</sub> — ported (2026-10-18)
-- [ ] **drop** `~/.local/bin/wsl-windows-tool` (WSL/Windows only) <sub>`dot_local/bin/executable_wsl-windows-tool`</sub>
+- [x] **drop** `~/.local/bin/wsl-windows-tool` (WSL/Windows only) <sub>`dot_local/bin/executable_wsl-windows-tool`</sub> — WSL only (2026-10-18)
 
 ## Claude Code
 
@@ -290,11 +290,11 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 
 ## Cline and Cursor
 
-- [ ] **port** `~/.cline/data/settings/global-settings.json` <sub>`dot_cline/data/settings/global-settings.json`</sub>
+- [x] **skip** `~/.cline/data/settings/global-settings.json` <sub>`dot_cline/data/settings/global-settings.json`</sub> — Cline not installed (2026-10-18)
 - [x] **skip** `~/.cline/skills/project-doc-planner` (keep as symlink) <sub>`dot_cline/skills/symlink_project-doc-planner`</sub> — skills left to Tern (2026-10-18)
 - [x] **done** `~/.config/Cursor/User/settings.json` (chmod 600/700 in bootstrap) <sub>`dot_config/private_Cursor/User/settings.json`</sub> — ported; Cursor installs as cursor-bin, cursor-agent via mise (2026-10-18)
 - [x] **drop** `~/.local/share/applications/cursor-desktop.desktop` (hardcoded AppImage path) <sub>`dot_local/share/applications/cursor-desktop.desktop`</sub> — AppImage entry; cursor-bin ships its own (2026-10-18)
-- [ ] **port** `~/Documents/Cline/Workflows/usage.md` <sub>`Documents/Cline/Workflows/usage.md`</sub>
+- [x] **skip** `~/Documents/Cline/Workflows/usage.md` <sub>`Documents/Cline/Workflows/usage.md`</sub> — Cline not installed (2026-10-18)
 
 ## Other agent skill links
 
@@ -303,9 +303,9 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 
 ## Other
 
-- [ ] **port** `~/.config/dots/cloud-services` <sub>`dot_config/dots/cloud-services`</sub>
-- [ ] **rewrite** `~/.config/dots/cloudflare.env` (encrypted → `secrets.list` + op:// template; chmod 600/700 in bootstrap) <sub>`dot_config/dots/encrypted_private_cloudflare.env.age`</sub>
-- [ ] **drop** `~/.local/share/wsl-ssh-bridge/main.go` (WSL/Windows only) <sub>`dot_local/share/wsl-ssh-bridge/main.go`</sub>
+- [x] **drop** `~/.config/dots/cloud-services` <sub>`dot_config/dots/cloud-services`</sub> — fed the old dots-identity splash (2026-10-18)
+- [x] **skip** `~/.config/dots/cloudflare.env` (encrypted → `secrets.list` + op:// template; chmod 600/700 in bootstrap) <sub>`dot_config/dots/encrypted_private_cloudflare.env.age`</sub> — tunnel token; goes with the Omarchy Agents stack (deferred to Tern) (2026-10-18)
+- [x] **drop** `~/.local/share/wsl-ssh-bridge/main.go` (WSL/Windows only) <sub>`dot_local/share/wsl-ssh-bridge/main.go`</sub> — WSL only (2026-10-18)
 
 ## chezmoi run scripts → bootstrap steps
 
@@ -313,27 +313,27 @@ None of these copy over directly. Each becomes an idempotent bootstrap step, or 
 
 - [x] **skip** `run_after_23-sync-agent-skills.sh.tmpl` — skills left to Tern (2026-10-18)
 - [x] **done** `run_after_34-augustus-backdrop-split.sh.tmpl` — replaced by the theme-set and post-boot hooks
-- [ ] **rewrite** `run_after_35-augustus-theme-modes-converge.sh.tmpl`
-- [ ] **rewrite** `run_once_after_24-setup-omarchy-agents.sh.tmpl`
-- [ ] **rewrite** `run_once_before_00-verify-deps.sh.tmpl`
+- [x] **drop** `run_after_35-augustus-theme-modes-converge.sh.tmpl` — synced theme-modes from the old dots palette (2026-10-18)
+- [x] **skip** `run_once_after_24-setup-omarchy-agents.sh.tmpl` — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **drop** `run_once_before_00-verify-deps.sh.tmpl` — replaced by yadm bootstrap (2026-10-18)
 - [x] **skip** `run_once_before_05-sync-hermes-skills.sh.tmpl` — skills left to Tern (2026-10-18)
 - [x] **done** `run_onchange_after_10-install-omarchy-plugins.sh.tmpl` — replaced by omarchy-plugins.txt + bootstrap + omarchy-plugin-patches
-- [ ] **rewrite** `run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl`
-- [ ] **rewrite** `run_onchange_after_25-sync-omarchy-agents-workspace.sh.tmpl`
+- [x] **skip** `run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl` — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **skip** `run_onchange_after_25-sync-omarchy-agents-workspace.sh.tmpl` — Omarchy Agents stack deferred to Tern (2026-10-18)
 - [x] **done** `run_onchange_after_26-setup-omarchy-cursor.sh.tmpl` — status line now a JSON seed (seeds.list) (2026-10-18)
 - [x] **done** `run_onchange_after_27-sync-claude-mcp.sh.tmpl` — codebase-memory-mcp reinstalled with its own installer (SETUP.md) (2026-10-18)
 - [x] **done** `run_onchange_after_28-sync-claude-settings.sh.tmpl` — status line and plugins ported into the tracked settings.json; git deny rules and dangerous-mode skip not wanted; herdr hooks skipped (2026-10-18)
-- [ ] **rewrite** `run_onchange_after_29-enable-omarchy-user-units.sh.tmpl`
-- [ ] **drop** `run_onchange_after_30-hadrian-macos-defaults.sh.tmpl` (macOS only)
+- [x] **skip** `run_onchange_after_29-enable-omarchy-user-units.sh.tmpl` — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **drop** `run_onchange_after_30-hadrian-macos-defaults.sh.tmpl` (macOS only) — macOS only (2026-10-18)
 - [x] **done** `run_onchange_after_31-augustus-mouse-dpi.sh.tmpl` (same desk as Augustus; libratbag is installed) — ported 2026-10-18 as ~/.local/bin/mouse-dpi + bootstrap step
-- [ ] **rewrite** `run_onchange_after_32-setup-omarchy-agent-registrations.sh.tmpl`
-- [ ] **rewrite** `run_onchange_after_33-augustus-machine-branding.sh.tmpl`
-- [ ] **drop** `run_onchange_after_40-vespasian-windows-terminal.sh.tmpl` (WSL/Windows only)
-- [ ] **drop** `run_onchange_after_41-vespasian-nerd-font.sh.tmpl` (WSL/Windows only)
-- [ ] **drop** `run_onchange_after_42-vespasian-theme-state.sh.tmpl` (WSL/Windows only)
-- [ ] **drop** `run_onchange_after_43-vespasian-1password-ssh-bridge.sh.tmpl` (WSL/Windows only)
-- [ ] **drop** `run_onchange_after_44-vespasian-windows-debloat.sh.tmpl` (WSL/Windows only)
-- [ ] **drop** `run_onchange_after_45-vespasian-desktop-tools.sh.tmpl` (WSL/Windows only)
-- [ ] **drop** `run_onchange_after_46-vespasian-wallpaper.sh.tmpl` (WSL/Windows only)
-- [ ] **drop** `run_onchange_after_47-vespasian-wsl-boot.sh.tmpl` (WSL/Windows only)
+- [x] **skip** `run_onchange_after_32-setup-omarchy-agent-registrations.sh.tmpl` — Omarchy Agents stack deferred to Tern (2026-10-18)
+- [x] **drop** `run_onchange_after_33-augustus-machine-branding.sh.tmpl` — replaced by the theme-art hook (2026-10-18)
+- [x] **drop** `run_onchange_after_40-vespasian-windows-terminal.sh.tmpl` (WSL/Windows only) — WSL only (2026-10-18)
+- [x] **drop** `run_onchange_after_41-vespasian-nerd-font.sh.tmpl` (WSL/Windows only) — WSL only (2026-10-18)
+- [x] **drop** `run_onchange_after_42-vespasian-theme-state.sh.tmpl` (WSL/Windows only) — WSL only (2026-10-18)
+- [x] **drop** `run_onchange_after_43-vespasian-1password-ssh-bridge.sh.tmpl` (WSL/Windows only) — WSL only (2026-10-18)
+- [x] **drop** `run_onchange_after_44-vespasian-windows-debloat.sh.tmpl` (WSL/Windows only) — WSL only (2026-10-18)
+- [x] **drop** `run_onchange_after_45-vespasian-desktop-tools.sh.tmpl` (WSL/Windows only) — WSL only (2026-10-18)
+- [x] **drop** `run_onchange_after_46-vespasian-wallpaper.sh.tmpl` (WSL/Windows only) — WSL only (2026-10-18)
+- [x] **drop** `run_onchange_after_47-vespasian-wsl-boot.sh.tmpl` (WSL/Windows only) — WSL only (2026-10-18)
 - [x] **skip** `run_onchange_before_09-install-agent-skills.sh.tmpl` — skills left to Tern (2026-10-18)
