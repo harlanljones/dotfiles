@@ -284,9 +284,9 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 
 ## Hermes
 
-- [ ] **port** `~/.hermes/SOUL.md` (chmod 600/700 in bootstrap) <sub>`private_dot_hermes/SOUL.md`</sub>
-- [ ] **rewrite** `~/.hermes/config.yaml` (template → esh `##template.esh` or plain file; chmod 600/700 in bootstrap) <sub>`private_dot_hermes/config.yaml.tmpl`</sub>
-- [ ] **rewrite** `~/.hermes/skins/omarchy.yaml` (template → esh `##template.esh` or plain file; chmod 600/700 in bootstrap) <sub>`private_dot_hermes/skins/omarchy.yaml.tmpl`</sub>
+- [x] **done** `~/.hermes/SOUL.md` (chmod 600/700 in bootstrap) <sub>`private_dot_hermes/SOUL.md`</sub> — ported (2026-10-18)
+- [x] **done** `~/.hermes/config.yaml` (template → esh `##template.esh` or plain file; chmod 600/700 in bootstrap) <sub>`private_dot_hermes/config.yaml.tmpl`</sub> — Augustus's non-default settings applied with `hermes config set` (Nous provider and model, turn limit, providers, pruning, gateway, fallback); tracked directly; verdict project dir dropped (2026-10-18)
+- [x] **drop** `~/.hermes/skins/omarchy.yaml` (template → esh `##template.esh` or plain file; chmod 600/700 in bootstrap) <sub>`private_dot_hermes/skins/omarchy.yaml.tmpl`</sub> — Omarchy renders the omarchy skin from the current theme (2026-10-18)
 
 ## Cline and Cursor
 

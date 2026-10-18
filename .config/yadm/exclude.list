@@ -19,6 +19,9 @@
 !.config/Cursor/User/settings.json
 .cursor/
 .grokbot/
+.hermes/*
+!.hermes/config.yaml
+!.hermes/SOUL.md
 .config/1Password/*
 !.config/1Password/ssh/
 .config/1Password/ssh/*

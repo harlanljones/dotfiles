@@ -28,9 +28,11 @@ to this list whenever you set something up by hand.
   `ssh -T git@github.com`.
 
 ## Apps installed outside the package manager
+- **Hermes**: `omarchy install ai hermes`. `~/.hermes/config.yaml` and
+  `SOUL.md` are tracked; sign in to Nous (the configured provider) on first run.
 - **codebase-memory-mcp** (code knowledge graph MCP for Claude): download
   https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh,
-  read it, then run `bash install.sh --clients=claude,codex,opencode,gemini`. It installs the binary
+  read it, then run `bash install.sh --clients=claude,codex,opencode,gemini,hermes`. It installs the binary
   and its updater (`install.sh`) in `~/.local/bin`, registers the MCP server in
   `~/.claude.json`, `~/.codex/config.toml` `~/.config/opencode/opencode.json` and `~/.gemini/settings.json`, and writes its hooks, subagents,
   skill and `~/.codex/AGENTS.md` block; the hook entries in the tracked
