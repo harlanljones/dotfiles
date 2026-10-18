@@ -28,27 +28,27 @@ Rules while porting:
 
 ## Shell
 
-- [ ] **port** `~/.bash_profile` <sub>`dot_bash_profile`</sub>
-- [ ] **port** `~/.bashrc` <sub>`dot_bashrc`</sub>
-- [ ] **port** `~/.config/environment.d/10-defaults.conf` <sub>`dot_config/environment.d/10-defaults.conf`</sub>
+- [x] **drop** `~/.bash_profile` <sub>`dot_bash_profile`</sub> — stock is fine; no cargo here (2026-10-18)
+- [x] **done** `~/.bashrc` <sub>`dot_bashrc`</sub> — stock Omarchy .bashrc plus a module loader; installer leftovers dropped (2026-10-18)
+- [x] **done** `~/.config/environment.d/10-defaults.conf` <sub>`dot_config/environment.d/10-defaults.conf`</sub> — ported (2026-10-18)
 - [ ] **rewrite** `~/.config/environment.d/10-machine.conf` (template → esh `##template.esh` or plain file) <sub>`dot_config/environment.d/10-machine.conf.tmpl`</sub>
-- [ ] **port** `~/.config/shell/00-env.sh` <sub>`dot_config/shell/00-env.sh`</sub>
-- [ ] **port** `~/.config/shell/05-omarchy-detect.sh` <sub>`dot_config/shell/05-omarchy-detect.sh`</sub>
-- [ ] **port** `~/.config/shell/10-tools.sh` <sub>`dot_config/shell/10-tools.sh`</sub>
-- [ ] **port** `~/.config/shell/15-base-bash.sh` <sub>`dot_config/shell/15-base-bash.sh`</sub>
-- [ ] **port** `~/.config/shell/20-integrations.sh` <sub>`dot_config/shell/20-integrations.sh`</sub>
-- [ ] **port** `~/.config/shell/30-navigation.sh` <sub>`dot_config/shell/30-navigation.sh`</sub>
-- [ ] **port** `~/.config/shell/40-aliases.sh` <sub>`dot_config/shell/40-aliases.sh`</sub>
-- [ ] **port** `~/.config/shell/45-omarchy-portable-aliases.sh` <sub>`dot_config/shell/45-omarchy-portable-aliases.sh`</sub>
+- [x] **done** `~/.config/shell/00-env.sh` <sub>`dot_config/shell/00-env.sh`</sub> — EDITOR/VISUAL=nvim; PATH handled by Omarchy and mise (2026-10-18)
+- [x] **drop** `~/.config/shell/05-omarchy-detect.sh` <sub>`dot_config/shell/05-omarchy-detect.sh`</sub> — stock .bashrc loads Omarchy's rc (2026-10-18)
+- [x] **done** `~/.config/shell/10-tools.sh` <sub>`dot_config/shell/10-tools.sh`</sub> — ported; MANPAGER left to Omarchy (2026-10-18)
+- [x] **drop** `~/.config/shell/15-base-bash.sh` <sub>`dot_config/shell/15-base-bash.sh`</sub> — non-Omarchy hosts only (2026-10-18)
+- [x] **done** `~/.config/shell/20-integrations.sh` <sub>`dot_config/shell/20-integrations.sh`</sub> — atuin, direnv, op completion, 1Password agent; zoxide/fzf left to Omarchy (2026-10-18)
+- [x] **done** `~/.config/shell/30-navigation.sh` <sub>`dot_config/shell/30-navigation.sh`</sub> — bash only (2026-10-18)
+- [x] **done** `~/.config/shell/40-aliases.sh` <sub>`dot_config/shell/40-aliases.sh`</sub> — dots aliases became ys/yd; Omarchy's cx (Claude) and cy (Codex) kept (2026-10-18)
+- [x] **drop** `~/.config/shell/45-omarchy-portable-aliases.sh` <sub>`dot_config/shell/45-omarchy-portable-aliases.sh`</sub> — zsh/macOS only (2026-10-18)
 - [ ] **port** `~/.config/shell/50-agents.sh` <sub>`dot_config/shell/50-agents.sh`</sub>
-- [ ] **port** `~/.config/shell/55-apps.sh` <sub>`dot_config/shell/55-apps.sh`</sub>
-- [ ] **port** `~/.config/shell/60-prompt.sh` <sub>`dot_config/shell/60-prompt.sh`</sub>
+- [x] **drop** `~/.config/shell/55-apps.sh` <sub>`dot_config/shell/55-apps.sh`</sub> — WebKit fix not wanted; ft and chrome-profile not installed (2026-10-18)
+- [x] **done** `~/.config/shell/60-prompt.sh` <sub>`dot_config/shell/60-prompt.sh`</sub> — bash branch only (2026-10-18)
 - [ ] **port** `~/.config/shell/61-splash.sh` <sub>`dot_config/shell/61-splash.sh`</sub>
-- [ ] **port** `~/.config/shell/65-theme.sh` <sub>`dot_config/shell/65-theme.sh`</sub>
-- [ ] **port** `~/.config/shell/70-cloud.sh` <sub>`dot_config/shell/70-cloud.sh`</sub>
-- [ ] **port** `~/.config/shell/75-tool-paths.sh` <sub>`dot_config/shell/75-tool-paths.sh`</sub>
-- [ ] **port** `~/.config/shell/80-local.sh` <sub>`dot_config/shell/80-local.sh`</sub>
-- [ ] **port** `~/.config/shell/README.md` <sub>`dot_config/shell/README.md`</sub>
+- [x] **drop** `~/.config/shell/65-theme.sh` <sub>`dot_config/shell/65-theme.sh`</sub> — Vespasian only (2026-10-18)
+- [x] **done** `~/.config/shell/70-cloud.sh` <sub>`dot_config/shell/70-cloud.sh`</sub> — gcp switchers; SDK and flyctl paths dropped (2026-10-18)
+- [x] **drop** `~/.config/shell/75-tool-paths.sh` <sub>`dot_config/shell/75-tool-paths.sh`</sub> — opencode and grok live in ~/.local/bin (2026-10-18)
+- [x] **done** `~/.config/shell/80-local.sh` <sub>`dot_config/shell/80-local.sh`</sub> — ported; local.sh excluded (2026-10-18)
+- [x] **done** `~/.config/shell/README.md` <sub>`dot_config/shell/README.md`</sub> — rewritten for the bash-only layout (2026-10-18)
 - [ ] **drop** `~/.zshrc` (macOS only) <sub>`dot_zshrc`</sub>
 
 ## Git and GitHub
