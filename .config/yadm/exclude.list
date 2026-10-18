@@ -4,6 +4,10 @@
 .ssh/id_*
 .claude/.credentials.json
 .claude.json
+.codex/*
+!.codex/config.toml
+!.codex/rules/
+!.codex/themes/
 .config/1Password/*
 !.config/1Password/ssh/
 .config/1Password/ssh/*

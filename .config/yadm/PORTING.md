@@ -229,10 +229,10 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 
 ## Codex
 
-- [ ] **port** `~/.codex/AGENTS.md` (chmod 600/700 in bootstrap) <sub>`dot_codex/private_AGENTS.md`</sub>
-- [ ] **rewrite** `~/.codex/config.toml` (`modify_` merge → jq/yq step in bootstrap; chmod 600/700 in bootstrap) <sub>`dot_codex/modify_private_config.toml`</sub>
-- [ ] **rewrite** `~/.codex/hooks.json` (template → esh `##template.esh` or plain file) <sub>`dot_codex/hooks.json.tmpl`</sub>
-- [ ] **port** `~/.codex/rules/default.rules` <sub>`dot_codex/rules/default.rules`</sub>
+- [x] **done** `~/.codex/AGENTS.md` (chmod 600/700 in bootstrap) <sub>`dot_codex/private_AGENTS.md`</sub> — it was only the codebase-memory-mcp block; the installer writes it (2026-10-18)
+- [x] **done** `~/.codex/config.toml` (`modify_` merge → jq/yq step in bootstrap; chmod 600/700 in bootstrap) <sub>`dot_codex/modify_private_config.toml`</sub> — tracked directly; Augustus's review/plan effort, features, TUI status line, desktop prefs, chrome-devtools (bunx) and OpenAI docs MCP, Claude plugin marketplaces, trust for ~; model kept at the current default (2026-10-18)
+- [x] **done** `~/.codex/hooks.json` (template → esh `##template.esh` or plain file) <sub>`dot_codex/hooks.json.tmpl`</sub> — codebase-memory hooks now come from its installer; herdr hooks skipped (2026-10-18)
+- [x] **done** `~/.codex/rules/default.rules` <sub>`dot_codex/rules/default.rules`</sub> — ported (2026-10-18)
 - [x] **skip** `~/.codex/skills/dots/SKILL.md` <sub>`dot_codex/skills/dots/SKILL.md`</sub> — skills left to Tern (2026-10-18)
 - [x] **skip** `~/.codex/skills/frontier-sweep/SKILL.md` <sub>`dot_codex/skills/frontier-sweep/SKILL.md`</sub> — skills left to Tern (2026-10-18)
 - [x] **skip** `~/.codex/skills/grilling/SKILL.md` <sub>`dot_codex/skills/grilling/SKILL.md`</sub> — skills left to Tern (2026-10-18)
@@ -243,7 +243,7 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 - [x] **skip** `~/.codex/skills/linear-agent-tracking/references/linear-cli.md` <sub>`dot_codex/skills/linear-agent-tracking/references/linear-cli.md`</sub> — skills left to Tern (2026-10-18)
 - [x] **skip** `~/.codex/skills/project-doc-planner/SKILL.md` <sub>`dot_codex/skills/project-doc-planner/SKILL.md`</sub> — skills left to Tern (2026-10-18)
 - [x] **skip** `~/.codex/skills/project-doc-planner/agents/openai.yaml` <sub>`dot_codex/skills/project-doc-planner/agents/openai.yaml`</sub> — skills left to Tern (2026-10-18)
-- [ ] **rewrite** `~/.codex/themes/dots.tmTheme` (template → esh `##template.esh` or plain file) <sub>`dot_codex/themes/dots.tmTheme.tmpl`</sub>
+- [x] **done** `~/.codex/themes/dots.tmTheme` (template → esh `##template.esh` or plain file) <sub>`dot_codex/themes/dots.tmTheme.tmpl`</sub> — ~/.codex/themes/omarchy.tmTheme links to the theme-synced bat theme (2026-10-18)
 
 ## Gemini
 
