@@ -8,6 +8,11 @@
 !.codex/config.toml
 !.codex/rules/
 !.codex/themes/
+.gemini/*
+!.gemini/settings.json
+!.gemini/config/
+.gemini/config/*
+!.gemini/config/mcp_config.json
 .config/1Password/*
 !.config/1Password/ssh/
 .config/1Password/ssh/*

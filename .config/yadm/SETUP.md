@@ -30,9 +30,9 @@ to this list whenever you set something up by hand.
 ## Apps installed outside the package manager
 - **codebase-memory-mcp** (code knowledge graph MCP for Claude): download
   https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh,
-  read it, then run `bash install.sh --clients=claude,codex,opencode`. It installs the binary
+  read it, then run `bash install.sh --clients=claude,codex,opencode,gemini`. It installs the binary
   and its updater (`install.sh`) in `~/.local/bin`, registers the MCP server in
-  `~/.claude.json`, `~/.codex/config.toml` and `~/.config/opencode/opencode.json`, and writes its hooks, subagents,
+  `~/.claude.json`, `~/.codex/config.toml` `~/.config/opencode/opencode.json` and `~/.gemini/settings.json`, and writes its hooks, subagents,
   skill and `~/.codex/AGENTS.md` block; the hook entries in the tracked
   `~/.claude/settings.json` and `~/.codex/config.toml` come back as-is. It also appends a
   PATH line to `~/.bashrc`: delete it (Omarchy already puts `~/.local/bin` on PATH).

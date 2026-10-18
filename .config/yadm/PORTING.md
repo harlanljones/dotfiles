@@ -247,15 +247,15 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 
 ## Gemini
 
-- [ ] **port** `~/.gemini/GEMINI.md` (chmod 600/700 in bootstrap) <sub>`dot_gemini/private_GEMINI.md`</sub>
-- [ ] **port** `~/.gemini/agents/codebase-memory-auditor.md` (chmod 600/700 in bootstrap) <sub>`dot_gemini/agents/private_codebase-memory-auditor.md`</sub>
-- [ ] **port** `~/.gemini/agents/codebase-memory-scout.md` (chmod 600/700 in bootstrap) <sub>`dot_gemini/agents/private_codebase-memory-scout.md`</sub>
-- [ ] **port** `~/.gemini/agents/codebase-memory.md` (chmod 600/700 in bootstrap) <sub>`dot_gemini/agents/private_codebase-memory.md`</sub>
-- [ ] **port** `~/.gemini/config/hooks.json` <sub>`dot_gemini/config/hooks.json`</sub>
+- [x] **done** `~/.gemini/GEMINI.md` (chmod 600/700 in bootstrap) <sub>`dot_gemini/private_GEMINI.md`</sub> — codebase-memory installer writes it (2026-10-18)
+- [x] **done** `~/.gemini/agents/codebase-memory-auditor.md` (chmod 600/700 in bootstrap) <sub>`dot_gemini/agents/private_codebase-memory-auditor.md`</sub> — codebase-memory installer writes it (2026-10-18)
+- [x] **done** `~/.gemini/agents/codebase-memory-scout.md` (chmod 600/700 in bootstrap) <sub>`dot_gemini/agents/private_codebase-memory-scout.md`</sub> — codebase-memory installer writes it (2026-10-18)
+- [x] **done** `~/.gemini/agents/codebase-memory.md` (chmod 600/700 in bootstrap) <sub>`dot_gemini/agents/private_codebase-memory.md`</sub> — codebase-memory installer writes it (2026-10-18)
+- [x] **skip** `~/.gemini/config/hooks.json` <sub>`dot_gemini/config/hooks.json`</sub> — herdr only (2026-10-18)
 - [x] **skip** `~/.gemini/config/hooks/herdr-agent-metadata.sh` <sub>`dot_gemini/config/hooks/herdr-agent-metadata.sh`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
-- [ ] **rewrite** `~/.gemini/config/mcp_config.json` (template → esh `##template.esh` or plain file) <sub>`dot_gemini/config/mcp_config.json.tmpl`</sub>
+- [x] **done** `~/.gemini/config/mcp_config.json` (template → esh `##template.esh` or plain file) <sub>`dot_gemini/config/mcp_config.json.tmpl`</sub> — Antigravity MCP servers ported (Cloudflare x5, nomads, codebase-memory) (2026-10-18)
 - [x] **skip** `~/.gemini/config/skills/project-doc-planner` (keep as symlink) <sub>`dot_gemini/config/skills/symlink_project-doc-planner`</sub> — skills left to Tern (2026-10-18)
-- [ ] **rewrite** `~/.gemini/settings.json` (`modify_` merge → jq/yq step in bootstrap; chmod 600/700 in bootstrap) <sub>`dot_gemini/modify_private_settings.json`</sub>
+- [x] **done** `~/.gemini/settings.json` (`modify_` merge → jq/yq step in bootstrap; chmod 600/700 in bootstrap) <sub>`dot_gemini/modify_private_settings.json`</sub> — tracked directly; theme now a theme-synced Omarchy template (themed/gemini-theme.json.tpl); codebase-memory MCP and hooks from its installer; herdr hooks skipped (2026-10-18)
 - [x] **skip** `~/.gemini/skills/project-doc-planner` (keep as symlink) <sub>`dot_gemini/skills/symlink_project-doc-planner`</sub> — skills left to Tern (2026-10-18)
 
 ## Grok

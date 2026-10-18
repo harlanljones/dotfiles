@@ -49,6 +49,7 @@ close to stock and `yadm diff` shows the stray append.
 | `fzf.sh` | 65-theme.sh |
 | `lazygit.yml` | `LG_CONFIG_FILE` (10-tools.sh, environment.d) |
 | `fastfetch.jsonc` | `~/.config/fastfetch/config.jsonc` link |
+| `gemini-theme.json` | `ui.theme` path in `~/.gemini/settings.json` |
 
 The theme-set hook `~/.config/omarchy/hooks/theme-set.d/theme-art` copies the
 theme's `branding/{about,screensaver}.txt` into `~/.config/omarchy/branding/`
