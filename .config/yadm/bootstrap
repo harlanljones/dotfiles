@@ -50,6 +50,9 @@ configure_repo() {
   step "Repo config: hooks and excludes"
   run yadm gitconfig core.hooksPath "$yadm_dir/git-hooks"
   run yadm gitconfig user.email "$author_email"
+  # The work tree is all of $HOME: a global core.fsmonitor would start a
+  # daemon watching the whole home folder (and pile up when that fails).
+  run yadm gitconfig core.fsmonitor false
 
   # Repo config and info/exclude don't travel with a clone, so regenerate the
   # managed block on every run. yadm owns everything below its marker.
