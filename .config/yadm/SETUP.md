@@ -21,10 +21,11 @@ to this list whenever you set something up by hand.
   `ssh -T git@github.com`.
 
 ## Apps installed outside the package manager
-- **Tern 0.9.4**: download `Tern-0.9.4-linux-x86_64` (source URL: TODO), extract
-  it to `~/.local/opt/tern/0.9.4/`, then
-  `ln -sfn ~/.local/opt/tern/0.9.4/tern/tern ~/.local/bin/tern`.
-  Tern manages its own runtime in `~/.local/share/tern` (not tracked).
+- **Tern 0.9.4** (deferred: downloads are invite-only for now). Currently
+  extracted under `~/Downloads/Tern-0.9.4-linux-x86_64/` and linked as
+  `~/.local/bin/tern`. When it's publicly downloadable, record the source URL
+  here and move it to `~/.local/opt/tern/<version>/`. Tern manages its own
+  runtime in `~/.local/share/tern` (not tracked).
 
 ## Not tracked on purpose
 - `~/.XCompose`: the Omarchy installer generates it from your name and email.
