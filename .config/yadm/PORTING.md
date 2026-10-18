@@ -180,7 +180,7 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 - [x] **done** `~/.local/bin/backdrop-split` <sub>`dot_local/bin/executable_backdrop-split`</sub> — ported 2026-10-18
 - [ ] **port** `~/.local/bin/chrome-profile` <sub>`dot_local/bin/executable_chrome-profile`</sub>
 - [ ] **port** `~/.local/bin/cline-safety/git` <sub>`dot_local/bin/cline-safety/executable_git`</sub>
-- [ ] **port** `~/.local/bin/cursor` <sub>`dot_local/bin/executable_cursor`</sub>
+- [x] **drop** `~/.local/bin/cursor` <sub>`dot_local/bin/executable_cursor`</sub> — Cursor's own CLI shim; not needed with cursor-bin (2026-10-18)
 - [ ] **drop** `~/.local/bin/dots` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots`</sub>
 - [ ] **drop** `~/.local/bin/dots-cloud-status` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-cloud-status`</sub>
 - [x] **drop** `~/.local/bin/dots-identity` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-identity`</sub> — replaced by fastfetch (2026-10-18)
@@ -264,7 +264,7 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 - [x] **skip** `~/.grok/hooks/herdr-agent-metadata.sh` <sub>`dot_grok/hooks/executable_herdr-agent-metadata.sh`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [x] **skip** `~/.grok/hooks/herdr-agent-state.sh` <sub>`dot_grok/hooks/executable_herdr-agent-state.sh`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [x] **skip** `~/.grok/hooks/herdr.json` <sub>`dot_grok/hooks/herdr.json`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
-- [x] **skip** `~/.grokbot/settings.json` (chmod 600/700 in bootstrap) <sub>`private_dot_grokbot/settings.json`</sub> — desktop app not installed; Grok CLI comes from mise (2026-10-18)
+- [x] **done** `~/.grokbot/settings.json` (chmod 600/700 in bootstrap) <sub>`private_dot_grokbot/settings.json`</sub> — preferences are a JSON seed merged by bootstrap (grok-bot is installed) (2026-10-18)
 
 ## OpenCode
 
@@ -292,8 +292,8 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 
 - [ ] **port** `~/.cline/data/settings/global-settings.json` <sub>`dot_cline/data/settings/global-settings.json`</sub>
 - [x] **skip** `~/.cline/skills/project-doc-planner` (keep as symlink) <sub>`dot_cline/skills/symlink_project-doc-planner`</sub> — skills left to Tern (2026-10-18)
-- [ ] **port** `~/.config/Cursor/User/settings.json` (chmod 600/700 in bootstrap) <sub>`dot_config/private_Cursor/User/settings.json`</sub>
-- [ ] **drop** `~/.local/share/applications/cursor-desktop.desktop` (hardcoded AppImage path) <sub>`dot_local/share/applications/cursor-desktop.desktop`</sub>
+- [x] **done** `~/.config/Cursor/User/settings.json` (chmod 600/700 in bootstrap) <sub>`dot_config/private_Cursor/User/settings.json`</sub> — ported; Cursor installs as cursor-bin, cursor-agent via mise (2026-10-18)
+- [x] **drop** `~/.local/share/applications/cursor-desktop.desktop` (hardcoded AppImage path) <sub>`dot_local/share/applications/cursor-desktop.desktop`</sub> — AppImage entry; cursor-bin ships its own (2026-10-18)
 - [ ] **port** `~/Documents/Cline/Workflows/usage.md` <sub>`Documents/Cline/Workflows/usage.md`</sub>
 
 ## Other agent skill links
@@ -320,7 +320,7 @@ None of these copy over directly. Each becomes an idempotent bootstrap step, or 
 - [x] **done** `run_onchange_after_10-install-omarchy-plugins.sh.tmpl` — replaced by omarchy-plugins.txt + bootstrap + omarchy-plugin-patches
 - [ ] **rewrite** `run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl`
 - [ ] **rewrite** `run_onchange_after_25-sync-omarchy-agents-workspace.sh.tmpl`
-- [ ] **rewrite** `run_onchange_after_26-setup-omarchy-cursor.sh.tmpl`
+- [x] **done** `run_onchange_after_26-setup-omarchy-cursor.sh.tmpl` — status line now a JSON seed (seeds.list) (2026-10-18)
 - [x] **done** `run_onchange_after_27-sync-claude-mcp.sh.tmpl` — codebase-memory-mcp reinstalled with its own installer (SETUP.md) (2026-10-18)
 - [x] **done** `run_onchange_after_28-sync-claude-settings.sh.tmpl` — status line and plugins ported into the tracked settings.json; git deny rules and dangerous-mode skip not wanted; herdr hooks skipped (2026-10-18)
 - [ ] **rewrite** `run_onchange_after_29-enable-omarchy-user-units.sh.tmpl`

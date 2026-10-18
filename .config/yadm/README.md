@@ -86,6 +86,7 @@ Only one machine uses this repo today. When another host joins:
 | `git-hooks/` | gitleaks and Git LFS hooks (enabled via `core.hooksPath`) |
 | `exclude.list` | Paths that must never be committed |
 | `secrets.list`, `secrets/` | 1Password templates rendered by bootstrap |
+| `seeds.list`, `seeds/`, `merge-json` | JSON preferences merged into app-owned files (Grok Bot, Cursor CLI) |
 | `packages.txt` | Packages added on top of Omarchy |
 | `omarchy-plugins.txt` | Third-party Omarchy shell plugins |
 | `SETUP.md` | Manual steps |

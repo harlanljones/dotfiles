@@ -8,8 +8,8 @@
 # accepts --dry-run.)
 #
 # Steps: repo config (hooks, excludes) -> Git LFS -> packages -> mise ->
-# mouse DPI -> Omarchy plugins and their patches -> secrets from 1Password -> print the
-# manual steps in SETUP.md.
+# mouse DPI -> Omarchy plugins and their patches -> JSON seeds -> secrets from
+# 1Password -> print the manual steps in SETUP.md.
 set -euo pipefail
 
 dry_run=0
@@ -152,6 +152,22 @@ install_omarchy_plugins() {
   fi
 }
 
+# seeds.list: <seed><TAB><target>. Deep-merge a tracked JSON fragment into a
+# file an app owns, so our preferences sit alongside its own state.
+apply_seeds() {
+  step "JSON seeds"
+  local line seed target extra
+  while IFS= read -r line; do
+    IFS=$'\t' read -r seed target extra <<<"$line"
+    if [[ -n ${extra:-} ]] || ! valid_rel_path "${seed:-}" || ! valid_rel_path "${target:-}"; then
+      warn "seeds.list: rejecting malformed line: $line"
+      continue
+    fi
+    run /usr/bin/python3 -I "$yadm_dir/merge-json" "$HOME/$seed" "$HOME/$target" ||
+      warn "could not merge $seed into $target"
+  done < <(entries "$yadm_dir/seeds.list")
+}
+
 # secrets.list: <template><TAB><target>, both relative to $HOME. Templates hold
 # only op://Agents/... references; rendered targets are never tracked.
 provision_secrets() {
@@ -230,6 +246,7 @@ install_packages
 install_mise_tools
 set_mouse_dpi
 install_omarchy_plugins
+apply_seeds
 provision_secrets
 
 step "Manual steps (see $yadm_dir/SETUP.md)"

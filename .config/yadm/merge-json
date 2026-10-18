@@ -1,0 +1,51 @@
+#!/usr/bin/env python3
+"""Deep-merge a JSON seed into a target file; seed keys win.
+
+Usage: merge-json <seed> <target>
+
+Used by yadm bootstrap (seeds.list) to set a few preferences in files that
+apps own and fill with state we don't track. The target is created if
+missing and replaced atomically; nothing is written when nothing changes.
+"""
+
+import json
+import os
+import sys
+import tempfile
+
+
+def merge(base, extra):
+    for key, value in extra.items():
+        if isinstance(value, dict) and isinstance(base.get(key), dict):
+            merge(base[key], value)
+        else:
+            base[key] = value
+    return base
+
+
+def main():
+    seed_path, target_path = sys.argv[1:3]
+    with open(seed_path) as f:
+        seed = json.load(f)
+
+    current = {}
+    if os.path.exists(target_path):
+        with open(target_path) as f:
+            current = json.load(f)
+
+    merged = merge(json.loads(json.dumps(current)), seed)
+    if os.path.exists(target_path) and merged == current:
+        return
+
+    directory = os.path.dirname(target_path) or "."
+    os.makedirs(directory, exist_ok=True)
+    fd, tmp = tempfile.mkstemp(dir=directory)
+    with os.fdopen(fd, "w") as f:
+        json.dump(merged, f, indent=2)
+        f.write("\n")
+    os.replace(tmp, target_path)
+    print(f"merged {os.path.basename(seed_path)} -> {target_path}")
+
+
+if __name__ == "__main__":
+    main()

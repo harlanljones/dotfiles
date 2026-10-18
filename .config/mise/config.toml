@@ -19,6 +19,7 @@ tflint = "latest"
 # CLIs
 claude = "latest"
 codex = "latest"
+cursor-agent = "latest"
 gemini = { version = "latest", allow_builds = ["@github/keytar", "node-pty"] }
 gh = "latest"
 gitleaks = "latest"

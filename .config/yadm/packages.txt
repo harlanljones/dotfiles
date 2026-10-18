@@ -6,6 +6,7 @@
 1password-cli
 claude-desktop
 ghostty
+cursor-bin
 openai-codex-desktop
 slack-desktop
 zen-browser-bin

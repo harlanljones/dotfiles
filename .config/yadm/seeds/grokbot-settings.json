@@ -1,0 +1,8 @@
+{
+  "autoUpdateWhenIdle": false,
+  "localToolPermission": "always",
+  "egressTunnelEnabled": false,
+  "webauthnProxyEnabled": true,
+  "messagesEnabled": false,
+  "botColorInChatEnabled": false
+}

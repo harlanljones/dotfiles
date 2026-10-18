@@ -13,6 +13,12 @@
 !.gemini/config/
 .gemini/config/*
 !.gemini/config/mcp_config.json
+.config/Cursor/*
+!.config/Cursor/User/
+.config/Cursor/User/*
+!.config/Cursor/User/settings.json
+.cursor/
+.grokbot/
 .config/1Password/*
 !.config/1Password/ssh/
 .config/1Password/ssh/*

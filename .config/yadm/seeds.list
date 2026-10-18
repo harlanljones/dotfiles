@@ -1,0 +1,6 @@
+# JSON seeds merged into files that apps own (and fill with state we don't
+# track). bootstrap deep-merges each seed into its target; seed keys win.
+#   <seed><TAB><target>, both relative to $HOME.
+.config/yadm/seeds/grokbot-settings.json	.grokbot/settings.json
+.config/yadm/seeds/cursor-cli-config.json	.cursor/cli-config.json
+.config/yadm/seeds/cursor-cli-config.json	.config/cursor/cli-config.json
