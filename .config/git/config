@@ -26,3 +26,5 @@
 [rerere]
 	enabled = true           # Record and reuse conflict resolutions
 	autoupdate = true        # Apply stored conflict resolutions automatically
+[include]
+	path = identity          # user.name/email, rendered by yadm bootstrap from 1Password
