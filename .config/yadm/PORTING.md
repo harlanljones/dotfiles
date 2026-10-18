@@ -122,11 +122,11 @@ Rules while porting:
 ## Hyprland
 
 - [x] **done** `~/.config/hypr/bindings.lua` <sub>`dot_config/hypr/bindings.lua`</sub> — ported 2026-10-18: notifications, theme modes, Omaland, Keychron knob, omalt-tab loader; X Native, Reprieve and Local AI binds dropped with their plugins
-- [ ] **port** `~/.config/hypr/hyprland.lua` <sub>`dot_config/hypr/hyprland.lua`</sub>
-- [ ] **drop** `~/.config/hypr/hyprmoncfg-monitors.lua` (superseded by this machine's monitors.lua) <sub>`dot_config/hypr/hyprmoncfg-monitors.lua`</sub>
-- [ ] **port** `~/.config/hypr/input.lua` <sub>`dot_config/hypr/input.lua`</sub>
-- [ ] **port** `~/.config/hypr/looknfeel.lua` <sub>`dot_config/hypr/looknfeel.lua`</sub>
-- [ ] **drop** `~/.config/hypr/monitors.lua` (superseded by this machine's monitors.lua) <sub>`dot_config/hypr/monitors.lua`</sub>
+- [x] **drop** `~/.config/hypr/hyprland.lua` <sub>`dot_config/hypr/hyprland.lua`</sub> — not ported 2026-10-18: Omaland opacity and hyprmoncfg loader not wanted; this machine's own hyprland.lua is tracked
+- [x] **drop** `~/.config/hypr/hyprmoncfg-monitors.lua` — dropped
+- [x] **done** `~/.config/hypr/input.lua` <sub>`dot_config/hypr/input.lua`</sub> — ported 2026-10-18: flat acceleration
+- [x] **drop** `~/.config/hypr/looknfeel.lua` <sub>`dot_config/hypr/looknfeel.lua`</sub> — not ported 2026-10-18: keeping Omarchy's default look
+- [x] **drop** `~/.config/hypr/monitors.lua` — dropped; this machine's own monitors.lua is tracked
 
 ## Omarchy
 
@@ -216,8 +216,8 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 - [ ] **rewrite** `~/.local/bin/omarchy-opencode-go-usage-login` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-opencode-go-usage-login.tmpl`</sub>
 - [ ] **rewrite** `~/.local/bin/omarchy-opencode-go-usage-override` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-opencode-go-usage-override.tmpl`</sub>
 - [ ] **rewrite** `~/.local/bin/omarchy-opencode-go-usage-scrape` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-opencode-go-usage-scrape.tmpl`</sub>
-- [ ] **port** `~/.local/bin/piper` (libratbag is installed here; check the mouse is the same) <sub>`dot_local/bin/executable_piper`</sub>
-- [ ] **port** `~/.local/bin/ratbagctl` (libratbag is installed here; check the mouse is the same) <sub>`dot_local/bin/executable_ratbagctl`</sub>
+- [x] **drop** `~/.local/bin/piper` — dropped: piper not installed, no mise Python
+- [x] **drop** `~/.local/bin/ratbagctl` — dropped: no mise Python on this machine
 - [ ] **rewrite** `~/.local/bin/statusline` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_statusline.tmpl`</sub>
 - [ ] **drop** `~/.local/bin/wsl-windows-tool` (WSL/Windows only) <sub>`dot_local/bin/executable_wsl-windows-tool`</sub>
 
@@ -324,7 +324,7 @@ None of these copy over directly. Each becomes an idempotent bootstrap step, or 
 - [ ] **rewrite** `run_onchange_after_28-sync-claude-settings.sh.tmpl`
 - [ ] **rewrite** `run_onchange_after_29-enable-omarchy-user-units.sh.tmpl`
 - [ ] **drop** `run_onchange_after_30-hadrian-macos-defaults.sh.tmpl` (macOS only)
-- [ ] **rewrite** `run_onchange_after_31-augustus-mouse-dpi.sh.tmpl` (same desk as Augustus; libratbag is installed)
+- [x] **done** `run_onchange_after_31-augustus-mouse-dpi.sh.tmpl` (same desk as Augustus; libratbag is installed) — ported 2026-10-18 as ~/.local/bin/mouse-dpi + bootstrap step
 - [ ] **rewrite** `run_onchange_after_32-setup-omarchy-agent-registrations.sh.tmpl`
 - [ ] **rewrite** `run_onchange_after_33-augustus-machine-branding.sh.tmpl`
 - [ ] **drop** `run_onchange_after_40-vespasian-windows-terminal.sh.tmpl` (WSL/Windows only)
