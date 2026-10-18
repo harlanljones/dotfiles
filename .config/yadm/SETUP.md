@@ -9,6 +9,7 @@ to this list whenever you set something up by hand.
 
 ## System services
 - Network printer discovery: `sudo systemctl enable --now cups-browsed`
+- Ollama (local models on the NVIDIA GPU): `sudo systemctl enable --now ollama`
   (cups itself is enabled by Omarchy).
 
 ## 1Password
