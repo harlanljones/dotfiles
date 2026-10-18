@@ -121,7 +121,7 @@ Rules while porting:
 
 ## Hyprland
 
-- [ ] **port** `~/.config/hypr/bindings.lua` <sub>`dot_config/hypr/bindings.lua`</sub>
+- [ ] **port** `~/.config/hypr/bindings.lua` <sub>`dot_config/hypr/bindings.lua`</sub> — omalt-tab loader ported 2026-10-18; theme-modes binds still to review (X Native and Reprieve binds dropped with their plugins)
 - [ ] **port** `~/.config/hypr/hyprland.lua` <sub>`dot_config/hypr/hyprland.lua`</sub>
 - [ ] **drop** `~/.config/hypr/hyprmoncfg-monitors.lua` (superseded by this machine's monitors.lua) <sub>`dot_config/hypr/hyprmoncfg-monitors.lua`</sub>
 - [ ] **port** `~/.config/hypr/input.lua` <sub>`dot_config/hypr/input.lua`</sub>
