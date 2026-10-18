@@ -1,0 +1,4 @@
+# 1Password SSH agent: only offer keys from the Agents vault.
+# https://developer.1password.com/docs/ssh/agent/config
+[[ssh-keys]]
+vault = "Agents"
