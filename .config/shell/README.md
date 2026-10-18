@@ -8,7 +8,7 @@ zoxide, fzf, the default aliases) and ends with a loader that sources every
 | Module | Holds |
 | --- | --- |
 | `00-env.sh` | `EDITOR`/`VISUAL` |
-| `10-tools.sh` | Environment read by tools: ripgrep config, fzf commands and layout, pager |
+| `10-tools.sh` | Environment read by tools: ripgrep config, fzf commands and layout, pager, zoxide |
 | `20-integrations.sh` | atuin and direnv hooks, 1Password CLI completion and SSH agent socket |
 | `30-navigation.sh` | `zj` / `zp` zoxide pickers on Alt-X / Alt-Z |
 | `40-aliases.sh` | Listing, git, yadm, mise and agent aliases; `opr` |

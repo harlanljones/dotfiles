@@ -1,0 +1,7 @@
+# ripgrep config — loaded via RIPGREP_CONFIG_PATH (set in ~/.config/shell/10-tools.sh)
+--smart-case
+--max-columns=160
+--max-columns-preview
+--follow
+--hidden
+--glob=!.git/

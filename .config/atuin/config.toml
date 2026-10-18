@@ -1,0 +1,25 @@
+# Atuin shell history — synced across machines.
+#
+# First run on a new machine:
+#   atuin register --email you@example.com   # once, creates the account
+#   atuin login                               # or link an existing account
+# Keys are end-to-end encrypted by atuin; the key lives in ~/.local/share/atuin.
+
+## How often to sync with the server
+sync_frequency = "5m"
+
+## Compact list UI, fuzzy search
+style = "compact"
+search_mode = "fuzzy"
+
+## Max lines the search UI takes up inline at the bottom of the terminal.
+## 0 = fullscreen; atuin also forces fullscreen if this exceeds the
+## terminal height (default 40, taller than most terminals).
+inline_height = 15
+
+## Enter runs the command directly (ghostty/fish-style)
+enter_accept = true
+
+## Up-arrow searches history scoped to the current directory;
+## Ctrl-R stays global.
+filter_mode_shell_up_key_binding = "directory"

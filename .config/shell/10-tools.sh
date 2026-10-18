@@ -12,3 +12,7 @@ export FZF_ALT_C_COMMAND='fd --type d --hidden --follow --exclude .git'
 export FZF_DEFAULT_OPTS='--height=40% --layout=reverse --border --info=inline'
 
 export PAGER=less
+
+# zoxide reads its settings from the environment (it has no config file).
+export _ZO_RESOLVE_SYMLINKS=1
+export _ZO_EXCLUDE_DIRS="$HOME:*/.git:*/.git/*:*/node_modules:*/node_modules/*:*/.venv:*/.venv/*:*/target:*/target/*:/tmp:/tmp/*:/mnt:/mnt/*"
