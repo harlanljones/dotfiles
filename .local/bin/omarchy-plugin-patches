@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Apply, revert, or report local patches to third-party Omarchy plugins.
+#
+#   omarchy-plugin-patches apply    apply every patch that isn't applied yet
+#   omarchy-plugin-patches revert   take patches out (before `omarchy plugin update`)
+#   omarchy-plugin-patches status   show each patch's state
+#
+# A patch named <plugin-id>-<label>.patch (label without dashes) in
+# ~/.local/share/omarchy-patches
+# applies to ~/.config/omarchy/plugins/<plugin-id>.
+set -euo pipefail
+
+action=${1:-status}
+patch_dir=${XDG_DATA_HOME:-$HOME/.local/share}/omarchy-patches
+plugin_dir=${XDG_CONFIG_HOME:-$HOME/.config}/omarchy/plugins
+status=0
+
+shopt -s nullglob
+for patch in "$patch_dir"/*.patch; do
+  name=$(basename "$patch" .patch)
+  id=${name%-*}
+  dir=$plugin_dir/$id
+
+  if [[ ! -d $dir/.git ]]; then
+    echo "$name: plugin $id not installed; skipping"
+    continue
+  fi
+
+  if git -C "$dir" apply --reverse --check "$patch" 2>/dev/null; then
+    state=applied
+  elif git -C "$dir" apply --check "$patch" 2>/dev/null; then
+    state=unapplied
+  else
+    state=stale
+  fi
+
+  case $action:$state in
+    apply:unapplied) git -C "$dir" apply "$patch" && echo "$name: applied" ;;
+    revert:applied) git -C "$dir" apply --reverse "$patch" && echo "$name: reverted" ;;
+    apply:applied | revert:unapplied | status:*) echo "$name: $state" ;;
+    *:stale)
+      echo "$name: no longer applies to the current $id; update the patch" >&2
+      status=1
+      ;;
+    *)
+      echo "usage: omarchy-plugin-patches [apply|revert|status]" >&2
+      exit 2
+      ;;
+  esac
+done
+
+exit $status
