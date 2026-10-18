@@ -53,12 +53,12 @@ Rules while porting:
 
 ## Git and GitHub
 
-- [ ] **port** `~/.config/gh/config.yml` <sub>`dot_config/gh/config.yml`</sub>
-- [ ] **rewrite** `~/.config/git/config` (template → esh `##template.esh` or plain file) <sub>`dot_config/git/config.tmpl`</sub>
-- [ ] **port** `~/.config/git/hooks/commit-msg` <sub>`dot_config/git/hooks/executable_commit-msg`</sub>
-- [ ] **port** `~/.config/git/hooks/pre-push` <sub>`dot_config/git/hooks/executable_pre-push`</sub>
-- [ ] **port** `~/.config/git/ignore` <sub>`dot_config/git/ignore`</sub>
-- [ ] **rewrite** `~/.config/lazygit/config.yml` (template → esh `##template.esh` or plain file) <sub>`dot_config/lazygit/config.yml.tmpl`</sub>
+- [x] **drop** `~/.config/gh/config.yml` <sub>`dot_config/gh/config.yml`</sub> — matches what gh writes by default (2026-10-18)
+- [x] **done** `~/.config/git/config` (template → esh `##template.esh` or plain file) <sub>`dot_config/git/config.tmpl`</sub> — signing via 1Password Agents key, gh credentials, global hooks, delta, zdiff3, .gitconfig.local; identity and signing key rendered from 1Password (2026-10-18)
+- [x] **done** `~/.config/git/hooks/commit-msg` <sub>`dot_config/git/hooks/executable_commit-msg`</sub> — ported (2026-10-18)
+- [x] **done** `~/.config/git/hooks/pre-push` <sub>`dot_config/git/hooks/executable_pre-push`</sub> — ported; uses `gitleaks git` (2026-10-18)
+- [x] **done** `~/.config/git/ignore` <sub>`dot_config/git/ignore`</sub> — .DS_Store dropped (2026-10-18)
+- [x] **done** `~/.config/lazygit/config.yml` (template → esh `##template.esh` or plain file) <sub>`dot_config/lazygit/config.yml.tmpl`</sub> — delta renderer only; Ollama commit commands deferred to AI agents, dots theme dropped (2026-10-18)
 
 ## SSH and 1Password
 

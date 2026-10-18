@@ -31,6 +31,10 @@ tailscale
 python-pillow
 tk
 
+# Git
+git-delta
+shellcheck
+
 # Dotfiles tooling
 git-lfs
 yadm

@@ -17,7 +17,10 @@ to this list whenever you set something up by hand.
   other vault is used.
 - Settings → Developer → turn on "Integrate with 1Password CLI", so
   `op inject` in bootstrap can render secrets.
-- Log in to GitHub over SSH: `gh auth login` (choose SSH), then check with
+- Log in to GitHub: `gh auth login`, then
+  `gh auth refresh -h github.com -s admin:ssh_signing_key`. Don't let gh create
+  an SSH key on disk; the Agents vault key ("SSH Key") is registered on GitHub
+  for both authentication and commit signing. Check with
   `ssh -T git@github.com`.
 
 ## Apps installed outside the package manager

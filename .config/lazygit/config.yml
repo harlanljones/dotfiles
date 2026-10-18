@@ -1,0 +1,4 @@
+git:
+  # delta renders diffs (follows lazygit's light/dark scheme); `|` cycles renderers.
+  diffRenderers:
+    - command: delta --{{colorScheme}} --paging=never
