@@ -7,6 +7,7 @@
 claude-desktop
 ghostty
 openai-codex-desktop
+slack-desktop
 zen-browser-bin
 
 # Games
@@ -25,8 +26,28 @@ figlet
 
 # System and networking
 flatpak
+fwupd
 libratbag
 tailscale
+
+# Intel iGPU video decode
+intel-media-driver
+vpl-gpu-rt
+
+# Printing
+cups-browsed
+cups-pdf
+
+# Build tools and CLI helpers (languages come from mise)
+dotnet-runtime-9.0
+ninja
+rust
+xmlstarlet
+yq
+
+# Fonts
+noto-fonts-extra
+ttf-cascadia-mono-nerd
 
 # backdrop-split --interactive tile picker
 python-pillow

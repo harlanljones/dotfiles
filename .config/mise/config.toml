@@ -1,11 +1,36 @@
 [tools]
+# Package managers first: npm-backed tools install through bun, and Python
+# tools through uv (mise's PyPI backend uses uv when it's installed).
+bun = "latest"
+uv = "latest"
+pnpm = "latest"
+
+# Languages
+go = "1.26.5"
+node = "26.8.2"
+python = "3.12.13"
+ruby = "latest"
+
+# Infrastructure
+gcloud = "latest"
+terraform = "latest"
+tflint = "latest"
+
+# CLIs
 claude = "latest"
 codex = "latest"
-gcloud = "latest"
 gh = "latest"
 gitleaks = "latest"
-node = "26.8.2"
-uv = "latest"
+"npm:playwright" = "latest"
+
+[settings]
+idiomatic_version_file_enable_tools = ["ruby"]
+
+[settings.npm]
+package_manager = "bun"
+
+[settings.ruby]
+compile = false
 
 [settings.upgrade]
 auto_prune = false

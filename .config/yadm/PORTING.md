@@ -116,8 +116,8 @@ Rules while porting:
 
 ## mise
 
-- [ ] **drop** `~/.config/mise/conf.d/vespasian.toml` (WSL/Windows only) <sub>`dot_config/mise/conf.d/vespasian.toml`</sub>
-- [ ] **port** `~/.config/mise/config.toml` <sub>`dot_config/mise/config.toml`</sub>
+- [x] **drop** `~/.config/mise/conf.d/vespasian.toml` (WSL/Windows only) <sub>`dot_config/mise/conf.d/vespasian.toml`</sub> — dropped (2026-10-18)
+- [x] **done** `~/.config/mise/config.toml` <sub>`dot_config/mise/config.toml`</sub> — bun/uv first (npm tools via bun), go, python, ruby, pnpm, terraform, tflint, playwright; chezmoi, 1password-cli dropped; gemini and oh-my-pi deferred to AI agents (2026-10-18)
 
 ## Hyprland
 
@@ -147,10 +147,10 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 
 ## Packages
 
-- [ ] **drop** `~/.Brewfile` (macOS only) <sub>`dot_Brewfile`</sub>
-- [ ] **drop** `~/.config/apt/pkglist.txt` (WSL/Windows only) <sub>`dot_config/apt/pkglist.txt`</sub>
-- [ ] **port** `~/.config/pacman/aurlist.txt` <sub>`dot_config/pacman/aurlist.txt`</sub>
-- [ ] **port** `~/.config/pacman/pkglist.txt` <sub>`dot_config/pacman/pkglist.txt`</sub>
+- [x] **drop** `~/.Brewfile` (macOS only) <sub>`dot_Brewfile`</sub> — dropped (2026-10-18)
+- [x] **drop** `~/.config/apt/pkglist.txt` (WSL/Windows only) <sub>`dot_config/apt/pkglist.txt`</sub> — dropped (2026-10-18)
+- [x] **done** `~/.config/pacman/aurlist.txt` <sub>`dot_config/pacman/aurlist.txt`</sub> — slack-desktop (now in Omarchy's repo); google-chrome not wanted (2026-10-18)
+- [x] **done** `~/.config/pacman/pkglist.txt` <sub>`dot_config/pacman/pkglist.txt`</sub> — 182 of 210 already installed; picks added to packages.txt; superseded ones dropped; ollama-cuda and cloudflared deferred (2026-10-18)
 
 ## systemd user units
 

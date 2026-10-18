@@ -46,3 +46,7 @@ opr() {
     op run -- "$@"
   fi
 }
+
+# mise's Python shadows the system one, but ratbagctl needs the system
+# interpreter's python-evdev.
+alias ratbagctl='/usr/bin/python3 /usr/bin/ratbagctl'
