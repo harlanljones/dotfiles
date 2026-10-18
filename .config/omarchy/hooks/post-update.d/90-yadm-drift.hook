@@ -1,0 +1,14 @@
+#!/bin/bash
+
+# After `omarchy update`, flag files tracked by yadm that the update's
+# migrations changed, so they can be reviewed with `yadm diff`.
+
+command -v yadm >/dev/null || exit 0
+
+changed=$(yadm status --porcelain --untracked-files=no 2>/dev/null) || exit 0
+[[ -z $changed ]] && exit 0
+
+count=$(wc -l <<<"$changed")
+printf 'yadm: %s tracked file(s) changed during this update:\n%s\nReview with: yadm diff\n' "$count" "$changed"
+omarchy-notification-send -u normal "Dotfiles changed by update" \
+  "$count tracked file(s) differ. Review with: yadm diff" || true
