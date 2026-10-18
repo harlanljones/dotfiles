@@ -18,6 +18,10 @@ Actions are only suggestions:
 - **drop**: other OS, other hardware, or tied to chezmoi.
 - **skip**: deliberately not ported for now (revisit later).
 
+Status (2026-10-18): every item is decided. `skip` items can be revisited;
+the fan-control plugin (private repo harlanljones/omarchy-fan-control) and
+the Omarchy Agents stack (harlanljones/omarchy-agents) are the notable ones.
+
 Rules while porting:
 - Files that Omarchy also edits get tracked directly, never as alternates.
 - Symlinks stay symlinks.
@@ -165,7 +169,7 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 - [x] **skip** `~/.config/systemd/user/omarchy-agents-analysis.timer` <sub>`dot_config/systemd/user/omarchy-agents-analysis.timer`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
 - [x] **skip** `~/.config/systemd/user/omarchy-agents-dashboard.service` <sub>`dot_config/systemd/user/omarchy-agents-dashboard.service`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
 - [x] **skip** `~/.config/systemd/user/omarchy-agents-tunnel.service` <sub>`dot_config/systemd/user/omarchy-agents-tunnel.service`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
-- [ ] **port** `~/.config/systemd/user/omarchy-camera-reset.service` <sub>`dot_config/systemd/user/omarchy-camera-reset.service`</sub>
+- [x] **skip** `~/.config/systemd/user/omarchy-camera-reset.service` <sub>`dot_config/systemd/user/omarchy-camera-reset.service`</sub> — not wanted for now (2026-10-18)
 - [x] **skip** `~/.config/systemd/user/omarchy-cline-usage-scrape.service` <sub>`dot_config/systemd/user/omarchy-cline-usage-scrape.service`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
 - [x] **skip** `~/.config/systemd/user/omarchy-cline-usage-scrape.timer` <sub>`dot_config/systemd/user/omarchy-cline-usage-scrape.timer`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
 - [x] **skip** `~/.config/systemd/user/omarchy-cursor-usage-scrape.service` <sub>`dot_config/systemd/user/omarchy-cursor-usage-scrape.service`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
@@ -204,7 +208,7 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 - [x] **skip** `~/.local/bin/omarchy-agent-usage-opencode` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent-usage-opencode.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
 - [x] **skip** `~/.local/bin/omarchy-agent-usage-pi` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent-usage-pi.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
 - [x] **skip** `~/.local/bin/omarchy-agent-usage-update` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-agent-usage-update.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
-- [ ] **port** `~/.local/bin/omarchy-camera-reset` <sub>`dot_local/bin/executable_omarchy-camera-reset`</sub>
+- [x] **skip** `~/.local/bin/omarchy-camera-reset` <sub>`dot_local/bin/executable_omarchy-camera-reset`</sub> — not wanted for now (2026-10-18)
 - [x] **skip** `~/.local/bin/omarchy-cline-usage-login` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-cline-usage-login.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
 - [x] **skip** `~/.local/bin/omarchy-cline-usage-override` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-cline-usage-override.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
 - [x] **skip** `~/.local/bin/omarchy-cline-usage-scrape` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-cline-usage-scrape.tmpl`</sub> — Omarchy Agents stack deferred to Tern (2026-10-18)
