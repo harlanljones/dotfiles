@@ -16,6 +16,7 @@ Actions are only suggestions:
   since only one host uses this repo. `modify_`/`create_`/`run_*` become
   idempotent bootstrap steps. Encrypted files become `secrets.list` entries.
 - **drop**: other OS, other hardware, or tied to chezmoi.
+- **skip**: deliberately not ported for now (revisit later).
 
 Rules while porting:
 - Files that Omarchy also edits get tracked directly, never as alternates.
@@ -80,7 +81,7 @@ Rules while porting:
 - [x] **done** `~/.config/nvim/lua/plugins/dashboard-dots-identity.lua` <sub>`dot_config/nvim/lua/plugins/dashboard-dots-identity.lua`</sub> — replaced by dashboard-theme-art.lua (theme-synced ASCII art) (2026-10-18)
 - [x] **drop** `~/.config/nvim/lua/plugins/example.lua` <sub>`dot_config/nvim/lua/plugins/example.lua`</sub> — identical to Omarchy's (2026-10-18)
 - [x] **done** `~/.config/nvim/lua/plugins/faster-smear-cursor.lua` <sub>`dot_config/nvim/lua/plugins/faster-smear-cursor.lua`</sub> — ported (2026-10-18)
-- [ ] **port** `~/.config/nvim/lua/plugins/herdr-nvim.lua` <sub>`dot_config/nvim/lua/plugins/herdr-nvim.lua`</sub> — deferred to the herdr group (2026-10-18)
+- [x] **skip** `~/.config/nvim/lua/plugins/herdr-nvim.lua` <sub>`dot_config/nvim/lua/plugins/herdr-nvim.lua`</sub> — deferred to the herdr group (2026-10-18) — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [x] **done** `~/.config/nvim/lua/plugins/html-preview.lua` <sub>`dot_config/nvim/lua/plugins/empty_html-preview.lua`</sub> — ported (2026-10-18)
 - [x] **done** `~/.config/nvim/lua/plugins/mini-animate-disable-cursor.lua` <sub>`dot_config/nvim/lua/plugins/mini-animate-disable-cursor.lua`</sub> — ported (2026-10-18)
 - [x] **drop** `~/.config/nvim/lua/plugins/theme.lua` (template → esh `##template.esh` or plain file) <sub>`dot_config/nvim/lua/plugins/theme.lua.tmpl`</sub> — Omarchy links the theme (2026-10-18)
@@ -109,10 +110,10 @@ Rules while porting:
 
 ## herdr
 
-- [ ] **rewrite** `~/.config/herdr/config.toml` (template → esh `##template.esh` or plain file) <sub>`dot_config/herdr/config.toml.tmpl`</sub>
-- [ ] **rewrite** `~/.config/herdr/plugins.json` (template → esh `##template.esh` or plain file) <sub>`dot_config/herdr/plugins.json.tmpl`</sub>
-- [ ] **port** `~/.config/herdr/plugins/config/hhdebb.herdr-radar/config.toml` <sub>`dot_config/herdr/plugins/config/hhdebb.herdr-radar/config.toml`</sub>
-- [ ] **port** `~/.config/herdr/plugins/config/hhdebb.herdr-radar/hook.js` <sub>`dot_config/herdr/plugins/config/hhdebb.herdr-radar/hook.js`</sub>
+- [x] **skip** `~/.config/herdr/config.toml` (template → esh `##template.esh` or plain file) <sub>`dot_config/herdr/config.toml.tmpl`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
+- [x] **skip** `~/.config/herdr/plugins.json` (template → esh `##template.esh` or plain file) <sub>`dot_config/herdr/plugins.json.tmpl`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
+- [x] **skip** `~/.config/herdr/plugins/config/hhdebb.herdr-radar/config.toml` <sub>`dot_config/herdr/plugins/config/hhdebb.herdr-radar/config.toml`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
+- [x] **skip** `~/.config/herdr/plugins/config/hhdebb.herdr-radar/hook.js` <sub>`dot_config/herdr/plugins/config/hhdebb.herdr-radar/hook.js`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 
 ## mise
 
@@ -156,9 +157,9 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 
 - [ ] **port** `~/.config/systemd/user/dots-theme-agents.path` <sub>`dot_config/systemd/user/dots-theme-agents.path`</sub>
 - [ ] **port** `~/.config/systemd/user/dots-theme-agents.service` <sub>`dot_config/systemd/user/dots-theme-agents.service`</sub>
-- [ ] **port** `~/.config/systemd/user/herdr-cline-state.service` <sub>`dot_config/systemd/user/herdr-cline-state.service`</sub>
-- [ ] **port** `~/.config/systemd/user/herdr-cline-state.timer` <sub>`dot_config/systemd/user/herdr-cline-state.timer`</sub>
-- [ ] **port** `~/.config/systemd/user/herdr-outpost-relay.service` <sub>`dot_config/systemd/user/herdr-outpost-relay.service`</sub>
+- [x] **skip** `~/.config/systemd/user/herdr-cline-state.service` <sub>`dot_config/systemd/user/herdr-cline-state.service`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
+- [x] **skip** `~/.config/systemd/user/herdr-cline-state.timer` <sub>`dot_config/systemd/user/herdr-cline-state.timer`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
+- [x] **skip** `~/.config/systemd/user/herdr-outpost-relay.service` <sub>`dot_config/systemd/user/herdr-outpost-relay.service`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [ ] **port** `~/.config/systemd/user/ollama-omarchy-agents.service` <sub>`dot_config/systemd/user/ollama-omarchy-agents.service`</sub>
 - [ ] **port** `~/.config/systemd/user/omarchy-agents-analysis.service` <sub>`dot_config/systemd/user/omarchy-agents-analysis.service`</sub>
 - [ ] **port** `~/.config/systemd/user/omarchy-agents-analysis.timer` <sub>`dot_config/systemd/user/omarchy-agents-analysis.timer`</sub>
@@ -186,12 +187,12 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 - [ ] **drop** `~/.local/bin/dots-push` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-push`</sub>
 - [ ] **drop** `~/.local/bin/dots-theme-agents` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-theme-agents`</sub>
 - [ ] **drop** `~/.local/bin/dots-theme-import-aether` (chezmoi-coupled; replaced by yadm + the post-update drift hook) <sub>`dot_local/bin/executable_dots-theme-import-aether`</sub>
-- [ ] **port** `~/.local/bin/herdr-agent-lifecycle` <sub>`dot_local/bin/executable_herdr-agent-lifecycle`</sub>
-- [ ] **port** `~/.local/bin/herdr-cline-state` <sub>`dot_local/bin/executable_herdr-cline-state`</sub>
-- [ ] **port** `~/.local/bin/herdr-gemini-session` <sub>`dot_local/bin/executable_herdr-gemini-session`</sub>
-- [ ] **port** `~/.local/bin/herdr-subagents` <sub>`dot_local/bin/executable_herdr-subagents`</sub>
-- [ ] **port** `~/.local/bin/herdr-sync-hermes-plugin` <sub>`dot_local/bin/executable_herdr-sync-hermes-plugin`</sub>
-- [ ] **port** `~/.local/bin/herdr-verify` <sub>`dot_local/bin/executable_herdr-verify`</sub>
+- [x] **skip** `~/.local/bin/herdr-agent-lifecycle` <sub>`dot_local/bin/executable_herdr-agent-lifecycle`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
+- [x] **skip** `~/.local/bin/herdr-cline-state` <sub>`dot_local/bin/executable_herdr-cline-state`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
+- [x] **skip** `~/.local/bin/herdr-gemini-session` <sub>`dot_local/bin/executable_herdr-gemini-session`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
+- [x] **skip** `~/.local/bin/herdr-subagents` <sub>`dot_local/bin/executable_herdr-subagents`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
+- [x] **skip** `~/.local/bin/herdr-sync-hermes-plugin` <sub>`dot_local/bin/executable_herdr-sync-hermes-plugin`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
+- [x] **skip** `~/.local/bin/herdr-verify` <sub>`dot_local/bin/executable_herdr-verify`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [x] **done** `~/.local/bin/keychron-audio-toggle` <sub>`dot_local/bin/executable_keychron-audio-toggle`</sub> — ported 2026-10-18; sink names now come from a 1Password-rendered config
 - [ ] **port** `~/.local/bin/lazygit-ollama-commit.sh` <sub>`dot_local/bin/executable_lazygit-ollama-commit.sh`</sub>
 - [ ] **port** `~/.local/bin/ollama-commit-msg.sh` <sub>`dot_local/bin/executable_ollama-commit-msg.sh`</sub>
@@ -251,7 +252,7 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 - [ ] **port** `~/.gemini/agents/codebase-memory-scout.md` (chmod 600/700 in bootstrap) <sub>`dot_gemini/agents/private_codebase-memory-scout.md`</sub>
 - [ ] **port** `~/.gemini/agents/codebase-memory.md` (chmod 600/700 in bootstrap) <sub>`dot_gemini/agents/private_codebase-memory.md`</sub>
 - [ ] **port** `~/.gemini/config/hooks.json` <sub>`dot_gemini/config/hooks.json`</sub>
-- [ ] **port** `~/.gemini/config/hooks/herdr-agent-metadata.sh` <sub>`dot_gemini/config/hooks/herdr-agent-metadata.sh`</sub>
+- [x] **skip** `~/.gemini/config/hooks/herdr-agent-metadata.sh` <sub>`dot_gemini/config/hooks/herdr-agent-metadata.sh`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [ ] **rewrite** `~/.gemini/config/mcp_config.json` (template → esh `##template.esh` or plain file) <sub>`dot_gemini/config/mcp_config.json.tmpl`</sub>
 - [ ] **port** `~/.gemini/config/skills/project-doc-planner` (keep as symlink) <sub>`dot_gemini/config/skills/symlink_project-doc-planner`</sub>
 - [ ] **rewrite** `~/.gemini/settings.json` (`modify_` merge → jq/yq step in bootstrap; chmod 600/700 in bootstrap) <sub>`dot_gemini/modify_private_settings.json`</sub>
@@ -260,9 +261,9 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 ## Grok
 
 - [ ] **rewrite** `~/.grok/config.toml` (`modify_` merge → jq/yq step in bootstrap) <sub>`dot_grok/modify_config.toml`</sub>
-- [ ] **port** `~/.grok/hooks/herdr-agent-metadata.sh` <sub>`dot_grok/hooks/executable_herdr-agent-metadata.sh`</sub>
-- [ ] **port** `~/.grok/hooks/herdr-agent-state.sh` <sub>`dot_grok/hooks/executable_herdr-agent-state.sh`</sub>
-- [ ] **port** `~/.grok/hooks/herdr.json` <sub>`dot_grok/hooks/herdr.json`</sub>
+- [x] **skip** `~/.grok/hooks/herdr-agent-metadata.sh` <sub>`dot_grok/hooks/executable_herdr-agent-metadata.sh`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
+- [x] **skip** `~/.grok/hooks/herdr-agent-state.sh` <sub>`dot_grok/hooks/executable_herdr-agent-state.sh`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
+- [x] **skip** `~/.grok/hooks/herdr.json` <sub>`dot_grok/hooks/herdr.json`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [ ] **port** `~/.grokbot/settings.json` (chmod 600/700 in bootstrap) <sub>`private_dot_grokbot/settings.json`</sub>
 
 ## OpenCode
@@ -273,8 +274,8 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 - [ ] **port** `~/.config/opencode/agents/codebase-memory-scout.md` (chmod 600/700 in bootstrap) <sub>`dot_config/opencode/agents/private_codebase-memory-scout.md`</sub>
 - [ ] **port** `~/.config/opencode/agents/codebase-memory.md` (chmod 600/700 in bootstrap) <sub>`dot_config/opencode/agents/private_codebase-memory.md`</sub>
 - [ ] **rewrite** `~/.config/opencode/opencode.json` (encrypted → `secrets.list` + op:// template) <sub>`dot_config/opencode/encrypted_opencode.json.age`</sub>
-- [ ] **port** `~/.config/opencode/plugins/herdr-agent-metadata.js` <sub>`dot_config/opencode/plugins/herdr-agent-metadata.js`</sub>
-- [ ] **port** `~/.config/opencode/plugins/herdr-subagents.js` <sub>`dot_config/opencode/plugins/herdr-subagents.js`</sub>
+- [x] **skip** `~/.config/opencode/plugins/herdr-agent-metadata.js` <sub>`dot_config/opencode/plugins/herdr-agent-metadata.js`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
+- [x] **skip** `~/.config/opencode/plugins/herdr-subagents.js` <sub>`dot_config/opencode/plugins/herdr-subagents.js`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [ ] **port** `~/.config/opencode/skills/opencode-go-usage/SKILL.md` <sub>`dot_config/opencode/skills/opencode-go-usage/SKILL.md`</sub>
 - [ ] **port** `~/.config/opencode/skills/project-doc-planner` (keep as symlink) <sub>`dot_config/opencode/skills/symlink_project-doc-planner`</sub>
 - [ ] **rewrite** `~/.config/opencode/themes/dots.json` (template → esh `##template.esh` or plain file) <sub>`dot_config/opencode/themes/dots.json.tmpl`</sub>
