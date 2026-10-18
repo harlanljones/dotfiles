@@ -130,12 +130,20 @@ Rules while porting:
 
 ## Omarchy
 
+Plugins (2026-10-18): kept 23 of Augustus's 43 third-party plugins, listed in
+`omarchy-plugins.txt`. Dropped: hw monitor/storage duplicates (disk-lens,
+zakarch.storage), shelfish, simple-notifications, workspace-profiles,
+hyprmoncfg, any-monitor (repo gone), omaproton-vpn, mouse-odometer, screen
+time, AppImage, alias manager, resume, local-ai, umarchy, omabudget,
+omafinance, LetsFG, omashift. Not recoverable from the old repo: the
+`harlan.fan-control` and `harlan.agent-leaderboard` plugins were never in it.
+
 - [ ] **port** `~/.config/chrome-flags.conf` <sub>`dot_config/chrome-flags.conf`</sub>
-- [ ] **rewrite** `~/.config/omarchy/defaults/agent` (template → esh `##template.esh` or plain file) <sub>`dot_config/omarchy/defaults/agent.tmpl`</sub>
-- [ ] **port** `~/.config/omarchy/hooks/post-boot.d/backdrop-split` <sub>`dot_config/omarchy/hooks/post-boot.d/executable_backdrop-split`</sub>
-- [ ] **port** `~/.config/omarchy/hooks/theme-set.d/backdrop-split` <sub>`dot_config/omarchy/hooks/theme-set.d/executable_backdrop-split`</sub>
-- [ ] **rewrite** `~/.config/omarchy/shell.json` (template → esh `##template.esh` or plain file; `create_` → copy-if-missing in bootstrap; chmod 600/700 in bootstrap) <sub>`dot_config/omarchy/create_private_shell.json.tmpl`</sub>
-- [ ] **port** `~/.local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch` <sub>`dot_local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch`</sub>
+- [x] **done** `~/.config/omarchy/defaults/agent` (template → esh `##template.esh` or plain file) <sub>`dot_config/omarchy/defaults/agent.tmpl`</sub> — already tracked from this machine
+- [x] **done** `~/.config/omarchy/hooks/post-boot.d/backdrop-split` <sub>`dot_config/omarchy/hooks/post-boot.d/executable_backdrop-split`</sub> — ported 2026-10-18, longer IPC timeout
+- [x] **done** `~/.config/omarchy/hooks/theme-set.d/backdrop-split` <sub>`dot_config/omarchy/hooks/theme-set.d/executable_backdrop-split`</sub> — ported 2026-10-18
+- [x] **done** `~/.config/omarchy/shell.json` (template → esh `##template.esh` or plain file; `create_` → copy-if-missing in bootstrap; chmod 600/700 in bootstrap) <sub>`dot_config/omarchy/create_private_shell.json.tmpl`</sub> — ported 2026-10-18: rebuilt on this machine's layout in Augustus order, plain tracked file
+- [x] **done** `~/.local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch` <sub>`dot_local/share/omarchy-patches/io.github.codesmith28.omalt-tab-compact.patch`</sub> — ported 2026-10-18: Dimensions.js only (the tests part no longer applies); applied by omarchy-plugin-patches
 
 ## Packages
 
@@ -168,7 +176,7 @@ Rules while porting:
 
 ## ~/.local/bin scripts
 
-- [ ] **port** `~/.local/bin/backdrop-split` <sub>`dot_local/bin/executable_backdrop-split`</sub>
+- [x] **done** `~/.local/bin/backdrop-split` <sub>`dot_local/bin/executable_backdrop-split`</sub> — ported 2026-10-18
 - [ ] **port** `~/.local/bin/chrome-profile` <sub>`dot_local/bin/executable_chrome-profile`</sub>
 - [ ] **port** `~/.local/bin/cline-safety/git` <sub>`dot_local/bin/cline-safety/executable_git`</sub>
 - [ ] **port** `~/.local/bin/cursor` <sub>`dot_local/bin/executable_cursor`</sub>
@@ -303,12 +311,12 @@ Rules while porting:
 None of these copy over directly. Each becomes an idempotent bootstrap step, or is dropped. Read the script at the tag before deciding.
 
 - [ ] **rewrite** `run_after_23-sync-agent-skills.sh.tmpl`
-- [ ] **rewrite** `run_after_34-augustus-backdrop-split.sh.tmpl`
+- [x] **done** `run_after_34-augustus-backdrop-split.sh.tmpl` — replaced by the theme-set and post-boot hooks
 - [ ] **rewrite** `run_after_35-augustus-theme-modes-converge.sh.tmpl`
 - [ ] **rewrite** `run_once_after_24-setup-omarchy-agents.sh.tmpl`
 - [ ] **rewrite** `run_once_before_00-verify-deps.sh.tmpl`
 - [ ] **rewrite** `run_once_before_05-sync-hermes-skills.sh.tmpl`
-- [ ] **rewrite** `run_onchange_after_10-install-omarchy-plugins.sh.tmpl`
+- [x] **done** `run_onchange_after_10-install-omarchy-plugins.sh.tmpl` — replaced by omarchy-plugins.txt + bootstrap + omarchy-plugin-patches
 - [ ] **rewrite** `run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl`
 - [ ] **rewrite** `run_onchange_after_25-sync-omarchy-agents-workspace.sh.tmpl`
 - [ ] **rewrite** `run_onchange_after_26-setup-omarchy-cursor.sh.tmpl`
