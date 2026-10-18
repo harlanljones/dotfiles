@@ -219,13 +219,13 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 - [ ] **rewrite** `~/.local/bin/omarchy-opencode-go-usage-scrape` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_omarchy-opencode-go-usage-scrape.tmpl`</sub>
 - [x] **drop** `~/.local/bin/piper` — dropped: piper not installed, no mise Python
 - [x] **drop** `~/.local/bin/ratbagctl` — dropped: no mise Python on this machine
-- [ ] **rewrite** `~/.local/bin/statusline` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_statusline.tmpl`</sub>
+- [x] **rewrite** `~/.local/bin/statusline` (template → esh `##template.esh` or plain file) <sub>`dot_local/bin/executable_statusline.tmpl`</sub> — ported (2026-10-18)
 - [ ] **drop** `~/.local/bin/wsl-windows-tool` (WSL/Windows only) <sub>`dot_local/bin/executable_wsl-windows-tool`</sub>
 
 ## Claude Code
 
-- [ ] **port** `~/.claude/skills/project-doc-planner` (keep as symlink) <sub>`dot_claude/skills/symlink_project-doc-planner`</sub>
-- [ ] **rewrite** `~/.claude/themes/omarchy.json` (template → esh `##template.esh` or plain file) <sub>`dot_claude/themes/omarchy.json.tmpl`</sub>
+- [x] **skip** `~/.claude/skills/project-doc-planner` (keep as symlink) <sub>`dot_claude/skills/symlink_project-doc-planner`</sub> — skills left to Tern (2026-10-18)
+- [x] **drop** `~/.claude/themes/omarchy.json` (template → esh `##template.esh` or plain file) <sub>`dot_claude/themes/omarchy.json.tmpl`</sub> — Omarchy themes Claude itself (2026-10-18)
 
 ## Codex
 
@@ -233,16 +233,16 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 - [ ] **rewrite** `~/.codex/config.toml` (`modify_` merge → jq/yq step in bootstrap; chmod 600/700 in bootstrap) <sub>`dot_codex/modify_private_config.toml`</sub>
 - [ ] **rewrite** `~/.codex/hooks.json` (template → esh `##template.esh` or plain file) <sub>`dot_codex/hooks.json.tmpl`</sub>
 - [ ] **port** `~/.codex/rules/default.rules` <sub>`dot_codex/rules/default.rules`</sub>
-- [ ] **port** `~/.codex/skills/dots/SKILL.md` <sub>`dot_codex/skills/dots/SKILL.md`</sub>
-- [ ] **port** `~/.codex/skills/frontier-sweep/SKILL.md` <sub>`dot_codex/skills/frontier-sweep/SKILL.md`</sub>
-- [ ] **port** `~/.codex/skills/grilling/SKILL.md` <sub>`dot_codex/skills/grilling/SKILL.md`</sub>
-- [ ] **port** `~/.codex/skills/grilling/agents/openai.yaml` <sub>`dot_codex/skills/grilling/agents/openai.yaml`</sub>
-- [ ] **port** `~/.codex/skills/linear-agent-tracking/SKILL.md` <sub>`dot_codex/skills/linear-agent-tracking/SKILL.md`</sub>
-- [ ] **port** `~/.codex/skills/linear-agent-tracking/agents/openai.yaml` <sub>`dot_codex/skills/linear-agent-tracking/agents/openai.yaml`</sub>
-- [ ] **port** `~/.codex/skills/linear-agent-tracking/references/issue-tracker-linear.md` <sub>`dot_codex/skills/linear-agent-tracking/references/issue-tracker-linear.md`</sub>
-- [ ] **port** `~/.codex/skills/linear-agent-tracking/references/linear-cli.md` <sub>`dot_codex/skills/linear-agent-tracking/references/linear-cli.md`</sub>
-- [ ] **port** `~/.codex/skills/project-doc-planner/SKILL.md` <sub>`dot_codex/skills/project-doc-planner/SKILL.md`</sub>
-- [ ] **port** `~/.codex/skills/project-doc-planner/agents/openai.yaml` <sub>`dot_codex/skills/project-doc-planner/agents/openai.yaml`</sub>
+- [x] **skip** `~/.codex/skills/dots/SKILL.md` <sub>`dot_codex/skills/dots/SKILL.md`</sub> — skills left to Tern (2026-10-18)
+- [x] **skip** `~/.codex/skills/frontier-sweep/SKILL.md` <sub>`dot_codex/skills/frontier-sweep/SKILL.md`</sub> — skills left to Tern (2026-10-18)
+- [x] **skip** `~/.codex/skills/grilling/SKILL.md` <sub>`dot_codex/skills/grilling/SKILL.md`</sub> — skills left to Tern (2026-10-18)
+- [x] **skip** `~/.codex/skills/grilling/agents/openai.yaml` <sub>`dot_codex/skills/grilling/agents/openai.yaml`</sub> — skills left to Tern (2026-10-18)
+- [x] **skip** `~/.codex/skills/linear-agent-tracking/SKILL.md` <sub>`dot_codex/skills/linear-agent-tracking/SKILL.md`</sub> — skills left to Tern (2026-10-18)
+- [x] **skip** `~/.codex/skills/linear-agent-tracking/agents/openai.yaml` <sub>`dot_codex/skills/linear-agent-tracking/agents/openai.yaml`</sub> — skills left to Tern (2026-10-18)
+- [x] **skip** `~/.codex/skills/linear-agent-tracking/references/issue-tracker-linear.md` <sub>`dot_codex/skills/linear-agent-tracking/references/issue-tracker-linear.md`</sub> — skills left to Tern (2026-10-18)
+- [x] **skip** `~/.codex/skills/linear-agent-tracking/references/linear-cli.md` <sub>`dot_codex/skills/linear-agent-tracking/references/linear-cli.md`</sub> — skills left to Tern (2026-10-18)
+- [x] **skip** `~/.codex/skills/project-doc-planner/SKILL.md` <sub>`dot_codex/skills/project-doc-planner/SKILL.md`</sub> — skills left to Tern (2026-10-18)
+- [x] **skip** `~/.codex/skills/project-doc-planner/agents/openai.yaml` <sub>`dot_codex/skills/project-doc-planner/agents/openai.yaml`</sub> — skills left to Tern (2026-10-18)
 - [ ] **rewrite** `~/.codex/themes/dots.tmTheme` (template → esh `##template.esh` or plain file) <sub>`dot_codex/themes/dots.tmTheme.tmpl`</sub>
 
 ## Gemini
@@ -254,9 +254,9 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 - [ ] **port** `~/.gemini/config/hooks.json` <sub>`dot_gemini/config/hooks.json`</sub>
 - [x] **skip** `~/.gemini/config/hooks/herdr-agent-metadata.sh` <sub>`dot_gemini/config/hooks/herdr-agent-metadata.sh`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [ ] **rewrite** `~/.gemini/config/mcp_config.json` (template → esh `##template.esh` or plain file) <sub>`dot_gemini/config/mcp_config.json.tmpl`</sub>
-- [ ] **port** `~/.gemini/config/skills/project-doc-planner` (keep as symlink) <sub>`dot_gemini/config/skills/symlink_project-doc-planner`</sub>
+- [x] **skip** `~/.gemini/config/skills/project-doc-planner` (keep as symlink) <sub>`dot_gemini/config/skills/symlink_project-doc-planner`</sub> — skills left to Tern (2026-10-18)
 - [ ] **rewrite** `~/.gemini/settings.json` (`modify_` merge → jq/yq step in bootstrap; chmod 600/700 in bootstrap) <sub>`dot_gemini/modify_private_settings.json`</sub>
-- [ ] **port** `~/.gemini/skills/project-doc-planner` (keep as symlink) <sub>`dot_gemini/skills/symlink_project-doc-planner`</sub>
+- [x] **skip** `~/.gemini/skills/project-doc-planner` (keep as symlink) <sub>`dot_gemini/skills/symlink_project-doc-planner`</sub> — skills left to Tern (2026-10-18)
 
 ## Grok
 
@@ -276,8 +276,8 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 - [ ] **rewrite** `~/.config/opencode/opencode.json` (encrypted → `secrets.list` + op:// template) <sub>`dot_config/opencode/encrypted_opencode.json.age`</sub>
 - [x] **skip** `~/.config/opencode/plugins/herdr-agent-metadata.js` <sub>`dot_config/opencode/plugins/herdr-agent-metadata.js`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
 - [x] **skip** `~/.config/opencode/plugins/herdr-subagents.js` <sub>`dot_config/opencode/plugins/herdr-subagents.js`</sub> — skipped 2026-10-18: experimenting with Tern as the meta harness
-- [ ] **port** `~/.config/opencode/skills/opencode-go-usage/SKILL.md` <sub>`dot_config/opencode/skills/opencode-go-usage/SKILL.md`</sub>
-- [ ] **port** `~/.config/opencode/skills/project-doc-planner` (keep as symlink) <sub>`dot_config/opencode/skills/symlink_project-doc-planner`</sub>
+- [x] **skip** `~/.config/opencode/skills/opencode-go-usage/SKILL.md` <sub>`dot_config/opencode/skills/opencode-go-usage/SKILL.md`</sub> — skills left to Tern (2026-10-18)
+- [x] **skip** `~/.config/opencode/skills/project-doc-planner` (keep as symlink) <sub>`dot_config/opencode/skills/symlink_project-doc-planner`</sub> — skills left to Tern (2026-10-18)
 - [ ] **rewrite** `~/.config/opencode/themes/dots.json` (template → esh `##template.esh` or plain file) <sub>`dot_config/opencode/themes/dots.json.tmpl`</sub>
 - [ ] **port** `~/.config/opencode/tui.json` <sub>`dot_config/opencode/tui.json`</sub>
 - [ ] **port** `~/.config/opencode/tui.jsonc` <sub>`dot_config/opencode/tui.jsonc`</sub>
@@ -291,15 +291,15 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 ## Cline and Cursor
 
 - [ ] **port** `~/.cline/data/settings/global-settings.json` <sub>`dot_cline/data/settings/global-settings.json`</sub>
-- [ ] **port** `~/.cline/skills/project-doc-planner` (keep as symlink) <sub>`dot_cline/skills/symlink_project-doc-planner`</sub>
+- [x] **skip** `~/.cline/skills/project-doc-planner` (keep as symlink) <sub>`dot_cline/skills/symlink_project-doc-planner`</sub> — skills left to Tern (2026-10-18)
 - [ ] **port** `~/.config/Cursor/User/settings.json` (chmod 600/700 in bootstrap) <sub>`dot_config/private_Cursor/User/settings.json`</sub>
 - [ ] **drop** `~/.local/share/applications/cursor-desktop.desktop` (hardcoded AppImage path) <sub>`dot_local/share/applications/cursor-desktop.desktop`</sub>
 - [ ] **port** `~/Documents/Cline/Workflows/usage.md` <sub>`Documents/Cline/Workflows/usage.md`</sub>
 
 ## Other agent skill links
 
-- [ ] **port** `~/.agents/skills/project-doc-planner` (keep as symlink) <sub>`dot_agents/skills/symlink_project-doc-planner`</sub>
-- [ ] **port** `~/.pi/agent/skills/project-doc-planner` (keep as symlink) <sub>`dot_pi/agent/skills/symlink_project-doc-planner`</sub>
+- [x] **skip** `~/.agents/skills/project-doc-planner` (keep as symlink) <sub>`dot_agents/skills/symlink_project-doc-planner`</sub> — skills left to Tern (2026-10-18)
+- [x] **skip** `~/.pi/agent/skills/project-doc-planner` (keep as symlink) <sub>`dot_pi/agent/skills/symlink_project-doc-planner`</sub> — skills left to Tern (2026-10-18)
 
 ## Other
 
@@ -311,18 +311,18 @@ omafinance, LetsFG, omashift. Not recoverable from the old repo: the
 
 None of these copy over directly. Each becomes an idempotent bootstrap step, or is dropped. Read the script at the tag before deciding.
 
-- [ ] **rewrite** `run_after_23-sync-agent-skills.sh.tmpl`
+- [x] **skip** `run_after_23-sync-agent-skills.sh.tmpl` — skills left to Tern (2026-10-18)
 - [x] **done** `run_after_34-augustus-backdrop-split.sh.tmpl` — replaced by the theme-set and post-boot hooks
 - [ ] **rewrite** `run_after_35-augustus-theme-modes-converge.sh.tmpl`
 - [ ] **rewrite** `run_once_after_24-setup-omarchy-agents.sh.tmpl`
 - [ ] **rewrite** `run_once_before_00-verify-deps.sh.tmpl`
-- [ ] **rewrite** `run_once_before_05-sync-hermes-skills.sh.tmpl`
+- [x] **skip** `run_once_before_05-sync-hermes-skills.sh.tmpl` — skills left to Tern (2026-10-18)
 - [x] **done** `run_onchange_after_10-install-omarchy-plugins.sh.tmpl` — replaced by omarchy-plugins.txt + bootstrap + omarchy-plugin-patches
 - [ ] **rewrite** `run_onchange_after_20-setup-omarchy-antigravity.sh.tmpl`
 - [ ] **rewrite** `run_onchange_after_25-sync-omarchy-agents-workspace.sh.tmpl`
 - [ ] **rewrite** `run_onchange_after_26-setup-omarchy-cursor.sh.tmpl`
-- [ ] **rewrite** `run_onchange_after_27-sync-claude-mcp.sh.tmpl`
-- [ ] **rewrite** `run_onchange_after_28-sync-claude-settings.sh.tmpl`
+- [x] **done** `run_onchange_after_27-sync-claude-mcp.sh.tmpl` — codebase-memory-mcp reinstalled with its own installer (SETUP.md) (2026-10-18)
+- [x] **done** `run_onchange_after_28-sync-claude-settings.sh.tmpl` — status line and plugins ported into the tracked settings.json; git deny rules and dangerous-mode skip not wanted; herdr hooks skipped (2026-10-18)
 - [ ] **rewrite** `run_onchange_after_29-enable-omarchy-user-units.sh.tmpl`
 - [ ] **drop** `run_onchange_after_30-hadrian-macos-defaults.sh.tmpl` (macOS only)
 - [x] **done** `run_onchange_after_31-augustus-mouse-dpi.sh.tmpl` (same desk as Augustus; libratbag is installed) — ported 2026-10-18 as ~/.local/bin/mouse-dpi + bootstrap step
@@ -336,4 +336,4 @@ None of these copy over directly. Each becomes an idempotent bootstrap step, or 
 - [ ] **drop** `run_onchange_after_45-vespasian-desktop-tools.sh.tmpl` (WSL/Windows only)
 - [ ] **drop** `run_onchange_after_46-vespasian-wallpaper.sh.tmpl` (WSL/Windows only)
 - [ ] **drop** `run_onchange_after_47-vespasian-wsl-boot.sh.tmpl` (WSL/Windows only)
-- [ ] **rewrite** `run_onchange_before_09-install-agent-skills.sh.tmpl`
+- [x] **skip** `run_onchange_before_09-install-agent-skills.sh.tmpl` — skills left to Tern (2026-10-18)

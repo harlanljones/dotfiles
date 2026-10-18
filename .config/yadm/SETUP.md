@@ -28,6 +28,17 @@ to this list whenever you set something up by hand.
   `ssh -T git@github.com`.
 
 ## Apps installed outside the package manager
+- **codebase-memory-mcp** (code knowledge graph MCP for Claude): download
+  https://raw.githubusercontent.com/DeusData/codebase-memory-mcp/main/install.sh,
+  read it, then run `bash install.sh --clients=claude`. It installs the binary
+  and its updater (`install.sh`) in `~/.local/bin`, registers the MCP server in
+  `~/.claude.json`, and writes its hooks, subagents and skill under `~/.claude/`;
+  the hook entries in `~/.claude/settings.json` are tracked. It also appends a
+  PATH line to `~/.bashrc`: delete it (Omarchy already puts `~/.local/bin` on PATH).
+- **Claude Code plugins**: `~/.claude/settings.json` (tracked) lists them, but
+  install them with `claude plugin install <name>@claude-plugins-official` and,
+  for impeccable, `claude plugin marketplace add pbakaus/impeccable` then
+  `claude plugin install impeccable@impeccable`.
 - **Tern 0.9.4** (deferred: downloads are invite-only for now). Currently
   extracted under `~/Downloads/Tern-0.9.4-linux-x86_64/` and linked as
   `~/.local/bin/tern`. When it's publicly downloadable, record the source URL
