@@ -7,6 +7,10 @@ to this list whenever you set something up by hand.
 - `omarchy theme set diocletian`
 - `omarchy plymouth set-by-theme diocletian` (boot splash; system-level)
 
+## System services
+- Network printer discovery: `sudo systemctl enable --now cups-browsed`
+  (cups itself is enabled by Omarchy).
+
 ## 1Password
 - Sign in to the desktop app.
 - Settings → Developer → turn on "Use the SSH agent". The tracked
