@@ -8,7 +8,8 @@
 # accepts --dry-run.)
 #
 # Steps: repo config (hooks, excludes) -> Git LFS -> packages -> mise ->
-# secrets from 1Password -> print the manual steps in SETUP.md.
+# Omarchy plugins and their patches -> secrets from 1Password -> print the
+# manual steps in SETUP.md.
 set -euo pipefail
 
 dry_run=0
@@ -107,6 +108,38 @@ install_mise_tools() {
   run mise install
 }
 
+# Clone any plugin in omarchy-plugins.txt that isn't installed. Whether each one
+# is enabled, and where it sits on the bar, comes from the tracked shell.json.
+install_omarchy_plugins() {
+  step "Omarchy shell plugins"
+  if ! command -v omarchy >/dev/null 2>&1; then
+    warn "omarchy not installed; skipping"
+    return
+  fi
+
+  local plugin_dir=${XDG_CONFIG_HOME:-$HOME/.config}/omarchy/plugins
+  local -A installed=()
+  local dir remote url
+  for dir in "$plugin_dir"/*/; do
+    [[ -d $dir/.git ]] || continue
+    remote=$(git -C "$dir" remote get-url origin 2>/dev/null) || continue
+    installed[${remote%.git}]=1
+  done
+
+  # Plugin installs reload the shell, which then answers IPC slowly.
+  export OMARCHY_SHELL_IPC_TIMEOUT=${OMARCHY_SHELL_IPC_TIMEOUT:-30s}
+  while read -r url _; do
+    if [[ -n ${installed[${url%.git}]:-} ]]; then
+      continue
+    fi
+    run omarchy plugin add "$url" --yes || warn "could not add $url"
+  done < <(entries "$yadm_dir/omarchy-plugins.txt")
+
+  if command -v omarchy-plugin-patches >/dev/null 2>&1; then
+    run omarchy-plugin-patches apply || warn "a plugin patch no longer applies; see omarchy-plugin-patches status"
+  fi
+}
+
 # secrets.list: <template><TAB><target>, both relative to $HOME. Templates hold
 # only op://Agents/... references; rendered targets are never tracked.
 provision_secrets() {
@@ -183,6 +216,7 @@ configure_repo
 setup_lfs
 install_packages
 install_mise_tools
+install_omarchy_plugins
 provision_secrets
 
 step "Manual steps (see $yadm_dir/SETUP.md)"

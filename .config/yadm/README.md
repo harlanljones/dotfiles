@@ -52,6 +52,20 @@ with `yadm status` / `yadm diff` before taking the repo's version with
 - **Installs belong somewhere reproducible**: `packages.txt` for packages,
   `~/.config/mise/config.toml` for dev tools, `SETUP.md` for anything manual.
 
+## Omarchy shell plugins
+- `omarchy-plugins.txt` lists the third-party plugins; bootstrap clones any
+  that are missing. `~/.config/omarchy/shell.json` (tracked) decides which are
+  enabled and where they sit on the bar. The clones themselves are not tracked.
+- Local patches live in `~/.local/share/omarchy-patches/` and are applied with
+  `omarchy-plugin-patches apply`. Before `omarchy plugin update`, run
+  `omarchy-plugin-patches revert`, then `apply` again afterward.
+- Enabling many plugins makes the shell slow to answer IPC; if an `omarchy
+  plugin` command says the shell is not responding, retry with
+  `OMARCHY_SHELL_IPC_TIMEOUT=30s`.
+- `backdrop-split` spreads the theme background across the monitors (Backdrop
+  plugin); hooks run it on theme change and at boot. `backdrop-split -i` opens
+  a tile picker.
+
 ## Per-host differences (when a second machine arrives)
 Only one machine uses this repo today. When another host joins:
 - Prefer dispatch inside the file when the tool supports it. For Hyprland:
@@ -71,6 +85,7 @@ Only one machine uses this repo today. When another host joins:
 | `exclude.list` | Paths that must never be committed |
 | `secrets.list`, `secrets/` | 1Password templates rendered by bootstrap |
 | `packages.txt` | Packages added on top of Omarchy |
+| `omarchy-plugins.txt` | Third-party Omarchy shell plugins |
 | `SETUP.md` | Manual steps |
 | `PORTING.md` | Checklist for porting from the old chezmoi repo |
 | `notes/` | Local-only session notes (excluded from the repo) |

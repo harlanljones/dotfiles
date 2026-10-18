@@ -1,0 +1,37 @@
+# Third-party Omarchy shell plugins. bootstrap clones any that are missing
+# with `omarchy plugin add`; which ones are enabled, and where they sit on the
+# bar, comes from the tracked ~/.config/omarchy/shell.json.
+# Plugins run unsandboxed in omarchy-shell: only list repos you trust.
+
+# Desktop and windows
+https://github.com/Codesmith28/omalt-tab.git              # io.github.codesmith28.omalt-tab (compact patch in omarchy-patches/)
+https://github.com/lgse/backdrop.git                      # lgse.backdrop
+https://github.com/harlanljones/omarchy-theme-modes.git   # esemczak.theme-modes (own fork)
+https://github.com/bobby-nicholas/omaland.git             # bobbynicholas.omaland
+https://github.com/anothaDev/omachord.git                 # anothadev.omachord
+
+# Notifications and lock screen
+https://github.com/njpatel/omapager.git                   # njpatel.omapager (replaces omarchy.notifications)
+https://github.com/shmall03/omarchy-shmall.lock-plugin.git # shmall.lock (replaces omarchy.lock)
+https://github.com/rbmrs/omarchy-smart-enter.git          # io.github.rbmrs.smart-enter
+
+# System and tools
+https://github.com/hzerrad/hzerrad.bottleneck.git         # hzerrad.bottleneck
+https://github.com/IM0001GT/omarchy-hw-tooltip.git        # im0001gt.hw-tooltip
+https://github.com/Camstraps/omatree.git                  # io.github.camstraps.omatree
+https://github.com/This-Is-NPC/dockmarchy.git             # io.github.this-is-npc.dockmarchy
+https://github.com/taufderl/omarchy.taufderl.ipinfo.git   # taufderl.ipinfo
+https://github.com/jankeesvw/omarchy-downloads.git        # jankeesvw.downloads
+https://github.com/brianblakely/omarchy-plugins.git       # b.okomart
+https://github.com/fross100/omaplug.git                   # omaplug
+
+# Productivity
+https://github.com/robzolkos/omarchy-github.git           # robzolkos.github
+https://github.com/crmne/omatasks.git                     # crmne.todoist
+https://github.com/tmn73/omarchy-calendar.git             # tmn73.calendar
+https://github.com/Deca/omarchy-from-time-to-time.git     # io.github.deca.from-time-to-time
+https://github.com/mtolhuys/omarchy-news-radar.git        # io.github.mtolhuys.news-radar
+
+# Finance and fun
+https://github.com/maiosx/Runway.git                      # runway.forecast
+https://github.com/cgmccarron/omarchy-sportsbar.git       # sportsbar
