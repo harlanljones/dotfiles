@@ -1,6 +1,7 @@
-{
+{ "workbench.colorTheme": "Retro '82",
     "window.autoDetectColorScheme": true,
     "cursor.composer.queueMessageDefaultBehavior": "steer",
     "cursor.composer.usageSummaryDisplay": "always",
-    "cursor.composer.conversationDensity": "detailed"
+    "cursor.composer.conversationDensity": "detailed",
+    "cursor.composer.queueManualSendBehavior2": "steer"
 }

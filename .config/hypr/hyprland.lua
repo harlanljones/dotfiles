@@ -30,3 +30,9 @@ require("default.hypr.toggles")
 
 -- OOTP 27 (Proton) breaks when the tiler resizes its window at startup; give it the whole monitor.
 o.window("^steam_app_4045750$", { fullscreen = true })
+
+-- >>> omaland managed block >>>
+-- Written by Omaland. Safe to hand-edit: Omaland re-reads this block
+-- every time it opens, and only ever rewrites what's between the fences.
+o.window(".*", { opacity = "1 1" })
+-- <<< omaland managed block <<<

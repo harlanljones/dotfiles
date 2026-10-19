@@ -73,25 +73,6 @@ command = "/home/harlan/.local/bin/codebase-memory-mcp"
 args = []
 env_vars = ["CBM_CACHE_DIR", "CBM_RUNTIME_DIR"]
 # <<< codebase-memory-mcp MCP <<<
-# >>> codebase-memory-mcp SessionStart >>>
-[[hooks.SessionStart]]
-matcher = "startup|resume|clear|compact"
-
-[[hooks.SessionStart.hooks]]
-type = "command"
-command = "'/home/harlan/.local/bin/codebase-memory-mcp' hook-augment"
-command_windows = "& '/home/harlan/.local/bin/codebase-memory-mcp' hook-augment"
-timeout = 5
-
-[[hooks.SubagentStart]]
-matcher = "*"
-
-[[hooks.SubagentStart.hooks]]
-type = "command"
-command = "'/home/harlan/.local/bin/codebase-memory-mcp' hook-augment"
-command_windows = "& '/home/harlan/.local/bin/codebase-memory-mcp' hook-augment"
-timeout = 5
-# <<< codebase-memory-mcp SessionStart <<<
 
 [features]
 hooks = true
@@ -148,3 +129,22 @@ enabled = false
 
 [plugins."impeccable@impeccable"]
 enabled = false
+# >>> codebase-memory-mcp SessionStart >>>
+[[hooks.SessionStart]]
+matcher = "startup|resume|clear|compact"
+
+[[hooks.SessionStart.hooks]]
+type = "command"
+command = "'/home/harlan/.local/bin/codebase-memory-mcp' hook-augment"
+command_windows = "& '/home/harlan/.local/bin/codebase-memory-mcp' hook-augment"
+timeout = 5
+
+[[hooks.SubagentStart]]
+matcher = "*"
+
+[[hooks.SubagentStart.hooks]]
+type = "command"
+command = "'/home/harlan/.local/bin/codebase-memory-mcp' hook-augment"
+command_windows = "& '/home/harlan/.local/bin/codebase-memory-mcp' hook-augment"
+timeout = 5
+# <<< codebase-memory-mcp SessionStart <<<

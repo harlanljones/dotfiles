@@ -76,7 +76,7 @@
           ]
         },
         {
-          "id": "lgse.backdrop"
+          "id": "omarchy.background"
         },
         {
           "id": "crmne.todoist"
@@ -137,22 +137,20 @@
       "id": "bobbynicholas.omaland"
     },
     {
-      "id": "shmall.lock"
-    },
-    {
-      "id": "io.github.rbmrs.smart-enter"
-    },
-    {
       "id": "b.okomart"
+    },
+    {
+      "id": "io.github.sirjul1337.lock-explorer",
+      "tourSeen": true,
+      "openAs": "panel",
+      "design": "login"
     }
   ],
   "disabledPlugins": [
-    "omarchy.background",
-    "omarchy.lock",
-    "omarchy.notifications"
+    "omarchy.notifications",
+    "omarchy.lock"
   ],
   "cloneSourceRestores": [
-    "lgse.backdrop",
-    "shmall.lock"
+    "io.github.sirjul1337.lock-explorer"
   ]
 }

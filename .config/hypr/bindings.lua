@@ -63,3 +63,5 @@ o.bind("SUPER + SHIFT + L", "Omaplug: bobbynicholas.omaland", "omarchy-shell she
 -- Keychron knob: switch between the USB headphones and the LG monitor speakers.
 -- Sink names live in ~/.config/keychron-audio-toggle/sinks (rendered from 1Password).
 o.bind("F13", "Switch headphones and speakers", "keychron-audio-toggle", { locked = true })
+
+dofile(os.getenv("HOME") .. "/src/forge/omarchy/hypr/tern-nav.lua")

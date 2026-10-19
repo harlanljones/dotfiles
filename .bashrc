@@ -18,3 +18,6 @@ for _shell_module in "${XDG_CONFIG_HOME:-$HOME/.config}"/shell/*.sh; do
   [ -r "$_shell_module" ] && source "$_shell_module"
 done
 unset _shell_module
+
+# Added by codebase-memory-mcp install
+export PATH="/home/harlan/.local/bin:$PATH"
